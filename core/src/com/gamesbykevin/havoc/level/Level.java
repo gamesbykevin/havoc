@@ -140,12 +140,16 @@ public class Level {
         //remove any existing decals
         getDecals().clear();
 
-        TextureRegion[] textures = {new TextureRegion(new Texture(Gdx.files.internal("egg.png"))),
+        TextureRegion[] textures = {
+                new TextureRegion(new Texture(Gdx.files.internal("egg.png"))),
                 new TextureRegion(new Texture(Gdx.files.internal("wheel.png"))),
-                new TextureRegion(new Texture(Gdx.files.internal("badlogic.jpg")))};
+                new TextureRegion(new Texture(Gdx.files.internal("badlogic.jpg"))),
+                new TextureRegion(new Texture(Gdx.files.internal("floor.jpg"))),
+                new TextureRegion(new Texture(Gdx.files.internal("ceiling.jpg"))),
+        };
 
-        int w = 1;
-        int h = 1;
+        final int w = 1;
+        final int h = 1;
 
         for (int col = 0; col < getMaze().getCols(); col++) {
             for (int row = 0; row < getMaze().getRows(); row++) {
@@ -189,6 +193,23 @@ public class Level {
                     if (room.hasSouth())
                         addBox(w,h, roomCol, roomRowStart, textures[index]);
                 }
+
+
+                for (int roomRow = roomRowStart; roomRow < roomRowStart + ROOM_SIZE; roomRow++) {
+
+                    for (int roomCol = roomColStart; roomCol < roomColStart + ROOM_SIZE; roomCol++) {
+
+                        Decal floor = Decal.newDecal(w, h, textures[3]);
+                        floor.setPosition(roomCol - ((float) w / 2), roomRow, -.5f);
+                        getDecals().add(floor);
+
+                        Decal ceiling = Decal.newDecal(w, h, textures[4]);
+                        ceiling.setPosition(roomCol - ((float) w / 2), roomRow, .5f);
+                        getDecals().add(ceiling);
+
+                    }
+                }
+
             }
         }
     }
@@ -214,6 +235,7 @@ public class Level {
         s.setPosition(col, row - ((float) h / 2), 0);
         s.rotateX(270);
         getDecals().add(s);
+
     }
 
     private void drawDecals() {
