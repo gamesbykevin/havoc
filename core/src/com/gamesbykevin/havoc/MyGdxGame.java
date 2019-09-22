@@ -2,10 +2,9 @@ package com.gamesbykevin.havoc;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
-import static com.gamesbykevin.havoc.input.MyController.*;
+import com.gamesbykevin.havoc.player.Player;
 
 public class MyGdxGame extends ApplicationAdapter {
 
@@ -13,11 +12,17 @@ public class MyGdxGame extends ApplicationAdapter {
 	public static final int SIZE_WIDTH = 800;
 	public static final int SIZE_HEIGHT = 480;
 
+	//frames per second
+	public static final float FPS = 60f;
+
 	//how we will control the game
 	private MyController controller;
 
 	//our game level
 	private Level level;
+
+	//our hero
+	private Player player;
 
 	@Override
 	public void create () {
@@ -29,7 +34,15 @@ public class MyGdxGame extends ApplicationAdapter {
 		getController();
 	}
 
-	public Level getLevel() {
+    public Player getPlayer() {
+
+	    if (this.player == null)
+	        this.player = new Player(getController());
+
+        return this.player;
+    }
+
+    public Level getLevel() {
 
 		if (this.level == null)
 			this.level = new Level();
@@ -53,11 +66,17 @@ public class MyGdxGame extends ApplicationAdapter {
 		//update controller input
         getController().update();
 
+        //update the player
+        getPlayer().update();
+
         //render the level
         getLevel().render();
 
         //render the controls
         getController().render();
+
+        //render the player
+        getPlayer().render();
 	}
 
 	@Override

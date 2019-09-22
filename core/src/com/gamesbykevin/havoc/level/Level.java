@@ -206,7 +206,6 @@ public class Level {
                         Decal ceiling = Decal.newDecal(w, h, textures[4]);
                         ceiling.setPosition(roomCol - ((float) w / 2), roomRow, .5f);
                         getDecals().add(ceiling);
-
                     }
                 }
 

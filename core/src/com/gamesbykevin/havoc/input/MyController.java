@@ -6,13 +6,12 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.maze.Room;
@@ -23,26 +22,13 @@ import static com.gamesbykevin.havoc.level.Level.ROOM_SIZE;
 
 public class MyController implements InputProcessor {
 
-    public static final int BUTTON_LEFT_X = 20;
-    public static final int BUTTON_LEFT_Y = 20;
-    public static final int BUTTON_LEFT_W = 76;
-    public static final int BUTTON_LEFT_H = 61;
+    //space between the buttons
+    public static final int PADDING = 5;
 
-    public static final int BUTTON_RIGHT_X = 120;
-    public static final int BUTTON_RIGHT_Y = BUTTON_LEFT_Y;
-    public static final int BUTTON_RIGHT_W = 75;
-    public static final int BUTTON_RIGHT_H = 61;
+    public static final float MAX_COORDINATE = 110f;
+    public static final float MIN_COORDINATE = 48f;
 
-    public static final int BUTTON_UP_X = 700;
-    public static final int BUTTON_UP_Y = 120;
-    public static final int BUTTON_UP_W = 61;
-    public static final int BUTTON_UP_H = 76;
-
-    public static final int BUTTON_DOWN_X = BUTTON_UP_X;
-    public static final int BUTTON_DOWN_Y = 20;
-    public static final int BUTTON_DOWN_W = 61;
-    public static final int BUTTON_DOWN_H = 75;
-
+    //how fast can we move
     public static final float SPEED_WALK = .1f;
     public static final float SPEED_RUN = .25f;
 
@@ -78,8 +64,11 @@ public class MyController implements InputProcessor {
     public static final int KEY_MOVE_RUNNING = Input.Keys.SHIFT_LEFT;
     public static final int KEY_STRAFE_LEFT = Input.Keys.A;
     public static final int KEY_STRAFE_RIGHT = Input.Keys.D;
-    public static final int KEY_TURN_LEFT = Input.Keys.R;
-    public static final int KEY_TURN_RIGHT = Input.Keys.T;
+    public static final int KEY_TURN_LEFT = Input.Keys.LEFT;
+    public static final int KEY_TURN_RIGHT = Input.Keys.RIGHT;
+    public static final int KEY_SHOOT = Input.Keys.ENTER;
+    public static final int KEY_ACTION = Input.Keys.SPACE;
+    public static final int KEY_CHANGE = Input.Keys.NUM_1;
 
     //what are we doing?
     private boolean moveForward = false;
@@ -89,24 +78,84 @@ public class MyController implements InputProcessor {
     private boolean turnRight = false;
     private boolean turnLeft = false;
     private boolean running = false;
-
-    //images for our controls
-    private Sprite up, down, left, right;
-
-    //used to render a number of sprites
-    private SpriteBatch spriteBatch;
+    private boolean shooting = false;
+    private boolean action = false;
+    private boolean change = false;
 
     //camera to render controls
     private OrthographicCamera camera2d;
 
     public MyController(Level level) {
+
+        //reference our level for collision detection
         this.level = level;
+
+        //track previous position in maze
         this.previousPosition = new Vector3();
 
-        addButton(BUTTON_RIGHT_X, BUTTON_RIGHT_Y, BUTTON_RIGHT_W, BUTTON_RIGHT_H, KEY_TURN_RIGHT, KEY_TURN_LEFT);
-        addButton(BUTTON_LEFT_X, BUTTON_LEFT_Y, BUTTON_LEFT_W, BUTTON_LEFT_H, KEY_TURN_LEFT, KEY_TURN_RIGHT);
-        addButton(BUTTON_UP_X, BUTTON_UP_Y, BUTTON_UP_W, BUTTON_UP_H, KEY_MOVE_FORWARD, KEY_MOVE_BACKWARD);
-        addButton(BUTTON_DOWN_X, BUTTON_DOWN_Y, BUTTON_DOWN_W, BUTTON_DOWN_H, KEY_MOVE_BACKWARD, KEY_MOVE_FORWARD);
+        Table tablePad = new Table();
+        tablePad.setFillParent(true);
+        tablePad.left().bottom().pad(PADDING);
+
+        Image pad = new Image(new Texture(Gdx.files.internal("controls/pad.png")));
+        pad.addListener(new InputListener(){
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                checkPad(x, y, true);
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                checkPad(x, y, false);
+                super.touchUp(event, x, y, pointer, button);
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                checkPad(x, y, true);
+                super.touchDragged(event, x, y, pointer);
+            }
+        });
+
+        tablePad.add(pad).row();
+
+        getStage().addActor(tablePad);
+
+        Table tableButtons = new Table();
+        tableButtons.setFillParent(true);
+        tableButtons.right().bottom().pad(PADDING);
+
+        Image change = new Image(new Texture(Gdx.files.internal("controls/change.png")));
+        change.addListener(new InputListener() {
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                setChange(true);
+                super.touchUp(event, x, y, pointer, button);
+            }
+        });
+
+        addListener(change, KEY_CHANGE, KEY_SHOOT);
+        Image shoot = new Image(new Texture(Gdx.files.internal("controls/shoot.png")));
+        addListener(shoot, KEY_SHOOT, KEY_ACTION);
+        Image tmpAction = new Image(new Texture(Gdx.files.internal("controls/action.png")));
+        addListener(tmpAction, KEY_ACTION, KEY_SHOOT);
+        Image strafeL = new Image(new Texture(Gdx.files.internal("controls/left.png")));
+        addListener(strafeL, KEY_TURN_LEFT, KEY_TURN_RIGHT);
+        Image strafeR = new Image(new Texture(Gdx.files.internal("controls/right.png")));
+        addListener(strafeR, KEY_TURN_RIGHT, KEY_TURN_LEFT);
+
+        tableButtons.add();
+        tableButtons.add(change).pad(PADDING);
+        tableButtons.row();
+        tableButtons.add(tmpAction).pad(PADDING);
+        tableButtons.add(shoot).pad(PADDING);
+        tableButtons.row();
+        tableButtons.add(strafeL).pad(PADDING);
+        tableButtons.add(strafeR).pad(PADDING);
+
+        getStage().addActor(tableButtons);
 
         //make sure we are capturing input correct
         setInput();
@@ -114,32 +163,38 @@ public class MyController implements InputProcessor {
         //how fast can we turn?
         setSpeedRotate(DEFAULT_SPEED_ROTATE);
 
-        //our texture images
-        Texture tmpUp = new Texture(Gdx.files.internal("controls/up.png"));
-        Texture tmpDown = new Texture(Gdx.files.internal("controls/down.png"));
-        Texture tmpLeft = new Texture(Gdx.files.internal("controls/left.png"));
-        Texture tmpRight = new Texture(Gdx.files.internal("controls/right.png"));
-
-        //create our sprites
-        this.up = new Sprite(tmpUp, 0, 0, tmpUp.getWidth(), tmpUp.getHeight());
-        this.down = new Sprite(tmpDown, 0, 0, tmpDown.getWidth(), tmpDown.getHeight());
-        this.left = new Sprite(tmpLeft, 0, 0, tmpLeft.getWidth(), tmpLeft.getHeight());
-        this.right = new Sprite(tmpRight, 0, 0, tmpRight.getWidth(), tmpRight.getHeight());
-
         //create our camera
         getCamera2d();
     }
 
-    public Level getLevel() {
-        return this.level;
+    private void checkPad(float x, float y, boolean flag) {
+
+        if (y >= MIN_COORDINATE && y <= MAX_COORDINATE) {
+            if (x <= MIN_COORDINATE) {
+                updateFlag(KEY_STRAFE_LEFT, flag);
+                updateFlag(KEY_STRAFE_RIGHT, false);
+            }
+            if (x >= MAX_COORDINATE) {
+                updateFlag(KEY_STRAFE_RIGHT, flag);
+                updateFlag(KEY_STRAFE_LEFT, false);
+            }
+        }
+
+        if (x >= MIN_COORDINATE && x <= MAX_COORDINATE) {
+
+            if (y <= MIN_COORDINATE) {
+                updateFlag(KEY_MOVE_BACKWARD, flag);
+                updateFlag(KEY_MOVE_FORWARD, false);
+            }
+            if (y >= MAX_COORDINATE) {
+                updateFlag(KEY_MOVE_FORWARD, flag);
+                updateFlag(KEY_MOVE_BACKWARD, false);
+            }
+        }
     }
 
-    public SpriteBatch getSpriteBatch() {
-
-        if (this.spriteBatch == null)
-            this.spriteBatch = new SpriteBatch();
-
-        return this.spriteBatch;
+    public Level getLevel() {
+        return this.level;
     }
 
     public OrthographicCamera getCamera2d() {
@@ -171,12 +226,8 @@ public class MyController implements InputProcessor {
         */
     }
 
-    private void addButton(int x, int y, int w, int h, int keyEnable, int keyDisable) {
+    private void addListener(Image img, int keyEnable, int keyDisable) {
 
-        Image img = new Image();
-        img.setPosition(x, y);
-        img.setSize(w, h);
-        img.setBounds(x, y, w, h);
         img.addListener(new InputListener() {
 
             @Override
@@ -200,9 +251,6 @@ public class MyController implements InputProcessor {
                 super.touchDragged(event, x, y, pointer);
             }
         });
-
-        //add to the stage
-        getStage().addActor(img);
     }
 
     public void update() {
@@ -413,6 +461,18 @@ public class MyController implements InputProcessor {
             case KEY_TURN_RIGHT:
                 setTurnRight(flag);
                 break;
+
+            case KEY_ACTION:
+                setAction(flag);
+                break;
+
+            case KEY_SHOOT:
+                setShooting(flag);
+                break;
+
+            case KEY_CHANGE:
+                setChange(flag);
+                break;
         }
     }
 
@@ -480,6 +540,30 @@ public class MyController implements InputProcessor {
         this.turnLeft = turnLeft;
     }
 
+    public boolean isShooting() {
+        return this.shooting;
+    }
+
+    public void setShooting(boolean shooting) {
+        this.shooting = shooting;
+    }
+
+    public boolean isAction() {
+        return this.action;
+    }
+
+    public void setAction(boolean action) {
+        this.action = action;
+    }
+
+    public boolean isChange() {
+        return this.change;
+    }
+
+    public void setChange(boolean change) {
+        this.change = change;
+    }
+
     public Stage getStage() {
 
         if (this.stage == null)
@@ -494,13 +578,9 @@ public class MyController implements InputProcessor {
         getCamera2d().update();
 
         //set the screen projection coordinates
-        getSpriteBatch().setProjectionMatrix(getCamera2d().combined);
+        getStage().getBatch().setProjectionMatrix(getCamera2d().combined);
 
-        getSpriteBatch().begin();
-        getSpriteBatch().draw(left, BUTTON_LEFT_X, BUTTON_LEFT_Y, BUTTON_LEFT_W, BUTTON_LEFT_H);
-        getSpriteBatch().draw(right, BUTTON_RIGHT_X, BUTTON_RIGHT_Y, BUTTON_RIGHT_W, BUTTON_RIGHT_H);
-        getSpriteBatch().draw(up, BUTTON_UP_X, BUTTON_UP_Y, BUTTON_UP_W, BUTTON_UP_H);
-        getSpriteBatch().draw(down, BUTTON_DOWN_X, BUTTON_DOWN_Y, BUTTON_DOWN_W, BUTTON_DOWN_H);
-        getSpriteBatch().end();
+        //draw the buttons on the stage
+        getStage().draw();
     }
 }
