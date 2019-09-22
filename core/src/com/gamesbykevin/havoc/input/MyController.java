@@ -129,14 +129,29 @@ public class MyController implements InputProcessor {
 
         Image change = new Image(new Texture(Gdx.files.internal("controls/change.png")));
         change.addListener(new InputListener() {
+
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 setChange(true);
+                updateFlag(KEY_SHOOT, false);
                 super.touchUp(event, x, y, pointer, button);
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                setChange(false);
+                updateFlag(KEY_SHOOT, false);
+                return true;
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                setChange(false);
+                updateFlag(KEY_SHOOT, false);
+                super.touchDragged(event, x, y, pointer);
             }
         });
 
-        addListener(change, KEY_CHANGE, KEY_SHOOT);
         Image shoot = new Image(new Texture(Gdx.files.internal("controls/shoot.png")));
         addListener(shoot, KEY_SHOOT, KEY_ACTION);
         Image tmpAction = new Image(new Texture(Gdx.files.internal("controls/action.png")));

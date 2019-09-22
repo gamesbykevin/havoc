@@ -1,12 +1,8 @@
 package com.gamesbykevin.havoc.player;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.gamesbykevin.havoc.animation.SpriteAnimation;
 import com.gamesbykevin.havoc.input.MyController;
-
-import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
-import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
 
 public class Player {
 
@@ -87,7 +83,7 @@ public class Player {
                 setWeaponIndex(0);
 
             getController().setChange(false);
-
+            getAnimation().reset();
         } else {
 
             if (getController().isShooting()) {
