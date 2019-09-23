@@ -23,8 +23,14 @@ public class Level {
     public static final int ROOM_SIZE = 5;
 
     //how big is our maze
-    public static final int MAZE_COLS = 5;
-    public static final int MAZE_ROWS = 5;
+    public static final int MAZE_COLS = 3;
+    public static final int MAZE_ROWS = 3;
+
+    //how many tiles can we choose from for the floor ceiling?
+    public static final int TILES_FLOOR_CEILING = 27;
+
+    //how many tiles can we choose from for the walls
+    public static final int TILES_WALL = 168;
 
     //our randomly created maze
     private Maze maze;
@@ -135,18 +141,21 @@ public class Level {
         createDecals();
     }
 
+    private TextureRegion getRandomFloorCeiling() {
+        return new TextureRegion(new Texture(Gdx.files.internal("floor_ceiling/tile" + (Maze.getRandom().nextInt(TILES_FLOOR_CEILING) + 1) + ".bmp")));
+    }
+
+    private TextureRegion getRandomWall() {
+        return new TextureRegion(new Texture(Gdx.files.internal("walls/tile (" + (Maze.getRandom().nextInt(TILES_WALL) + 1) + ").bmp")));
+    }
+
     private void createDecals() {
 
         //remove any existing decals
         getDecals().clear();
 
-        TextureRegion[] textures = {
-                new TextureRegion(new Texture(Gdx.files.internal("egg.png"))),
-                new TextureRegion(new Texture(Gdx.files.internal("wheel.png"))),
-                new TextureRegion(new Texture(Gdx.files.internal("badlogic.jpg"))),
-                new TextureRegion(new Texture(Gdx.files.internal("floor.jpg"))),
-                new TextureRegion(new Texture(Gdx.files.internal("ceiling.jpg"))),
-        };
+        TextureRegion textureRegionCeiling = getRandomFloorCeiling();
+        TextureRegion textureRegionFloor = getRandomFloorCeiling();
 
         final int w = 1;
         final int h = 1;
@@ -154,56 +163,44 @@ public class Level {
         for (int col = 0; col < getMaze().getCols(); col++) {
             for (int row = 0; row < getMaze().getRows(); row++) {
 
-                //if (col != 0 || row != 0)
-                //   continue;
-
                 Room room = getMaze().getRoom(col, row);
-
-                Room east = getMaze().getRoom(col + 1, row);
-                Room north = getMaze().getRoom(col, row + 1);
-
-                int index = 1;
-
-                if (col == getMaze().getStartCol() && row == getMaze().getStartRow())
-                    index = 0;
-                if (col == getMaze().getGoalCol() && row == getMaze().getGoalRow())
-                    index = 2;
 
                 int roomColStart = ROOM_SIZE * col;
                 int roomRowStart = ROOM_SIZE * row;
+
+                TextureRegion wall = getRandomWall();
 
                 for (int roomRow = roomRowStart; roomRow < roomRowStart + ROOM_SIZE; roomRow++) {
 
                     //west wall
                     if (room.hasWest())
-                        addBox(w,h, roomColStart, roomRow, textures[index]);
+                        addBox(w,h, roomColStart, roomRow, wall);
 
-                    //east wall
-                    if (room.hasEast() && (east == null || !east.hasWest()))
-                        addBox(w,h, roomColStart + (ROOM_SIZE-1), roomRow, textures[index]);
+                    //if the last column we need to add walls
+                    if (col >= getMaze().getCols() - 1)
+                        addBox(w,h, roomColStart + (ROOM_SIZE), roomRow, wall);
                 }
 
                 for (int roomCol = roomColStart; roomCol < roomColStart + ROOM_SIZE; roomCol++) {
 
-                    //north wall
-                    if (room.hasNorth() && (north == null || !north.hasSouth()))
-                        addBox(w,h, roomCol, roomRowStart + (ROOM_SIZE-1), textures[index]);
+                    //if the last row we need to add walls
+                    if (row >= getMaze().getRows() - 1)
+                        addBox(w,h, roomCol, roomRowStart + (ROOM_SIZE), wall);
 
                     //south wall
                     if (room.hasSouth())
-                        addBox(w,h, roomCol, roomRowStart, textures[index]);
+                        addBox(w,h, roomCol, roomRowStart, wall);
                 }
 
+                for (int roomRow = roomRowStart; roomRow <= roomRowStart + ROOM_SIZE; roomRow++) {
 
-                for (int roomRow = roomRowStart; roomRow < roomRowStart + ROOM_SIZE; roomRow++) {
+                    for (int roomCol = roomColStart; roomCol <= roomColStart + ROOM_SIZE; roomCol++) {
 
-                    for (int roomCol = roomColStart; roomCol < roomColStart + ROOM_SIZE; roomCol++) {
-
-                        Decal floor = Decal.newDecal(w, h, textures[3]);
+                        Decal floor = Decal.newDecal(w, h, textureRegionFloor);
                         floor.setPosition(roomCol - ((float) w / 2), roomRow, -.5f);
                         getDecals().add(floor);
 
-                        Decal ceiling = Decal.newDecal(w, h, textures[4]);
+                        Decal ceiling = Decal.newDecal(w, h, textureRegionCeiling);
                         ceiling.setPosition(roomCol - ((float) w / 2), roomRow, .5f);
                         getDecals().add(ceiling);
                     }

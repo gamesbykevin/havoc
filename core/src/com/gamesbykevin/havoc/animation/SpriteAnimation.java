@@ -27,6 +27,10 @@ public class SpriteAnimation {
     private boolean loop = false;
 
     public SpriteAnimation(final String path, final String filename, final String extension, final int count) {
+        this(path, filename, extension, count, FRAME_DURATION_DEFAULT);
+    }
+
+    public SpriteAnimation(final String path, final String filename, final String extension, final int count, final float duration) {
 
         //create our array of images
         this.images = new Texture[count];
@@ -39,7 +43,7 @@ public class SpriteAnimation {
         setIndex(0);
         setLoop(false);
         setElapsed(0);
-        setFrameDuration(FRAME_DURATION_DEFAULT);
+        setFrameDuration(duration);
     }
 
     public int getIndex() {

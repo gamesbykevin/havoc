@@ -20,7 +20,7 @@ public abstract class Maze implements IMaze {
     private boolean generated = false;
 
     //object used to make random decisions
-    private Random random;
+    private static Random RANDOM;
 
     //different directions
     public static final int DIRECTION_NONE = 0;
@@ -46,12 +46,12 @@ public abstract class Maze implements IMaze {
         }
     }
 
-    public Random getRandom() {
+    public static Random getRandom() {
 
-        if (this.random == null)
-            this.random = new Random();
+        if (RANDOM == null)
+            RANDOM = new Random();
 
-        return this.random;
+        return RANDOM;
     }
 
     public boolean isGenerated() {

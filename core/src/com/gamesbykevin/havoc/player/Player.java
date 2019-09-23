@@ -4,10 +4,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gamesbykevin.havoc.animation.SpriteAnimation;
 import com.gamesbykevin.havoc.input.MyController;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Player {
 
     //animations for our weapons
-    private SpriteAnimation[] animations;
+    private List<SpriteAnimation> animations;
 
     //used to render images fast
     private SpriteBatch spriteBatch;
@@ -48,25 +51,24 @@ public class Player {
         //store reference to controller
         this.controller = controller;
 
-        this.animations = new SpriteAnimation[11];
-        this.animations[0] = new SpriteAnimation(WEAPONS_DIR + "assault_rifle/", "assault_rifle_f", ".png", 29);
-        this.animations[1] = new SpriteAnimation(WEAPONS_DIR + "auto45/", "auto45_f", ".png", 6);
-        this.animations[2] = new SpriteAnimation(WEAPONS_DIR + "buzzsaw_cannon/", "buzzsaw_cannon_f", ".png", 20);
-        this.animations[3] = new SpriteAnimation(WEAPONS_DIR + "glock_handgun/", "glock_handgun_f", ".png", 10);
-        this.animations[4] = new SpriteAnimation(WEAPONS_DIR + "hunter_handgun/", "hunter_handgun_f", ".png", 7);
-        this.animations[5] = new SpriteAnimation(WEAPONS_DIR + "impact_cannon/", "impact_cannon_f", ".png", 14);
-        this.animations[6] = new SpriteAnimation(WEAPONS_DIR + "magnum/", "magnum_f", ".png", 15);
-        this.animations[7] = new SpriteAnimation(WEAPONS_DIR + "rifle/", "rifle_f", ".png", 58);
-        this.animations[8] = new SpriteAnimation(WEAPONS_DIR + "shotgun/", "shotgun_f", ".png", 19);
-        this.animations[9] = new SpriteAnimation(WEAPONS_DIR + "smg/", "smg_f", ".png", 11);
-        this.animations[10] = new SpriteAnimation(WEAPONS_DIR + "thermic_lance/", "thermic_lance_f", ".png", 20);
+        //getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "assault_rifle/", "assault_rifle_f", ".png", 30));
+        //getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "auto45/", "auto45_f", ".png", 6));
+        getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "buzzsaw_cannon/", "buzzsaw_cannon_f", ".png", 20));
+        getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "glock_handgun/", "glock_handgun_f", ".png", 10));
+        //getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "hunter_handgun/", "hunter_handgun_f", ".png", 7));
+        getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "impact_cannon/", "impact_cannon_f", ".png", 14));
+        getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "magnum/", "magnum_f", ".png", 15));
+        //getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "rifle/", "rifle_f", ".png", 58, 5));
+        getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "shotgun/", "shotgun_f", ".png", 19));
+        getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "smg/", "smg_f", ".png", 11, 10));
+        getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "thermic_lance/", "thermic_lance_f", ".png", 20));
 
-        for (int i = 0; i < this.animations.length; i++) {
-            this.animations[i].setLoop(true);
-            this.animations[i].setFrameDuration(FRAME_DURATION);
+        for (int i = 0; i < getAnimations().size(); i++) {
+            getAnimations().get(i).setLoop(true);
+            getAnimations().get(i).setFrameDuration(FRAME_DURATION);
         }
 
-        setWeaponIndex((int)(Math.random() * this.animations.length));
+        setWeaponIndex((int)(Math.random() * getAnimations().size()));
     }
 
     public MyController getController() {
@@ -79,7 +81,7 @@ public class Player {
 
             setWeaponIndex(getWeaponIndex() + 1);
 
-            if (getWeaponIndex() >= this.animations.length)
+            if (getWeaponIndex() >= getAnimations().size())
                 setWeaponIndex(0);
 
             getController().setChange(false);
@@ -148,8 +150,16 @@ public class Player {
         return this.weaponIndex;
     }
 
+    private List<SpriteAnimation> getAnimations() {
+
+        if (this.animations == null)
+            this.animations = new ArrayList<>();
+
+        return this.animations;
+    }
+
     public SpriteAnimation getAnimation() {
-        return this.animations[getWeaponIndex()];
+        return getAnimations().get(getWeaponIndex());
     }
 
     public SpriteBatch getSpriteBatch() {

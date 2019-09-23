@@ -344,16 +344,31 @@ public class MyController implements InputProcessor {
         }
 
         if (checkCollision()) {
+
+            //move back to previous position
             getCamera3d().position.x = getPreviousPosition().x;
             getCamera3d().position.y = getPreviousPosition().y;
             getCamera3d().position.z = getPreviousPosition().z;
+
+            //stop moving as well
+            setMoveForward(false);
+            setMoveBackward(false);
+            setStrafeLeft(false);
+            setStrafeRight(false);
         }
     }
 
     private boolean checkCollision() {
 
+        //where are we currently located
         final float x = getCamera3d().position.x;
         final float y = getCamera3d().position.y;
+
+        //player can't leave the maze
+        if (x < 1 || y < 1)
+            return true;
+        if (x >= ROOM_SIZE * getLevel().getMaze().getCols() || y >= ROOM_SIZE * getLevel().getMaze().getRows())
+            return true;
 
         //figure out which room we are in
         int col = (int)(x / ROOM_SIZE);
@@ -365,6 +380,7 @@ public class MyController implements InputProcessor {
         //get the current room
         Room room = getLevel().getMaze().getRoom(col, row);
 
+        //if room not found we have collision
         if (room == null)
             return true;
 

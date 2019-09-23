@@ -6,6 +6,8 @@ import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.player.Player;
 
+import java.util.Random;
+
 public class MyGdxGame extends ApplicationAdapter {
 
 	//size of our window
