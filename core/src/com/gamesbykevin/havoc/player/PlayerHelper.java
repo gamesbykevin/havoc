@@ -167,6 +167,9 @@ public class PlayerHelper {
 
                 boolean match = false;
 
+                if (decal.getCol() == (int)(roomCol) && decal.getRow() == (int)(roomRow))
+                    match = true;
+
                 if (decal.getCol() == (int)(roomCol) && decal.getRow() == (int)(roomRow - DOOR_DISTANCE))
                     match = true;
 

@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.decals.DecalMaterial;
 
+import static com.gamesbykevin.havoc.level.LevelHelper.DOOR_DEPTH;
+
 public abstract class DecalCustom {
 
     //size of a block
@@ -108,6 +110,25 @@ public abstract class DecalCustom {
         }
 
         decalSetup(door.getDecal(), col, row, side);
+
+        switch (door.getSide()) {
+            case West:
+                door.getDecal().getPosition().x += DOOR_DEPTH;
+                break;
+
+            case East:
+                door.getDecal().getPosition().x -= DOOR_DEPTH;
+                break;
+
+            case South:
+                door.getDecal().getPosition().y += DOOR_DEPTH;
+                break;
+
+            case North:
+                door.getDecal().getPosition().y -= DOOR_DEPTH;
+                break;
+        }
+
         return door;
     }
 

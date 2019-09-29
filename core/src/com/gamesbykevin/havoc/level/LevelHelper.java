@@ -14,7 +14,7 @@ import static com.gamesbykevin.havoc.decals.DecalCustom.*;
 public class LevelHelper {
 
     //how big is each room
-    public static final int ROOM_SIZE = 5;
+    public static final int ROOM_SIZE = 7;
 
     //how many tiles can we choose from for the floor ceiling?
     public static final int TILES_FLOOR_CEILING = 27;
@@ -23,7 +23,7 @@ public class LevelHelper {
     public static final int TILES_WALL = 152;
 
     //how deep is the door placed
-    public static final float DOOR_DEPTH = .25f;
+    public static final float DOOR_DEPTH = .5f;
 
     //how to access the door
     public static final String PATH_DOOR = "door/door.bmp";
@@ -131,8 +131,8 @@ public class LevelHelper {
                     for (int roomCol = roomColStart; roomCol < roomColStart + ROOM_SIZE; roomCol++) {
 
                         if (roomCol == middle) {
-                            addWall(level, Side.North, Type.Door, door, roomCol, roomRowStart - DOOR_DEPTH);
-                            addWall(level, Side.South, Type.Door, door, roomCol, roomRowStart + DOOR_DEPTH);
+                            addWall(level, Side.North, Type.Door, door, roomCol, roomRowStart);
+                            addWall(level, Side.South, Type.Door, door, roomCol, roomRowStart);
                         } else if (roomCol == middle - 1 || roomCol == middle + 1) {
                             addWall(level, Side.North, Type.Wall, wall, roomCol, roomRowStart);
                             addWall(level, Side.South, Type.Wall, wall, roomCol, roomRowStart);
@@ -157,8 +157,8 @@ public class LevelHelper {
                     for (int roomRow = roomRowStart; roomRow < roomRowStart + ROOM_SIZE; roomRow++) {
 
                         if (roomRow == middle) {
-                            addWall(level, Side.West, Type.Door, door, roomColStart + DOOR_DEPTH, roomRow);
-                            addWall(level, Side.East, Type.Door, door, roomColStart - DOOR_DEPTH, roomRow);
+                            addWall(level, Side.West, Type.Door, door, roomColStart, roomRow);
+                            addWall(level, Side.East, Type.Door, door, roomColStart, roomRow);
                         } else if (roomRow == middle - 1 || roomRow == middle + 1) {
                             addWall(level, Side.West, Type.Wall, wall, roomColStart, roomRow);
                             addWall(level, Side.East, Type.Wall, wall, roomColStart, roomRow);
