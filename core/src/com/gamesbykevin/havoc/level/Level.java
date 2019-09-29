@@ -2,35 +2,27 @@ package com.gamesbykevin.havoc.level;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
-import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.gamesbykevin.havoc.decals.DecalCustom;
+import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.maze.Maze;
-import com.gamesbykevin.havoc.maze.Room;
 import com.gamesbykevin.havoc.maze.algorithm.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import static com.gamesbykevin.havoc.level.LevelHelper.ROOM_SIZE;
+import static com.gamesbykevin.havoc.level.LevelHelper.createDecals;
 import static com.gamesbykevin.havoc.maze.MazeHelper.calculateCost;
 import static com.gamesbykevin.havoc.maze.MazeHelper.locateGoal;
 
 public class Level {
 
-    //how big is each room
-    public static final int ROOM_SIZE = 5;
-
     //how big is our maze
     public static final int MAZE_COLS = 3;
     public static final int MAZE_ROWS = 3;
-
-    //how many tiles can we choose from for the floor ceiling?
-    public static final int TILES_FLOOR_CEILING = 27;
-
-    //how many tiles can we choose from for the walls
-    public static final int TILES_WALL = 168;
 
     //our randomly created maze
     private Maze maze;
@@ -42,14 +34,23 @@ public class Level {
     private DecalBatch decalBatch;
 
     //this is where we will contain our walls
-    private ArrayList<Decal> decals;
+    private List<DecalCustom> wallDecals;
+
+    //contains our doors
+    private List<DecalCustom> doorDecals;
+
+    //contains our backgrounds
+    private List<DecalCustom> backgroundDecals;
+
+    //for collision detection
+    private DecalCustom.Type[][] bounds;
 
     public Level() {
 
         //set our start of the level
         getCamera3d().near = .1f;
         getCamera3d().far = 300f;
-        getCamera3d().position.set(2,2,0);
+        getCamera3d().position.set((ROOM_SIZE / 2),(ROOM_SIZE / 2),0);
         getCamera3d().position.z = 0;
         getCamera3d().rotate(Vector3.X, 90);
 
@@ -61,7 +62,7 @@ public class Level {
         return this.maze;
     }
 
-    public DecalBatch getDecalBatch() {
+    private DecalBatch getDecalBatch() {
 
         if (this.decalBatch == null)
             this.decalBatch = new DecalBatch(new CameraGroupStrategy(getCamera3d()));
@@ -69,12 +70,32 @@ public class Level {
         return this.decalBatch;
     }
 
-    public ArrayList<Decal> getDecals() {
+    public List<DecalCustom> getWallDecals() {
 
-        if (this.decals == null)
-            this.decals = new ArrayList<>();
+        if (this.wallDecals == null)
+            this.wallDecals = new ArrayList<>();
 
-        return this.decals;
+        return this.wallDecals;
+    }
+
+    public List<DecalCustom> getBackgroundDecals() {
+
+        if (this.backgroundDecals == null)
+            this.backgroundDecals = new ArrayList<>();
+
+        return backgroundDecals;
+    }
+
+    public List<DecalCustom> getDoorDecals() {
+
+        if (this.doorDecals == null)
+            this.doorDecals = new ArrayList<>();
+
+        return doorDecals;
+    }
+
+    public DecalCustom.Type[][] getBounds() {
+        return this.bounds;
     }
 
     public PerspectiveCamera getCamera3d() {
@@ -137,130 +158,70 @@ public class Level {
         //locate the goal
         locateGoal(getMaze());
 
-        //create our decals
-        createDecals();
-    }
+        //create the array of bounds
+        this.bounds = new DecalCustom.Type[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
 
-    private TextureRegion getRandomFloorCeiling() {
-        return new TextureRegion(new Texture(Gdx.files.internal("floor_ceiling/tile" + (Maze.getRandom().nextInt(TILES_FLOOR_CEILING) + 1) + ".bmp")));
-    }
-
-    private TextureRegion getRandomWall() {
-        return new TextureRegion(new Texture(Gdx.files.internal("walls/tile (" + (Maze.getRandom().nextInt(TILES_WALL) + 1) + ").bmp")));
-    }
-
-    private void createDecals() {
-
-        //remove any existing decals
-        getDecals().clear();
-
-        TextureRegion textureRegionCeiling = getRandomFloorCeiling();
-        TextureRegion textureRegionFloor = getRandomFloorCeiling();
-
-        final int w = 1;
-        final int h = 1;
-
-        for (int col = 0; col < getMaze().getCols(); col++) {
-            for (int row = 0; row < getMaze().getRows(); row++) {
-
-                Room room = getMaze().getRoom(col, row);
-
-                int roomColStart = ROOM_SIZE * col;
-                int roomRowStart = ROOM_SIZE * row;
-
-                TextureRegion wall = getRandomWall();
-
-                for (int roomRow = roomRowStart; roomRow < roomRowStart + ROOM_SIZE; roomRow++) {
-
-                    //west wall
-                    if (room.hasWest())
-                        addBox(w,h, roomColStart, roomRow, wall);
-
-                    //if the last column we need to add walls
-                    if (col >= getMaze().getCols() - 1)
-                        addBox(w,h, roomColStart + (ROOM_SIZE), roomRow, wall);
-                }
-
-                for (int roomCol = roomColStart; roomCol < roomColStart + ROOM_SIZE; roomCol++) {
-
-                    //if the last row we need to add walls
-                    if (row >= getMaze().getRows() - 1)
-                        addBox(w,h, roomCol, roomRowStart + (ROOM_SIZE), wall);
-
-                    //south wall
-                    if (room.hasSouth())
-                        addBox(w,h, roomCol, roomRowStart, wall);
-                }
-
-                for (int roomRow = roomRowStart; roomRow <= roomRowStart + ROOM_SIZE; roomRow++) {
-
-                    for (int roomCol = roomColStart; roomCol <= roomColStart + ROOM_SIZE; roomCol++) {
-
-                        Decal floor = Decal.newDecal(w, h, textureRegionFloor);
-                        floor.setPosition(roomCol - ((float) w / 2), roomRow, -.5f);
-                        getDecals().add(floor);
-
-                        Decal ceiling = Decal.newDecal(w, h, textureRegionCeiling);
-                        ceiling.setPosition(roomCol - ((float) w / 2), roomRow, .5f);
-                        getDecals().add(ceiling);
-                    }
-                }
-
-            }
-        }
-    }
-
-    private void addBox(int w, int h, int col, int row, TextureRegion texture) {
-
-        Decal west = Decal.newDecal(w, h, texture);
-        west.setPosition(col - ((float) w / 2), row, 0);
-        west.rotateY(90);
-        getDecals().add(west);
-
-        Decal e = Decal.newDecal(w, h, texture);
-        e.setPosition(col + ((float) w / 2), row, 0);
-        e.rotateY(270);
-        getDecals().add(e);
-
-        Decal n = Decal.newDecal(w, h, texture);
-        n.setPosition(col, row + ((float) h / 2), 0);
-        n.rotateX(90);
-        getDecals().add(n);
-
-        Decal s = Decal.newDecal(w, h, texture);
-        s.setPosition(col, row - ((float) h / 2), 0);
-        s.rotateX(270);
-        getDecals().add(s);
-
+        //add the decals and boundaries for our maze
+        createDecals(this);
     }
 
     private void drawDecals() {
 
-        //billboard will have the decal always facing the camera
-        boolean billboard = false;
+        for (int i = 0; i < getWallDecals().size(); i++) {
 
-        for (int i = 0; i < getDecals().size(); i++) {
-            Decal decal = getDecals().get(i);
+            DecalCustom decal = getWallDecals().get(i);
 
-            if (billboard) {
-                // billboarding for ortho cam :)
-                // dir.set(-camera.direction.x, -camera.direction.y, -camera.direction.z);
-                // decal.setRotation(dir, Vector3.Y);
+            if (decal.isBillboard())
+                decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
 
-                // billboarding for perspective cam
-                decal.lookAt(getCamera3d().position, getCamera3d().up);
-            }
+            getDecalBatch().add(decal.getDecal());
+        }
 
-            getDecalBatch().add(decal);
+        for (int i = 0; i < getDoorDecals().size(); i++) {
+
+            DecalCustom decal = getDoorDecals().get(i);
+
+            if (decal.isBillboard())
+                decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
+
+            getDecalBatch().add(decal.getDecal());
+        }
+
+        for (int i = 0; i < getBackgroundDecals().size(); i++) {
+
+            DecalCustom decal = getBackgroundDecals().get(i);
+
+            if (decal.isBillboard())
+                decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
+
+            getDecalBatch().add(decal.getDecal());
         }
 
         getDecalBatch().flush();
+    }
+
+    private void updateDecals() {
+
+        for (int i = 0; i < getWallDecals().size(); i++) {
+            getWallDecals().get(i).update();
+        }
+
+        for (int i = 0; i < getDoorDecals().size(); i++) {
+            getDoorDecals().get(i).update();
+        }
+
+        for (int i = 0; i < getBackgroundDecals().size(); i++) {
+            getBackgroundDecals().get(i).update();
+        }
     }
 
     public void render() {
 
         //update the camera
         getCamera3d().update();
+
+        //update our decals
+        updateDecals();
 
         //draw our 3d walls
         drawDecals();

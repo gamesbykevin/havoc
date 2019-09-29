@@ -14,11 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.gamesbykevin.havoc.level.Level;
-import com.gamesbykevin.havoc.maze.Room;
 
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
-import static com.gamesbykevin.havoc.level.Level.ROOM_SIZE;
 
 public class MyController implements InputProcessor {
 
@@ -54,9 +52,9 @@ public class MyController implements InputProcessor {
     private Stage stage;
 
     //move camera up/down while we are walking/running
-    private static final float MIN_Z = 0f;
-    private static final float MAX_Z = .25f;
-    private static float VELOCITY_Z = 0.01f;
+    public static final float MIN_Z = 0f;
+    public static final float MAX_Z = .25f;
+    public static float VELOCITY_Z = 0.01f;
 
     //different control inputs
     public static final int KEY_MOVE_FORWARD = Input.Keys.W;
@@ -92,6 +90,8 @@ public class MyController implements InputProcessor {
 
         //track previous position in maze
         this.previousPosition = new Vector3();
+        getPreviousPosition().x = getCamera3d().position.x;
+        getPreviousPosition().y = getCamera3d().position.y;
 
         Table tablePad = new Table();
         tablePad.setFillParent(true);
@@ -154,8 +154,17 @@ public class MyController implements InputProcessor {
 
         Image shoot = new Image(new Texture(Gdx.files.internal("controls/shoot.png")));
         addListener(shoot, KEY_SHOOT, KEY_ACTION);
+
         Image tmpAction = new Image(new Texture(Gdx.files.internal("controls/action.png")));
-        addListener(tmpAction, KEY_ACTION, KEY_SHOOT);
+        tmpAction.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                setAction(true);
+                return true;
+            }
+        });
+
+        //addListener(tmpAction, KEY_ACTION, KEY_SHOOT);
         Image strafeL = new Image(new Texture(Gdx.files.internal("controls/left.png")));
         addListener(strafeL, KEY_TURN_LEFT, KEY_TURN_RIGHT);
         Image strafeR = new Image(new Texture(Gdx.files.internal("controls/right.png")));
@@ -225,9 +234,8 @@ public class MyController implements InputProcessor {
 
     public void setInput() {
 
-        Gdx.input.setInputProcessor(getStage());
+        //Gdx.input.setInputProcessor(getStage());
 
-        /*
         switch (Gdx.app.getType()) {
             case Android:
             case iOS:
@@ -238,7 +246,6 @@ public class MyController implements InputProcessor {
                 Gdx.input.setInputProcessor(this);
                 break;
         }
-        */
     }
 
     private void addListener(Image img, int keyEnable, int keyDisable) {
@@ -266,134 +273,6 @@ public class MyController implements InputProcessor {
                 super.touchDragged(event, x, y, pointer);
             }
         });
-    }
-
-    public void update() {
-
-        int xMove = 0;
-        int yMove = 0;
-
-        if (isRunning()) {
-            setSpeed(SPEED_RUN);
-        } else {
-            setSpeed(SPEED_WALK);
-        }
-
-        if (isMoveForward())
-            yMove++;
-        if (isMoveBackward())
-            yMove--;
-
-        if (isStrafeLeft())
-            xMove--;
-        if (isStrafeRight())
-            xMove++;
-
-        float rotationA = 0;
-
-        if (isTurnLeft()) {
-            rotationA = getSpeedRotate();
-        } else if (isTurnRight()) {
-            rotationA = -getSpeedRotate();
-        }
-
-        double angle = Math.toRadians(getRotation());
-
-        //calculate distance moved
-        double xa = (xMove * Math.cos(angle)) - (yMove * Math.sin(angle));
-        xa *= getSpeed();
-
-        double ya = (yMove * Math.cos(angle)) + (xMove * Math.sin(angle));
-        ya *= getSpeed();
-
-        //store previous position
-        if (xMove != 0 || yMove != 0) {
-            getPreviousPosition().x = getCamera3d().position.x;
-            getPreviousPosition().y = getCamera3d().position.y;
-            getPreviousPosition().z = getCamera3d().position.z;
-        }
-
-        //update camera location?
-        getCamera3d().position.x += xa;
-        getCamera3d().position.y += ya;
-        getCamera3d().rotate(Vector3.Z, rotationA);
-
-        if (isMoveForward() || isMoveBackward()) {
-
-            getCamera3d().position.z += VELOCITY_Z;
-
-            if (getCamera3d().position.z <= MIN_Z) {
-                getCamera3d().position.z = MIN_Z;
-                VELOCITY_Z = -VELOCITY_Z;
-            } else if (getCamera3d().position.z >= MAX_Z) {
-                getCamera3d().position.z = MAX_Z;
-                VELOCITY_Z = -VELOCITY_Z;
-            }
-        }
-
-        if (rotationA != 0) {
-
-            //add rotation angle to overall rotation
-            setRotation(getRotation() + rotationA);
-
-            //keep radian value from getting to large/small
-            if (getRotation() > 360)
-                setRotation(0);
-            if (getRotation() < 0)
-                setRotation(360);
-        }
-
-        if (checkCollision()) {
-
-            //move back to previous position
-            getCamera3d().position.x = getPreviousPosition().x;
-            getCamera3d().position.y = getPreviousPosition().y;
-            getCamera3d().position.z = getPreviousPosition().z;
-
-            //stop moving as well
-            setMoveForward(false);
-            setMoveBackward(false);
-            setStrafeLeft(false);
-            setStrafeRight(false);
-        }
-    }
-
-    private boolean checkCollision() {
-
-        //where are we currently located
-        final float x = getCamera3d().position.x;
-        final float y = getCamera3d().position.y;
-
-        //player can't leave the maze
-        if (x < 1 || y < 1)
-            return true;
-        if (x >= ROOM_SIZE * getLevel().getMaze().getCols() || y >= ROOM_SIZE * getLevel().getMaze().getRows())
-            return true;
-
-        //figure out which room we are in
-        int col = (int)(x / ROOM_SIZE);
-        int row = (int)(y / ROOM_SIZE);
-
-        int roomCol = col * ROOM_SIZE;
-        int roomRow = row * ROOM_SIZE;
-
-        //get the current room
-        Room room = getLevel().getMaze().getRoom(col, row);
-
-        //if room not found we have collision
-        if (room == null)
-            return true;
-
-        if (room.hasWest() && x < roomCol + 1)
-            return true;
-        if (room.hasEast() && x > roomCol + ROOM_SIZE - 1)
-            return true;
-        if (room.hasNorth() && y > roomRow + ROOM_SIZE - 1)
-            return true;
-        if (room.hasSouth() && y < roomRow + 1)
-            return true;
-
-        return false;
     }
 
     public float getRotation() {

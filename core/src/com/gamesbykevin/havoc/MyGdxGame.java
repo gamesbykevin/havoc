@@ -6,8 +6,6 @@ import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.player.Player;
 
-import java.util.Random;
-
 public class MyGdxGame extends ApplicationAdapter {
 
 	//size of our window
@@ -16,6 +14,11 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	//frames per second
 	public static final float FPS = 60f;
+
+	/**
+	 * How long is 1 frame in milliseconds
+	 */
+	public static final float FRAME_MS = (1000f / FPS);
 
 	//how we will control the game
 	private MyController controller;
@@ -65,8 +68,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
-		//update controller input
-        getController().update();
+		final long time = System.currentTimeMillis();
 
         //update the player
         getPlayer().update();
@@ -79,6 +81,19 @@ public class MyGdxGame extends ApplicationAdapter {
 
         //render the player
         getPlayer().render();
+
+        final long elapsed = System.currentTimeMillis() - time;
+
+        try {
+        	//maintain steady game speed
+			if (elapsed > FRAME_MS) {
+				Thread.sleep(1);
+			} else {
+				Thread.sleep((long)(FRAME_MS - elapsed));
+			}
+		} catch (Exception e) {
+        	e.printStackTrace();
+		}
 	}
 
 	@Override
