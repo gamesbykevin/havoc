@@ -111,7 +111,7 @@ public class PlayerHelper {
             case Door:
 
                 //if we hit a door, let's see if it is open
-                Door door = (Door)level.getDoorDecal((int)col, (int)row);
+                Door door = level.getDoorDecals()[(int)row][(int)col];
 
                 if (door.isOpen()) {
 
@@ -180,37 +180,42 @@ public class PlayerHelper {
             float roomCol = (col * ROOM_SIZE);
             float roomRow = (row * ROOM_SIZE);
 
-            for (int i = 0; i < player.getController().getLevel().getDoorDecals().size(); i++) {
+            boolean match = false;
 
-                //get the door
-                Door decal = (Door)player.getController().getLevel().getDoorDecals().get(i);
+            Door door = null;
 
-                boolean match = false;
+            if (!match && player.getController().getLevel().getDoorDecals()[(int)(roomRow)][(int)(roomCol)] != null) {
+                door = player.getController().getLevel().getDoorDecals()[(int)(roomRow)][(int)(roomCol)];
+                match = true;
+            }
 
-                if (!match && decal.getCol() == (int)(roomCol) && decal.getRow() == (int)(roomRow))
-                    match = true;
+            if (!match && player.getController().getLevel().getDoorDecals()[(int)(roomRow - DOOR_DISTANCE)][(int)(roomCol)] != null) {
+                door = player.getController().getLevel().getDoorDecals()[(int)(roomRow - DOOR_DISTANCE)][(int)(roomCol)];
+                match = true;
+            }
 
-                if (!match && decal.getCol() == (int)(roomCol) && decal.getRow() == (int)(roomRow - DOOR_DISTANCE))
-                    match = true;
+            if (!match && player.getController().getLevel().getDoorDecals()[(int)(roomRow + DOOR_DISTANCE)][(int)(roomCol)] != null) {
+                door = player.getController().getLevel().getDoorDecals()[(int)(roomRow + DOOR_DISTANCE)][(int)(roomCol)];
+                match = true;
+            }
 
-                if (!match && decal.getCol() == (int)(roomCol) && decal.getRow() == (int)(roomRow + DOOR_DISTANCE))
-                    match = true;
+            if (!match && player.getController().getLevel().getDoorDecals()[(int)(roomRow)][(int)(roomCol - DOOR_DISTANCE)] != null) {
+                door = player.getController().getLevel().getDoorDecals()[(int)(roomRow)][(int)(roomCol - DOOR_DISTANCE)];
+                match = true;
+            }
+            if (!match && player.getController().getLevel().getDoorDecals()[(int)(roomRow)][(int)(roomCol + DOOR_DISTANCE)] != null) {
+                door = player.getController().getLevel().getDoorDecals()[(int)(roomRow)][(int)(roomCol + DOOR_DISTANCE)];
+                match = true;
+            }
 
-                if (!match && decal.getCol() == (int)(roomCol - DOOR_DISTANCE) && decal.getRow() == (int)(roomRow))
-                    match = true;
+            //flag the door to open
+            if (match) {
 
-                if (!match && decal.getCol() == (int)(roomCol + DOOR_DISTANCE) && decal.getRow() == (int)(roomRow))
-                    match = true;
-
-                //flag the door to open
-                if (match) {
-
-                    //we can only open the door if it's closed
-                    if (decal.isClosed()) {
-                        decal.setClosed(false);
-                        decal.setOpening(true);
-                        decal.setLapsed(0);
-                    }
+                //we can only open the door if it's closed
+                if (door.isClosed()) {
+                    door.setClosed(false);
+                    door.setOpening(true);
+                    door.setLapsed(0);
                 }
             }
 

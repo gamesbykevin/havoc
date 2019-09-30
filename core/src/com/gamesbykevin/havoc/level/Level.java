@@ -37,7 +37,7 @@ public class Level {
     private List<DecalCustom> wallDecals;
 
     //contains our doors
-    private List<DecalCustom> doorDecals;
+    private Door[][] doorDecals;
 
     //contains our backgrounds
     private List<DecalCustom> backgroundDecals;
@@ -49,7 +49,7 @@ public class Level {
 
         //set our start of the level
         getCamera3d().near = .1f;
-        getCamera3d().far = 300f;
+        getCamera3d().far = 50f;
         getCamera3d().position.set((ROOM_SIZE / 2),(ROOM_SIZE / 2),0);
         getCamera3d().position.z = 0;
         getCamera3d().rotate(Vector3.X, 90);
@@ -86,24 +86,12 @@ public class Level {
         return backgroundDecals;
     }
 
-    public List<DecalCustom> getDoorDecals() {
+    public Door[][] getDoorDecals() {
 
         if (this.doorDecals == null)
-            this.doorDecals = new ArrayList<>();
+            this.doorDecals = new Door[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
 
         return doorDecals;
-    }
-
-    public DecalCustom getDoorDecal(int col, int row) {
-
-        for (int i = 0; i < getDoorDecals().size(); i++) {
-            DecalCustom decal = getDoorDecals().get(i);
-
-            if (decal.getCol() == col && decal.getRow() == row)
-                return decal;
-        }
-
-        return null;
     }
 
     public DecalCustom.Type[][] getBounds() {
@@ -189,14 +177,19 @@ public class Level {
             getDecalBatch().add(decal.getDecal());
         }
 
-        for (int i = 0; i < getDoorDecals().size(); i++) {
+        for (int col = 0; col < getDoorDecals()[0].length; col++) {
+            for (int row = 0; row < getDoorDecals().length; row++) {
 
-            DecalCustom decal = getDoorDecals().get(i);
+                DecalCustom decal = getDoorDecals()[row][col];
 
-            if (decal.isBillboard())
-                decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
+                if (decal == null)
+                    continue;
 
-            getDecalBatch().add(decal.getDecal());
+                if (decal.isBillboard())
+                    decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
+
+                getDecalBatch().add(decal.getDecal());
+            }
         }
 
         for (int i = 0; i < getBackgroundDecals().size(); i++) {
@@ -215,8 +208,16 @@ public class Level {
 
     private void updateDecals() {
 
-        for (int i = 0; i < getDoorDecals().size(); i++) {
-            getDoorDecals().get(i).update();
+        for (int col = 0; col < getDoorDecals()[0].length; col++) {
+            for (int row = 0; row < getDoorDecals().length; row++) {
+
+                DecalCustom decal = getDoorDecals()[row][col];
+
+                if (decal == null)
+                    continue;
+
+                decal.update();
+            }
         }
     }
 

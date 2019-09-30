@@ -191,7 +191,7 @@ public class LevelHelper {
                 break;
 
             case Door:
-                level.getDoorDecals().add(DecalCustom.createDecalDoor(col, row, textureRegion, side));
+                level.getDoorDecals()[(int)row][(int)col] = DecalCustom.createDecalDoor(col, row, textureRegion, side);
                 break;
         }
     }
