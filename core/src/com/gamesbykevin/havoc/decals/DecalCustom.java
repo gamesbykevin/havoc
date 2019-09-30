@@ -99,13 +99,13 @@ public abstract class DecalCustom {
             case West:
             case East:
                 door.setStart(row + (WALL_HEIGHT / 2));
-                door.setDestination(row - 1);
+                door.setDestination(row - (WALL_HEIGHT / 2));
                 break;
 
             case South:
             case North:
                 door.setStart(col + (WALL_WIDTH / 2));
-                door.setDestination(col - 1);
+                door.setDestination(col - (WALL_WIDTH / 2));
                 break;
         }
 

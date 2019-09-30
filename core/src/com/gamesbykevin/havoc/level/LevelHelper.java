@@ -132,7 +132,7 @@ public class LevelHelper {
 
                         if (roomCol == middle) {
                             addWall(level, Side.North, Type.Door, door, roomCol, roomRowStart);
-                            addWall(level, Side.South, Type.Door, door, roomCol, roomRowStart);
+                            //addWall(level, Side.South, Type.Door, door, roomCol, roomRowStart);
                         } else if (roomCol == middle - 1 || roomCol == middle + 1) {
                             addWall(level, Side.North, Type.Wall, wall, roomCol, roomRowStart);
                             addWall(level, Side.South, Type.Wall, wall, roomCol, roomRowStart);
@@ -158,7 +158,7 @@ public class LevelHelper {
 
                         if (roomRow == middle) {
                             addWall(level, Side.West, Type.Door, door, roomColStart, roomRow);
-                            addWall(level, Side.East, Type.Door, door, roomColStart, roomRow);
+                            //addWall(level, Side.East, Type.Door, door, roomColStart, roomRow);
                         } else if (roomRow == middle - 1 || roomRow == middle + 1) {
                             addWall(level, Side.West, Type.Wall, wall, roomColStart, roomRow);
                             addWall(level, Side.East, Type.Wall, wall, roomColStart, roomRow);

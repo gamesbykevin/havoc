@@ -29,7 +29,7 @@ public class Door extends DecalCustom {
     private float lapsed;
 
     //how long does the door stay open
-    private static final float DOOR_OPEN_TIME = 2000f;
+    private static final float DOOR_OPEN_TIME = 2500f;
 
     public Door(TextureRegion texture, Side side) {
         super(texture, Type.Door, side);
@@ -76,8 +76,9 @@ public class Door extends DecalCustom {
                     getDecal().translate(0, -DOOR_VELOCITY, 0);
 
                     //door is open all the way now
-                    if (getDecal().getPosition().y <= getDestination()) {
+                    if (getDecal().getPosition().y < getDestination()) {
                         getDecal().getPosition().y = getDestination();
+                        setLapsed(0);
                         setOpening(false);
                         setOpen(true);
                     }
@@ -90,8 +91,9 @@ public class Door extends DecalCustom {
                     getDecal().translate(-DOOR_VELOCITY, 0, 0);
 
                     //door is open all the way now
-                    if (getDecal().getPosition().x <= getDestination()) {
+                    if (getDecal().getPosition().x < getDestination()) {
                         getDecal().getPosition().x = getDestination();
+                        setLapsed(0);
                         setOpening(false);
                         setOpen(true);
                     }

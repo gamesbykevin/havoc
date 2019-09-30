@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.input.MyController;
+import com.gamesbykevin.havoc.level.Level;
 
 import static com.gamesbykevin.havoc.input.MyController.*;
 import static com.gamesbykevin.havoc.input.MyController.VELOCITY_Z;
@@ -100,12 +101,31 @@ public class PlayerHelper {
             controller.getCamera3d().position.x = controller.getPreviousPosition().x;
     }
 
-    private static boolean checkBounds(DecalCustom.Type[][] bounds, float row, float col) {
+    private static boolean checkBounds(Level level, float row, float col) {
 
-        switch (bounds[(int)row][(int)col]) {
+        switch (level.getBounds()[(int)row][(int)col]) {
+
             case Wall:
-            //case Door:
                 return true;
+
+            case Door:
+
+                //if we hit a door, let's see if it is open
+                Door door = (Door)level.getDoorDecal((int)col, (int)row);
+
+                if (door.isOpen()) {
+
+                    //reset the timer
+                    door.setLapsed(0);
+
+                    //no collision
+                    return false;
+
+                } else {
+
+                    //we have collision
+                    return true;
+                }
 
             default:
                 return false;
@@ -126,20 +146,20 @@ public class PlayerHelper {
         float roomCol = (col * ROOM_SIZE);
         float roomRow = (row * ROOM_SIZE);
 
-        if (checkBounds(controller.getLevel().getBounds(), roomRow, roomCol))
+        if (checkBounds(controller.getLevel(), roomRow, roomCol))
             return true;
 
         if (yDiff != 0) {
-            if (checkBounds(controller.getLevel().getBounds(), roomRow + WALL_DISTANCE, roomCol))
+            if (checkBounds(controller.getLevel(), roomRow + WALL_DISTANCE, roomCol))
                 return true;
-            if (checkBounds(controller.getLevel().getBounds(), roomRow - WALL_DISTANCE, roomCol))
+            if (checkBounds(controller.getLevel(), roomRow - WALL_DISTANCE, roomCol))
                 return true;
         }
 
         if (xDiff != 0) {
-            if (checkBounds(controller.getLevel().getBounds(), roomRow, roomCol + WALL_DISTANCE))
+            if (checkBounds(controller.getLevel(), roomRow, roomCol + WALL_DISTANCE))
                 return true;
-            if (checkBounds(controller.getLevel().getBounds(), roomRow, roomCol - WALL_DISTANCE))
+            if (checkBounds(controller.getLevel(), roomRow, roomCol - WALL_DISTANCE))
                 return true;
         }
 
@@ -167,19 +187,19 @@ public class PlayerHelper {
 
                 boolean match = false;
 
-                if (decal.getCol() == (int)(roomCol) && decal.getRow() == (int)(roomRow))
+                if (!match && decal.getCol() == (int)(roomCol) && decal.getRow() == (int)(roomRow))
                     match = true;
 
-                if (decal.getCol() == (int)(roomCol) && decal.getRow() == (int)(roomRow - DOOR_DISTANCE))
+                if (!match && decal.getCol() == (int)(roomCol) && decal.getRow() == (int)(roomRow - DOOR_DISTANCE))
                     match = true;
 
-                if (decal.getCol() == (int)(roomCol) && decal.getRow() == (int)(roomRow + DOOR_DISTANCE))
+                if (!match && decal.getCol() == (int)(roomCol) && decal.getRow() == (int)(roomRow + DOOR_DISTANCE))
                     match = true;
 
-                if (decal.getCol() == (int)(roomCol - DOOR_DISTANCE) && decal.getRow() == (int)(roomRow))
+                if (!match && decal.getCol() == (int)(roomCol - DOOR_DISTANCE) && decal.getRow() == (int)(roomRow))
                     match = true;
 
-                if (decal.getCol() == (int)(roomCol + DOOR_DISTANCE) && decal.getRow() == (int)(roomRow))
+                if (!match && decal.getCol() == (int)(roomCol + DOOR_DISTANCE) && decal.getRow() == (int)(roomRow))
                     match = true;
 
                 //flag the door to open

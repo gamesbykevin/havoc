@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.decals.DecalCustom;
+import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.algorithm.*;
 
@@ -91,6 +92,18 @@ public class Level {
             this.doorDecals = new ArrayList<>();
 
         return doorDecals;
+    }
+
+    public DecalCustom getDoorDecal(int col, int row) {
+
+        for (int i = 0; i < getDoorDecals().size(); i++) {
+            DecalCustom decal = getDoorDecals().get(i);
+
+            if (decal.getCol() == col && decal.getRow() == row)
+                return decal;
+        }
+
+        return null;
     }
 
     public DecalCustom.Type[][] getBounds() {
@@ -196,21 +209,14 @@ public class Level {
             getDecalBatch().add(decal.getDecal());
         }
 
+        //call flush at the end to draw
         getDecalBatch().flush();
     }
 
     private void updateDecals() {
 
-        for (int i = 0; i < getWallDecals().size(); i++) {
-            getWallDecals().get(i).update();
-        }
-
         for (int i = 0; i < getDoorDecals().size(); i++) {
             getDoorDecals().get(i).update();
-        }
-
-        for (int i = 0; i < getBackgroundDecals().size(); i++) {
-            getBackgroundDecals().get(i).update();
         }
     }
 
