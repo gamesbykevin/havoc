@@ -159,12 +159,16 @@ public class MyController implements InputProcessor {
         tmpAction.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                setAction(true);
                 return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                setAction(true);
+                super.touchUp(event, x, y, pointer, button);
             }
         });
 
-        //addListener(tmpAction, KEY_ACTION, KEY_SHOOT);
         Image strafeL = new Image(new Texture(Gdx.files.internal("controls/left.png")));
         addListener(strafeL, KEY_TURN_LEFT, KEY_TURN_RIGHT);
         Image strafeR = new Image(new Texture(Gdx.files.internal("controls/right.png")));
@@ -373,7 +377,7 @@ public class MyController implements InputProcessor {
                 break;
 
             case KEY_ACTION:
-                setAction(flag);
+                setAction(!flag);
                 break;
 
             case KEY_SHOOT:

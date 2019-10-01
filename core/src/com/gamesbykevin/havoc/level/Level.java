@@ -33,17 +33,20 @@ public class Level {
     //needed to render multiple decals
     private DecalBatch decalBatch;
 
-    //this is where we will contain our walls
-    private List<DecalCustom> wallDecals;
+    //this is where we will contain our wall / floor / ceiling
+    private List<DecalCustom> decals;
+
+    //for collision detection
+    private boolean[][] walls;
 
     //contains our doors
     private Door[][] doorDecals;
 
-    //contains our backgrounds
-    private List<DecalCustom> backgroundDecals;
-
     //for collision detection
-    private DecalCustom.Type[][] bounds;
+    private boolean[][] doors;
+
+    //which doors are open
+    private boolean[][] doorsOpen;
 
     public Level() {
 
@@ -70,20 +73,12 @@ public class Level {
         return this.decalBatch;
     }
 
-    public List<DecalCustom> getWallDecals() {
+    public List<DecalCustom> getDecals() {
 
-        if (this.wallDecals == null)
-            this.wallDecals = new ArrayList<>();
+        if (this.decals == null)
+            this.decals = new ArrayList<>();
 
-        return this.wallDecals;
-    }
-
-    public List<DecalCustom> getBackgroundDecals() {
-
-        if (this.backgroundDecals == null)
-            this.backgroundDecals = new ArrayList<>();
-
-        return backgroundDecals;
+        return this.decals;
     }
 
     public Door[][] getDoorDecals() {
@@ -94,8 +89,16 @@ public class Level {
         return doorDecals;
     }
 
-    public DecalCustom.Type[][] getBounds() {
-        return this.bounds;
+    public boolean[][] getWalls() {
+        return this.walls;
+    }
+
+    public boolean[][] getDoors() {
+        return this.doors;
+    }
+
+    public boolean[][] getDoorsOpen() {
+        return this.doorsOpen;
     }
 
     public PerspectiveCamera getCamera3d() {
@@ -158,8 +161,19 @@ public class Level {
         //locate the goal
         locateGoal(getMaze());
 
-        //create the array of bounds
-        this.bounds = new DecalCustom.Type[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
+        //create the arrays for our collision detection
+        this.walls = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
+        this.doors = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
+        this.doorsOpen = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
+
+        //default to false
+        for (int row = 0 ; row < getWalls().length; row++) {
+            for (int col = 0; col < getWalls()[0].length; col++) {
+                getWalls()[row][col] = false;
+                getDoors()[row][col] = false;
+                getDoorsOpen()[row][col] = false;
+            }
+        }
 
         //add the decals and boundaries for our maze
         createDecals(this);
@@ -167,9 +181,9 @@ public class Level {
 
     private void drawDecals() {
 
-        for (int i = 0; i < getWallDecals().size(); i++) {
+        for (int i = 0; i < getDecals().size(); i++) {
 
-            DecalCustom decal = getWallDecals().get(i);
+            DecalCustom decal = getDecals().get(i);
 
             if (decal.isBillboard())
                 decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
@@ -192,16 +206,6 @@ public class Level {
             }
         }
 
-        for (int i = 0; i < getBackgroundDecals().size(); i++) {
-
-            DecalCustom decal = getBackgroundDecals().get(i);
-
-            if (decal.isBillboard())
-                decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
-
-            getDecalBatch().add(decal.getDecal());
-        }
-
         //call flush at the end to draw
         getDecalBatch().flush();
     }
@@ -211,12 +215,16 @@ public class Level {
         for (int col = 0; col < getDoorDecals()[0].length; col++) {
             for (int row = 0; row < getDoorDecals().length; row++) {
 
-                DecalCustom decal = getDoorDecals()[row][col];
+                Door door = getDoorDecals()[row][col];
 
-                if (decal == null)
+                if (door == null)
                     continue;
 
-                decal.update();
+                //update the door
+                door.update();
+
+                //flag if the door is open
+                getDoorsOpen()[row][col] = door.isOpen();
             }
         }
     }

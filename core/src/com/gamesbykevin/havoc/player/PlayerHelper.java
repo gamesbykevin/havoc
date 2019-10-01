@@ -94,42 +94,39 @@ public class PlayerHelper {
                 controller.setRotation(360);
         }
 
-        //reset position if there is a collision
-        if (checkCollision(controller, controller.getPreviousPosition().x, controller.getCamera3d().position.y))
-            controller.getCamera3d().position.y = controller.getPreviousPosition().y;
-        if (checkCollision(controller, controller.getCamera3d().position.x, controller.getPreviousPosition().y))
-            controller.getCamera3d().position.x = controller.getPreviousPosition().x;
+        //check collision if we are moving
+        if (xMove != 0 || yMove != 0) {
+
+            //reset position if there is a collision
+            if (checkCollision(controller, controller.getPreviousPosition().x, controller.getCamera3d().position.y))
+                controller.getCamera3d().position.y = controller.getPreviousPosition().y;
+            if (checkCollision(controller, controller.getCamera3d().position.x, controller.getPreviousPosition().y))
+                controller.getCamera3d().position.x = controller.getPreviousPosition().x;
+        }
     }
 
     private static boolean checkBounds(Level level, float row, float col) {
+        return checkBounds(level, (int)row, (int)col);
+    }
 
-        switch (level.getBounds()[(int)row][(int)col]) {
+    private static boolean checkBounds(Level level, int row, int col) {
 
-            case Wall:
+        //if true we hit a wall
+        if (level.getWalls()[row][col])
+            return true;
+
+        //is there a door here
+        if (level.getDoors()[row][col]) {
+
+            //door isn't open
+            if (!level.getDoorsOpen()[row][col]) {
                 return true;
-
-            case Door:
-
-                //if we hit a door, let's see if it is open
-                Door door = level.getDoorDecals()[(int)row][(int)col];
-
-                if (door.isOpen()) {
-
-                    //reset the timer
-                    door.setLapsed(0);
-
-                    //no collision
-                    return false;
-
-                } else {
-
-                    //we have collision
-                    return true;
-                }
-
-            default:
-                return false;
+            } else {
+                level.getDoorDecals()[row][col].setLapsed(0);
+            }
         }
+
+        return false;
     }
 
     private static boolean checkCollision(MyController controller, final float x, final float y) {

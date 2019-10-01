@@ -2,9 +2,9 @@ package com.gamesbykevin.havoc.decals;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
-import com.badlogic.gdx.graphics.g3d.decals.DecalMaterial;
 
 import static com.gamesbykevin.havoc.level.LevelHelper.DOOR_DEPTH;
+import static com.gamesbykevin.havoc.level.LevelHelper.SECRET_DEPTH;
 
 public abstract class DecalCustom {
 
@@ -90,7 +90,7 @@ public abstract class DecalCustom {
         return wall;
     }
 
-    public static Door createDecalDoor(float col, float row, TextureRegion texture, Side side) {
+    public static Door createDecalDoor(float col, float row, TextureRegion texture, Side side, boolean secret) {
         Door door = new Door(texture, side);
         door.setCol((int)col);
         door.setRow((int)row);
@@ -111,21 +111,23 @@ public abstract class DecalCustom {
 
         decalSetup(door.getDecal(), col, row, side);
 
+        final float depth = (secret) ? SECRET_DEPTH : DOOR_DEPTH;
+
         switch (door.getSide()) {
             case West:
-                door.getDecal().getPosition().x += DOOR_DEPTH;
+                door.getDecal().getPosition().x += depth;
                 break;
 
             case East:
-                door.getDecal().getPosition().x -= DOOR_DEPTH;
+                door.getDecal().getPosition().x -= depth;
                 break;
 
             case South:
-                door.getDecal().getPosition().y += DOOR_DEPTH;
+                door.getDecal().getPosition().y += depth;
                 break;
 
             case North:
-                door.getDecal().getPosition().y -= DOOR_DEPTH;
+                door.getDecal().getPosition().y -= depth;
                 break;
         }
 
