@@ -13,8 +13,7 @@ import com.gamesbykevin.havoc.maze.algorithm.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gamesbykevin.havoc.level.LevelHelper.ROOM_SIZE;
-import static com.gamesbykevin.havoc.level.LevelHelper.createDecals;
+import static com.gamesbykevin.havoc.level.LevelHelper.*;
 import static com.gamesbykevin.havoc.maze.MazeHelper.calculateCost;
 import static com.gamesbykevin.havoc.maze.MazeHelper.locateGoal;
 
@@ -52,7 +51,7 @@ public class Level {
 
         //set our start of the level
         getCamera3d().near = .1f;
-        getCamera3d().far = 50f;
+        getCamera3d().far = RENDER_RANGE;
         getCamera3d().position.set((ROOM_SIZE / 2),(ROOM_SIZE / 2),0);
         getCamera3d().position.z = 0;
         getCamera3d().rotate(Vector3.X, 90);
@@ -181,9 +180,15 @@ public class Level {
 
     private void drawDecals() {
 
+        int locX = (int)getCamera3d().position.x;
+        int locY = (int)getCamera3d().position.y;
+
         for (int i = 0; i < getDecals().size(); i++) {
 
             DecalCustom decal = getDecals().get(i);
+
+            if (Math.abs(decal.getCol() - locX) > RENDER_RANGE || Math.abs(decal.getRow() - locY) > RENDER_RANGE)
+                continue;
 
             if (decal.isBillboard())
                 decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
@@ -197,6 +202,9 @@ public class Level {
                 DecalCustom decal = getDoorDecals()[row][col];
 
                 if (decal == null)
+                    continue;
+
+                if (Math.abs(decal.getCol() - locX) > RENDER_RANGE || Math.abs(decal.getRow() - locY) > RENDER_RANGE)
                     continue;
 
                 if (decal.isBillboard())

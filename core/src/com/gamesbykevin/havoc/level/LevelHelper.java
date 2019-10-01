@@ -16,6 +16,12 @@ public class LevelHelper {
     //how big is each room
     public static final int ROOM_SIZE = 8;
 
+    //render decals within the specified range
+    public static final int RENDER_RANGE = 30;
+
+    //chance we add a door or secret
+    public static final float DOOR_PROBABILITY = .7f;
+
     //how many tiles can we choose from for the floor ceiling?
     public static final int TILES_FLOOR_CEILING = 27;
 
@@ -121,7 +127,7 @@ public class LevelHelper {
                 TextureRegion door = getTextureRegion(PATH_DOOR);
                 TextureRegion side = getTextureRegion(PATH_SIDE);
 
-                if (!room.hasSouth() && Math.random() > .1) {
+                if (!room.hasSouth() && Math.random() <= DOOR_PROBABILITY) {
                     if (room.hasWest() && room.hasEast() && room.hasNorth()) {
                         addDoorSouth(level, wall, side, door, roomColStart, roomRowStart, true);
                     } else {
@@ -129,7 +135,7 @@ public class LevelHelper {
                     }
                 }
 
-                if (!room.hasWest() && Math.random() > .1) {
+                if (!room.hasWest() && Math.random() <= DOOR_PROBABILITY) {
                     if (room.hasEast() && room.hasNorth() && room.hasSouth()) {
                         addDoorWest(level, wall, side, door, roomColStart, roomRowStart, true);
                     } else {

@@ -1,7 +1,6 @@
 package com.gamesbykevin.havoc.decals;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.decals.Decal;
 
 public class Background extends DecalCustom {
 
@@ -16,6 +15,8 @@ public class Background extends DecalCustom {
 
     public static Background createDecalBackground(float col, float row, TextureRegion texture, boolean floor) {
         Background decal = new Background(texture, null);
+        decal.setCol((int)col);
+        decal.setRow((int)row);
         decal.getDecal().setPosition(col, row, (floor) ? -.5f : .5f);
         return decal;
     }

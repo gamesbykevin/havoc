@@ -97,12 +97,16 @@ public class PlayerHelper {
         //check collision if we are moving
         if (xMove != 0 || yMove != 0) {
 
-            //reset position if there is a collision
-            if (checkCollision(controller, controller.getPreviousPosition().x, controller.getCamera3d().position.y))
-                controller.getCamera3d().position.y = controller.getPreviousPosition().y;
-            if (checkCollision(controller, controller.getCamera3d().position.x, controller.getPreviousPosition().y))
-                controller.getCamera3d().position.x = controller.getPreviousPosition().x;
         }
+    }
+
+    protected static void checkCollision(MyController controller) {
+
+        //reset position if there is a collision
+        if (checkCollision(controller, controller.getPreviousPosition().x, controller.getCamera3d().position.y))
+            controller.getCamera3d().position.y = controller.getPreviousPosition().y;
+        if (checkCollision(controller, controller.getCamera3d().position.x, controller.getPreviousPosition().y))
+            controller.getCamera3d().position.x = controller.getPreviousPosition().x;
     }
 
     private static boolean checkBounds(Level level, float row, float col) {

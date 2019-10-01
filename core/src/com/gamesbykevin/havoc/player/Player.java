@@ -81,6 +81,9 @@ public final class Player {
         //update the players location
         updateLocation(getController());
 
+        //check for collision
+        checkCollision(getController());
+
         //update the level
         updateLevel(this);
     }
