@@ -93,11 +93,6 @@ public class PlayerHelper {
             if (controller.getRotation() < 0)
                 controller.setRotation(360);
         }
-
-        //check collision if we are moving
-        if (xMove != 0 || yMove != 0) {
-
-        }
     }
 
     protected static void checkCollision(MyController controller) {
@@ -176,6 +171,16 @@ public class PlayerHelper {
             //figure out which room we are in
             float col = (player.getController().getLevel().getCamera3d().position.x / ROOM_SIZE);
             float row = (player.getController().getLevel().getCamera3d().position.y / ROOM_SIZE);
+
+            /*
+            //is this the goal room
+            boolean goal = (col == player.getController().getLevel().getMaze().getGoalCol() && row == player.getController().getLevel().getMaze().getGoalRow());
+
+            //if this is the goal, create a new level
+            if (goal) {
+
+            }
+            */
 
             //and then what specific column in the room
             float roomCol = (col * ROOM_SIZE);

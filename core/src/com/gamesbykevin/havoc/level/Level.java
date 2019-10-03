@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.maze.Maze;
+import com.gamesbykevin.havoc.maze.Room;
 import com.gamesbykevin.havoc.maze.algorithm.*;
 
 import java.util.ArrayList;
@@ -20,8 +21,8 @@ import static com.gamesbykevin.havoc.maze.MazeHelper.locateGoal;
 public class Level {
 
     //how big is our maze
-    public static final int MAZE_COLS = 3;
-    public static final int MAZE_ROWS = 3;
+    public static final int MAZE_COLS = 5;
+    public static final int MAZE_ROWS = 5;
 
     //our randomly created maze
     private Maze maze;
@@ -149,8 +150,6 @@ public class Level {
                 break;
         }
 
-        System.out.println(getMaze().toString());
-
         //generate the maze
         getMaze().generate();
 
@@ -180,19 +179,31 @@ public class Level {
 
     private void drawDecals() {
 
-        int locX = (int)getCamera3d().position.x;
-        int locY = (int)getCamera3d().position.y;
+        //figure out which room we are in
+        int locX = (int)(getCamera3d().position.x / ROOM_SIZE);
+        int locY = (int)(getCamera3d().position.y / ROOM_SIZE);
+
+        Room room = getMaze().getRoom(locX, locY);
+
+        float minCol = room.hasWest() ? getCamera3d().position.x - ROOM_SIZE : getCamera3d().position.x - RENDER_RANGE;
+        float maxCol = room.hasEast() ? getCamera3d().position.x + ROOM_SIZE : getCamera3d().position.x + RENDER_RANGE;
+        float minRow = room.hasSouth() ? getCamera3d().position.y - ROOM_SIZE : getCamera3d().position.y - RENDER_RANGE;
+        float maxRow = room.hasNorth() ? getCamera3d().position.y + ROOM_SIZE : getCamera3d().position.y + RENDER_RANGE;;
+
+        int count = 0;
 
         for (int i = 0; i < getDecals().size(); i++) {
 
             DecalCustom decal = getDecals().get(i);
 
-            if (Math.abs(decal.getCol() - locX) > RENDER_RANGE || Math.abs(decal.getRow() - locY) > RENDER_RANGE)
+            //only render if in range
+            if (!hasRange(decal, minCol, maxCol, minRow, maxRow))
                 continue;
 
             if (decal.isBillboard())
                 decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
 
+            count++;
             getDecalBatch().add(decal.getDecal());
         }
 
@@ -204,18 +215,32 @@ public class Level {
                 if (decal == null)
                     continue;
 
-                if (Math.abs(decal.getCol() - locX) > RENDER_RANGE || Math.abs(decal.getRow() - locY) > RENDER_RANGE)
+                //only render if in range
+                if (!hasRange(decal, minCol, maxCol, minRow, maxRow))
                     continue;
 
                 if (decal.isBillboard())
                     decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
 
+                count++;
                 getDecalBatch().add(decal.getDecal());
             }
         }
 
+        System.out.println("Count: " + count);
+
         //call flush at the end to draw
         getDecalBatch().flush();
+    }
+
+    private boolean hasRange(DecalCustom decal, float minCol, float maxCol, float minRow, float maxRow) {
+
+        if (decal.getCol() < minCol || decal.getCol() > maxCol)
+            return false;
+        if (decal.getRow() < minRow || decal.getRow() > maxRow)
+            return false;
+
+        return true;
     }
 
     private void updateDecals() {

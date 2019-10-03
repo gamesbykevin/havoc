@@ -13,7 +13,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	public static final int SIZE_HEIGHT = 480;
 
 	//frames per second
-	public static final float FPS = 60f;
+	public static final float FPS = 90f;
 
 	/**
 	 * How long is 1 frame in milliseconds
