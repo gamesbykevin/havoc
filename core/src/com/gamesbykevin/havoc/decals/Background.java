@@ -4,8 +4,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Background extends DecalCustom {
 
+    public static final float TEXTURE_WIDTH = 16;
+    public static final float TEXTURE_HEIGHT = 16;
+
     public Background(TextureRegion texture, Side side) {
-        super(texture, Type.Background, side);
+        super(texture, Type.Background, side, TEXTURE_WIDTH, TEXTURE_HEIGHT);
     }
 
     @Override

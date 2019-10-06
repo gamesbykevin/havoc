@@ -3,6 +3,7 @@ package com.gamesbykevin.havoc.level;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.gamesbykevin.havoc.decals.Background;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.DecalCustom.Type;
 import com.gamesbykevin.havoc.maze.Maze;
@@ -17,10 +18,10 @@ public class LevelHelper {
     public static final int ROOM_SIZE = 8;
 
     //render decals within the specified range
-    public static final int RENDER_RANGE = 20;
+    public static final int RENDER_RANGE = 30;
 
     //chance we add a door or secret
-    public static final float DOOR_PROBABILITY = .8f;
+    public static final float DOOR_PROBABILITY = .6f;
 
     //how many tiles can we choose from for the floor ceiling?
     public static final int TILES_FLOOR_CEILING = 73;
@@ -32,11 +33,15 @@ public class LevelHelper {
     public static final float DOOR_DEPTH = .5f;
 
     //how deep is the secret placed
-    public static final float SECRET_DEPTH = .1f;
+    public static final float SECRET_DEPTH = .075f;
 
-    //how to access the door
+    //locations of some of our textures
     public static final String PATH_DOOR = "door/door.bmp";
     public static final String PATH_SIDE = "door/door_side.bmp";
+    public static final String PATH_DOOR_GOAL = "goal/door.bmp";
+    public static final String PATH_WALL_GOAL = "goal/wall.bmp";
+    public static final String PATH_SWITCH_OFF = "goal/switch_off.bmp";
+    public static final String PATH_SWITCH_ON = "goal/switch_on.bmp";
 
     private static TextureRegion getTextureRegion(String path) {
         return new TextureRegion(new Texture(Gdx.files.internal(path)));
@@ -59,15 +64,15 @@ public class LevelHelper {
     }
 
     private static TextureRegion getWallGoal() {
-        return getTextureRegion("goal/wall.bmp");
+        return getTextureRegion(PATH_WALL_GOAL);
     }
 
     private static TextureRegion getDoorGoal() {
-        return getTextureRegion("goal/door.bmp");
+        return getTextureRegion(PATH_DOOR_GOAL);
     }
 
     private static TextureRegion getSwitchGoal() {
-        return getTextureRegion("goal/switch_off.bmp");
+        return getTextureRegion(PATH_SWITCH_OFF);
     }
 
     protected static void createDecals(Level level) {
@@ -104,7 +109,9 @@ public class LevelHelper {
                     addWall(level, Side.East, Type.Wall, textureRegionSwitchGoal, roomColStart + (ROOM_SIZE / 2), roomRowStart + (ROOM_SIZE / 2), false);
                 }
 
-                for (int roomRow = roomRowStart; roomRow < roomRowStart + ROOM_SIZE; roomRow++) {
+                int endRow = roomRowStart + ROOM_SIZE;
+
+                for (int roomRow = roomRowStart; roomRow < endRow; roomRow++) {
 
                     if (room.hasWest()) {
                         addWall(level, Side.East, Type.Wall, wall, roomColStart, roomRow, false);
@@ -118,14 +125,16 @@ public class LevelHelper {
                     if (room.hasEast()) {
                         addWall(level, Side.West, Type.Wall, wall, roomColStart + ROOM_SIZE, roomRow, false);
 
-                        if (room.hasEast() && roomRow == roomRowStart + ROOM_SIZE - 1) {
+                        if (roomRow == endRow - 1) {
                             addWall(level, Side.North, Type.Wall, wall, roomColStart + ROOM_SIZE, roomRow, false);
                             addWall(level, Side.South, Type.Wall, wall, roomColStart + ROOM_SIZE, roomRow, false);
                         }
                     }
                 }
 
-                for (int roomCol = roomColStart; roomCol < roomColStart + ROOM_SIZE; roomCol++) {
+                int endCol = roomColStart + ROOM_SIZE;
+
+                for (int roomCol = roomColStart; roomCol < endCol; roomCol++) {
 
                     if (room.hasSouth()) {
                         addWall(level, Side.North, Type.Wall, wall, roomCol, roomRowStart, false);
@@ -139,7 +148,7 @@ public class LevelHelper {
                     if (room.hasNorth()) {
                         addWall(level, Side.South, Type.Wall, wall, roomCol, roomRowStart + ROOM_SIZE, false);
 
-                        if (roomCol == roomColStart + ROOM_SIZE - 1) {
+                        if (roomCol == endCol - 1) {
                             addWall(level, Side.West, Type.Wall, wall, roomCol, roomRowStart + ROOM_SIZE, false);
                             addWall(level, Side.East, Type.Wall, wall, roomCol, roomRowStart + ROOM_SIZE, false);
                         }
@@ -147,10 +156,10 @@ public class LevelHelper {
                 }
 
                 //add floor and ceiling
-                for (int roomRow = roomRowStart; roomRow <= roomRowStart + ROOM_SIZE; roomRow++) {
-                    for (int roomCol = roomColStart; roomCol <= roomColStart + ROOM_SIZE; roomCol++) {
-                        level.getDecals().add(createDecalBackground(roomCol - (WALL_WIDTH / 2), roomRow, textureRegionFloor, true));
-                        level.getDecals().add(createDecalBackground(roomCol - (WALL_WIDTH / 2), roomRow, textureRegionCeiling, false));
+                for (int roomRow = roomRowStart; roomRow <= roomRowStart + ROOM_SIZE; roomRow += Background.TEXTURE_HEIGHT) {
+                    for (int roomCol = roomColStart; roomCol <= roomColStart + ROOM_SIZE; roomCol += Background.TEXTURE_WIDTH) {
+                        level.getDecals().add(createDecalBackground(roomCol, roomRow, textureRegionFloor, true));
+                        level.getDecals().add(createDecalBackground(roomCol, roomRow, textureRegionCeiling, false));
                     }
                 }
 
@@ -158,6 +167,7 @@ public class LevelHelper {
                 TextureRegion door = (goal) ? getDoorGoal() : getTextureRegion(PATH_DOOR);
                 TextureRegion side = getTextureRegion(PATH_SIDE);
 
+                //for the goal every opening will be enclosed by a door
                 if (goal) {
 
                     if (!room.hasSouth())
@@ -166,7 +176,7 @@ public class LevelHelper {
                         addDoorSouth(level, wall, side, door, roomColStart, roomRowStart + ROOM_SIZE, false);
                     if (!room.hasWest())
                         addDoorWest(level, wall, side, door, roomColStart, roomRowStart, false);
-                    if (!room.hasWest())
+                    if (!room.hasEast())
                         addDoorWest(level, wall, side, door, roomColStart + ROOM_SIZE, roomRowStart, false);
 
                 } else {
@@ -221,7 +231,6 @@ public class LevelHelper {
         int middle = roomColStart + (ROOM_SIZE / 2);
 
         for (int roomCol = roomColStart; roomCol < roomColStart + ROOM_SIZE; roomCol++) {
-
             if (roomCol == middle) {
                 addWall(level, Side.South, Type.Door, (secret) ? wall : door, roomCol, roomRowStart, secret);
             } else if (roomCol == middle - 1 || roomCol == middle + 1) {
@@ -245,18 +254,17 @@ public class LevelHelper {
 
         //add decal to be rendered
         switch (type) {
+
+            //create and flag wall here
             case Wall:
                 level.getDecals().add(DecalCustom.createDecalWall(col, row, textureRegion, side));
-
-                //flag wall here
-                level.getWalls()[(int)row][(int)col] = true;
+                level.setWall((int)col, (int)row, true);
                 break;
 
+            //create and flag door here
             case Door:
-                level.getDoorDecals()[(int)row][(int)col] = DecalCustom.createDecalDoor(col, row, textureRegion, side, secret);
-
-                //flag door here
-                level.getDoors()[(int)row][(int)col] = true;
+                level.setDoorDecal(DecalCustom.createDecalDoor(col, row, textureRegion, side, secret), (int)col, (int)row);
+                level.setDoor((int)col, (int)row, true);
                 break;
         }
     }

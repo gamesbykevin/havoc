@@ -32,7 +32,7 @@ public class Door extends DecalCustom {
     private static final float DOOR_OPEN_TIME = 2500f;
 
     public Door(TextureRegion texture, Side side) {
-        super(texture, Type.Door, side);
+        super(texture, Type.Door, side, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         setOpen(false);
         setOpening(false);
         setClosing(false);

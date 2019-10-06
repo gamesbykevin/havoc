@@ -9,8 +9,8 @@ import static com.gamesbykevin.havoc.level.LevelHelper.SECRET_DEPTH;
 public abstract class DecalCustom {
 
     //size of a block
-    public static final float WALL_WIDTH = 1.0f;
-    public static final float WALL_HEIGHT = 1.0f;
+    public static final float TEXTURE_WIDTH = 1.0f;
+    public static final float TEXTURE_HEIGHT = 1.0f;
 
     //the location of this decal as it relates to the level
     private int col, row;
@@ -18,8 +18,7 @@ public abstract class DecalCustom {
     public enum Type {
         Wall,
         Door,
-        Background,
-        Nothing
+        Background
     }
 
     //what type of decal is this?
@@ -38,8 +37,8 @@ public abstract class DecalCustom {
 
     private final Decal decal;
 
-    public DecalCustom(TextureRegion textureRegion, Type type, Side side) {
-        this.decal = Decal.newDecal(WALL_WIDTH, WALL_HEIGHT, textureRegion);
+    public DecalCustom(TextureRegion textureRegion, Type type, Side side, float textureWidth, float textureHeight) {
+        this.decal = Decal.newDecal(textureWidth, textureHeight, textureRegion);
         this.type = type;
         this.side = side;
     }
@@ -95,24 +94,27 @@ public abstract class DecalCustom {
         door.setCol((int)col);
         door.setRow((int)row);
 
+        //set the start and finish so the door knows how far to open and close
         switch (door.getSide()) {
             case West:
             case East:
-                door.setStart(row + (WALL_HEIGHT / 2));
-                door.setDestination(row - (WALL_HEIGHT / 2));
+                door.setStart(row + (TEXTURE_HEIGHT / 2));
+                door.setDestination(row - (TEXTURE_HEIGHT / 2));
                 break;
 
             case South:
             case North:
-                door.setStart(col + (WALL_WIDTH / 2));
-                door.setDestination(col - (WALL_WIDTH / 2));
+                door.setStart(col + (TEXTURE_WIDTH / 2));
+                door.setDestination(col - (TEXTURE_WIDTH / 2));
                 break;
         }
 
         decalSetup(door.getDecal(), col, row, side);
 
+        //secret doors will have a different depth and be harder to spot
         final float depth = (secret) ? SECRET_DEPTH : DOOR_DEPTH;
 
+        //increase the depth of the door so it is noticeable
         switch (door.getSide()) {
             case West:
                 door.getDecal().getPosition().x += depth;
@@ -137,13 +139,13 @@ public abstract class DecalCustom {
     private static void decalSetup(Decal decal, float col, float row, Side side) {
 
         //shift coordinates so they render correct
-        float newCol = col + (WALL_WIDTH / 2);
-        float newRow = row + WALL_HEIGHT;
+        float newCol = col + (TEXTURE_WIDTH / 2);
+        float newRow = row + TEXTURE_HEIGHT;
 
         switch (side) {
 
             case South:
-                decal.setPosition(newCol, newRow - WALL_HEIGHT, 0);
+                decal.setPosition(newCol, newRow - TEXTURE_HEIGHT, 0);
                 decal.rotateX(90);
                 break;
 
@@ -155,13 +157,13 @@ public abstract class DecalCustom {
                 break;
 
             case West:
-                decal.setPosition(newCol - (WALL_WIDTH / 2), newRow - (WALL_HEIGHT / 2), 0);
+                decal.setPosition(newCol - (TEXTURE_WIDTH / 2), newRow - (TEXTURE_HEIGHT / 2), 0);
                 decal.rotateX(90);
                 decal.rotateY(90);
                 break;
 
             case East:
-                decal.setPosition(newCol + (WALL_WIDTH / 2), newRow - (WALL_HEIGHT / 2), 0);
+                decal.setPosition(newCol + (TEXTURE_WIDTH / 2), newRow - (TEXTURE_HEIGHT / 2), 0);
                 decal.rotateX(90);
                 decal.rotateY(90);
                 break;

@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.maze.Maze;
-import com.gamesbykevin.havoc.maze.Room;
 import com.gamesbykevin.havoc.maze.algorithm.*;
 
 import java.util.ArrayList;
@@ -21,8 +20,8 @@ import static com.gamesbykevin.havoc.maze.MazeHelper.locateGoal;
 public class Level {
 
     //how big is our maze
-    public static final int MAZE_COLS = 5;
-    public static final int MAZE_ROWS = 5;
+    public static final int MAZE_COLS = 3;
+    public static final int MAZE_ROWS = 3;
 
     //our randomly created maze
     private Maze maze;
@@ -33,32 +32,27 @@ public class Level {
     //needed to render multiple decals
     private DecalBatch decalBatch;
 
-    //this is where we will contain our wall / floor / ceiling
+    //this is where we will contain our wall / floor / ceiling, etc...
     private List<DecalCustom> decals;
 
     //for collision detection
     private boolean[][] walls;
+    private boolean[][] doors;
 
     //contains our doors
     private Door[][] doorDecals;
 
-    //for collision detection
-    private boolean[][] doors;
-
-    //which doors are open
-    private boolean[][] doorsOpen;
-
     public Level() {
 
-        //set our start of the level
-        getCamera3d().near = .1f;
-        getCamera3d().far = RENDER_RANGE;
-        getCamera3d().position.set((ROOM_SIZE / 2),(ROOM_SIZE / 2),0);
-        getCamera3d().position.z = 0;
-        getCamera3d().rotate(Vector3.X, 90);
+        //set the start location
+        resetPosition();
 
         //create the batch
         getDecalBatch();
+    }
+
+    public void resetPosition() {
+        getCamera3d(true);
     }
 
     public Maze getMaze() {
@@ -81,7 +75,21 @@ public class Level {
         return this.decals;
     }
 
-    public Door[][] getDoorDecals() {
+    public void setDoorDecal(Door door, int col, int row) {
+        getDoorDecals()[row][col] = door;
+    }
+
+    public Door getDoorDecal(int col, int row) {
+
+        if (row < 0 || row >= getDoorDecals().length)
+            return null;
+        if (col < 0 || col >= getDoorDecals()[0].length)
+            return null;
+
+        return getDoorDecals()[row][col];
+    }
+
+    private Door[][] getDoorDecals() {
 
         if (this.doorDecals == null)
             this.doorDecals = new Door[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
@@ -89,26 +97,62 @@ public class Level {
         return doorDecals;
     }
 
-    public boolean[][] getWalls() {
+    public void setWall(int col, int row, boolean value) {
+        getWalls()[row][col] = value;
+    }
+
+    public boolean hasWall(int col, int row) {
+        return hasValue(getWalls(), col, row);
+    }
+
+    private boolean[][] getWalls() {
         return this.walls;
     }
 
-    public boolean[][] getDoors() {
+    public void setDoor(int col, int row, boolean value) {
+        getDoors()[row][col] = value;
+    }
+
+    public boolean hasDoor(int col, int row) {
+        return hasValue(getDoors(), col, row);
+    }
+
+    private boolean[][] getDoors() {
         return this.doors;
     }
 
-    public boolean[][] getDoorsOpen() {
-        return this.doorsOpen;
+    private boolean hasValue(boolean[][] array, int col, int row) {
+
+        if (row < 0 || row >= array.length)
+            return false;
+        if (col < 0 || col >= array[0].length)
+            return false;
+
+        return array[row][col];
     }
 
     public PerspectiveCamera getCamera3d() {
+        return getCamera3d(false);
+    }
+
+    public PerspectiveCamera getCamera3d(boolean reset) {
 
         if (this.camera3d == null) {
-
             float w = Gdx.graphics.getWidth();
             float h = Gdx.graphics.getHeight();
-
             this.camera3d = new PerspectiveCamera(67, 1, h/w);
+            this.camera3d.near = .1f;
+            this.camera3d.far = RENDER_RANGE;
+        }
+
+        if (reset) {
+            this.camera3d.direction.set(0, 0, -1);
+            this.camera3d.up.set(0, 1, 0);
+            this.camera3d.update();
+
+            this.camera3d.position.set((ROOM_SIZE / 2),(ROOM_SIZE / 2),0);
+            this.camera3d.position.z = 0;
+            this.camera3d.rotate(Vector3.X, 90);
         }
 
         return this.camera3d;
@@ -162,14 +206,12 @@ public class Level {
         //create the arrays for our collision detection
         this.walls = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
         this.doors = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
-        this.doorsOpen = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
 
         //default to false
         for (int row = 0 ; row < getWalls().length; row++) {
             for (int col = 0; col < getWalls()[0].length; col++) {
                 getWalls()[row][col] = false;
                 getDoors()[row][col] = false;
-                getDoorsOpen()[row][col] = false;
             }
         }
 
@@ -179,16 +221,18 @@ public class Level {
 
     private void drawDecals() {
 
-        //figure out which room we are in
-        int locX = (int)(getCamera3d().position.x / ROOM_SIZE);
-        int locY = (int)(getCamera3d().position.y / ROOM_SIZE);
-
+        //this will be the range of items that we render
+        float minCol = getCamera3d().position.x - RENDER_RANGE;
+        float maxCol = getCamera3d().position.x + RENDER_RANGE;
+        float minRow = getCamera3d().position.y - RENDER_RANGE;
+        float maxRow = getCamera3d().position.y + RENDER_RANGE;
+        /*
         Room room = getMaze().getRoom(locX, locY);
-
         float minCol = room.hasWest() ? getCamera3d().position.x - ROOM_SIZE : getCamera3d().position.x - RENDER_RANGE;
         float maxCol = room.hasEast() ? getCamera3d().position.x + ROOM_SIZE : getCamera3d().position.x + RENDER_RANGE;
         float minRow = room.hasSouth() ? getCamera3d().position.y - ROOM_SIZE : getCamera3d().position.y - RENDER_RANGE;
-        float maxRow = room.hasNorth() ? getCamera3d().position.y + ROOM_SIZE : getCamera3d().position.y + RENDER_RANGE;;
+        float maxRow = room.hasNorth() ? getCamera3d().position.y + ROOM_SIZE : getCamera3d().position.y + RENDER_RANGE;
+        */
 
         int count = 0;
 
@@ -210,7 +254,7 @@ public class Level {
         for (int col = 0; col < getDoorDecals()[0].length; col++) {
             for (int row = 0; row < getDoorDecals().length; row++) {
 
-                DecalCustom decal = getDoorDecals()[row][col];
+                DecalCustom decal = getDoorDecal(col, row);
 
                 if (decal == null)
                     continue;
@@ -255,9 +299,6 @@ public class Level {
 
                 //update the door
                 door.update();
-
-                //flag if the door is open
-                getDoorsOpen()[row][col] = door.isOpen();
             }
         }
     }
