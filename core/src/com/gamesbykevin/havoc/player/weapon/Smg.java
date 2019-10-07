@@ -21,7 +21,7 @@ public class Smg extends Weapon {
         this.starting = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 0, 1);
 
         //attacking animation
-        this.attacking = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 1, 9);
+        this.attacking = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 1, 3);
 
         //stop attacking animation
         this.stopping = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 9, 2);

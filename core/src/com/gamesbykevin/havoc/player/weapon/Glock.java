@@ -21,9 +21,9 @@ public class Glock extends Weapon {
         this.starting = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 0, 3);
 
         //attacking animation
-        this.attacking = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 2, 7);
+        this.attacking = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 2, 8);
 
         //stop attacking animation
-        this.stopping = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 8, 2);
+        this.stopping = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 9, 1);
     }
 }

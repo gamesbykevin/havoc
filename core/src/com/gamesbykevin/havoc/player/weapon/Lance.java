@@ -21,7 +21,7 @@ public class Lance extends Weapon {
         this.starting = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 1, 3);
 
         //attacking animation
-        this.attacking = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 4, 12);
+        this.attacking = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 4, 2);
 
         //stop attacking animation
         this.stopping = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 16, 4);

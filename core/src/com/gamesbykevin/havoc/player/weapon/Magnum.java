@@ -21,9 +21,9 @@ public class Magnum extends Weapon {
         this.starting = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 0, 4);
 
         //attacking animation
-        this.attacking = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 4, 10);
+        this.attacking = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 4, 11);
 
         //stop attacking animation
-        this.stopping = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 13, 2);
+        this.stopping = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 14, 1);
     }
 }

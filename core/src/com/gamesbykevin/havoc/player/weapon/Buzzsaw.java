@@ -21,7 +21,7 @@ public class Buzzsaw extends Weapon {
         this.starting = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 0, 3);
 
         //attacking animation
-        this.attacking = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 3, 12);
+        this.attacking = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 3, 2);
 
         //stop attacking animation
         this.stopping = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 15, 5);

@@ -21,7 +21,7 @@ public class Impact extends Weapon {
         this.starting = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 0, 2);
 
         //attacking animation
-        this.attacking = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 2, 6);
+        this.attacking = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 2, 2);
 
         //stop attacking animation
         this.stopping = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 8, 6);
