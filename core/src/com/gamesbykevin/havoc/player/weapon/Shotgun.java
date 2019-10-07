@@ -2,6 +2,7 @@ package com.gamesbykevin.havoc.player.weapon;
 
 import com.gamesbykevin.havoc.animation.SpriteAnimation;
 
+import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.BULLETS_MAX_SHOTGUN;
 import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.WEAPONS_DIR;
 
 public class Shotgun extends Weapon {
@@ -13,6 +14,9 @@ public class Shotgun extends Weapon {
     public Shotgun() {
 
         super(Type.Shotgun);
+
+        //set the bullet count
+        setBullets(BULLETS_MAX_SHOTGUN);
 
         //create our resting animation
         this.resting = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 0, 1);

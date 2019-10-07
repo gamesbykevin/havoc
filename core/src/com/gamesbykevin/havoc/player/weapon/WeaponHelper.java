@@ -4,6 +4,15 @@ import com.gamesbykevin.havoc.player.Player;
 
 public class WeaponHelper {
 
+    //how many bullets can we hold per weapon
+    public static final int BULLETS_MAX_BUZZ = 500;
+    public static final int BULLETS_MAX_GLOCK = 50;
+    public static final int BULLETS_MAX_IMPACT = 250;
+    public static final int BULLETS_MAX_MAGNUM = 75;
+    public static final int BULLETS_MAX_SHOTGUN = 100;
+    public static final int BULLETS_MAX_SMG = 300;
+    public static final int BULLETS_MAX_LANCE = -1;
+
     //how long is each animation frame
     public static final float FRAME_DURATION = 50f;
 

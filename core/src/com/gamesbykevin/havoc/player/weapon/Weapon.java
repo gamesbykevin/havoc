@@ -17,6 +17,12 @@ public abstract class Weapon {
     //what are we doing with the weapon
     private boolean isResting = true, isStarting = false, isAttacking = false, isStopping = false, isSwitchingOn = false, isSwitchingOff = false;
 
+    //how many bullets do we have
+    private int bullets;
+
+    //how much damage does each bullet inflict
+    private int damage;
+
     //different types of weapons
     public enum Type {
         Buzz, Glock, Impact, Magnum, Shotgun, Smg, Lance
@@ -43,6 +49,22 @@ public abstract class Weapon {
 
     public Type getType() {
         return this.type;
+    }
+
+    public int getBullets() {
+        return this.bullets;
+    }
+
+    public void setBullets(int bullets) {
+        this.bullets = bullets;
+    }
+
+    public int getDamage() {
+        return this.damage;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
     }
 
     public boolean isSwitchingOn() {
@@ -151,7 +173,7 @@ public abstract class Weapon {
         }
 
         //if we are resting and the player wants to shoot
-        if (isResting() && controller.isShooting()) {
+        if (isResting() && controller.isShooting() && getBullets() != 0) {
 
             //stop resting
             setResting(false);
@@ -173,8 +195,13 @@ public abstract class Weapon {
 
         } else if (isAttacking() && getAttacking().isFinish()) {
 
-            //if the player no longer wishes to shoot we will stop
-            if (!controller.isShooting()) {
+            //take a bullet away
+            setBullets(getBullets() - 1);
+
+            System.out.println("Ammo: " + getBullets());
+
+            //if the player no longer wishes to shoot, or we ran out of bullets we will stop
+            if (!controller.isShooting() || getBullets() == 0) {
 
                 //stop the attack animation
                 setAttacking(false);
