@@ -139,14 +139,12 @@ public class MyController implements InputProcessor {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                setChange(false);
                 updateFlag(KEY_SHOOT, false);
                 return true;
             }
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                setChange(false);
                 updateFlag(KEY_SHOOT, false);
                 super.touchDragged(event, x, y, pointer);
             }

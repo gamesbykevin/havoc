@@ -26,18 +26,21 @@ public class SpriteAnimation {
     //do we repeat the animation
     private boolean loop = false;
 
-    public SpriteAnimation(final String path, final String filename, final String extension, final int count) {
-        this(path, filename, extension, count, FRAME_DURATION_DEFAULT);
+    //did the animation finish
+    private boolean finish = false;
+
+    public SpriteAnimation(final String path, final String filename, final String extension, final int startIndex, final int count) {
+        this(path, filename, extension, startIndex, count, FRAME_DURATION_DEFAULT);
     }
 
-    public SpriteAnimation(final String path, final String filename, final String extension, final int count, final float duration) {
+    public SpriteAnimation(final String path, final String filename, final String extension, final int startIndex, final int count, final float duration) {
 
         //create our array of images
         this.images = new Texture[count];
 
         //load all the images
         for (int i = 0; i < this.images.length; i++) {
-            this.images[i] = new Texture(Gdx.files.internal(path + filename + (i+1) + extension));
+            this.images[i] = new Texture(Gdx.files.internal(path + filename + (startIndex + (i+1)) + extension));
         }
 
         setIndex(0);
@@ -86,8 +89,17 @@ public class SpriteAnimation {
         return getImages()[getIndex()];
     }
 
+    public boolean isFinish() {
+        return this.finish;
+    }
+
+    public void setFinish(boolean finish) {
+        this.finish = finish;
+    }
+
     public void reset() {
         setIndex(0);
+        setFinish(false);
     }
 
     public void update() {
@@ -112,8 +124,11 @@ public class SpriteAnimation {
             setIndex(getImages().length - 1);
 
             //reset the index if looping
-            if (isLoop())
+            if (isLoop()) {
                 reset();
+            } else {
+                setFinish(true);
+            }
         }
     }
 }

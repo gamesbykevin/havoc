@@ -3,16 +3,19 @@ package com.gamesbykevin.havoc.player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gamesbykevin.havoc.animation.SpriteAnimation;
 import com.gamesbykevin.havoc.input.MyController;
+import com.gamesbykevin.havoc.player.weapon.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.gamesbykevin.havoc.player.PlayerHelper.*;
+import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.reset;
+import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.updateWeapon;
 
 public final class Player {
 
-    //animations for our weapons
-    private List<SpriteAnimation> animations;
+    //our weapons
+    private List<Weapon> weapons;
 
     //used to render images fast
     private SpriteBatch spriteBatch;
@@ -23,59 +26,39 @@ public final class Player {
     //controller reference
     private final MyController controller;
 
-    //how long is each animation frame
-    public static final float FRAME_DURATION = 50f;
-
-    //default resting place for our weapons
-    public static final float DEFAULT_WEAPON_X = 300;
-    public static final float DEFAULT_WEAPON_Y = 0;
-
-    protected static final float WEAPON_X_MAX = DEFAULT_WEAPON_X + 20;
-    protected static final float WEAPON_X_MIN = DEFAULT_WEAPON_X - 20;
-
-    protected static final float WEAPON_Y_MAX = DEFAULT_WEAPON_Y + 1;
-    protected static final float WEAPON_Y_MIN = DEFAULT_WEAPON_Y - 10;
-
-    //how fast do we swing the weapon
-    protected static final float DEFAULT_VELOCITY_X = .5f;
-    protected static final float DEFAULT_VELOCITY_Y = .5f;
-
-    //velocity to move weapon
-    private float velocityX = DEFAULT_VELOCITY_X, velocityY = DEFAULT_VELOCITY_Y;
-
-    //where to render our weapon
-    private float weaponX = DEFAULT_WEAPON_X, weaponY = DEFAULT_WEAPON_Y;
-
-    private static final String WEAPONS_DIR = "weapons/";
-
     public Player(MyController controller) {
 
         //store reference to controller
         this.controller = controller;
 
-        getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "buzzsaw_cannon/", "buzzsaw_cannon_f", ".png", 20));
-        getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "glock_handgun/", "glock_handgun_f", ".png", 10));
-        getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "impact_cannon/", "impact_cannon_f", ".png", 14));
-        getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "magnum/", "magnum_f", ".png", 15));
-        getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "shotgun/", "shotgun_f", ".png", 19));
-        getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "smg/", "smg_f", ".png", 11, 10));
-        getAnimations().add(new SpriteAnimation(WEAPONS_DIR + "thermic_lance/", "thermic_lance_f", ".png", 20));
+        //add weapon to our list
+        getWeapons().add(new Lance());
+        getWeapons().add(new Glock());
+        getWeapons().add(new Smg());
+        getWeapons().add(new Impact());
+        getWeapons().add(new Magnum());
+        getWeapons().add(new Shotgun());
+        getWeapons().add(new Buzzsaw());
 
-        for (int i = 0; i < getAnimations().size(); i++) {
-            getAnimations().get(i).setLoop(true);
-            getAnimations().get(i).setFrameDuration(FRAME_DURATION);
+        for (int i = 0; i < getWeapons().size(); i++) {
+            reset(getWeapons().get(i));
         }
 
-        setWeaponIndex((int)(Math.random() * getAnimations().size()));
+        //start with lance
+        setWeaponIndex(0);
     }
 
     public MyController getController() {
         return this.controller;
     }
 
+    public Weapon getWeapon() {
+        return getWeapons().get(getWeaponIndex());
+    }
+
     public void update() {
 
-        //update weapon animation
+        //update the weapon
         updateWeapon(this);
 
         //update the players location
@@ -90,22 +73,21 @@ public final class Player {
 
     public void setWeaponIndex(int weaponIndex) {
         this.weaponIndex = weaponIndex;
+
+        if (getWeaponIndex() >= getWeapons().size())
+            this.weaponIndex = 0;
     }
 
     public int getWeaponIndex() {
         return this.weaponIndex;
     }
 
-    protected List<SpriteAnimation> getAnimations() {
+    protected List<Weapon> getWeapons() {
 
-        if (this.animations == null)
-            this.animations = new ArrayList<>();
+        if (this.weapons == null)
+            this.weapons = new ArrayList<>();
 
-        return this.animations;
-    }
-
-    public SpriteAnimation getAnimation() {
-        return getAnimations().get(getWeaponIndex());
+        return this.weapons;
     }
 
     public SpriteBatch getSpriteBatch() {
@@ -116,42 +98,10 @@ public final class Player {
         return this.spriteBatch;
     }
 
-    public float getWeaponX() {
-        return this.weaponX;
-    }
-
-    public void setWeaponX(float weaponX) {
-        this.weaponX = weaponX;
-    }
-
-    public float getWeaponY() {
-        return this.weaponY;
-    }
-
-    public void setWeaponY(float weaponY) {
-        this.weaponY = weaponY;
-    }
-
-    public float getVelocityX() {
-        return this.velocityX;
-    }
-
-    public void setVelocityX(float velocityX) {
-        this.velocityX = velocityX;
-    }
-
-    public float getVelocityY() {
-        return this.velocityY;
-    }
-
-    public void setVelocityY(float velocityY) {
-        this.velocityY = velocityY;
-    }
-
     public void render() {
         getSpriteBatch().setProjectionMatrix(getController().getCamera2d().combined);
         getController().getStage().getBatch().begin();
-        getController().getStage().getBatch().draw(getAnimation().getImage(), getWeaponX(), getWeaponY());
+        getWeapons().get(getWeaponIndex()).render(getController().getStage().getBatch());
         getController().getStage().getBatch().end();
     }
 }
