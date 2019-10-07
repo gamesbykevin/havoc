@@ -77,6 +77,7 @@ public class WeaponHelper {
 
         enemies.checkAttack(
             weapon,
+            controller.getLevel(),
             Math.toRadians(controller.getRotation()),
             controller.getCamera3d().position,
             controller.getSpeed()
