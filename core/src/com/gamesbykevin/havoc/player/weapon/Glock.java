@@ -11,12 +11,17 @@ public class Glock extends Weapon {
     private static final String FILE_NAME = "glock_handgun_f";
     private static final String EXTENSION = ".png";
 
+    private static final float DEFAULT_DAMAGE = 10f;
+
     public Glock() {
 
         super(Type.Glock);
 
         //set the bullet count
         setBullets(BULLETS_MAX_GLOCK);
+
+        //how much damage can a single bullet do?
+        setDamage(DEFAULT_DAMAGE);
 
         //create our resting animation
         this.resting = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 0, 1);

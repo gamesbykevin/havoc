@@ -11,12 +11,17 @@ public class Smg extends Weapon {
     private static final String FILE_NAME = "smg_f";
     private static final String EXTENSION = ".png";
 
+    private static final float DEFAULT_DAMAGE = 15f;
+
     public Smg() {
 
         super(Type.Smg);
 
         //set the bullet count
         setBullets(BULLETS_MAX_SMG);
+
+        //how much damage can a single bullet do?
+        setDamage(DEFAULT_DAMAGE);
 
         //create our resting animation
         this.resting = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 0, 1);

@@ -21,7 +21,7 @@ public abstract class Weapon {
     private int bullets;
 
     //how much damage does each bullet inflict
-    private int damage;
+    private float damage;
 
     //different types of weapons
     public enum Type {
@@ -59,11 +59,11 @@ public abstract class Weapon {
         this.bullets = bullets;
     }
 
-    public int getDamage() {
+    public float getDamage() {
         return this.damage;
     }
 
-    public void setDamage(int damage) {
+    public void setDamage(float damage) {
         this.damage = damage;
     }
 
@@ -193,6 +193,9 @@ public abstract class Weapon {
             setAttacking(true);
             getAttacking().reset();
 
+            //check if attack hit enemy
+            checkAttack(controller, this);
+
         } else if (isAttacking() && getAttacking().isFinish()) {
 
             //take a bullet away
@@ -215,6 +218,9 @@ public abstract class Weapon {
 
                 //continue to attack
                 getAttacking().reset();
+
+                //check if attack hit enemy
+                checkAttack(controller, this);
             }
 
         } else if (isStopping() && getStopping().isFinish()) {

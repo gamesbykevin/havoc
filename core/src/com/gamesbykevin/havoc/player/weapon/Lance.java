@@ -11,12 +11,17 @@ public class Lance extends Weapon {
     private static final String FILE_NAME = "thermic_lance_f";
     private static final String EXTENSION = ".png";
 
+    private static final float DEFAULT_DAMAGE = 1f;
+
     public Lance() {
 
         super(Type.Lance);
 
         //set the bullet count
         setBullets(BULLETS_MAX_LANCE);
+
+        //how much damage can a single bullet do?
+        setDamage(DEFAULT_DAMAGE);
 
         //create our resting animation
         this.resting = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 0, 1);

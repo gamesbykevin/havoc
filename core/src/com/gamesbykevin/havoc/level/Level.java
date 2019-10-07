@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
+import com.gamesbykevin.havoc.enemies.Enemies;
 import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.algorithm.*;
 
@@ -42,13 +43,27 @@ public class Level {
     //contains our doors
     private Door[][] doorDecals;
 
+    //our enemies are contained here
+    private Enemies enemies;
+
     public Level() {
+
+        //create our enemies container
+        getEnemies();
 
         //set the start location
         resetPosition();
 
         //create the batch
         getDecalBatch();
+    }
+
+    public Enemies getEnemies() {
+
+        if (this.enemies == null)
+            this.enemies = new Enemies();
+
+        return this.enemies;
     }
 
     public void resetPosition() {
@@ -226,15 +241,6 @@ public class Level {
         float maxCol = getCamera3d().position.x + RENDER_RANGE;
         float minRow = getCamera3d().position.y - RENDER_RANGE;
         float maxRow = getCamera3d().position.y + RENDER_RANGE;
-        /*
-        Room room = getMaze().getRoom(locX, locY);
-        float minCol = room.hasWest() ? getCamera3d().position.x - ROOM_SIZE : getCamera3d().position.x - RENDER_RANGE;
-        float maxCol = room.hasEast() ? getCamera3d().position.x + ROOM_SIZE : getCamera3d().position.x + RENDER_RANGE;
-        float minRow = room.hasSouth() ? getCamera3d().position.y - ROOM_SIZE : getCamera3d().position.y - RENDER_RANGE;
-        float maxRow = room.hasNorth() ? getCamera3d().position.y + ROOM_SIZE : getCamera3d().position.y + RENDER_RANGE;
-        */
-
-        int count = 0;
 
         for (int i = 0; i < getDecals().size(); i++) {
 
@@ -247,7 +253,6 @@ public class Level {
             if (decal.isBillboard())
                 decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
 
-            count++;
             getDecalBatch().add(decal.getDecal());
         }
 
@@ -266,12 +271,12 @@ public class Level {
                 if (decal.isBillboard())
                     decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
 
-                count++;
                 getDecalBatch().add(decal.getDecal());
             }
         }
 
-        System.out.println("Count: " + count);
+        //render the enemies
+        getEnemies().render(getDecalBatch(), getCamera3d());
 
         //call flush at the end to draw
         getDecalBatch().flush();

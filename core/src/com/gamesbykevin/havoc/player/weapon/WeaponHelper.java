@@ -1,5 +1,7 @@
 package com.gamesbykevin.havoc.player.weapon;
 
+import com.gamesbykevin.havoc.enemies.Enemies;
+import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.player.Player;
 
 public class WeaponHelper {
@@ -35,7 +37,7 @@ public class WeaponHelper {
     protected static final float DEFAULT_VELOCITY_Y = .5f;
 
     //how fast do we switch our weapon
-    protected static final float DEFAULT_VELOCITY_SWITCH_Y = 5f;
+    protected static final float DEFAULT_VELOCITY_SWITCH_Y = 6f;
 
     //where our weapon images are located
     protected static final String WEAPONS_DIR = "weapons/";
@@ -68,6 +70,17 @@ public class WeaponHelper {
         weapon.getStopping().reset();
         weapon.getStopping().setLoop(false);
         weapon.getStopping().setFrameDuration(FRAME_DURATION);
+    }
+
+    public static void checkAttack(MyController controller, Weapon weapon) {
+        Enemies enemies = controller.getLevel().getEnemies();
+
+        enemies.checkAttack(
+            weapon,
+            Math.toRadians(controller.getRotation()),
+            controller.getCamera3d().position,
+            controller.getSpeed()
+        );
     }
 
     public static void updateWeapon(Player player) {

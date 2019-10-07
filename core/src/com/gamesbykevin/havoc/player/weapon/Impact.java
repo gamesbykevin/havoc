@@ -11,12 +11,17 @@ public class Impact extends Weapon {
     private static final String FILE_NAME = "impact_cannon_f";
     private static final String EXTENSION = ".png";
 
+    private static final float DEFAULT_DAMAGE = 2f;
+
     public Impact() {
 
         super(Type.Impact);
 
         //set the bullet count
         setBullets(BULLETS_MAX_IMPACT);
+
+        //how much damage can a single bullet do?
+        setDamage(DEFAULT_DAMAGE);
 
         //create our resting animation
         this.resting = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 0, 1);

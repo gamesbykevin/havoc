@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gamesbykevin.havoc.decals.Background;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.DecalCustom.Type;
+import com.gamesbykevin.havoc.enemies.Enemy;
 import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.Room;
 
@@ -96,8 +97,17 @@ public class LevelHelper {
                 //get the current room
                 Room room = level.getMaze().getRoom(col, row);
 
+                //where does the room start
                 int roomColStart = ROOM_SIZE * col;
                 int roomRowStart = ROOM_SIZE * row;
+
+                //add 1 enemy for each room
+                if (col != 0 || row != 0 && !goal) {
+                    Enemy enemy = new Enemy();
+                    enemy.setCol(roomColStart + (ROOM_SIZE / 2));
+                    enemy.setRow(roomRowStart + (ROOM_SIZE / 2));
+                    level.getEnemies().getEnemies().add(enemy);
+                }
 
                 TextureRegion wall = (goal) ? textureRegionWallGoal : getRandomWall();
 

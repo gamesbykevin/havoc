@@ -11,12 +11,17 @@ public class Magnum extends Weapon {
     private static final String FILE_NAME = "magnum_f";
     private static final String EXTENSION = ".png";
 
+    private static final float DEFAULT_DAMAGE = 20f;
+
     public Magnum() {
 
         super(Type.Magnum);
 
         //set the bullet count
         setBullets(BULLETS_MAX_MAGNUM);
+
+        //how much damage can a single bullet do?
+        setDamage(DEFAULT_DAMAGE);
 
         //create our resting animation
         this.resting = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 0, 1);

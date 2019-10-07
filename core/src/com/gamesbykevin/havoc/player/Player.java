@@ -45,7 +45,7 @@ public final class Player {
         }
 
         //start with lance
-        setWeaponIndex(0);
+        setWeaponIndex(5);
     }
 
     public MyController getController() {

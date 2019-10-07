@@ -11,12 +11,17 @@ public class Buzzsaw extends Weapon {
     private static final String FILE_NAME = "buzzsaw_cannon_f";
     private static final String EXTENSION = ".png";
 
+    private static final float DEFAULT_DAMAGE = 5f;
+
     public Buzzsaw() {
 
         super(Type.Buzz);
 
         //set the bullet count
         setBullets(BULLETS_MAX_BUZZ);
+
+        //how much damage can a single bullet do?
+        setDamage(DEFAULT_DAMAGE);
 
         //create our resting animation
         this.resting = new SpriteAnimation(DIR, FILE_NAME, EXTENSION, 0, 1);

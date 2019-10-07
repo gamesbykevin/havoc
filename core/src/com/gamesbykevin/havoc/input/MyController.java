@@ -151,7 +151,7 @@ public class MyController implements InputProcessor {
         });
 
         Image shoot = new Image(new Texture(Gdx.files.internal("controls/shoot.png")));
-        addListener(shoot, KEY_SHOOT, KEY_ACTION);
+        addListener(shoot, KEY_SHOOT, KEY_CHANGE);
 
         Image tmpAction = new Image(new Texture(Gdx.files.internal("controls/action.png")));
         tmpAction.addListener(new InputListener() {

@@ -8,7 +8,6 @@ import com.gamesbykevin.havoc.level.Level;
 import static com.gamesbykevin.havoc.input.MyController.*;
 import static com.gamesbykevin.havoc.input.MyController.VELOCITY_Z;
 import static com.gamesbykevin.havoc.level.LevelHelper.ROOM_SIZE;
-import static com.gamesbykevin.havoc.player.Player.*;
 
 public class PlayerHelper {
 
@@ -189,6 +188,7 @@ public class PlayerHelper {
                 if (hasNeighborWall(level, roomCol, roomRow)) {
                     player.getController().setRotation(0);
                     level.resetPosition();
+                    level.getEnemies().reset();
                     return;
                 }
             }
