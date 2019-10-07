@@ -102,7 +102,7 @@ public class LevelHelper {
                 int roomRowStart = ROOM_SIZE * row;
 
                 //add 1 enemy for each room
-                if (col != 0 || row != 0 && !goal) {
+                if ((col != 0 || row != 0) && !goal) {
                     Enemy enemy = new Enemy();
                     enemy.setCol(roomColStart + (ROOM_SIZE / 2));
                     enemy.setRow(roomRowStart + (ROOM_SIZE / 2));
