@@ -139,7 +139,7 @@ public class Enemies {
 
         for (int i = 0; i < getEnemies().size(); i++) {
             Enemy enemy = getEnemies().get(i);
-            enemy.update();
+            enemy.update(camera3d);
             enemy.getAnimation().getDecal().lookAt(camera3d.position, camera3d.up);
             enemy.render(decalBatch);
         }

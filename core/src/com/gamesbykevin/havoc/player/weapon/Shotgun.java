@@ -13,7 +13,7 @@ public class Shotgun extends Weapon {
 
     private static final float DEFAULT_DAMAGE = 51f;
 
-    private static final float DEFAULT_RANGE = 10f;
+    private static final float DEFAULT_RANGE = 8f;
 
     public Shotgun() {
 

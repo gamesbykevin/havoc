@@ -12,11 +12,12 @@ import com.gamesbykevin.havoc.maze.Room;
 
 import static com.gamesbykevin.havoc.decals.Background.createDecalBackground;
 import static com.gamesbykevin.havoc.decals.DecalCustom.*;
+import static com.gamesbykevin.havoc.maze.Maze.getRandom;
 
 public class LevelHelper {
 
     //how big is each room
-    public static final int ROOM_SIZE = 8;
+    public static final int ROOM_SIZE = 12;
 
     //render decals within the specified range
     public static final int RENDER_RANGE = 30;
@@ -49,7 +50,7 @@ public class LevelHelper {
     }
 
     private static TextureRegion getRandomBackground() {
-        return getCeiling(Maze.getRandom().nextInt(TILES_FLOOR_CEILING) + 1);
+        return getCeiling(getRandom().nextInt(TILES_FLOOR_CEILING) + 1);
     }
 
     private static TextureRegion getCeiling(int index) {
@@ -57,7 +58,7 @@ public class LevelHelper {
     }
 
     private static TextureRegion getRandomWall() {
-        return getWall(Maze.getRandom().nextInt(TILES_WALL) + 1);
+        return getWall(getRandom().nextInt(TILES_WALL) + 1);
     }
 
     private static TextureRegion getWall(int index) {
@@ -100,14 +101,6 @@ public class LevelHelper {
                 //where does the room start
                 int roomColStart = ROOM_SIZE * col;
                 int roomRowStart = ROOM_SIZE * row;
-
-                //add 1 enemy for each room
-                if ((col != 0 || row != 0) && !goal) {
-                    Enemy enemy = new Enemy();
-                    enemy.setCol(roomColStart + (ROOM_SIZE / 2));
-                    enemy.setRow(roomRowStart + (ROOM_SIZE / 2));
-                    level.getEnemies().getEnemies().add(enemy);
-                }
 
                 TextureRegion wall = (goal) ? textureRegionWallGoal : getRandomWall();
 
@@ -165,14 +158,6 @@ public class LevelHelper {
                     }
                 }
 
-                //add floor and ceiling
-                for (int roomRow = roomRowStart; roomRow <= roomRowStart + ROOM_SIZE; roomRow += Background.TEXTURE_HEIGHT) {
-                    for (int roomCol = roomColStart; roomCol <= roomColStart + ROOM_SIZE; roomCol += Background.TEXTURE_WIDTH) {
-                        level.getDecals().add(createDecalBackground(roomCol, roomRow, textureRegionFloor, true));
-                        level.getDecals().add(createDecalBackground(roomCol, roomRow, textureRegionCeiling, false));
-                    }
-                }
-
                 //textures for the doors
                 TextureRegion door = (goal) ? getDoorGoal() : getTextureRegion(PATH_DOOR);
                 TextureRegion side = getTextureRegion(PATH_SIDE);
@@ -207,6 +192,46 @@ public class LevelHelper {
                         }
                     }
                 }
+            }
+        }
+
+        //add floors and ceiling
+        for (int col = 0; col < level.getMaze().getCols() * ROOM_SIZE; col += Background.TEXTURE_WIDTH) {
+            for (int row = 0; row < level.getMaze().getRows() * ROOM_SIZE; row += Background.TEXTURE_HEIGHT) {
+                level.getDecals().add(createDecalBackground(col, row, textureRegionFloor, true));
+                level.getDecals().add(createDecalBackground(col, row, textureRegionCeiling, false));
+            }
+        }
+
+        //spawn enemies in the rooms
+        for (int col = 0; col < level.getMaze().getCols(); col++) {
+            for (int row = 0; row < level.getMaze().getRows(); row++) {
+
+                //where does the room start
+                int roomColStart = ROOM_SIZE * col;
+                int roomRowStart = ROOM_SIZE * row;
+
+                boolean start = (col == level.getMaze().getStartCol() && row == level.getMaze().getStartRow());
+                boolean goal = (col == level.getMaze().getGoalCol() && row == level.getMaze().getGoalRow());
+
+                //add 1 enemy for each room but avoid the start and goal
+                if (!start && !goal) {
+                    Enemy enemy = new Enemy();
+                    enemy.setCol(roomColStart + getRandom().nextInt(ROOM_SIZE - 1) + 1);
+                    enemy.setRow(roomRowStart + getRandom().nextInt(ROOM_SIZE - 1) + 1);
+                    enemy.setCol(enemy.getCol() - (TEXTURE_WIDTH / 2));
+                    enemy.setRow(enemy.getRow() - (TEXTURE_HEIGHT / 2));
+
+                    level.getEnemies().getEnemies().add(enemy);
+
+                    enemy = new Enemy();
+                    enemy.setCol(roomColStart + getRandom().nextInt(ROOM_SIZE - 1) + 1);
+                    enemy.setRow(roomRowStart + getRandom().nextInt(ROOM_SIZE - 1) + 1);
+                    enemy.setCol(enemy.getCol() - (TEXTURE_WIDTH / 2));
+                    enemy.setRow(enemy.getRow() - (TEXTURE_HEIGHT / 2));
+                    level.getEnemies().getEnemies().add(enemy);
+                }
+
             }
         }
     }
