@@ -23,6 +23,9 @@ public abstract class Weapon {
     //how much damage does each bullet inflict
     private float damage;
 
+    //how close do we need to be in order to attack?
+    private float range;
+
     //different types of weapons
     public enum Type {
         Buzz, Glock, Impact, Magnum, Shotgun, Smg, Lance
@@ -49,6 +52,14 @@ public abstract class Weapon {
 
     public Type getType() {
         return this.type;
+    }
+
+    public float getRange() {
+        return this.range;
+    }
+
+    public void setRange(float range) {
+        this.range = range;
     }
 
     public int getBullets() {

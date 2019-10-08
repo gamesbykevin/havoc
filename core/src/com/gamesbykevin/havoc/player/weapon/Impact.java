@@ -13,9 +13,14 @@ public class Impact extends Weapon {
 
     private static final float DEFAULT_DAMAGE = 2f;
 
+    private static final float DEFAULT_RANGE = 20f;
+
     public Impact() {
 
         super(Type.Impact);
+
+        //assign the attack range
+        setRange(DEFAULT_RANGE);
 
         //set the bullet count
         setBullets(BULLETS_MAX_IMPACT);

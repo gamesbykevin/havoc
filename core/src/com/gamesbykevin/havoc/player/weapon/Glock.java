@@ -13,9 +13,14 @@ public class Glock extends Weapon {
 
     private static final float DEFAULT_DAMAGE = 10f;
 
+    private static final float DEFAULT_RANGE = 30f;
+
     public Glock() {
 
         super(Type.Glock);
+
+        //assign the attack range
+        setRange(DEFAULT_RANGE);
 
         //set the bullet count
         setBullets(BULLETS_MAX_GLOCK);

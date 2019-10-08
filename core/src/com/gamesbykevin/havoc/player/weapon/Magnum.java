@@ -13,9 +13,14 @@ public class Magnum extends Weapon {
 
     private static final float DEFAULT_DAMAGE = 20f;
 
+    private static final float DEFAULT_RANGE = 30f;
+
     public Magnum() {
 
         super(Type.Magnum);
+
+        //assign the attack range
+        setRange(DEFAULT_RANGE);
 
         //set the bullet count
         setBullets(BULLETS_MAX_MAGNUM);

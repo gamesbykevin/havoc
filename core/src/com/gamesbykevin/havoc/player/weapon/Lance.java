@@ -13,9 +13,14 @@ public class Lance extends Weapon {
 
     private static final float DEFAULT_DAMAGE = 1f;
 
+    private static final float DEFAULT_RANGE = 1f;
+
     public Lance() {
 
         super(Type.Lance);
+
+        //assign the attack range
+        setRange(DEFAULT_RANGE);
 
         //set the bullet count
         setBullets(BULLETS_MAX_LANCE);

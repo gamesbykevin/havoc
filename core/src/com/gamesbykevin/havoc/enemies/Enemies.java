@@ -10,23 +10,42 @@ import com.gamesbykevin.havoc.player.weapon.Weapon;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gamesbykevin.havoc.level.LevelHelper.RENDER_RANGE;
-import static com.gamesbykevin.havoc.level.LevelHelper.ROOM_SIZE;
-
 public class Enemies {
 
     private List<Enemy> enemies;
 
     //how many times do we check for collision
-    private static final int ATTEMPT_LIMIT = 100;
+    private static final int ATTEMPT_LIMIT = 200;
+
+    //how close does the bullet need to be for collision detection
+    private static final double BULLET_DISTANCE = 1.5d;
+
+    //how close can the player get to an enemy
+    private static final double PLAYER_COLLISION = 0.75d;
 
     public Enemies() {
-
         this.enemies = new ArrayList<>();
     }
 
     public List<Enemy> getEnemies() {
         return this.enemies;
+    }
+
+    public boolean hasCollision(float x, float y) {
+
+        for (int i = 0; i < getEnemies().size(); i++) {
+
+            Enemy enemy = getEnemies().get(i);
+
+            //skip if dead
+            if (enemy.isDead())
+                continue;
+
+            if (getDistance(enemy.getCol(), enemy.getRow(), x, y) <= PLAYER_COLLISION)
+                return true;
+        }
+
+        return false;
     }
 
     public void checkAttack(Weapon weapon, Level level, double angle, Vector3 position, float speed) {
@@ -43,6 +62,9 @@ public class Enemies {
 
         int attempts = 0;
 
+        //do we have range
+        boolean range = false;
+
         while (attempts < ATTEMPT_LIMIT) {
 
             for (int i = 0; i < getEnemies().size(); i++) {
@@ -53,15 +75,30 @@ public class Enemies {
                 if (enemy.isDead())
                     continue;
 
+                //how far are we from the enemy
+                double playerDistance = getDistance(enemy.getCol(), enemy.getRow(), position.x, position.y);
+
+                //if too far away to attack skip this enemy
+                if (playerDistance >= weapon.getRange())
+                    continue;
+
+                //flag that we have range with at least 1 enemy
+                range = true;
+
                 //calculate distance
-                double dist = Math.sqrt((Math.pow(enemy.getCol() - col, 2)) + (Math.pow(enemy.getRow() - row, 2)));
+                double dist = getDistance(enemy.getCol(), enemy.getRow(), col, row);
 
                 //if close enough, we hit the enemy
-                if (dist <= 1.5d) {
+                if (dist <= BULLET_DISTANCE) {
+                    System.out.println("HIT ENEMY!!!");
                     enemy.setHealth(enemy.getHealth() - weapon.getDamage());
                     return;
                 }
             }
+
+            //if we don't have range with any enemies skip this
+            if (!range)
+                break;
 
             //move to the next position
             col += xa;
@@ -86,6 +123,10 @@ public class Enemies {
             //keep track of the attempts
             attempts++;
         }
+    }
+
+    public static double getDistance(float x1, float y1, float x2, float y2) {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + (Math.pow(y2 - y1, 2)));
     }
 
     public void reset() {

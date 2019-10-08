@@ -13,9 +13,14 @@ public class Smg extends Weapon {
 
     private static final float DEFAULT_DAMAGE = 15f;
 
+    private static final float DEFAULT_RANGE = 30f;
+
     public Smg() {
 
         super(Type.Smg);
+
+        //assign the attack range
+        setRange(DEFAULT_RANGE);
 
         //set the bullet count
         setBullets(BULLETS_MAX_SMG);

@@ -13,9 +13,14 @@ public class Buzzsaw extends Weapon {
 
     private static final float DEFAULT_DAMAGE = 5f;
 
+    private static final float DEFAULT_RANGE = 30f;
+
     public Buzzsaw() {
 
         super(Type.Buzz);
+
+        //assign the attack range
+        setRange(DEFAULT_RANGE);
 
         //set the bullet count
         setBullets(BULLETS_MAX_BUZZ);

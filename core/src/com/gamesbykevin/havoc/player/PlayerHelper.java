@@ -159,6 +159,10 @@ public class PlayerHelper {
                 return true;
         }
 
+        //if collision with an enemy return true
+        if (controller.getLevel().getEnemies().hasCollision(x, y))
+            return true;
+
         //no collision
         return false;
     }

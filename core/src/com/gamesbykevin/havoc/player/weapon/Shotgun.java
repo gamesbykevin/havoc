@@ -13,9 +13,14 @@ public class Shotgun extends Weapon {
 
     private static final float DEFAULT_DAMAGE = 51f;
 
+    private static final float DEFAULT_RANGE = 10f;
+
     public Shotgun() {
 
         super(Type.Shotgun);
+
+        //assign the attack range
+        setRange(DEFAULT_RANGE);
 
         //set the bullet count
         setBullets(BULLETS_MAX_SHOTGUN);
