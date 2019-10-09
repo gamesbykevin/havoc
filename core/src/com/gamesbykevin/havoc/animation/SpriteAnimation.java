@@ -3,8 +3,6 @@ package com.gamesbykevin.havoc.animation;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 
-import static com.gamesbykevin.havoc.animation.Animation.FRAME_DURATION_DEFAULT;
-
 public class SpriteAnimation extends Animation {
 
     //list of images in our animation

@@ -11,7 +11,7 @@ public class Impact extends Weapon {
     private static final String FILE_NAME = "impact_cannon_f";
     private static final String EXTENSION = ".png";
 
-    private static final float DEFAULT_DAMAGE = 2f;
+    private static final float DEFAULT_DAMAGE = 8f;
 
     private static final float DEFAULT_RANGE = 20f;
 

@@ -1,7 +1,6 @@
 package com.gamesbykevin.havoc.player;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.gamesbykevin.havoc.animation.SpriteAnimation;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.player.weapon.*;
 
@@ -25,6 +24,9 @@ public final class Player {
 
     //controller reference
     private final MyController controller;
+
+    //how close can the player get to an object
+    public static final double PLAYER_COLLISION = 0.75d;
 
     public Player(MyController controller) {
 

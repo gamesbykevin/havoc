@@ -10,6 +10,11 @@ import com.gamesbykevin.havoc.player.weapon.Weapon;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.gamesbykevin.havoc.decals.DecalCustom.TEXTURE_HEIGHT;
+import static com.gamesbykevin.havoc.decals.DecalCustom.TEXTURE_WIDTH;
+import static com.gamesbykevin.havoc.level.LevelHelper.getDistance;
+import static com.gamesbykevin.havoc.player.Player.PLAYER_COLLISION;
+
 public class Enemies {
 
     private List<Enemy> enemies;
@@ -18,16 +23,22 @@ public class Enemies {
     private static final int ATTEMPT_LIMIT = 200;
 
     //how close does the bullet need to be for collision detection
-    private static final double BULLET_DISTANCE = 1.5d;
-
-    //how close can the player get to an enemy
-    private static final double PLAYER_COLLISION = 0.75d;
+    private static final double BULLET_DISTANCE = 1.25d;
 
     public Enemies() {
         this.enemies = new ArrayList<>();
     }
 
-    public List<Enemy> getEnemies() {
+    public void add(float col, float row) {
+        Enemy enemy = new Enemy();
+        enemy.setCol(col);
+        enemy.setRow(row);
+        enemy.setCol(enemy.getCol() - (TEXTURE_WIDTH / 2));
+        enemy.setRow(enemy.getRow() - (TEXTURE_HEIGHT / 2));
+        getEnemies().add(enemy);
+    }
+
+    private List<Enemy> getEnemies() {
         return this.enemies;
     }
 
@@ -90,7 +101,6 @@ public class Enemies {
 
                 //if close enough, we hit the enemy
                 if (dist <= BULLET_DISTANCE) {
-                    System.out.println("HIT ENEMY!!!");
                     enemy.setHealth(enemy.getHealth() - weapon.getDamage());
                     return;
                 }
@@ -105,28 +115,22 @@ public class Enemies {
             row += ya;
 
             //check if we hit a wall
-            if (level.hasWall((int)col, (int)row)) {
-                System.out.println("Hit wall");
+            if (level.hasWall((int)col, (int)row))
                 return;
-            } else if (level.hasDoor((int)col, (int)row)) {
+
+            if (level.hasDoor((int)col, (int)row)) {
 
                 //get the door at the current location
                 Door door = level.getDoorDecal((int)col, (int)row);
 
                 //if the door is closed then we hit the door
-                if (door != null && !door.isOpen()) {
-                    System.out.println("Hit door");
+                if (door != null && !door.isOpen())
                     return;
-                }
             }
 
             //keep track of the attempts
             attempts++;
         }
-    }
-
-    public static double getDistance(float x1, float y1, float x2, float y2) {
-        return Math.sqrt(Math.pow(x2 - x1, 2) + (Math.pow(y2 - y1, 2)));
     }
 
     public void reset() {
@@ -138,9 +142,17 @@ public class Enemies {
     public void render(DecalBatch decalBatch, PerspectiveCamera camera3d) {
 
         for (int i = 0; i < getEnemies().size(); i++) {
+
+            //get the current enemy
             Enemy enemy = getEnemies().get(i);
+
+            //update the enemy
             enemy.update(camera3d);
+
+            //render like a billboard
             enemy.getAnimation().getDecal().lookAt(camera3d.position, camera3d.up);
+
+            //add to the batch to be rendered
             enemy.render(decalBatch);
         }
     }

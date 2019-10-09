@@ -11,7 +11,7 @@ public class Smg extends Weapon {
     private static final String FILE_NAME = "smg_f";
     private static final String EXTENSION = ".png";
 
-    private static final float DEFAULT_DAMAGE = 15f;
+    private static final float DEFAULT_DAMAGE = 5f;
 
     private static final float DEFAULT_RANGE = 30f;
 

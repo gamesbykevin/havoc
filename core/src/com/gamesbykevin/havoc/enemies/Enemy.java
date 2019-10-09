@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
 
-import static com.gamesbykevin.havoc.enemies.Enemies.getDistance;
+import static com.gamesbykevin.havoc.level.LevelHelper.getDistance;
 
 public class Enemy {
 
@@ -33,15 +33,10 @@ public class Enemy {
 
     public Enemy() {
 
+        //our animations
         this.animations = new DecalAnimation[3];
-
-        //dead
         this.animations[INDEX_DEAD] = new DecalAnimation("enemies/enemy1/", "", ".png", 7, 4, DURATION);
-
-        //idle
         this.animations[INDEX_IDLE] = new DecalAnimation("enemies/enemy1/", "", ".png", 0, 4, DURATION);
-
-        //attack
         this.animations[INDEX_ATTACK] = new DecalAnimation("enemies/enemy1/", "", ".png", 4, 3, DURATION);
 
         reset();
@@ -50,7 +45,7 @@ public class Enemy {
     public void reset() {
         setHealth(100f);
         setDead(false);
-        setIndex(1);
+        setIndex(INDEX_IDLE);
         getAnimation().reset();
         getAnimation().setPosition(getCol(), getRow(), 0);
     }
@@ -58,9 +53,11 @@ public class Enemy {
     public void update(PerspectiveCamera camera3d) {
 
         if (!isDead()) {
+
             if (getHealth() <= 0) {
+
                 setDead(true);
-                setIndex(0);
+                setIndex(INDEX_DEAD);
                 getAnimation().reset();
 
             } else {
@@ -68,18 +65,26 @@ public class Enemy {
                 //calculate distance
                 double dist = getDistance(getCol(), getRow(), camera3d.position.x, camera3d.position.y);
 
+                //if the enemy isn't close enough
                 if (dist > RANGE) {
                     getAnimation().reset();
                     getAnimation().setPosition(getCol(), getRow(), 0);
                     return;
                 }
 
-                if (getIndex() == INDEX_IDLE && getAnimation().isFinish()) {
-                    setIndex(2);
-                    getAnimation().reset();
-                } else if (getIndex() == INDEX_ATTACK && getAnimation().isFinish()) {
-                    setIndex(1);
-                    getAnimation().reset();
+                if (getAnimation().isFinish()) {
+
+                    switch (getIndex()) {
+                        case INDEX_IDLE:
+                            setIndex(INDEX_ATTACK);
+                            getAnimation().reset();
+                            break;
+
+                        case INDEX_ATTACK:
+                            setIndex(INDEX_IDLE);
+                            getAnimation().reset();
+                            break;
+                    }
                 }
             }
         }

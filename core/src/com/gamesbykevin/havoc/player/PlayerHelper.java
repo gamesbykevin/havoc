@@ -163,6 +163,10 @@ public class PlayerHelper {
         if (controller.getLevel().getEnemies().hasCollision(x, y))
             return true;
 
+        //if collision with an obstacle return true
+        if (controller.getLevel().getObstacles().hasCollision(x, y))
+            return true;
+
         //no collision
         return false;
     }

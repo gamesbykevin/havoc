@@ -11,7 +11,7 @@ public class Lance extends Weapon {
     private static final String FILE_NAME = "thermic_lance_f";
     private static final String EXTENSION = ".png";
 
-    private static final float DEFAULT_DAMAGE = 1f;
+    private static final float DEFAULT_DAMAGE = 3f;
 
     private static final float DEFAULT_RANGE = 1f;
 

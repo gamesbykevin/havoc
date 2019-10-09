@@ -7,7 +7,6 @@ import com.gamesbykevin.havoc.decals.Background;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.DecalCustom.Type;
 import com.gamesbykevin.havoc.enemies.Enemy;
-import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.Room;
 
 import static com.gamesbykevin.havoc.decals.Background.createDecalBackground;
@@ -216,24 +215,27 @@ public class LevelHelper {
 
                 //add 1 enemy for each room but avoid the start and goal
                 if (!start && !goal) {
-                    Enemy enemy = new Enemy();
-                    enemy.setCol(roomColStart + getRandom().nextInt(ROOM_SIZE - 1) + 1);
-                    enemy.setRow(roomRowStart + getRandom().nextInt(ROOM_SIZE - 1) + 1);
-                    enemy.setCol(enemy.getCol() - (TEXTURE_WIDTH / 2));
-                    enemy.setRow(enemy.getRow() - (TEXTURE_HEIGHT / 2));
-
-                    level.getEnemies().getEnemies().add(enemy);
-
-                    enemy = new Enemy();
-                    enemy.setCol(roomColStart + getRandom().nextInt(ROOM_SIZE - 1) + 1);
-                    enemy.setRow(roomRowStart + getRandom().nextInt(ROOM_SIZE - 1) + 1);
-                    enemy.setCol(enemy.getCol() - (TEXTURE_WIDTH / 2));
-                    enemy.setRow(enemy.getRow() - (TEXTURE_HEIGHT / 2));
-                    level.getEnemies().getEnemies().add(enemy);
+                    addEnemy(level, roomColStart, roomRowStart);
+                    addEnemy(level, roomColStart, roomRowStart);
+                    addEnemy(level, roomColStart, roomRowStart);
+                    addObstacle(level, roomColStart, roomRowStart);
+                    addObstacle(level, roomColStart, roomRowStart);
+                    addObstacle(level, roomColStart, roomRowStart);
                 }
-
             }
         }
+    }
+
+    private static void addObstacle(Level level, int roomColStart, int roomRowStart) {
+        int randomCol = roomColStart + getRandom().nextInt(ROOM_SIZE - 4) + 2;
+        int randomRow = roomRowStart + getRandom().nextInt(ROOM_SIZE - 4) + 2;
+        level.getObstacles().add(randomCol, randomRow);
+    }
+
+    private static void addEnemy(Level level, int roomColStart, int roomRowStart) {
+        int randomCol = roomColStart + getRandom().nextInt(ROOM_SIZE - 4) + 2;
+        int randomRow = roomRowStart + getRandom().nextInt(ROOM_SIZE - 4) + 2;
+        level.getEnemies().add(randomCol, randomRow);
     }
 
     private static void addDoorWest(Level level, TextureRegion wall, TextureRegion side, TextureRegion door, int roomColStart, int roomRowStart, boolean secret) {
@@ -302,5 +304,9 @@ public class LevelHelper {
                 level.setDoor((int)col, (int)row, true);
                 break;
         }
+    }
+
+    public static double getDistance(float x1, float y1, float x2, float y2) {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + (Math.pow(y2 - y1, 2)));
     }
 }

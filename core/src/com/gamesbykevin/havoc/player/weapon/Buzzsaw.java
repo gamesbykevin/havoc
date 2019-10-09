@@ -11,7 +11,7 @@ public class Buzzsaw extends Weapon {
     private static final String FILE_NAME = "buzzsaw_cannon_f";
     private static final String EXTENSION = ".png";
 
-    private static final float DEFAULT_DAMAGE = 5f;
+    private static final float DEFAULT_DAMAGE = 12f;
 
     private static final float DEFAULT_RANGE = 30f;
 

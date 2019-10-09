@@ -10,6 +10,7 @@ import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.enemies.Enemies;
 import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.algorithm.*;
+import com.gamesbykevin.havoc.obstacles.Obstacles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,9 @@ public class Level {
     //our enemies are contained here
     private Enemies enemies;
 
+    //list of obstacles in the level
+    private Obstacles obstacles;
+
     public Level() {
 
         //create our enemies container
@@ -56,6 +60,14 @@ public class Level {
 
         //create the batch
         getDecalBatch();
+    }
+
+    public Obstacles getObstacles() {
+
+        if (this.obstacles == null)
+            this.obstacles = new Obstacles();
+
+        return this.obstacles;
     }
 
     public Enemies getEnemies() {
@@ -277,6 +289,9 @@ public class Level {
 
         //render the enemies
         getEnemies().render(getDecalBatch(), getCamera3d());
+
+        //render the obstacles
+        getObstacles().render(getDecalBatch(), getCamera3d());
 
         //call flush at the end to draw
         getDecalBatch().flush();
