@@ -204,15 +204,13 @@ public abstract class Weapon {
             setAttacking(true);
             getAttacking().reset();
 
+            //take a bullet away
+            setBullets(getBullets() - 1);
+
             //check if attack hit enemy
             checkAttack(controller, this);
 
         } else if (isAttacking() && getAttacking().isFinish()) {
-
-            //take a bullet away
-            setBullets(getBullets() - 1);
-
-            System.out.println("Ammo: " + getBullets());
 
             //if the player no longer wishes to shoot, or we ran out of bullets we will stop
             if (!controller.isShooting() || getBullets() == 0) {
@@ -229,6 +227,9 @@ public abstract class Weapon {
 
                 //continue to attack
                 getAttacking().reset();
+
+                //take a bullet away
+                setBullets(getBullets() - 1);
 
                 //check if attack hit enemy
                 checkAttack(controller, this);

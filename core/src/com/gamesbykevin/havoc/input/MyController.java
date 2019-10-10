@@ -53,6 +53,9 @@ public class MyController implements InputProcessor {
     public static final float MAX_Z = .25f;
     public static float VELOCITY_Z = 0.01f;
 
+    //size of each button
+    public static final int BUTTON_SIZE = 80;
+
     //different control inputs
     public static final int KEY_MOVE_FORWARD = Input.Keys.W;
     public static final int KEY_MOVE_BACKWARD = Input.Keys.S;
@@ -105,15 +108,15 @@ public class MyController implements InputProcessor {
         createPadListener(strafeRight, KEY_STRAFE_RIGHT, KEY_STRAFE_LEFT);
 
         tablePad.add().colspan(1);
-        tablePad.add(forward).colspan(1);
+        tablePad.add(forward).width(BUTTON_SIZE).height(BUTTON_SIZE).colspan(1);
         tablePad.add().colspan(1);
         tablePad.row();
-        tablePad.add(strafeLeft).colspan(1);
+        tablePad.add(strafeLeft).width(BUTTON_SIZE).height(BUTTON_SIZE).colspan(1);
         tablePad.add().colspan(1);
-        tablePad.add(strafeRight).colspan(1);
+        tablePad.add(strafeRight).width(BUTTON_SIZE).height(BUTTON_SIZE).colspan(1);
         tablePad.row();
         tablePad.add().colspan(1);
-        tablePad.add(backward).colspan(1).row();
+        tablePad.add(backward).width(BUTTON_SIZE).height(BUTTON_SIZE).colspan(1);
         tablePad.add().colspan(1);
 
         getStage().addActor(tablePad);
@@ -168,13 +171,13 @@ public class MyController implements InputProcessor {
         addListener(turnRight, KEY_TURN_RIGHT, KEY_TURN_LEFT);
 
         tableButtons.add();
-        tableButtons.add(change).pad(PADDING);
+        tableButtons.add(change).width(BUTTON_SIZE).height(BUTTON_SIZE).pad(PADDING);
         tableButtons.row();
-        tableButtons.add(tmpAction).pad(PADDING);
-        tableButtons.add(shoot).pad(PADDING);
+        tableButtons.add(tmpAction).width(BUTTON_SIZE).height(BUTTON_SIZE).pad(PADDING);
+        tableButtons.add(shoot).width(BUTTON_SIZE).height(BUTTON_SIZE).pad(PADDING);
         tableButtons.row();
-        tableButtons.add(turnLeft).pad(PADDING);
-        tableButtons.add(turnRight).pad(PADDING);
+        tableButtons.add(turnLeft).width(BUTTON_SIZE).height(BUTTON_SIZE).pad(PADDING);
+        tableButtons.add(turnRight).width(BUTTON_SIZE).height(BUTTON_SIZE).pad(PADDING);
 
         getStage().addActor(tableButtons);
 
