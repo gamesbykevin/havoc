@@ -23,9 +23,6 @@ public class MyController implements InputProcessor {
     //space between the buttons
     public static final int PADDING = 5;
 
-    public static final float MAX_COORDINATE = 110f;
-    public static final float MIN_COORDINATE = 48f;
-
     //how fast can we move
     public static final float SPEED_WALK = .1f;
     public static final float SPEED_RUN = .25f;
@@ -97,29 +94,27 @@ public class MyController implements InputProcessor {
         tablePad.setFillParent(true);
         tablePad.left().bottom().pad(PADDING);
 
-        Image pad = new Image(new Texture(Gdx.files.internal("controls/pad.png")));
-        pad.addListener(new InputListener(){
+        Image forward = new Image(new Texture(Gdx.files.internal("controls/forward.png")));
+        Image backward = new Image(new Texture(Gdx.files.internal("controls/backward.png")));
+        Image strafeLeft = new Image(new Texture(Gdx.files.internal("controls/strafeLeft.png")));
+        Image strafeRight = new Image(new Texture(Gdx.files.internal("controls/strafeRight.png")));
 
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                checkPad(x, y, true);
-                return true;
-            }
+        createPadListener(forward, KEY_MOVE_FORWARD, KEY_MOVE_BACKWARD);
+        createPadListener(backward, KEY_MOVE_BACKWARD, KEY_MOVE_FORWARD);
+        createPadListener(strafeLeft, KEY_STRAFE_LEFT, KEY_STRAFE_RIGHT);
+        createPadListener(strafeRight, KEY_STRAFE_RIGHT, KEY_STRAFE_LEFT);
 
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                checkPad(x, y, false);
-                super.touchUp(event, x, y, pointer, button);
-            }
-
-            @Override
-            public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                checkPad(x, y, true);
-                super.touchDragged(event, x, y, pointer);
-            }
-        });
-
-        tablePad.add(pad).row();
+        tablePad.add().colspan(1);
+        tablePad.add(forward).colspan(1);
+        tablePad.add().colspan(1);
+        tablePad.row();
+        tablePad.add(strafeLeft).colspan(1);
+        tablePad.add().colspan(1);
+        tablePad.add(strafeRight).colspan(1);
+        tablePad.row();
+        tablePad.add().colspan(1);
+        tablePad.add(backward).colspan(1).row();
+        tablePad.add().colspan(1);
 
         getStage().addActor(tablePad);
 
@@ -167,10 +162,10 @@ public class MyController implements InputProcessor {
             }
         });
 
-        Image strafeL = new Image(new Texture(Gdx.files.internal("controls/left.png")));
-        addListener(strafeL, KEY_TURN_LEFT, KEY_TURN_RIGHT);
-        Image strafeR = new Image(new Texture(Gdx.files.internal("controls/right.png")));
-        addListener(strafeR, KEY_TURN_RIGHT, KEY_TURN_LEFT);
+        Image turnLeft = new Image(new Texture(Gdx.files.internal("controls/left.png")));
+        addListener(turnLeft, KEY_TURN_LEFT, KEY_TURN_RIGHT);
+        Image turnRight = new Image(new Texture(Gdx.files.internal("controls/right.png")));
+        addListener(turnRight, KEY_TURN_RIGHT, KEY_TURN_LEFT);
 
         tableButtons.add();
         tableButtons.add(change).pad(PADDING);
@@ -178,8 +173,8 @@ public class MyController implements InputProcessor {
         tableButtons.add(tmpAction).pad(PADDING);
         tableButtons.add(shoot).pad(PADDING);
         tableButtons.row();
-        tableButtons.add(strafeL).pad(PADDING);
-        tableButtons.add(strafeR).pad(PADDING);
+        tableButtons.add(turnLeft).pad(PADDING);
+        tableButtons.add(turnRight).pad(PADDING);
 
         getStage().addActor(tableButtons);
 
@@ -193,30 +188,28 @@ public class MyController implements InputProcessor {
         getCamera2d();
     }
 
-    private void checkPad(float x, float y, boolean flag) {
+    private void createPadListener(Image image, int keyEnabled, int keyDisabled) {
 
-        if (y >= MIN_COORDINATE && y <= MAX_COORDINATE) {
-            if (x <= MIN_COORDINATE) {
-                updateFlag(KEY_STRAFE_LEFT, flag);
-                updateFlag(KEY_STRAFE_RIGHT, false);
-            }
-            if (x >= MAX_COORDINATE) {
-                updateFlag(KEY_STRAFE_RIGHT, flag);
-                updateFlag(KEY_STRAFE_LEFT, false);
-            }
-        }
+        image.addListener(new InputListener(){
 
-        if (x >= MIN_COORDINATE && x <= MAX_COORDINATE) {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                updateFlag(keyEnabled, true);
+                updateFlag(keyDisabled, false);
+                return true;
+            }
 
-            if (y <= MIN_COORDINATE) {
-                updateFlag(KEY_MOVE_BACKWARD, flag);
-                updateFlag(KEY_MOVE_FORWARD, false);
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                updateFlag(keyEnabled, false);
+                super.touchUp(event, x, y, pointer, button);
             }
-            if (y >= MAX_COORDINATE) {
-                updateFlag(KEY_MOVE_FORWARD, flag);
-                updateFlag(KEY_MOVE_BACKWARD, false);
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                super.touchDragged(event, x, y, pointer);
             }
-        }
+        });
     }
 
     public Level getLevel() {
@@ -236,8 +229,9 @@ public class MyController implements InputProcessor {
 
     public void setInput() {
 
-        //Gdx.input.setInputProcessor(getStage());
+        Gdx.input.setInputProcessor(getStage());
 
+        /*
         switch (Gdx.app.getType()) {
             case Android:
             case iOS:
@@ -248,6 +242,7 @@ public class MyController implements InputProcessor {
                 Gdx.input.setInputProcessor(this);
                 break;
         }
+        */
     }
 
     private void addListener(Image img, int keyEnable, int keyDisable) {

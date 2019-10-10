@@ -5,6 +5,8 @@ import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
 
+import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
+import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
 import static com.gamesbykevin.havoc.input.MyController.*;
 import static com.gamesbykevin.havoc.input.MyController.VELOCITY_Z;
 import static com.gamesbykevin.havoc.level.LevelHelper.ROOM_SIZE;
@@ -16,6 +18,16 @@ public class PlayerHelper {
 
     //how close we have to be to open a door
     public static final float DOOR_DISTANCE = 1.0f;
+
+    //where to render our hud items
+    public static final float HUD_NUMBER_RATIO = .5f;
+    public static final int HUD_NUMBER_WIDTH = (int)(58 * HUD_NUMBER_RATIO);
+    public static final int HUD_NUMBER_HEIGHT = (int)(70 * HUD_NUMBER_RATIO);
+    public static final int HUD_NUMBER_PAD = (int)(5 * HUD_NUMBER_RATIO);
+    public static final int HUD_BULLET_X = SIZE_WIDTH - (3 * HUD_NUMBER_WIDTH) - (3 * HUD_NUMBER_PAD);
+    public static final int HUD_BULLET_Y = SIZE_HEIGHT - (HUD_NUMBER_HEIGHT);
+    public static final int HUD_HEALTH_X = (3 * HUD_NUMBER_PAD);
+    public static final int HUD_HEALTH_Y = SIZE_HEIGHT - HUD_NUMBER_HEIGHT - (HUD_NUMBER_PAD * 2);
 
     protected static void updateLocation(MyController controller) {
 

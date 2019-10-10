@@ -213,14 +213,14 @@ public class LevelHelper {
                 boolean start = (col == level.getMaze().getStartCol() && row == level.getMaze().getStartRow());
                 boolean goal = (col == level.getMaze().getGoalCol() && row == level.getMaze().getGoalRow());
 
-                //add 1 enemy for each room but avoid the start and goal
+                //add for each room but avoid the start and goal
                 if (!start && !goal) {
                     addEnemy(level, roomColStart, roomRowStart);
                     addEnemy(level, roomColStart, roomRowStart);
                     addEnemy(level, roomColStart, roomRowStart);
                     addObstacle(level, roomColStart, roomRowStart);
-                    addObstacle(level, roomColStart, roomRowStart);
-                    addObstacle(level, roomColStart, roomRowStart);
+                    //addObstacle(level, roomColStart, roomRowStart);
+                    //addObstacle(level, roomColStart, roomRowStart);
                 }
             }
         }

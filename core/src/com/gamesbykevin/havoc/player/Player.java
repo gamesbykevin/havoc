@@ -1,5 +1,7 @@
 package com.gamesbykevin.havoc.player;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.player.weapon.*;
@@ -8,8 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.gamesbykevin.havoc.player.PlayerHelper.*;
-import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.reset;
-import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.updateWeapon;
+import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.*;
 
 public final class Player {
 
@@ -28,10 +29,36 @@ public final class Player {
     //how close can the player get to an object
     public static final double PLAYER_COLLISION = 0.75d;
 
+    //array of numbers
+    private Texture[] numbers;
+
+    private static final int HEALTH_MAX = 100;
+    private static final int HEALTH_MIN = 0;
+
+    //what is our health
+    private int health = 0;
+
     public Player(MyController controller) {
 
         //store reference to controller
         this.controller = controller;
+
+        //create our array of number images
+        this.numbers = new Texture[13];
+
+        //load our textures
+        for (int i = 0; i < this.numbers.length; i++) {
+
+            if (i < 10) {
+                this.numbers[i] = new Texture(Gdx.files.internal("hud/" + i + ".png"));
+            } else if (i == 10) {
+                this.numbers[i] = new Texture(Gdx.files.internal("hud/key_1_small.png"));
+            } else if (i == 11) {
+                this.numbers[i] = new Texture(Gdx.files.internal("hud/key_2_small.png"));
+            } else if (i == 12) {
+                this.numbers[i] = new Texture(Gdx.files.internal("hud/percent.png"));
+            }
+        }
 
         //add weapon to our list
         getWeapons().add(new Lance());
@@ -48,6 +75,17 @@ public final class Player {
 
         //start with lance
         setWeaponIndex(5);
+
+        //start out with the max health
+        setHealth(HEALTH_MAX);
+    }
+
+    public int getHealth() {
+        return this.health;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
     }
 
     public MyController getController() {
@@ -102,8 +140,57 @@ public final class Player {
 
     public void render() {
         getSpriteBatch().setProjectionMatrix(getController().getCamera2d().combined);
+
+        //start rendering
         getController().getStage().getBatch().begin();
+
+        //render weapon animation
         getWeapons().get(getWeaponIndex()).render(getController().getStage().getBatch());
+
+        //render ammo
+        renderNumber(getWeapon().getBullets(), HUD_BULLET_X, HUD_BULLET_Y, HUD_NUMBER_WIDTH, HUD_NUMBER_HEIGHT, HUD_NUMBER_PAD);
+
+        //render health
+        renderNumber(getHealth(), HUD_HEALTH_X, HUD_HEALTH_Y, HUD_NUMBER_WIDTH, HUD_NUMBER_HEIGHT, HUD_NUMBER_PAD);
+
+        //render keys
+
+        //done rendering
         getController().getStage().getBatch().end();
     }
+
+    public void renderNumber(final int number, int renderX, int renderY, int width, int height, int padding) {
+
+        float x = renderX;
+
+        for (int i = 0; i < 4; i++) {
+
+            int index = 12;
+
+            switch (i) {
+                case 0:
+                    index = (number / 100);
+                    break;
+
+                case 1:
+                    index = (number % 100) / 10;
+                    break;
+
+                case 2:
+                    index = (number % 10);
+                    break;
+            }
+
+            //if less than 0 we display as 999
+            if (number < 0)
+                index = 9;
+
+            //render the number
+            getController().getStage().getBatch().draw(this.numbers[index], x, renderY, width, height);
+
+            //move to the next coordinate
+            x += width + padding;
+        }
+    }
+
 }
