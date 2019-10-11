@@ -23,7 +23,7 @@ public class MyController implements InputProcessor {
     private float speed = SPEED_WALK;
 
     //how fast can the player turn by default
-    public static final float DEFAULT_SPEED_ROTATE = 2f;
+    public static final float DEFAULT_SPEED_ROTATE = 3f;
 
     //track how fast the player can turn
     private float speedRotate = DEFAULT_SPEED_ROTATE;

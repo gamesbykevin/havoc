@@ -19,6 +19,9 @@ public class PlayerHelper {
     //how close we have to be to open a door
     public static final float DOOR_DISTANCE = 1.0f;
 
+    //if we aren't moving the joystick enough we will ignore
+    private static final float DEADZONE_IGNORE = .33f;
+
     //where to render our hud items
     public static final float HUD_NUMBER_RATIO = .5f;
     public static final int HUD_NUMBER_WIDTH = (int)(58 * HUD_NUMBER_RATIO);
@@ -63,11 +66,19 @@ public class PlayerHelper {
         //if we aren't moving let's check the joystick
         if (yMove == 0 && xMove == 0) {
 
-            //move as fast as the percent
-            yMove = controller.getKnobPercentY();
+            //make sure we are moving enough
+            if (controller.getKnobPercentY() < -DEADZONE_IGNORE) {
+                yMove = controller.getKnobPercentY() + DEADZONE_IGNORE;
+            } else if (controller.getKnobPercentY() > DEADZONE_IGNORE) {
+                yMove = controller.getKnobPercentY() - DEADZONE_IGNORE;
+            }
 
-            //turn based on the joystick movement
-            rotationA = controller.getSpeedRotate() * -controller.getKnobPercentX();
+            //make sure we are moving enough
+            if (controller.getKnobPercentX() < -DEADZONE_IGNORE) {
+                rotationA = controller.getSpeedRotate() * (-controller.getKnobPercentX() - DEADZONE_IGNORE);
+            } else if (controller.getKnobPercentX() > DEADZONE_IGNORE) {
+                rotationA = controller.getSpeedRotate() * (-controller.getKnobPercentX() + DEADZONE_IGNORE);
+            }
         }
 
         //convert to radians
