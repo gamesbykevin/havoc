@@ -86,6 +86,9 @@ public final class Player {
 
     public void setHealth(int health) {
         this.health = health;
+
+        if (this.health < HEALTH_MIN)
+            this.health = HEALTH_MIN;
     }
 
     public MyController getController() {
@@ -153,7 +156,7 @@ public final class Player {
         //render health
         renderNumber(getHealth(), HUD_HEALTH_X, HUD_HEALTH_Y, HUD_NUMBER_WIDTH, HUD_NUMBER_HEIGHT, HUD_NUMBER_PAD);
 
-        //render keys
+        //render keys?
 
         //done rendering
         getController().getStage().getBatch().end();

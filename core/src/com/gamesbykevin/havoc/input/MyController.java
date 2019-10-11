@@ -1,27 +1,19 @@
 package com.gamesbykevin.havoc.input;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.gamesbykevin.havoc.level.Level;
 
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
+import static com.gamesbykevin.havoc.input.MyControllerHelper.*;
 
 public class MyController implements InputProcessor {
-
-    //space between the buttons
-    public static final int PADDING = 5;
 
     //how fast can we move
     public static final float SPEED_WALK = .1f;
@@ -31,7 +23,7 @@ public class MyController implements InputProcessor {
     private float speed = SPEED_WALK;
 
     //how fast can the player turn by default
-    public static final float DEFAULT_SPEED_ROTATE = 3f;
+    public static final float DEFAULT_SPEED_ROTATE = 2f;
 
     //track how fast the player can turn
     private float speedRotate = DEFAULT_SPEED_ROTATE;
@@ -53,21 +45,6 @@ public class MyController implements InputProcessor {
     public static final float MAX_Z = .25f;
     public static float VELOCITY_Z = 0.01f;
 
-    //size of each button
-    public static final int BUTTON_SIZE = 80;
-
-    //different control inputs
-    public static final int KEY_MOVE_FORWARD = Input.Keys.W;
-    public static final int KEY_MOVE_BACKWARD = Input.Keys.S;
-    public static final int KEY_MOVE_RUNNING = Input.Keys.SHIFT_LEFT;
-    public static final int KEY_STRAFE_LEFT = Input.Keys.A;
-    public static final int KEY_STRAFE_RIGHT = Input.Keys.D;
-    public static final int KEY_TURN_LEFT = Input.Keys.LEFT;
-    public static final int KEY_TURN_RIGHT = Input.Keys.RIGHT;
-    public static final int KEY_SHOOT = Input.Keys.ENTER;
-    public static final int KEY_ACTION = Input.Keys.SPACE;
-    public static final int KEY_CHANGE = Input.Keys.NUM_1;
-
     //what are we doing?
     private boolean moveForward = false;
     private boolean moveBackward = false;
@@ -83,6 +60,9 @@ public class MyController implements InputProcessor {
     //camera to render controls
     private OrthographicCamera camera2d;
 
+    //track the joystick position
+    private float knobPercentX = 0, knobPercentY = 0;
+
     public MyController(Level level) {
 
         //reference our level for collision detection
@@ -93,93 +73,8 @@ public class MyController implements InputProcessor {
         getPreviousPosition().x = getCamera3d().position.x;
         getPreviousPosition().y = getCamera3d().position.y;
 
-        Table tablePad = new Table();
-        tablePad.setFillParent(true);
-        tablePad.left().bottom().pad(PADDING);
-
-        Image forward = new Image(new Texture(Gdx.files.internal("controls/forward.png")));
-        Image backward = new Image(new Texture(Gdx.files.internal("controls/backward.png")));
-        Image strafeLeft = new Image(new Texture(Gdx.files.internal("controls/strafeLeft.png")));
-        Image strafeRight = new Image(new Texture(Gdx.files.internal("controls/strafeRight.png")));
-
-        createPadListener(forward, KEY_MOVE_FORWARD, KEY_MOVE_BACKWARD);
-        createPadListener(backward, KEY_MOVE_BACKWARD, KEY_MOVE_FORWARD);
-        createPadListener(strafeLeft, KEY_STRAFE_LEFT, KEY_STRAFE_RIGHT);
-        createPadListener(strafeRight, KEY_STRAFE_RIGHT, KEY_STRAFE_LEFT);
-
-        tablePad.add().colspan(1);
-        tablePad.add(forward).width(BUTTON_SIZE).height(BUTTON_SIZE).colspan(1);
-        tablePad.add().colspan(1);
-        tablePad.row();
-        tablePad.add(strafeLeft).width(BUTTON_SIZE).height(BUTTON_SIZE).colspan(1);
-        tablePad.add().colspan(1);
-        tablePad.add(strafeRight).width(BUTTON_SIZE).height(BUTTON_SIZE).colspan(1);
-        tablePad.row();
-        tablePad.add().colspan(1);
-        tablePad.add(backward).width(BUTTON_SIZE).height(BUTTON_SIZE).colspan(1);
-        tablePad.add().colspan(1);
-
-        getStage().addActor(tablePad);
-
-        Table tableButtons = new Table();
-        tableButtons.setFillParent(true);
-        tableButtons.right().bottom().pad(PADDING);
-
-        Image change = new Image(new Texture(Gdx.files.internal("controls/change.png")));
-        change.addListener(new InputListener() {
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                setChange(true);
-                updateFlag(KEY_SHOOT, false);
-                super.touchUp(event, x, y, pointer, button);
-            }
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                updateFlag(KEY_SHOOT, false);
-                return true;
-            }
-
-            @Override
-            public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                updateFlag(KEY_SHOOT, false);
-                super.touchDragged(event, x, y, pointer);
-            }
-        });
-
-        Image shoot = new Image(new Texture(Gdx.files.internal("controls/shoot.png")));
-        addListener(shoot, KEY_SHOOT, KEY_CHANGE);
-
-        Image tmpAction = new Image(new Texture(Gdx.files.internal("controls/action.png")));
-        tmpAction.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                setAction(true);
-                super.touchUp(event, x, y, pointer, button);
-            }
-        });
-
-        Image turnLeft = new Image(new Texture(Gdx.files.internal("controls/left.png")));
-        addListener(turnLeft, KEY_TURN_LEFT, KEY_TURN_RIGHT);
-        Image turnRight = new Image(new Texture(Gdx.files.internal("controls/right.png")));
-        addListener(turnRight, KEY_TURN_RIGHT, KEY_TURN_LEFT);
-
-        tableButtons.add();
-        tableButtons.add(change).width(BUTTON_SIZE).height(BUTTON_SIZE).pad(PADDING);
-        tableButtons.row();
-        tableButtons.add(tmpAction).width(BUTTON_SIZE).height(BUTTON_SIZE).pad(PADDING);
-        tableButtons.add(shoot).width(BUTTON_SIZE).height(BUTTON_SIZE).pad(PADDING);
-        tableButtons.row();
-        tableButtons.add(turnLeft).width(BUTTON_SIZE).height(BUTTON_SIZE).pad(PADDING);
-        tableButtons.add(turnRight).width(BUTTON_SIZE).height(BUTTON_SIZE).pad(PADDING);
-
-        getStage().addActor(tableButtons);
+        //setup our controller ui
+        setupController(this);
 
         //make sure we are capturing input correct
         setInput();
@@ -191,28 +86,20 @@ public class MyController implements InputProcessor {
         getCamera2d();
     }
 
-    private void createPadListener(Image image, int keyEnabled, int keyDisabled) {
+    public void setKnobPercentX(float knobPercentX) {
+        this.knobPercentX = knobPercentX;
+    }
 
-        image.addListener(new InputListener(){
+    public void setKnobPercentY(float knobPercentY) {
+        this.knobPercentY = knobPercentY;
+    }
 
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                updateFlag(keyEnabled, true);
-                updateFlag(keyDisabled, false);
-                return true;
-            }
+    public float getKnobPercentX() {
+        return this.knobPercentX;
+    }
 
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                updateFlag(keyEnabled, false);
-                super.touchUp(event, x, y, pointer, button);
-            }
-
-            @Override
-            public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                super.touchDragged(event, x, y, pointer);
-            }
-        });
+    public float getKnobPercentY() {
+        return this.knobPercentY;
     }
 
     public Level getLevel() {
@@ -248,33 +135,6 @@ public class MyController implements InputProcessor {
         */
     }
 
-    private void addListener(Image img, int keyEnable, int keyDisable) {
-
-        img.addListener(new InputListener() {
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                updateFlag(keyEnable, true);
-                updateFlag(keyDisable, false);
-                return true;
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                updateFlag(keyEnable, false);
-                updateFlag(keyDisable, false);
-                super.touchUp(event, x, y, pointer, button);
-            }
-
-            @Override
-            public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                updateFlag(keyEnable, true);
-                updateFlag(keyDisable, false);
-                super.touchDragged(event, x, y, pointer);
-            }
-        });
-    }
-
     public float getRotation() {
         return this.rotation;
     }
@@ -301,13 +161,13 @@ public class MyController implements InputProcessor {
 
     @Override
     public boolean keyDown (int keycode) {
-        updateFlag(keycode, true);
+        updateFlag(this, keycode, true);
         return false;
     }
 
     @Override
     public boolean keyUp (int keycode) {
-        updateFlag(keycode, false);
+        updateFlag(this, keycode, false);
         return false;
     }
 
@@ -341,57 +201,28 @@ public class MyController implements InputProcessor {
         return false;
     }
 
-    private void updateFlag(int keycode, boolean flag) {
-
-        switch (keycode) {
-            case KEY_MOVE_BACKWARD:
-                setMoveBackward(flag);
-                break;
-
-            case KEY_MOVE_FORWARD:
-                setMoveForward(flag);
-                break;
-
-            case KEY_MOVE_RUNNING:
-                setRunning(flag);
-                break;
-
-            case KEY_STRAFE_LEFT:
-                setStrafeLeft(flag);
-                break;
-
-            case KEY_STRAFE_RIGHT:
-                setStrafeRight(flag);
-                break;
-
-            case KEY_TURN_LEFT:
-                setTurnLeft(flag);
-                break;
-
-            case KEY_TURN_RIGHT:
-                setTurnRight(flag);
-                break;
-
-            case KEY_ACTION:
-                setAction(!flag);
-                break;
-
-            case KEY_SHOOT:
-                setShooting(flag);
-                break;
-
-            case KEY_CHANGE:
-                setChange(flag);
-                break;
-        }
-    }
-
     public PerspectiveCamera getCamera3d() {
         return this.level.getCamera3d();
     }
 
     public Vector3 getPreviousPosition() {
         return this.previousPosition;
+    }
+
+    public boolean isStrafeLeft() {
+        return this.strafeLeft;
+    }
+
+    public boolean isStrafeRight() {
+        return this.strafeRight;
+    }
+
+    public boolean isTurnRight() {
+        return this.turnRight;
+    }
+
+    public boolean isTurnLeft() {
+        return this.turnLeft;
     }
 
     public boolean isMoveForward() {
@@ -410,16 +241,8 @@ public class MyController implements InputProcessor {
         this.moveBackward = moveBackward;
     }
 
-    public boolean isStrafeLeft() {
-        return this.strafeLeft;
-    }
-
     public void setStrafeLeft(boolean strafeLeft) {
         this.strafeLeft = strafeLeft;
-    }
-
-    public boolean isStrafeRight() {
-        return this.strafeRight;
     }
 
     public void setStrafeRight(boolean strafeRight) {
@@ -434,16 +257,8 @@ public class MyController implements InputProcessor {
         this.running = running;
     }
 
-    public boolean isTurnRight() {
-        return this.turnRight;
-    }
-
     public void setTurnRight(boolean turnRight) {
         this.turnRight = turnRight;
-    }
-
-    public boolean isTurnLeft() {
-        return this.turnLeft;
     }
 
     public void setTurnLeft(boolean turnLeft) {

@@ -31,14 +31,18 @@ public class PlayerHelper {
 
     protected static void updateLocation(MyController controller) {
 
-        int xMove = 0;
-        int yMove = 0;
+        double xMove = 0;
+        double yMove = 0;
 
+        //determine the speed of the player
         if (controller.isRunning()) {
             controller.setSpeed(SPEED_RUN);
         } else {
             controller.setSpeed(SPEED_WALK);
         }
+
+        //which way are we turning?
+        float rotationA = 0;
 
         if (controller.isMoveForward())
             yMove++;
@@ -50,20 +54,28 @@ public class PlayerHelper {
         if (controller.isStrafeRight())
             xMove++;
 
-        float rotationA = 0;
-
         if (controller.isTurnLeft()) {
             rotationA = controller.getSpeedRotate();
         } else if (controller.isTurnRight()) {
             rotationA = -controller.getSpeedRotate();
         }
 
+        //if we aren't moving let's check the joystick
+        if (yMove == 0 && xMove == 0) {
+
+            //move as fast as the percent
+            yMove = controller.getKnobPercentY();
+
+            //turn based on the joystick movement
+            rotationA = controller.getSpeedRotate() * -controller.getKnobPercentX();
+        }
+
+        //convert to radians
         double angle = Math.toRadians(controller.getRotation());
 
         //calculate distance moved
         double xa = (xMove * Math.cos(angle)) - (yMove * Math.sin(angle));
         xa *= controller.getSpeed();
-
         double ya = (yMove * Math.cos(angle)) + (xMove * Math.sin(angle));
         ya *= controller.getSpeed();
 
