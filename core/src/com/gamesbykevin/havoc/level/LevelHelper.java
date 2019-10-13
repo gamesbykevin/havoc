@@ -100,12 +100,12 @@ public class LevelHelper {
             backgrounds.add(i);
         }
 
-        int index = backgrounds.get(getRandom().nextInt(backgrounds.size()));
+        int index = getRandom().nextInt(backgrounds.size());
 
         //choose the floor and ceiling
         TextureRegion textureRegionCeiling = getBackground(backgrounds.get(index));
         backgrounds.remove(index);
-        index = backgrounds.get(getRandom().nextInt(backgrounds.size()));
+        index = getRandom().nextInt(backgrounds.size());
         TextureRegion textureRegionFloor = getBackground(backgrounds.get(index));
         backgrounds.remove(index);
 

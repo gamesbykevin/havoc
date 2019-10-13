@@ -254,32 +254,42 @@ public class RoomHelper {
             }
         }
 
-        //south west
         if (Maze.getRandom().nextBoolean()) {
+
             addMiniRoom(level, wall, roomColStart, roomRowStart, middleCol, middleRow);
-        } else {
-            addCorner(level, wall, roomColStart, roomRowStart, middleCol, middleRow);
-        }
-
-        //south east
-        if (Maze.getRandom().nextBoolean()) {
             addMiniRoom(level, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart, middleCol, middleRow);
-        } else {
-            addCorner(level, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart, middleCol, middleRow);
-        }
-
-        //north west
-        if (Maze.getRandom().nextBoolean()) {
             addMiniRoom(level, wall, roomColStart, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
-        } else {
-            addCorner(level, wall, roomColStart, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
-        }
-
-        //north east
-        if (Maze.getRandom().nextBoolean()) {
             addMiniRoom(level, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
+
         } else {
-            addCorner(level, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
+
+            //south west
+            if (Maze.getRandom().nextBoolean()) {
+                addMiniRoom(level, wall, roomColStart, roomRowStart, middleCol, middleRow);
+            } else {
+                addCorner(level, wall, roomColStart, roomRowStart, middleCol, middleRow);
+            }
+
+            //south east
+            if (Maze.getRandom().nextBoolean()) {
+                addMiniRoom(level, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart, middleCol, middleRow);
+            } else {
+                addCorner(level, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart, middleCol, middleRow);
+            }
+
+            //north west
+            if (Maze.getRandom().nextBoolean()) {
+                addMiniRoom(level, wall, roomColStart, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
+            } else {
+                addCorner(level, wall, roomColStart, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
+            }
+
+            //north east
+            if (Maze.getRandom().nextBoolean()) {
+                addMiniRoom(level, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
+            } else {
+                addCorner(level, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
+            }
         }
     }
 
