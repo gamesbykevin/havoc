@@ -11,7 +11,7 @@ import static com.gamesbykevin.havoc.level.LevelHelper.*;
 public class RoomHelper {
 
     //how big is each room
-    public static final int ROOM_SIZE = 15;
+    public static final int ROOM_SIZE = 16;
 
     //the size of the smaller rooms
     public static final int ROOM_SIZE_SMALL = 5;
@@ -72,7 +72,6 @@ public class RoomHelper {
                 addWall(level, Side.South, Type.Wall, wall, roomCol, roomRowStart, false);
         }
 
-        //if no exit we block the hallway
         if (!hallN)
             addWall(level, Side.South, Type.Wall, wall, middleCol, middleRow + 1, false);
         if (!hallS)
@@ -229,7 +228,7 @@ public class RoomHelper {
         }
     }
 
-    protected static void addFourRooms(Level level, Room room, TextureRegion wall, int roomColStart, int roomRowStart) {
+    protected static void addMiniRooms(Level level, Room room, TextureRegion wall, int roomColStart, int roomRowStart) {
 
         int middleCol = roomColStart + (ROOM_SIZE / 2);
         int middleRow = roomRowStart + (ROOM_SIZE / 2);
@@ -287,10 +286,18 @@ public class RoomHelper {
     protected static void addEmptyRoom(Level level, Room room, TextureRegion wall, int roomColStart, int roomRowStart) {
 
         for (int roomRow = roomRowStart; roomRow < roomRowStart + ROOM_SIZE; roomRow++) {
+
             if (room.hasWest())
                 addWall(level, Side.East, Type.Wall, wall, roomColStart, roomRow, false);
             if (room.hasEast())
                 addWall(level, Side.West, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRow, false);
+
+            if (roomRow < roomRowStart + ROOM_SIZE_SMALL || roomRow > roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL - 1) {
+                if (!room.hasWest())
+                    addWall(level, Side.East, Type.Wall, wall, roomColStart, roomRow, false);
+                if (!room.hasEast())
+                    addWall(level, Side.West, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRow, false);
+            }
         }
 
         for (int roomCol = roomColStart; roomCol < roomColStart + ROOM_SIZE; roomCol++) {
@@ -298,6 +305,31 @@ public class RoomHelper {
                 addWall(level, Side.North, Type.Wall, wall, roomCol, roomRowStart, false);
             if (room.hasNorth())
                 addWall(level, Side.South, Type.Wall, wall, roomCol, roomRowStart + ROOM_SIZE - 1, false);
+
+            if (roomCol < roomColStart + ROOM_SIZE_SMALL || roomCol > roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL - 1) {
+                if (!room.hasNorth())
+                    addWall(level, Side.South, Type.Wall, wall, roomCol, roomRowStart + ROOM_SIZE - 1, false);
+                if (!room.hasSouth())
+                    addWall(level, Side.North, Type.Wall, wall, roomCol, roomRowStart, false);
+            }
+        }
+
+        //add walls on the ends
+        if (!room.hasNorth()) {
+            addWall(level, Side.East, Type.Wall, wall, roomColStart + ROOM_SIZE_SMALL - 1, roomRowStart + ROOM_SIZE - 1, false);
+            addWall(level, Side.West, Type.Wall, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart + ROOM_SIZE - 1, false);
+        }
+        if (!room.hasSouth()) {
+            addWall(level, Side.East, Type.Wall, wall, roomColStart + ROOM_SIZE_SMALL - 1, roomRowStart, false);
+            addWall(level, Side.West, Type.Wall, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart, false);
+        }
+        if (!room.hasWest()) {
+            addWall(level, Side.South, Type.Wall, wall, roomColStart, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, false);
+            addWall(level, Side.North, Type.Wall, wall, roomColStart, roomRowStart + ROOM_SIZE_SMALL - 1, false);
+        }
+        if (!room.hasEast()) {
+            addWall(level, Side.South, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, false);
+            addWall(level, Side.North, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRowStart + ROOM_SIZE_SMALL - 1, false);
         }
 
         //add walls on the corner
@@ -305,28 +337,18 @@ public class RoomHelper {
             addWall(level, Side.East, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRowStart, false);
             addWall(level, Side.West, Type.Wall, wall, roomColStart, roomRowStart, false);
         }
-
         if (room.hasNorth()) {
             addWall(level, Side.East, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRowStart + ROOM_SIZE - 1, false);
             addWall(level, Side.West, Type.Wall, wall, roomColStart, roomRowStart + ROOM_SIZE - 1, false);
         }
-
-        //add wall on the corner
         if (room.hasWest()) {
             addWall(level, Side.South, Type.Wall, wall, roomColStart, roomRowStart, false);
             addWall(level, Side.North, Type.Wall, wall, roomColStart, roomRowStart + ROOM_SIZE - 1, false);
         }
-
         if (room.hasEast()) {
             addWall(level, Side.South, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRowStart, false);
             addWall(level, Side.North, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRowStart + ROOM_SIZE - 1, false);
         }
-
-    }
-
-    protected static void addBlock(Level level, TextureRegion texture, int col, int row) {
-        addVertical(level, texture, col, row);
-        addHorizontal(level, texture, col, row);
     }
 
     protected static void addVertical(Level level, TextureRegion texture, int col, int row) {
@@ -339,4 +361,51 @@ public class RoomHelper {
         addWall(level, Side.West, Type.Wall, texture, col, row, false);
     }
 
+    protected static void createDoorVertical(Level level, TextureRegion wall, TextureRegion door, int col, int roomRowStart) {
+
+        int middleRow = roomRowStart + (ROOM_SIZE / 2);
+
+        for (int row = roomRowStart; row < roomRowStart + ROOM_SIZE; row++) {
+
+            //skip if a wall already exists
+            if (level.hasWall(col, row))
+                continue;
+
+            if (row == middleRow) {
+                addWall(level, Side.West, Type.Door, door, col, row, false);
+            } else if (row == middleRow + 1) {
+                addHorizontal(level, wall, col, row);
+                addWall(level, Side.South, Type.Wall, getTextureSide(), col, row, false);
+            } else if (row == middleRow - 1) {
+                addHorizontal(level, wall, col, row);
+                addWall(level, Side.North, Type.Wall, getTextureSide(), col, row, false);
+            } else {
+                addHorizontal(level, wall, col, row);
+            }
+        }
+    }
+
+    protected static void createDoorHorizontal(Level level, TextureRegion wall, TextureRegion door, int roomColStart, int row) {
+
+        int middleCol = roomColStart + (ROOM_SIZE / 2);
+
+        for (int col = roomColStart; col < roomColStart + ROOM_SIZE; col++) {
+
+            //skip if a wall already exists
+            if (level.hasWall(col, row))
+                continue;
+
+            if (col == middleCol) {
+                addWall(level, Side.South, Type.Door, door, col, row, false);
+            } else if (col == middleCol + 1) {
+                addVertical(level, wall, col, row);
+                addWall(level, Side.West, Type.Wall, getTextureSide(), col, row, false);
+            } else if (col == middleCol - 1) {
+                addVertical(level, wall, col, row);
+                addWall(level, Side.East, Type.Wall, getTextureSide(), col, row, false);
+            } else {
+                addVertical(level, wall, col, row);
+            }
+        }
+    }
 }

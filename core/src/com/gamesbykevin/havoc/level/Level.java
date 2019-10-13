@@ -23,8 +23,8 @@ import static com.gamesbykevin.havoc.maze.MazeHelper.locateGoal;
 public class Level {
 
     //how big is our maze
-    public static final int MAZE_COLS = 5;
-    public static final int MAZE_ROWS = 4;
+    public static final int MAZE_COLS = 2;
+    public static final int MAZE_ROWS = 2;
 
     //our randomly created maze
     private Maze maze;
@@ -179,7 +179,7 @@ public class Level {
             this.camera3d.update();
 
             this.camera3d.position.set((ROOM_SIZE / 2) + .5f, (ROOM_SIZE / 2) + .5f,0);
-            this.camera3d.position.z = 1.5f;
+            this.camera3d.position.z = 1.70f;
             this.camera3d.rotate(Vector3.X, 90);
         }
 
