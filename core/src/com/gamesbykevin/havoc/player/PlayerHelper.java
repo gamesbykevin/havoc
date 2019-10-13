@@ -9,7 +9,7 @@ import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
 import static com.gamesbykevin.havoc.input.MyController.*;
 import static com.gamesbykevin.havoc.input.MyController.VELOCITY_Z;
-import static com.gamesbykevin.havoc.level.LevelHelper.ROOM_SIZE;
+import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE;
 
 public class PlayerHelper {
 
@@ -104,6 +104,7 @@ public class PlayerHelper {
 
         if (controller.isMoveForward() || controller.isMoveBackward()) {
 
+            /*
             controller.getCamera3d().position.z += VELOCITY_Z;
 
             if (controller.getCamera3d().position.z <= MIN_Z) {
@@ -113,6 +114,7 @@ public class PlayerHelper {
                 controller.getCamera3d().position.z = MAX_Z;
                 VELOCITY_Z = -VELOCITY_Z;
             }
+             */
         }
 
         if (rotationA != 0) {

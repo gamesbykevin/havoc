@@ -6,20 +6,17 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gamesbykevin.havoc.decals.Background;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.DecalCustom.Type;
-import com.gamesbykevin.havoc.enemies.Enemy;
 import com.gamesbykevin.havoc.maze.Room;
 
 import static com.gamesbykevin.havoc.decals.Background.createDecalBackground;
 import static com.gamesbykevin.havoc.decals.DecalCustom.*;
+import static com.gamesbykevin.havoc.level.RoomHelper.*;
 import static com.gamesbykevin.havoc.maze.Maze.getRandom;
 
 public class LevelHelper {
 
-    //how big is each room
-    public static final int ROOM_SIZE = 12;
-
     //render decals within the specified range
-    public static final int RENDER_RANGE = 30;
+    public static final int RENDER_RANGE = 50;
 
     //chance we add a door or secret
     public static final float DOOR_PROBABILITY = .6f;
@@ -44,12 +41,31 @@ public class LevelHelper {
     public static final String PATH_SWITCH_OFF = "goal/switch_off.bmp";
     public static final String PATH_SWITCH_ON = "goal/switch_on.bmp";
 
+    private static TextureRegion TEXTURE_DOOR;
+    private static TextureRegion TEXTURE_SIDE;
+
     private static TextureRegion getTextureRegion(String path) {
         return new TextureRegion(new Texture(Gdx.files.internal(path)));
     }
 
     private static TextureRegion getRandomBackground() {
         return getCeiling(getRandom().nextInt(TILES_FLOOR_CEILING) + 1);
+    }
+
+    protected static TextureRegion getTextureDoor() {
+
+        if (TEXTURE_DOOR == null)
+            TEXTURE_DOOR = getTextureRegion(PATH_DOOR);
+
+        return TEXTURE_DOOR;
+    }
+
+    protected static TextureRegion getTextureSide() {
+
+        if (TEXTURE_SIDE == null)
+            TEXTURE_SIDE = getTextureRegion(PATH_SIDE);
+
+        return TEXTURE_SIDE;
     }
 
     private static TextureRegion getCeiling(int index) {
@@ -101,66 +117,26 @@ public class LevelHelper {
                 int roomColStart = ROOM_SIZE * col;
                 int roomRowStart = ROOM_SIZE * row;
 
+                //the goal will have a unique wall
                 TextureRegion wall = (goal) ? textureRegionWallGoal : getRandomWall();
 
                 //if this is the goal room add switch in the middle of room
                 if (goal) {
-                    addWall(level, Side.North, Type.Wall, textureRegionSwitchGoal, roomColStart + (ROOM_SIZE / 2), roomRowStart + (ROOM_SIZE / 2), false);
-                    addWall(level, Side.South, Type.Wall, textureRegionSwitchGoal, roomColStart + (ROOM_SIZE / 2), roomRowStart + (ROOM_SIZE / 2), false);
-                    addWall(level, Side.West, Type.Wall, textureRegionSwitchGoal, roomColStart + (ROOM_SIZE / 2), roomRowStart + (ROOM_SIZE / 2), false);
-                    addWall(level, Side.East, Type.Wall, textureRegionSwitchGoal, roomColStart + (ROOM_SIZE / 2), roomRowStart + (ROOM_SIZE / 2), false);
-                }
+                    addBlock(level, textureRegionSwitchGoal, roomColStart + (ROOM_SIZE / 2), roomRowStart + (ROOM_SIZE / 2));
+                    addEmptyRoom(level, room, wall, roomColStart, roomRowStart);
+                } else {
 
-                int endRow = roomRowStart + ROOM_SIZE;
-
-                for (int roomRow = roomRowStart; roomRow < endRow; roomRow++) {
-
-                    if (room.hasWest()) {
-                        addWall(level, Side.East, Type.Wall, wall, roomColStart, roomRow, false);
-
-                        if (roomRow == roomRowStart) {
-                            addWall(level, Side.North, Type.Wall, wall, roomColStart, roomRow, false);
-                            addWall(level, Side.South, Type.Wall, wall, roomColStart, roomRow, false);
-                        }
-                    }
-
-                    if (room.hasEast()) {
-                        addWall(level, Side.West, Type.Wall, wall, roomColStart + ROOM_SIZE, roomRow, false);
-
-                        if (roomRow == endRow - 1) {
-                            addWall(level, Side.North, Type.Wall, wall, roomColStart + ROOM_SIZE, roomRow, false);
-                            addWall(level, Side.South, Type.Wall, wall, roomColStart + ROOM_SIZE, roomRow, false);
-                        }
-                    }
-                }
-
-                int endCol = roomColStart + ROOM_SIZE;
-
-                for (int roomCol = roomColStart; roomCol < endCol; roomCol++) {
-
-                    if (room.hasSouth()) {
-                        addWall(level, Side.North, Type.Wall, wall, roomCol, roomRowStart, false);
-
-                        if (roomCol == roomColStart) {
-                            addWall(level, Side.West, Type.Wall, wall, roomCol, roomRowStart, false);
-                            addWall(level, Side.East, Type.Wall, wall, roomCol, roomRowStart, false);
-                        }
-                    }
-
-                    if (room.hasNorth()) {
-                        addWall(level, Side.South, Type.Wall, wall, roomCol, roomRowStart + ROOM_SIZE, false);
-
-                        if (roomCol == endCol - 1) {
-                            addWall(level, Side.West, Type.Wall, wall, roomCol, roomRowStart + ROOM_SIZE, false);
-                            addWall(level, Side.East, Type.Wall, wall, roomCol, roomRowStart + ROOM_SIZE, false);
-                        }
-                    }
+                    //add an empty room
+                    //addFourRooms(level, room, wall, roomColStart, roomRowStart);
+                    addEmptyRoom(level, room, wall, roomColStart, roomRowStart);
+                    //addHallways(level, room, wall, roomColStart, roomRowStart);
                 }
 
                 //textures for the doors
-                TextureRegion door = (goal) ? getDoorGoal() : getTextureRegion(PATH_DOOR);
-                TextureRegion side = getTextureRegion(PATH_SIDE);
+                TextureRegion door = (goal) ? getDoorGoal() : getTextureDoor();
+                TextureRegion side = getTextureSide();
 
+                /*
                 //for the goal every opening will be enclosed by a door
                 if (goal) {
 
@@ -173,36 +149,20 @@ public class LevelHelper {
                     if (!room.hasEast())
                         addDoorWest(level, wall, side, door, roomColStart + ROOM_SIZE, roomRowStart, false);
 
-                } else {
-
-                    if (!room.hasSouth() && Math.random() <= DOOR_PROBABILITY && (row - 1 != level.getMaze().getGoalRow() || col != level.getMaze().getGoalCol())) {
-                        if (room.hasWest() && room.hasEast() && room.hasNorth()) {
-                            addDoorSouth(level, wall, side, door, roomColStart, roomRowStart, true);
-                        } else {
-                            addDoorSouth(level, wall, side, door, roomColStart, roomRowStart, false);
-                        }
-                    }
-
-                    if (!room.hasWest() && Math.random() <= DOOR_PROBABILITY && (row != level.getMaze().getGoalRow() || col - 1 != level.getMaze().getGoalCol())) {
-                        if (room.hasEast() && room.hasNorth() && room.hasSouth()) {
-                            addDoorWest(level, wall, side, door, roomColStart, roomRowStart, true);
-                        } else {
-                            addDoorWest(level, wall, side, door, roomColStart, roomRowStart, false);
-                        }
-                    }
                 }
+                 */
             }
         }
 
         //add floors and ceiling
-        for (int col = 0; col < level.getMaze().getCols() * ROOM_SIZE; col += Background.TEXTURE_WIDTH) {
-            for (int row = 0; row < level.getMaze().getRows() * ROOM_SIZE; row += Background.TEXTURE_HEIGHT) {
-                level.getDecals().add(createDecalBackground(col, row, textureRegionFloor, true));
-                level.getDecals().add(createDecalBackground(col, row, textureRegionCeiling, false));
+        for (int col = 0; col <= (level.getMaze().getCols() * ROOM_SIZE) + ROOM_SIZE; col += Background.TEXTURE_WIDTH) {
+            for (int row = 0; row <= (level.getMaze().getRows() * ROOM_SIZE) + ROOM_SIZE; row += Background.TEXTURE_HEIGHT) {
+                //level.getDecals().add(createDecalBackground(col, row, textureRegionFloor, true));
+                //level.getDecals().add(createDecalBackground(col, row, textureRegionCeiling, false));
             }
         }
 
-        //spawn enemies in the rooms
+        //spawn enemies etc... in the rooms
         for (int col = 0; col < level.getMaze().getCols(); col++) {
             for (int row = 0; row < level.getMaze().getRows(); row++) {
 
@@ -215,11 +175,7 @@ public class LevelHelper {
 
                 //add for each room but avoid the start and goal
                 if (!start && !goal) {
-                    addEnemy(level, roomColStart, roomRowStart);
-                    addEnemy(level, roomColStart, roomRowStart);
-                    addEnemy(level, roomColStart, roomRowStart);
-                    addObstacle(level, roomColStart, roomRowStart);
-                    //addObstacle(level, roomColStart, roomRowStart);
+                    //addEnemy(level, roomColStart, roomRowStart);
                     //addObstacle(level, roomColStart, roomRowStart);
                 }
             }
@@ -252,10 +208,7 @@ public class LevelHelper {
                 addWall(level, Side.North, Type.Wall, side, roomColStart, roomRow, false);
                 addWall(level, Side.South, Type.Wall, side, roomColStart, roomRow, false);
             } else if (roomRow == roomRowStart || roomRow == roomRowStart + ROOM_SIZE - 1) {
-                addWall(level, Side.East, Type.Wall, wall, roomColStart, roomRow, false);
-                addWall(level, Side.West, Type.Wall, wall, roomColStart, roomRow, false);
-                addWall(level, Side.North, Type.Wall, wall, roomColStart, roomRow, false);
-                addWall(level, Side.South, Type.Wall, wall, roomColStart, roomRow, false);
+                addBlock(level, wall, roomColStart, roomRow);
             } else {
                 addWall(level, Side.West, Type.Wall, wall, roomColStart, roomRow, false);
                 addWall(level, Side.East, Type.Wall, wall, roomColStart, roomRow, false);
@@ -276,10 +229,7 @@ public class LevelHelper {
                 addWall(level, Side.West, Type.Wall, side, roomCol, roomRowStart, false);
                 addWall(level, Side.East, Type.Wall, side, roomCol, roomRowStart, false);
             } else if (roomCol == roomColStart || roomCol == roomColStart + ROOM_SIZE - 1) {
-                addWall(level, Side.North, Type.Wall, wall, roomCol, roomRowStart, false);
-                addWall(level, Side.South, Type.Wall, wall, roomCol, roomRowStart, false);
-                addWall(level, Side.West, Type.Wall, wall, roomCol, roomRowStart, false);
-                addWall(level, Side.East, Type.Wall, wall, roomCol, roomRowStart, false);
+                addBlock(level, wall, roomCol, roomRowStart);
             } else {
                 addWall(level, Side.North, Type.Wall, wall, roomCol, roomRowStart, false);
                 addWall(level, Side.South, Type.Wall, wall, roomCol, roomRowStart, false);
@@ -287,7 +237,7 @@ public class LevelHelper {
         }
     }
 
-    private static void addWall(Level level, Side side, Type type, TextureRegion textureRegion, final float col, final float row, boolean secret) {
+    protected static void addWall(Level level, Side side, Type type, TextureRegion textureRegion, final float col, final float row, boolean secret) {
 
         //add decal to be rendered
         switch (type) {

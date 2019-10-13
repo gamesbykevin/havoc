@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.gamesbykevin.havoc.level.LevelHelper.*;
+import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE;
 import static com.gamesbykevin.havoc.maze.MazeHelper.calculateCost;
 import static com.gamesbykevin.havoc.maze.MazeHelper.locateGoal;
 
@@ -168,7 +169,7 @@ public class Level {
             float w = Gdx.graphics.getWidth();
             float h = Gdx.graphics.getHeight();
             this.camera3d = new PerspectiveCamera(67, 1, h/w);
-            this.camera3d.near = .1f;
+            this.camera3d.near = .05f;
             this.camera3d.far = RENDER_RANGE;
         }
 
@@ -177,8 +178,8 @@ public class Level {
             this.camera3d.up.set(0, 1, 0);
             this.camera3d.update();
 
-            this.camera3d.position.set((ROOM_SIZE / 2),(ROOM_SIZE / 2),0);
-            this.camera3d.position.z = 0;
+            this.camera3d.position.set((ROOM_SIZE / 2) + .5f, (ROOM_SIZE / 2) + .5f,0);
+            this.camera3d.position.z = 1.5f;
             this.camera3d.rotate(Vector3.X, 90);
         }
 
@@ -254,6 +255,8 @@ public class Level {
         float minRow = getCamera3d().position.y - RENDER_RANGE;
         float maxRow = getCamera3d().position.y + RENDER_RANGE;
 
+        int count = 0;
+
         for (int i = 0; i < getDecals().size(); i++) {
 
             DecalCustom decal = getDecals().get(i);
@@ -265,6 +268,7 @@ public class Level {
             if (decal.isBillboard())
                 decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
 
+            count++;
             getDecalBatch().add(decal.getDecal());
         }
 
@@ -283,9 +287,12 @@ public class Level {
                 if (decal.isBillboard())
                     decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
 
+                count++;
                 getDecalBatch().add(decal.getDecal());
             }
         }
+
+        System.out.println("decal count: " + count);
 
         //render the enemies
         getEnemies().render(getDecalBatch(), getCamera3d());

@@ -119,9 +119,8 @@ public class MyController implements InputProcessor {
 
     public void setInput() {
 
-        Gdx.input.setInputProcessor(getStage());
+        //Gdx.input.setInputProcessor(getStage());
 
-        /*
         switch (Gdx.app.getType()) {
             case Android:
             case iOS:
@@ -132,7 +131,6 @@ public class MyController implements InputProcessor {
                 Gdx.input.setInputProcessor(this);
                 break;
         }
-        */
     }
 
     public float getRotation() {

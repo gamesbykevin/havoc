@@ -1,5 +1,6 @@
 package com.gamesbykevin.havoc.maze.algorithm;
 
+import com.gamesbykevin.havoc.maze.Location;
 import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.Room;
 
