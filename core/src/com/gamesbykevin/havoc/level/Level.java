@@ -23,8 +23,8 @@ import static com.gamesbykevin.havoc.maze.MazeHelper.locateGoal;
 public class Level {
 
     //how big is our maze
-    public static final int MAZE_COLS = 3;
-    public static final int MAZE_ROWS = 3;
+    public static final int MAZE_COLS = 5;
+    public static final int MAZE_ROWS = 4;
 
     //our randomly created maze
     private Maze maze;

@@ -22,6 +22,9 @@ public abstract class Maze implements IMaze {
     //object used to make random decisions
     private static Random RANDOM;
 
+    //seed used to generate random numbers etc...
+    private final long seed;
+
     //different directions
     public static final int DIRECTION_NONE = 0;
     public static final int DIRECTION_NORTH = 1;
@@ -30,9 +33,18 @@ public abstract class Maze implements IMaze {
     public static final int DIRECTION_EAST = 4;
 
     public Maze(int cols, int rows) {
+        this(cols, rows, System.currentTimeMillis());
+    }
 
+    public Maze(int cols, int rows, long seed) {
+
+        //store the size of the maze
         this.cols = cols;
         this.rows = rows;
+
+        //store the seed and create the random object
+        this.seed = seed;
+        RANDOM = new Random(seed);
 
         //create our array of rooms
         int count = 0;
@@ -46,11 +58,11 @@ public abstract class Maze implements IMaze {
         }
     }
 
+    public long getSeed() {
+        return this.seed;
+    }
+
     public static Random getRandom() {
-
-        if (RANDOM == null)
-            RANDOM = new Random();
-
         return RANDOM;
     }
 

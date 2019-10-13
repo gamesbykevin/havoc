@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gamesbykevin.havoc.decals.Background;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.DecalCustom.Type;
+import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.Room;
 
 import static com.gamesbykevin.havoc.decals.Background.createDecalBackground;
@@ -126,9 +127,15 @@ public class LevelHelper {
                     addEmptyRoom(level, room, wall, roomColStart, roomRowStart);
                 } else {
 
+                    if (Maze.getRandom().nextBoolean()) {
+                        addFourRooms(level, room, wall, roomColStart, roomRowStart);
+                    } else {
+                        addHallways(level, room, wall, roomColStart, roomRowStart);
+                    }
+
                     //add an empty room
                     //addFourRooms(level, room, wall, roomColStart, roomRowStart);
-                    addEmptyRoom(level, room, wall, roomColStart, roomRowStart);
+                    //addEmptyRoom(level, room, wall, roomColStart, roomRowStart);
                     //addHallways(level, room, wall, roomColStart, roomRowStart);
                 }
 
