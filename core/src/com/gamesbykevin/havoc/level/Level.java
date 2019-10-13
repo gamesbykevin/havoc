@@ -9,6 +9,7 @@ import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.enemies.Enemies;
 import com.gamesbykevin.havoc.maze.Maze;
+import com.gamesbykevin.havoc.maze.Room;
 import com.gamesbykevin.havoc.maze.algorithm.*;
 import com.gamesbykevin.havoc.obstacles.Obstacles;
 
@@ -23,8 +24,8 @@ import static com.gamesbykevin.havoc.maze.MazeHelper.locateGoal;
 public class Level {
 
     //how big is our maze
-    public static final int MAZE_COLS = 2;
-    public static final int MAZE_ROWS = 2;
+    public static final int MAZE_COLS = 4;
+    public static final int MAZE_ROWS = 4;
 
     //our randomly created maze
     private Maze maze;
@@ -179,7 +180,7 @@ public class Level {
             this.camera3d.update();
 
             this.camera3d.position.set((ROOM_SIZE / 2) + .5f, (ROOM_SIZE / 2) + .5f,0);
-            this.camera3d.position.z = 1.70f;
+            //this.camera3d.position.z = 1.50f;
             this.camera3d.rotate(Vector3.X, 90);
         }
 
@@ -249,11 +250,24 @@ public class Level {
 
     private void drawDecals() {
 
-        //this will be the range of items that we render
-        float minCol = getCamera3d().position.x - RENDER_RANGE;
-        float maxCol = getCamera3d().position.x + RENDER_RANGE;
-        float minRow = getCamera3d().position.y - RENDER_RANGE;
-        float maxRow = getCamera3d().position.y + RENDER_RANGE;
+        //figure out which room we are in
+        int roomCol = (int)(getCamera3d().position.x / ROOM_SIZE);
+        int roomRow = (int)(getCamera3d().position.y / ROOM_SIZE);
+
+        //get the current room
+        Room room = getMaze().getRoom(roomCol, roomRow);
+
+        //get the bounds of the current room
+        float minColRoom = roomCol * ROOM_SIZE;
+        float maxColRoom = minColRoom + ROOM_SIZE;
+        float minRowRoom = roomRow * ROOM_SIZE;
+        float maxRowRoom = minRowRoom + ROOM_SIZE;
+
+        //adjust the render range
+        float minCol = (room.hasWest()) ? roomCol * ROOM_SIZE : (roomCol - 1) * ROOM_SIZE;
+        float maxCol = (room.hasEast()) ? (roomCol * ROOM_SIZE) + ROOM_SIZE : ((roomCol + 1) * ROOM_SIZE) + ROOM_SIZE;
+        float maxRow = (room.hasNorth()) ? (roomRow * ROOM_SIZE) + ROOM_SIZE : ((roomRow + 1) * ROOM_SIZE) + ROOM_SIZE;
+        float minRow = (room.hasSouth()) ? (roomRow * ROOM_SIZE) : (roomRow - 1) * ROOM_SIZE;
 
         int count = 0;
 
@@ -262,7 +276,7 @@ public class Level {
             DecalCustom decal = getDecals().get(i);
 
             //only render if in range
-            if (!hasRange(decal, minCol, maxCol, minRow, maxRow))
+            if (!hasRange(decal, minCol, maxCol, minRow, maxRow, minColRoom, maxColRoom, minRowRoom, maxRowRoom))
                 continue;
 
             if (decal.isBillboard())
@@ -281,7 +295,7 @@ public class Level {
                     continue;
 
                 //only render if in range
-                if (!hasRange(decal, minCol, maxCol, minRow, maxRow))
+                if (!hasRange(decal, minCol, maxCol, minRow, maxRow, minColRoom, maxColRoom, minRowRoom, maxRowRoom))
                     continue;
 
                 if (decal.isBillboard())
@@ -304,10 +318,21 @@ public class Level {
         getDecalBatch().flush();
     }
 
-    private boolean hasRange(DecalCustom decal, float minCol, float maxCol, float minRow, float maxRow) {
+    private boolean hasRange(DecalCustom decal, float minCol, float maxCol, float minRow, float maxRow, float minColRoom, float maxColRoom, float minRowRoom, float maxRowRoom) {
 
+        //nw & sw
+        if (decal.getCol() < minColRoom && (decal.getRow() > maxRowRoom || decal.getRow() < minRowRoom))
+            return false;
+
+        //ne & se
+        if (decal.getCol() > maxColRoom && (decal.getRow() > maxRowRoom || decal.getRow() < minRowRoom))
+            return false;
+
+        //west & east
         if (decal.getCol() < minCol || decal.getCol() > maxCol)
             return false;
+
+        //north & south
         if (decal.getRow() < minRow || decal.getRow() > maxRow)
             return false;
 

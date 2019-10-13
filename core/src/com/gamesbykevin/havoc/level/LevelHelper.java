@@ -9,6 +9,9 @@ import com.gamesbykevin.havoc.decals.DecalCustom.Type;
 import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.Room;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.gamesbykevin.havoc.decals.Background.createDecalBackground;
 import static com.gamesbykevin.havoc.decals.DecalCustom.*;
 import static com.gamesbykevin.havoc.level.RoomHelper.*;
@@ -17,13 +20,13 @@ import static com.gamesbykevin.havoc.maze.Maze.getRandom;
 public class LevelHelper {
 
     //render decals within the specified range
-    public static final int RENDER_RANGE = 50;
+    public static final int RENDER_RANGE = (int)(ROOM_SIZE * 1.5);
 
     //chance we add a door or secret
     public static final float DOOR_PROBABILITY = .6f;
 
     //how many tiles can we choose from for the floor ceiling?
-    public static final int TILES_FLOOR_CEILING = 73;
+    public static final int TILES_BACKGROUND = 73;
 
     //how many tiles can we choose from for the walls
     public static final int TILES_WALL = 180;
@@ -49,10 +52,6 @@ public class LevelHelper {
         return new TextureRegion(new Texture(Gdx.files.internal(path)));
     }
 
-    private static TextureRegion getRandomBackground() {
-        return getCeiling(getRandom().nextInt(TILES_FLOOR_CEILING) + 1);
-    }
-
     protected static TextureRegion getTextureDoor() {
 
         if (TEXTURE_DOOR == null)
@@ -69,12 +68,8 @@ public class LevelHelper {
         return TEXTURE_SIDE;
     }
 
-    private static TextureRegion getCeiling(int index) {
-        return getTextureRegion("floor_ceiling/tile" + index + ".bmp");
-    }
-
-    private static TextureRegion getRandomWall() {
-        return getWall(getRandom().nextInt(TILES_WALL) + 1);
+    private static TextureRegion getBackground(int index) {
+        return getTextureRegion("background/tile" + index + ".bmp");
     }
 
     private static TextureRegion getWall(int index) {
@@ -95,9 +90,24 @@ public class LevelHelper {
 
     protected static void createDecals(Level level) {
 
+        List<Integer> walls = new ArrayList<>();
+        for (int i = 1; i < TILES_WALL; i++) {
+            walls.add(i);
+        }
+
+        List<Integer> backgrounds = new ArrayList<>();
+        for (int i = 1; i < TILES_BACKGROUND; i++) {
+            backgrounds.add(i);
+        }
+
+        int index = backgrounds.get(getRandom().nextInt(backgrounds.size()));
+
         //choose the floor and ceiling
-        TextureRegion textureRegionCeiling = getRandomBackground();
-        TextureRegion textureRegionFloor = getRandomBackground();
+        TextureRegion textureRegionCeiling = getBackground(backgrounds.get(index));
+        backgrounds.remove(index);
+        index = backgrounds.get(getRandom().nextInt(backgrounds.size()));
+        TextureRegion textureRegionFloor = getBackground(backgrounds.get(index));
+        backgrounds.remove(index);
 
         //goal will have specific textures on the walls
         TextureRegion textureRegionWallGoal = getWallGoal();
@@ -118,9 +128,6 @@ public class LevelHelper {
                 int roomColStart = ROOM_SIZE * col;
                 int roomRowStart = ROOM_SIZE * row;
 
-                //the goal will have a unique wall
-                TextureRegion wall = (goal) ? textureRegionWallGoal : getRandomWall();
-
                 if (goal) {
 
                     //add our switch in the middle of the room
@@ -128,27 +135,41 @@ public class LevelHelper {
                     addVertical(level, textureRegionSwitchGoal, roomColStart + (ROOM_SIZE / 2), roomRowStart + (ROOM_SIZE / 2));
 
                     //add walls around the room
-                    addEmptyRoom(level, room, wall, roomColStart, roomRowStart);
+                    addEmptyRoom(level, room, textureRegionWallGoal, roomColStart, roomRowStart);
 
                     //any opening in the goal will have a door
                     if (!room.hasWest())
-                        createDoorVertical(level, wall, getDoorGoal(), roomColStart, roomRowStart);
+                        createDoorVertical(level, textureRegionWallGoal, getDoorGoal(), roomColStart, roomRowStart);
                     if (!room.hasEast())
-                        createDoorVertical(level, wall, getDoorGoal(), roomColStart + ROOM_SIZE - 1, roomRowStart);
+                        createDoorVertical(level, textureRegionWallGoal, getDoorGoal(), roomColStart + ROOM_SIZE - 1, roomRowStart);
                     if (!room.hasNorth())
-                        createDoorHorizontal(level, wall, getDoorGoal(), roomColStart, roomRowStart + ROOM_SIZE - 1);
+                        createDoorHorizontal(level, textureRegionWallGoal, getDoorGoal(), roomColStart, roomRowStart + ROOM_SIZE - 1);
                     if (!room.hasSouth())
-                        createDoorHorizontal(level, wall, getDoorGoal(), roomColStart, roomRowStart);
+                        createDoorHorizontal(level, textureRegionWallGoal, getDoorGoal(), roomColStart, roomRowStart);
 
                 } else {
 
-                    //decide at random how the current room is going to look
-                    if (Maze.getRandom().nextBoolean()) {
-                        addMiniRooms(level, room, wall, roomColStart, roomRowStart);
-                    } else if (Maze.getRandom().nextBoolean()) {
-                        addHallways(level, room, wall, roomColStart, roomRowStart);
-                    } else {
+                    //pick random index
+                    index = getRandom().nextInt(walls.size());
+
+                    //pick random wall
+                    TextureRegion wall = getWall(walls.get(index));
+
+                    //remove from our list
+                    walls.remove(index);
+
+                    if (col == level.getMaze().getStartCol() && row == level.getMaze().getStartRow()) {
                         addEmptyRoom(level, room, wall, roomColStart, roomRowStart);
+                    } else {
+
+                        //decide at random how the current room is going to look
+                        if (Maze.getRandom().nextBoolean()) {
+                            addMiniRooms(level, room, wall, roomColStart, roomRowStart);
+                        } else if (Maze.getRandom().nextBoolean()) {
+                            addHallways(level, room, wall, roomColStart, roomRowStart);
+                        } else {
+                            addEmptyRoom(level, room, wall, roomColStart, roomRowStart);
+                        }
                     }
 
                     if (!room.hasNorth()) {
@@ -167,8 +188,8 @@ public class LevelHelper {
         //add floors and ceiling
         for (int col = 0; col <= (level.getMaze().getCols() * ROOM_SIZE) + ROOM_SIZE; col += Background.TEXTURE_WIDTH) {
             for (int row = 0; row <= (level.getMaze().getRows() * ROOM_SIZE) + ROOM_SIZE; row += Background.TEXTURE_HEIGHT) {
-                //level.getDecals().add(createDecalBackground(col, row, textureRegionFloor, true));
-                //level.getDecals().add(createDecalBackground(col, row, textureRegionCeiling, false));
+                level.getDecals().add(createDecalBackground(col, row, textureRegionFloor, true));
+                level.getDecals().add(createDecalBackground(col, row, textureRegionCeiling, false));
             }
         }
 
@@ -190,6 +211,12 @@ public class LevelHelper {
                 }
             }
         }
+
+        walls.clear();
+        walls = null;
+
+        backgrounds.clear();
+        backgrounds = null;
     }
 
     private static void addObstacle(Level level, int roomColStart, int roomRowStart) {

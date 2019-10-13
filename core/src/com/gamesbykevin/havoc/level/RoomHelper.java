@@ -11,10 +11,10 @@ import static com.gamesbykevin.havoc.level.LevelHelper.*;
 public class RoomHelper {
 
     //how big is each room
-    public static final int ROOM_SIZE = 16;
+    public static final int ROOM_SIZE = 25;
 
     //the size of the smaller rooms
-    public static final int ROOM_SIZE_SMALL = 5;
+    public static final int ROOM_SIZE_SMALL = 10;
 
     protected static void addHallways(Level level, Room room, TextureRegion wall, int roomColStart, int roomRowStart) {
 
