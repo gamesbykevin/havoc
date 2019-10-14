@@ -24,8 +24,8 @@ import static com.gamesbykevin.havoc.maze.MazeHelper.locateGoal;
 public class Level {
 
     //how big is our maze
-    public static final int MAZE_COLS = 4;
-    public static final int MAZE_ROWS = 4;
+    public static final int MAZE_COLS = 3;
+    public static final int MAZE_ROWS = 3;
 
     //our randomly created maze
     private Maze maze;
@@ -36,8 +36,11 @@ public class Level {
     //needed to render multiple decals
     private DecalBatch decalBatch;
 
-    //this is where we will contain our wall / floor / ceiling, etc...
+    //this is where we will contain our walls
     private List<DecalCustom> decals;
+
+    //contain the floor / ceiling
+    private List<DecalCustom> backgrounds;
 
     //for collision detection
     private boolean[][] walls;
@@ -94,6 +97,14 @@ public class Level {
             this.decalBatch = new DecalBatch(new CameraGroupStrategy(getCamera3d()));
 
         return this.decalBatch;
+    }
+
+    public List<DecalCustom> getBackgrounds() {
+
+        if (this.backgrounds == null)
+            this.backgrounds = new ArrayList<>();
+
+        return this.backgrounds;
     }
 
     public List<DecalCustom> getDecals() {
@@ -286,6 +297,19 @@ public class Level {
             getDecalBatch().add(decal.getDecal());
         }
 
+        //render the backgrounds
+        for (int i = 0; i < getBackgrounds().size(); i++) {
+            DecalCustom decal = getBackgrounds().get(i);
+
+            if (decal.getCol() < getCamera3d().position.x - RENDER_RANGE || decal.getCol() > getCamera3d().position.x + RENDER_RANGE)
+                continue;
+            if (decal.getRow() < getCamera3d().position.y - RENDER_RANGE || decal.getRow() > getCamera3d().position.y + RENDER_RANGE)
+                continue;
+
+            count++;
+            getDecalBatch().add(decal.getDecal());
+        }
+
         for (int col = 0; col < getDoorDecals()[0].length; col++) {
             for (int row = 0; row < getDoorDecals().length; row++) {
 
@@ -306,7 +330,7 @@ public class Level {
             }
         }
 
-        System.out.println("decal count: " + count);
+        //System.out.println("decal count: " + count);
 
         //render the enemies
         getEnemies().render(getDecalBatch(), getCamera3d());

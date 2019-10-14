@@ -15,7 +15,7 @@ import java.util.List;
 import static com.gamesbykevin.havoc.decals.Background.createDecalBackground;
 import static com.gamesbykevin.havoc.decals.DecalCustom.*;
 import static com.gamesbykevin.havoc.level.RoomHelper.*;
-import static com.gamesbykevin.havoc.maze.Maze.getRandom;
+import static com.gamesbykevin.havoc.maze.Maze.*;
 
 public class LevelHelper {
 
@@ -139,13 +139,13 @@ public class LevelHelper {
 
                     //any opening in the goal will have a door
                     if (!room.hasWest())
-                        createDoorVertical(level, textureRegionWallGoal, getDoorGoal(), roomColStart, roomRowStart);
+                        createDoorVertical(level, textureRegionWallGoal, getDoorGoal(), roomColStart, roomRowStart, false);
                     if (!room.hasEast())
-                        createDoorVertical(level, textureRegionWallGoal, getDoorGoal(), roomColStart + ROOM_SIZE - 1, roomRowStart);
+                        createDoorVertical(level, textureRegionWallGoal, getDoorGoal(), roomColStart + ROOM_SIZE - 1, roomRowStart, false);
                     if (!room.hasNorth())
-                        createDoorHorizontal(level, textureRegionWallGoal, getDoorGoal(), roomColStart, roomRowStart + ROOM_SIZE - 1);
+                        createDoorHorizontal(level, textureRegionWallGoal, getDoorGoal(), roomColStart, roomRowStart + ROOM_SIZE - 1, false);
                     if (!room.hasSouth())
-                        createDoorHorizontal(level, textureRegionWallGoal, getDoorGoal(), roomColStart, roomRowStart);
+                        createDoorHorizontal(level, textureRegionWallGoal, getDoorGoal(), roomColStart, roomRowStart, false);
 
                 } else {
 
@@ -162,34 +162,34 @@ public class LevelHelper {
                         addEmptyRoom(level, room, wall, roomColStart, roomRowStart);
                     } else {
 
-                        //decide at random how the current room is going to look
                         if (Maze.getRandom().nextBoolean()) {
                             addMiniRooms(level, room, wall, roomColStart, roomRowStart);
-                        } else if (Maze.getRandom().nextBoolean()) {
+                        } else if (Maze.getRandom().nextBoolean() || Maze.getRandom().nextBoolean()) {
                             addHallways(level, room, wall, roomColStart, roomRowStart);
                         } else {
                             addEmptyRoom(level, room, wall, roomColStart, roomRowStart);
                         }
                     }
 
-                    if (!room.hasNorth()) {
-                        if (row + 1 != level.getMaze().getGoalRow() || col != level.getMaze().getGoalCol())
-                            createDoorHorizontal(level, wall, getTextureDoor(), roomColStart, roomRowStart + ROOM_SIZE - 1);
-                    }
+                    //if there is an opening and the neighbor room isn't the goal
+                    if (!room.hasNorth() && (row + 1 != level.getMaze().getGoalRow() || col != level.getMaze().getGoalCol()))
+                        createDoorHorizontal(level, wall, getTextureDoor(), roomColStart, roomRowStart + ROOM_SIZE - 1, canSecret(level, room, DIRECTION_NORTH));
 
-                    if (!room.hasEast()) {
-                        if (row != level.getMaze().getGoalRow() || col + 1 != level.getMaze().getGoalCol())
-                            createDoorVertical(level, wall, getTextureDoor(), roomColStart + ROOM_SIZE - 1, roomRowStart);
-                    }
+                    //if there is an opening and the neighbor room isn't the goal
+                    if (!room.hasEast() && (row != level.getMaze().getGoalRow() || col + 1 != level.getMaze().getGoalCol()))
+                        createDoorVertical(level, wall, getTextureDoor(), roomColStart + ROOM_SIZE - 1, roomRowStart, canSecret(level, room, DIRECTION_EAST));
                 }
             }
         }
 
+        int cols = (int)((level.getMaze().getCols() * ROOM_SIZE) / Background.TEXTURE_WIDTH) + 1;
+        int rows = (int)((level.getMaze().getRows() * ROOM_SIZE) / Background.TEXTURE_HEIGHT) + 1;
+
         //add floors and ceiling
-        for (int col = 0; col <= (level.getMaze().getCols() * ROOM_SIZE) + ROOM_SIZE; col += Background.TEXTURE_WIDTH) {
-            for (int row = 0; row <= (level.getMaze().getRows() * ROOM_SIZE) + ROOM_SIZE; row += Background.TEXTURE_HEIGHT) {
-                level.getDecals().add(createDecalBackground(col, row, textureRegionFloor, true));
-                level.getDecals().add(createDecalBackground(col, row, textureRegionCeiling, false));
+        for (int col = 0; col < cols; col++) {
+            for (int row = 0; row < rows; row++) {
+                level.getBackgrounds().add(createDecalBackground(col * Background.TEXTURE_WIDTH, row * Background.TEXTURE_HEIGHT, textureRegionFloor, true));
+                level.getBackgrounds().add(createDecalBackground(col * Background.TEXTURE_WIDTH, row * Background.TEXTURE_HEIGHT, textureRegionCeiling, false));
             }
         }
 
@@ -206,8 +206,12 @@ public class LevelHelper {
 
                 //add for each room but avoid the start and goal
                 if (!start && !goal) {
-                    //addEnemy(level, roomColStart, roomRowStart);
-                    //addObstacle(level, roomColStart, roomRowStart);
+                    addEnemy(level, roomColStart, roomRowStart);
+                    addEnemy(level, roomColStart, roomRowStart);
+                    addEnemy(level, roomColStart, roomRowStart);
+                    addObstacle(level, roomColStart, roomRowStart);
+                    addObstacle(level, roomColStart, roomRowStart);
+                    addObstacle(level, roomColStart, roomRowStart);
                 }
             }
         }
@@ -248,6 +252,38 @@ public class LevelHelper {
                 level.setDoor((int)col, (int)row, true);
                 break;
         }
+    }
+
+    private static boolean canSecret(Level level, Room room, int direction) {
+
+        //get room
+        Room tmp = level.getMaze().getRoom(room, direction);
+
+        //if not exist, return false
+        if (tmp == null)
+            return false;
+
+        boolean secret = false;
+        int count = 0;
+
+        //count the number of walls
+        if (tmp.hasSouth())
+            count++;
+        if (tmp.hasWest())
+            count++;
+        if (tmp.hasEast())
+            count++;
+        if (tmp.hasNorth())
+            count++;
+
+        //if there are 3 walls decide at random if secret
+        if (count == 3)
+            secret = (getRandom().nextFloat() < DOOR_PROBABILITY);
+
+        if (secret)
+            System.out.println("col=" + tmp.getCol() + ", row=" + tmp.getRow());
+
+        return secret;
     }
 
     public static double getDistance(float x1, float y1, float x2, float y2) {
