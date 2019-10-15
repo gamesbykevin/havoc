@@ -160,6 +160,15 @@ public class LevelHelper {
 
                     if (col == level.getMaze().getStartCol() && row == level.getMaze().getStartRow()) {
                         addEmptyRoom(level, room, wall, roomColStart, roomRowStart);
+
+                        //if there is an opening and the neighbor room isn't the goal
+                        if (!room.hasNorth() && (row + 1 != level.getMaze().getGoalRow() || col != level.getMaze().getGoalCol()))
+                            createDoorHorizontal(level, wall, getTextureDoor(), roomColStart, roomRowStart + ROOM_SIZE - 1, false);
+
+                        //if there is an opening and the neighbor room isn't the goal
+                        if (!room.hasEast() && (row != level.getMaze().getGoalRow() || col + 1 != level.getMaze().getGoalCol()))
+                            createDoorVertical(level, wall, getTextureDoor(), roomColStart + ROOM_SIZE - 1, roomRowStart, false);
+
                     } else {
 
                         if (Maze.getRandom().nextBoolean()) {
@@ -169,15 +178,15 @@ public class LevelHelper {
                         } else {
                             addEmptyRoom(level, room, wall, roomColStart, roomRowStart);
                         }
+
+                        //if there is an opening and the neighbor room isn't the goal
+                        if (!room.hasNorth() && (row + 1 != level.getMaze().getGoalRow() || col != level.getMaze().getGoalCol()))
+                            createDoorHorizontal(level, wall, getTextureDoor(), roomColStart, roomRowStart + ROOM_SIZE - 1, canSecret(level, room, DIRECTION_NORTH));
+
+                        //if there is an opening and the neighbor room isn't the goal
+                        if (!room.hasEast() && (row != level.getMaze().getGoalRow() || col + 1 != level.getMaze().getGoalCol()))
+                            createDoorVertical(level, wall, getTextureDoor(), roomColStart + ROOM_SIZE - 1, roomRowStart, canSecret(level, room, DIRECTION_EAST));
                     }
-
-                    //if there is an opening and the neighbor room isn't the goal
-                    if (!room.hasNorth() && (row + 1 != level.getMaze().getGoalRow() || col != level.getMaze().getGoalCol()))
-                        createDoorHorizontal(level, wall, getTextureDoor(), roomColStart, roomRowStart + ROOM_SIZE - 1, canSecret(level, room, DIRECTION_NORTH));
-
-                    //if there is an opening and the neighbor room isn't the goal
-                    if (!room.hasEast() && (row != level.getMaze().getGoalRow() || col + 1 != level.getMaze().getGoalCol()))
-                        createDoorVertical(level, wall, getTextureDoor(), roomColStart + ROOM_SIZE - 1, roomRowStart, canSecret(level, room, DIRECTION_EAST));
                 }
             }
         }
