@@ -191,7 +191,7 @@ public class Level {
             this.camera3d.update();
 
             this.camera3d.position.set((ROOM_SIZE / 2) + .5f, (ROOM_SIZE / 2) + .5f,0);
-            //this.camera3d.position.z = 1.50f;
+            this.camera3d.position.z = 1.50f;
             this.camera3d.rotate(Vector3.X, 90);
         }
 
@@ -330,7 +330,7 @@ public class Level {
             }
         }
 
-        //System.out.println("decal count: " + count);
+        System.out.println("decal count: " + count);
 
         //render the enemies
         getEnemies().render(getDecalBatch(), getCamera3d());

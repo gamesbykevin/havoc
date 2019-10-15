@@ -1,12 +1,7 @@
 package com.gamesbykevin.havoc.level;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.gamesbykevin.havoc.decals.DecalCustom.Type;
-import com.gamesbykevin.havoc.decals.DecalCustom.Side;
 import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.Room;
-
-import static com.gamesbykevin.havoc.level.LevelHelper.*;
 
 public class RoomHelper {
 
@@ -16,7 +11,7 @@ public class RoomHelper {
     //the size of the smaller rooms
     public static final int ROOM_SIZE_SMALL = 10;
 
-    protected static void addHallways(Level level, Room room, TextureRegion wall, int roomColStart, int roomRowStart) {
+    protected static void addHallways(Level level, Room room, int roomColStart, int roomRowStart) {
 
         //the hallways only go across the middle
         int middleCol = roomColStart + (ROOM_SIZE / 2);
@@ -45,14 +40,14 @@ public class RoomHelper {
                 continue;
 
             if (roomRow < middleRow && hallS || roomRow > middleRow && hallN) {
-                addWall(level, Side.East, Type.Wall, wall, middleCol - 1, roomRow, false);
-                addWall(level, Side.West, Type.Wall, wall, middleCol + 1, roomRow, false);
+                level.setWall(middleCol - 1, roomRow, true);
+                level.setWall(middleCol + 1, roomRow, true);
             }
 
             if (!room.hasEast())
-                addWall(level, Side.East, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRow, false);
+                level.setWall(roomColStart + ROOM_SIZE - 1, roomRow, true);
             if (!room.hasWest())
-                addWall(level, Side.West, Type.Wall, wall, roomColStart, roomRow, false);
+                level.setWall(roomColStart, roomRow, true);
         }
 
         //we add walls across the side if open
@@ -62,291 +57,146 @@ public class RoomHelper {
                 continue;
 
             if (roomCol < middleCol && hallW || roomCol > middleCol && hallE) {
-                addWall(level, Side.North, Type.Wall, wall, roomCol, middleRow - 1, false);
-                addWall(level, Side.South, Type.Wall, wall, roomCol, middleRow + 1, false);
+                level.setWall(roomCol, middleRow - 1, true);
+                level.setWall(roomCol, middleRow + 1, true);
             }
 
             if (!room.hasNorth())
-                addWall(level, Side.North, Type.Wall, wall, roomCol, roomRowStart + ROOM_SIZE - 1, false);
+                level.setWall(roomCol, roomRowStart + ROOM_SIZE - 1, true);
             if (!room.hasSouth())
-                addWall(level, Side.South, Type.Wall, wall, roomCol, roomRowStart, false);
+                level.setWall(roomCol, roomRowStart, true);
         }
 
         if (!hallN)
-            addWall(level, Side.South, Type.Wall, wall, middleCol, middleRow + 1, false);
+            level.setWall(middleCol, middleRow + 1, true);
         if (!hallS)
-            addWall(level, Side.North, Type.Wall, wall, middleCol, middleRow - 1, false);
+            level.setWall(middleCol, middleRow - 1, true);
         if (!hallW)
-            addWall(level, Side.East, Type.Wall, wall, middleCol - 1, middleRow, false);
+            level.setWall(middleCol - 1, middleRow, true);
         if (!hallE)
-            addWall(level, Side.West, Type.Wall, wall, middleCol + 1, middleRow, false);
+            level.setWall(middleCol + 1, middleRow, true);
 
         //if hallway and no exit we add a wall at the end
         if (hallN && room.hasNorth())
-            addWall(level, Side.South, Type.Wall, wall, middleCol, roomRowStart + ROOM_SIZE - 1, false);
+            level.setWall(middleCol, roomRowStart + ROOM_SIZE - 1, true);
         if (hallS && room.hasSouth())
-            addWall(level, Side.North, Type.Wall, wall, middleCol, roomRowStart, false);
+            level.setWall(middleCol, roomRowStart, true);
         if (hallW && room.hasWest())
-            addWall(level, Side.East, Type.Wall, wall, roomColStart, middleRow, false);
+            level.setWall(roomColStart, middleRow, true);
         if (hallE && room.hasEast())
-            addWall(level, Side.West, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, middleRow, false);
+            level.setWall(roomColStart + ROOM_SIZE - 1, middleRow, true);
     }
 
-    private static void addMiniRoom(Level level, TextureRegion wall, int roomColStart, int roomRowStart, int middleCol, int middleRow) {
+    private static void addMiniRoom(Level level, int roomColStart, int roomRowStart, int middleCol, int middleRow) {
 
-        //where is this room placed
-        boolean nw = (roomColStart < middleCol && roomRowStart > middleRow);
-        boolean ne = (roomColStart > middleCol && roomRowStart > middleRow);
-        boolean sw = (roomColStart < middleCol && roomRowStart < middleRow);
-        boolean se = (roomColStart > middleCol && roomRowStart < middleRow);
+        int middle = roomColStart + (ROOM_SIZE_SMALL / 2);
 
-        int mid = (ROOM_SIZE_SMALL / 2);
+        boolean nw = (roomColStart < middleCol && roomColStart > middleRow);
+        boolean ne = (roomColStart > middleCol && roomColStart > middleRow);
+        boolean sw = (roomColStart < middleCol && roomColStart < middleRow);
+        boolean se = (roomColStart > middleCol && roomColStart < middleRow);
 
         for (int col = roomColStart; col < roomColStart + ROOM_SIZE_SMALL; col++) {
-
-            if (col == roomColStart + mid) {
-
-                if (nw || ne) {
-                    addWall(level, Side.South, Type.Door, getTextureDoor(), col, roomRowStart, false);
-                    addVertical(level, wall, col, roomRowStart + ROOM_SIZE_SMALL - 1);
-                } else if (sw || se) {
-                    addWall(level, Side.South, Type.Door, getTextureDoor(), col, roomRowStart + ROOM_SIZE_SMALL - 1, false);
-                    addVertical(level, wall, col, roomRowStart);
-                }
-
-            } else if (col == roomColStart + mid - 1 || col == roomColStart + mid + 1) {
-
-                addWall(level, Side.West, Type.Wall, getTextureSide(), col, roomRowStart, false);
-                addWall(level, Side.East, Type.Wall, getTextureSide(), col, roomRowStart, false);
-                addWall(level, Side.North, Type.Wall, wall, col, roomRowStart, false);
-                addWall(level, Side.South, Type.Wall, wall, col, roomRowStart, false);
-
-                addWall(level, Side.West, Type.Wall, getTextureSide(), col, roomRowStart + ROOM_SIZE_SMALL - 1, false);
-                addWall(level, Side.East, Type.Wall, getTextureSide(), col, roomRowStart + ROOM_SIZE_SMALL - 1, false);
-                addWall(level, Side.North, Type.Wall, wall, col, roomRowStart + ROOM_SIZE_SMALL - 1, false);
-                addWall(level, Side.South, Type.Wall, wall, col, roomRowStart + ROOM_SIZE_SMALL - 1, false);
-
-            } else {
-
-                addVertical(level, wall, col, roomRowStart);
-                addVertical(level, wall, col, roomRowStart + ROOM_SIZE_SMALL - 1);
-
-            }
+            level.setWall(col, roomRowStart, true);
+            level.setWall(col, roomRowStart + ROOM_SIZE_SMALL - 1, true);
         }
 
         for (int row = roomRowStart; row < roomRowStart + ROOM_SIZE_SMALL; row++) {
-
-            addHorizontal(level, wall, roomColStart, row);
-            addHorizontal(level, wall, roomColStart + ROOM_SIZE_SMALL - 1, row);
+            level.setWall(roomColStart, row, true);
+            level.setWall(roomColStart + ROOM_SIZE_SMALL - 1, row, true);
         }
     }
 
-    private static void addCorner(Level level, TextureRegion wall, int roomColStart, int roomRowStart, int middleCol, int middleRow) {
-
-        //where is this room placed
-        boolean nw = (roomColStart < middleCol && roomRowStart > middleRow);
-        boolean ne = (roomColStart > middleCol && roomRowStart > middleRow);
-        boolean sw = (roomColStart < middleCol && roomRowStart < middleRow);
-        boolean se = (roomColStart > middleCol && roomRowStart < middleRow);
-
-        for (int col = roomColStart; col < roomColStart + ROOM_SIZE_SMALL; col++) {
-
-            if (nw || ne) {
-                addWall(level, Side.South, Type.Wall, wall, col, roomRowStart + ROOM_SIZE_SMALL - 1, false);
-            } else if (sw || se) {
-                addWall(level, Side.North, Type.Wall, wall, col, roomRowStart, false);
-            }
-
-            //add texture on the end
-            if (col == roomColStart + ROOM_SIZE_SMALL - 1) {
-                if (nw || ne) {
-                    addWall(level, Side.East, Type.Wall, wall, col, roomRowStart + ROOM_SIZE_SMALL - 1, false);
-                } else if (sw || se) {
-                    addWall(level, Side.East, Type.Wall, wall, col, roomRowStart, false);
-                }
-            }
-
-            if (col == roomColStart) {
-                if (nw || ne) {
-                    addWall(level, Side.West, Type.Wall, wall, col, roomRowStart + ROOM_SIZE_SMALL - 1, false);
-                } else if (sw || se) {
-                    addWall(level, Side.West, Type.Wall, wall, col, roomRowStart, false);
-                }
-            }
-        }
-
-        for (int row = roomRowStart; row < roomRowStart + ROOM_SIZE_SMALL; row++) {
-
-            if (nw || sw) {
-                addWall(level, Side.East, Type.Wall, wall, roomColStart, row, false);
-            } else if (ne || se) {
-                addWall(level, Side.West, Type.Wall, wall, roomColStart + ROOM_SIZE_SMALL - 1, row, false);
-            }
-
-            //add texture on the end
-            if (row == roomRowStart + ROOM_SIZE_SMALL - 1) {
-                if (sw) {
-                    addWall(level, Side.North, Type.Wall, wall, roomColStart, row, false);
-                } else if (se) {
-                    addWall(level, Side.North, Type.Wall, wall, roomColStart + ROOM_SIZE_SMALL - 1, row, false);
-                }
-            }
-
-            if (row == roomRowStart) {
-                if (nw) {
-                    addWall(level, Side.South, Type.Wall, wall, roomColStart, row, false);
-                } else if (ne) {
-                    addWall(level, Side.South, Type.Wall, wall, roomColStart + ROOM_SIZE_SMALL - 1, row, false);
-                }
-            }
-        }
-    }
-
-    protected static void addMiniRooms(Level level, Room room, TextureRegion wall, int roomColStart, int roomRowStart) {
-
-        int middleCol = roomColStart + (ROOM_SIZE / 2);
-        int middleRow = roomRowStart + (ROOM_SIZE / 2);
+    protected static void addMiniRooms(Level level, Room room, int roomColStart, int roomRowStart) {
 
         //add walls where necessary
         for (int roomRow = roomRowStart; roomRow < roomRowStart + ROOM_SIZE; roomRow++) {
 
-            if (roomRow > roomRowStart + ROOM_SIZE_SMALL - 1 && roomRow < roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL) {
-                if (room.hasWest())
-                    addWall(level, Side.East, Type.Wall, wall, roomColStart, roomRow, false);
-                if (room.hasEast())
-                    addWall(level, Side.West, Type.Wall, wall, roomColStart + ROOM_SIZE, roomRow, false);
-            }
+            if (room.hasWest())
+                level.setWall(roomColStart, roomRow, true);
+            if (room.hasEast())
+                level.setWall(roomColStart + ROOM_SIZE - 1, roomRow, true);
         }
 
         for (int roomCol = roomColStart; roomCol < roomColStart + ROOM_SIZE; roomCol++) {
 
-            if (roomCol >  roomColStart + ROOM_SIZE_SMALL - 1 && roomCol < roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL) {
-                if (room.hasNorth())
-                    addWall(level, Side.South, Type.Wall, wall, roomCol, roomRowStart + ROOM_SIZE, false);
-                if (room.hasSouth())
-                    addWall(level, Side.North, Type.Wall, wall, roomCol, roomRowStart, false);
-            }
+            if (room.hasNorth())
+                level.setWall(roomCol, roomRowStart + ROOM_SIZE - 1, true);
+            if (room.hasSouth())
+                level.setWall(roomCol, roomRowStart, true);
         }
+
+        int middleCol = roomColStart + (ROOM_SIZE / 2);
+        int middleRow = roomRowStart + (ROOM_SIZE / 2);
 
         if (Maze.getRandom().nextBoolean()) {
 
-            addMiniRoom(level, wall, roomColStart, roomRowStart, middleCol, middleRow);
-            addMiniRoom(level, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart, middleCol, middleRow);
-            addMiniRoom(level, wall, roomColStart, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
-            addMiniRoom(level, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
+            //sw
+            addMiniRoom(level, roomColStart, roomRowStart, middleCol, middleRow);
+
+            //se
+            addMiniRoom(level, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart, middleCol, middleRow);
+
+            //nw
+            addMiniRoom(level, roomColStart, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
+
+            //ne
+            addMiniRoom(level, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
 
         } else {
 
             if (Maze.getRandom().nextBoolean()) {
 
                 //sw
-                addMiniRoom(level, wall, roomColStart, roomRowStart, middleCol, middleRow);
+                addMiniRoom(level, roomColStart, roomRowStart, middleCol, middleRow);
 
                 //ne
-                addMiniRoom(level, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
-
-                //nw
-                addCorner(level, wall, roomColStart, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
-
-                //se
-                addCorner(level, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart, middleCol, middleRow);
+                addMiniRoom(level, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
 
             } else if (Maze.getRandom().nextBoolean()) {
 
-                //sw
-                addCorner(level, wall, roomColStart, roomRowStart, middleCol, middleRow);
-
-                //ne
-                addCorner(level, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
-
                 //nw
-                addMiniRoom(level, wall, roomColStart, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
+                addMiniRoom(level, roomColStart, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, middleCol, middleRow);
 
                 //se
-                addMiniRoom(level, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart, middleCol, middleRow);
+                addMiniRoom(level, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart, middleCol, middleRow);
             }
         }
     }
 
-    protected static void addEmptyRoom(Level level, Room room, TextureRegion wall, int roomColStart, int roomRowStart) {
+    protected static void addEmptyRoom(Level level, Room room, int roomColStart, int roomRowStart) {
 
         for (int roomRow = roomRowStart; roomRow < roomRowStart + ROOM_SIZE; roomRow++) {
 
             if (room.hasWest())
-                addWall(level, Side.East, Type.Wall, wall, roomColStart, roomRow, false);
+                level.setWall(roomColStart, roomRow, true);
             if (room.hasEast())
-                addWall(level, Side.West, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRow, false);
+                level.setWall(roomColStart + ROOM_SIZE - 1, roomRow, true);
 
-            if (roomRow < roomRowStart + ROOM_SIZE_SMALL || roomRow > roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL - 1) {
+            if (roomRow < roomRowStart + ROOM_SIZE_SMALL || roomRow > roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL) {
                 if (!room.hasWest())
-                    addWall(level, Side.East, Type.Wall, wall, roomColStart, roomRow, false);
+                    level.setWall(roomColStart, roomRow, true);
                 if (!room.hasEast())
-                    addWall(level, Side.West, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRow, false);
+                    level.setWall(roomColStart + ROOM_SIZE - 1, roomRow, true);
             }
         }
 
         for (int roomCol = roomColStart; roomCol < roomColStart + ROOM_SIZE; roomCol++) {
             if (room.hasSouth())
-                addWall(level, Side.North, Type.Wall, wall, roomCol, roomRowStart, false);
+                level.setWall(roomCol, roomRowStart, true);
             if (room.hasNorth())
-                addWall(level, Side.South, Type.Wall, wall, roomCol, roomRowStart + ROOM_SIZE - 1, false);
+                level.setWall(roomCol, roomRowStart + ROOM_SIZE - 1, true);
 
             if (roomCol < roomColStart + ROOM_SIZE_SMALL || roomCol > roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL - 1) {
                 if (!room.hasNorth())
-                    addWall(level, Side.South, Type.Wall, wall, roomCol, roomRowStart + ROOM_SIZE - 1, false);
+                    level.setWall(roomCol, roomRowStart + ROOM_SIZE - 1, true);
                 if (!room.hasSouth())
-                    addWall(level, Side.North, Type.Wall, wall, roomCol, roomRowStart, false);
+                    level.setWall(roomCol, roomRowStart, true);
             }
         }
-
-        //add walls on the ends
-        if (!room.hasNorth()) {
-            addWall(level, Side.East, Type.Wall, wall, roomColStart + ROOM_SIZE_SMALL - 1, roomRowStart + ROOM_SIZE - 1, false);
-            addWall(level, Side.West, Type.Wall, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart + ROOM_SIZE - 1, false);
-        }
-        if (!room.hasSouth()) {
-            addWall(level, Side.East, Type.Wall, wall, roomColStart + ROOM_SIZE_SMALL - 1, roomRowStart, false);
-            addWall(level, Side.West, Type.Wall, wall, roomColStart + ROOM_SIZE - ROOM_SIZE_SMALL, roomRowStart, false);
-        }
-        if (!room.hasWest()) {
-            addWall(level, Side.South, Type.Wall, wall, roomColStart, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, false);
-            addWall(level, Side.North, Type.Wall, wall, roomColStart, roomRowStart + ROOM_SIZE_SMALL - 1, false);
-        }
-        if (!room.hasEast()) {
-            addWall(level, Side.South, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRowStart + ROOM_SIZE - ROOM_SIZE_SMALL, false);
-            addWall(level, Side.North, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRowStart + ROOM_SIZE_SMALL - 1, false);
-        }
-
-        //add walls on the corner
-        if (room.hasSouth()) {
-            addWall(level, Side.East, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRowStart, false);
-            addWall(level, Side.West, Type.Wall, wall, roomColStart, roomRowStart, false);
-        }
-        if (room.hasNorth()) {
-            addWall(level, Side.East, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRowStart + ROOM_SIZE - 1, false);
-            addWall(level, Side.West, Type.Wall, wall, roomColStart, roomRowStart + ROOM_SIZE - 1, false);
-        }
-        if (room.hasWest()) {
-            addWall(level, Side.South, Type.Wall, wall, roomColStart, roomRowStart, false);
-            addWall(level, Side.North, Type.Wall, wall, roomColStart, roomRowStart + ROOM_SIZE - 1, false);
-        }
-        if (room.hasEast()) {
-            addWall(level, Side.South, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRowStart, false);
-            addWall(level, Side.North, Type.Wall, wall, roomColStart + ROOM_SIZE - 1, roomRowStart + ROOM_SIZE - 1, false);
-        }
     }
 
-    protected static void addVertical(Level level, TextureRegion texture, int col, int row) {
-        addWall(level, Side.North, Type.Wall, texture, col, row, false);
-        addWall(level, Side.South, Type.Wall, texture, col, row, false);
-    }
-
-    protected static void addHorizontal(Level level, TextureRegion texture, int col, int row) {
-        addWall(level, Side.East, Type.Wall, texture, col, row, false);
-        addWall(level, Side.West, Type.Wall, texture, col, row, false);
-    }
-
-    protected static void createDoorVertical(Level level, TextureRegion wall, TextureRegion door, int col, int roomRowStart, boolean secret) {
+    protected static void createDoorVertical(Level level, int col, int roomRowStart) {
 
         int middleRow = roomRowStart + (ROOM_SIZE / 2);
 
@@ -357,20 +207,14 @@ public class RoomHelper {
                 continue;
 
             if (row == middleRow) {
-                addWall(level, Side.West, Type.Door, (secret) ? wall : door, col, row, secret);
-            } else if (row == middleRow + 1) {
-                addHorizontal(level, wall, col, row);
-                addWall(level, Side.South, Type.Wall, getTextureSide(), col, row, false);
-            } else if (row == middleRow - 1) {
-                addHorizontal(level, wall, col, row);
-                addWall(level, Side.North, Type.Wall, getTextureSide(), col, row, false);
+                level.setDoor(col, row, true);
             } else {
-                addHorizontal(level, wall, col, row);
+                level.setWall(col, row, true);
             }
         }
     }
 
-    protected static void createDoorHorizontal(Level level, TextureRegion wall, TextureRegion door, int roomColStart, int row, boolean secret) {
+    protected static void createDoorHorizontal(Level level, int roomColStart, int row) {
 
         int middleCol = roomColStart + (ROOM_SIZE / 2);
 
@@ -381,15 +225,9 @@ public class RoomHelper {
                 continue;
 
             if (col == middleCol) {
-                addWall(level, Side.South, Type.Door, (secret) ? wall : door, col, row, secret);
-            } else if (col == middleCol + 1) {
-                addVertical(level, wall, col, row);
-                addWall(level, Side.West, Type.Wall, getTextureSide(), col, row, false);
-            } else if (col == middleCol - 1) {
-                addVertical(level, wall, col, row);
-                addWall(level, Side.East, Type.Wall, getTextureSide(), col, row, false);
+                level.setDoor(col, row, true);
             } else {
-                addVertical(level, wall, col, row);
+                level.setWall(col, row, true);
             }
         }
     }
