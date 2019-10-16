@@ -19,7 +19,7 @@ public class RoomHelper {
     public static final int ROOM_SIZE_SMALL = 10;
 
     //how wide are the hallways
-    public static final int ROOM_SIZE_HALL = 9;
+    public static final int[] ROOM_SIZE_HALL = {3, 5, 7, 9, 11, 13};
 
     protected static void addHallways(Level level, Room room, int roomColStart, int roomRowStart) {
 
@@ -30,7 +30,7 @@ public class RoomHelper {
         boolean hallS = (!room.hasSouth() ||Maze.getRandom().nextBoolean());
 
         //how big is the hallway
-        int hallSize = ROOM_SIZE_HALL;
+        int hallSize = ROOM_SIZE_HALL[Maze.getRandom().nextInt(ROOM_SIZE_HALL.length)];
 
         //the hallways only go across the middle
         int middleCol = roomColStart + (ROOM_SIZE / 2);
@@ -314,25 +314,24 @@ public class RoomHelper {
                     if (tmpCol != 0 && tmpRow != 0)
                         continue;
 
-                    if (!level.hasWall(location.col + tmpCol, location.row + tmpRow) &&
-                        !level.hasFree(location.col + tmpCol, location.row + tmpRow)) {
+                    if (level.hasWall(location.col + tmpCol, location.row + tmpRow))
+                        continue;
+                    if (level.hasFree(location.col + tmpCol, location.row + tmpRow))
+                        continue;
 
-                        boolean found = false;
+                    boolean found = false;
 
-                        for (int i = 0; i < options.size(); i++) {
-
-                            if (options.get(i).col == location.col && options.get(i).row == location.row) {
-                                found = true;
-                                break;
-                            }
+                    for (int i = 0; i < options.size(); i++) {
+                        if (options.get(i).col == location.col && options.get(i).row == location.row) {
+                            found = true;
+                            break;
                         }
-
-                        if (!found)
-                            options.add(new Location(location.col + tmpCol, location.row + tmpRow));
                     }
+
+                    if (!found)
+                        options.add(new Location(location.col + tmpCol, location.row + tmpRow));
                 }
             }
-
         }
     }
 }
