@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gamesbykevin.havoc.decals.Background;
-import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.DecalCustom.Side;
 import com.gamesbykevin.havoc.decals.DecalCustom.Type;
 import com.gamesbykevin.havoc.maze.Maze;
@@ -38,7 +37,7 @@ public class TextureHelper {
     public static final int TILES_WALL = 180;
 
     //chance we add a door or secret
-    public static final float DOOR_PROBABILITY = .6f;
+    public static final float DOOR_PROBABILITY = 1.6f;
 
     private static TextureRegion getTextureRegion(String path) {
         return new TextureRegion(new Texture(Gdx.files.internal(path)));
@@ -91,6 +90,12 @@ public class TextureHelper {
 
             for (int row = 0; row < level.getMaze().getRows(); row++) {
 
+                //get the current room
+                Room room = level.getMaze().getRoom(col, row);
+
+                if (col == level.getMaze().getStartCol() && row == level.getMaze().getStartRow())
+                    room = null;
+
                 //is this room a goal
                 boolean goal = (col == level.getMaze().getGoalCol() && row == level.getMaze().getGoalRow());
 
@@ -111,7 +116,7 @@ public class TextureHelper {
                     texture = getWallGoal();
                 }
 
-                addTextures(level, startCol, startRow, texture, goal);
+                addTextures(level, startCol, startRow, texture, room, goal);
             }
         }
 
@@ -119,7 +124,7 @@ public class TextureHelper {
         walls = null;
     }
 
-    private static void addTextures(Level level, int startCol, int startRow, TextureRegion texture, boolean goal) {
+    private static void addTextures(Level level, int startCol, int startRow, TextureRegion texture, Room room, boolean goal) {
 
         for (int col = startCol; col < startCol + ROOM_SIZE; col++) {
             for (int row = startRow; row < startRow + ROOM_SIZE; row++) {
@@ -134,6 +139,11 @@ public class TextureHelper {
                 boolean doorS = level.hasDoor(col, row - 1);
                 boolean doorW = level.hasDoor(col - 1, row);
 
+                boolean freeN = level.hasFree(col, row + 1);
+                boolean freeE = level.hasFree(col + 1, row);
+                boolean freeS = level.hasFree(col, row - 1);
+                boolean freeW = level.hasFree(col - 1, row);
+
                 if (level.hasWall(col, row)) {
 
                     if (goal && col == startCol + (ROOM_SIZE / 2) && row == startRow + (ROOM_SIZE / 2)) {
@@ -146,13 +156,13 @@ public class TextureHelper {
 
                     } else {
 
-                        if (!wallN && !doorN)
+                        if (!wallN && !doorN && freeN)
                             addWall(level, Side.North, Type.Wall, texture, col, row, false);
-                        if (!wallW && !doorW)
+                        if (!wallW && !doorW && freeW)
                             addWall(level, Side.West, Type.Wall, texture, col, row, false);
-                        if (!wallS && !doorS)
+                        if (!wallS && !doorS && freeS)
                             addWall(level, Side.South, Type.Wall, texture, col, row, false);
-                        if (!wallE && !doorE)
+                        if (!wallE && !doorE && freeE)
                             addWall(level, Side.East, Type.Wall, texture, col, row, false);
 
                         if (doorN)
@@ -167,35 +177,48 @@ public class TextureHelper {
 
                 } else if (level.hasDoor(col, row)) {
 
-                    if (wallS && wallN)
-                        addWall(level, Side.East, Type.Door, (goal) ? getDoorGoal() : getTextureDoor(), col, row, false);
-                    if (wallW && wallE)
-                        addWall(level, Side.South, Type.Door, (goal) ? getDoorGoal() : getTextureDoor(), col, row, false);
+                    boolean secret = false;
+
+                    //if this isn't the goal, let's see if we can make the door a secret
+                    if (!goal)
+                        secret = hasSecret(room);
+
+                    if (secret) {
+
+                        if (wallS && wallN)
+                            addWall(level, (!room.hasEast()) ? Side.East : Side.West, Type.Door, texture, col, row, true);
+                        if (wallW && wallE)
+                            addWall(level, (!room.hasNorth()) ? Side.North : Side.South, Type.Door, texture, col, row, true);
+
+                    } else {
+
+                        if (wallS && wallN)
+                            addWall(level, Side.East, Type.Door, (goal) ? getDoorGoal() : getTextureDoor(), col, row, false);
+                        if (wallW && wallE)
+                            addWall(level, Side.South, Type.Door, (goal) ? getDoorGoal() : getTextureDoor(), col, row, false);
+                    }
                 }
             }
         }
     }
 
-    private static boolean canSecret(Level level, Room room, int direction) {
-
-        //get room
-        Room tmp = level.getMaze().getRoom(room, direction);
+    private static boolean hasSecret(Room room) {
 
         //if not exist, return false
-        if (tmp == null)
+        if (room == null)
             return false;
 
         boolean secret = false;
         int count = 0;
 
         //count the number of walls
-        if (tmp.hasSouth())
+        if (room.hasSouth())
             count++;
-        if (tmp.hasWest())
+        if (room.hasWest())
             count++;
-        if (tmp.hasEast())
+        if (room.hasEast())
             count++;
-        if (tmp.hasNorth())
+        if (room.hasNorth())
             count++;
 
         //if there are 3 walls decide at random if secret
@@ -203,7 +226,7 @@ public class TextureHelper {
             secret = (getRandom().nextFloat() < DOOR_PROBABILITY);
 
         if (secret)
-            System.out.println("col=" + tmp.getCol() + ", row=" + tmp.getRow());
+            System.out.println("col=" + room.getCol() + ", row=" + room.getRow());
 
         return secret;
     }

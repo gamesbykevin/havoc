@@ -24,8 +24,8 @@ import static com.gamesbykevin.havoc.maze.MazeHelper.locateGoal;
 public class Level {
 
     //how big is our maze
-    public static final int MAZE_COLS = 3;
-    public static final int MAZE_ROWS = 3;
+    public static final int MAZE_COLS = 4;
+    public static final int MAZE_ROWS = 4;
 
     //our randomly created maze
     private Maze maze;
@@ -45,6 +45,7 @@ public class Level {
     //for collision detection
     private boolean[][] walls;
     private boolean[][] doors;
+    private boolean[][] free;
 
     //contains our doors
     private Door[][] doorDecals;
@@ -149,6 +150,18 @@ public class Level {
         return this.walls;
     }
 
+    public void setFree(int col, int row, boolean value) {
+        getFree()[row][col] = value;
+    }
+
+    public boolean hasFree(int col, int row) {
+        return hasValue(getFree(), col, row);
+    }
+
+    private boolean[][] getFree() {
+        return this.free;
+    }
+
     public void setDoor(int col, int row, boolean value) {
         getDoors()[row][col] = value;
     }
@@ -246,12 +259,14 @@ public class Level {
         //create the arrays for our collision detection
         this.walls = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
         this.doors = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
+        this.free = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
 
         //default to false
         for (int row = 0 ; row < getWalls().length; row++) {
             for (int col = 0; col < getWalls()[0].length; col++) {
                 getWalls()[row][col] = false;
                 getDoors()[row][col] = false;
+                getFree()[row][col] = false;
             }
         }
 

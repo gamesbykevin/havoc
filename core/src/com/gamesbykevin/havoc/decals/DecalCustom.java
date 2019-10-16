@@ -90,7 +90,7 @@ public abstract class DecalCustom {
     }
 
     public static Door createDecalDoor(float col, float row, TextureRegion texture, Side side, boolean secret) {
-        Door door = new Door(texture, side);
+        Door door = new Door(texture, side, secret);
         door.setCol((int)col);
         door.setRow((int)row);
 

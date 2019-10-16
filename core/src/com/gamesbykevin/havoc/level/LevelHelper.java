@@ -60,19 +60,12 @@ public class LevelHelper {
 
                 } else {
 
-                    if (col == level.getMaze().getStartCol() && row == level.getMaze().getStartRow()) {
-
-                        addEmptyRoom(level, room, roomColStart, roomRowStart);
-
+                    if (Maze.getRandom().nextBoolean()) {
+                        addMiniRooms(level, room, roomColStart, roomRowStart);
+                    } else if (Maze.getRandom().nextBoolean() || Maze.getRandom().nextBoolean()) {
+                        addHallways(level, room, roomColStart, roomRowStart);
                     } else {
-
-                        if (Maze.getRandom().nextBoolean()) {
-                            addMiniRooms(level, room, roomColStart, roomRowStart);
-                        } else if (Maze.getRandom().nextBoolean() || Maze.getRandom().nextBoolean()) {
-                            addHallways(level, room, roomColStart, roomRowStart);
-                        } else {
-                            addEmptyRoom(level, room, roomColStart, roomRowStart);
-                        }
+                        addEmptyRoom(level, room, roomColStart, roomRowStart);
                     }
 
                     //if there is an opening and the neighbor room isn't the goal
@@ -86,11 +79,15 @@ public class LevelHelper {
             }
         }
 
-        //add textures to the level
+        //check for free space
+        checkFreeSpace(level);
+
+        //add wall textures to the level
         addTextures(level);
 
         //add floor / ceiling
         //addBackground(level);
+
 
         //spawn enemies etc... in the rooms
         for (int col = 0; col < level.getMaze().getCols(); col++) {
@@ -108,9 +105,9 @@ public class LevelHelper {
                     addEnemy(level, roomColStart, roomRowStart);
                     addEnemy(level, roomColStart, roomRowStart);
                     addEnemy(level, roomColStart, roomRowStart);
-                    addObstacle(level, roomColStart, roomRowStart);
-                    addObstacle(level, roomColStart, roomRowStart);
-                    addObstacle(level, roomColStart, roomRowStart);
+                    //addObstacle(level, roomColStart, roomRowStart);
+                    //addObstacle(level, roomColStart, roomRowStart);
+                    //addObstacle(level, roomColStart, roomRowStart);
                 }
             }
         }
