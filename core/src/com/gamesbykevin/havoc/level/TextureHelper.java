@@ -180,7 +180,7 @@ public class TextureHelper {
                     boolean secret = false;
 
                     //if this isn't the goal, let's see if we can make the door a secret
-                    if (!goal)
+                    if (!goal && (col == startCol || col == startCol + ROOM_SIZE - 1 || row == startRow || row == startRow + ROOM_SIZE - 1))
                         secret = hasSecret(room);
 
                     if (secret) {
