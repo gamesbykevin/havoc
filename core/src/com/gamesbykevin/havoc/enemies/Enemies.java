@@ -12,6 +12,7 @@ import java.util.List;
 
 import static com.gamesbykevin.havoc.decals.DecalCustom.TEXTURE_HEIGHT;
 import static com.gamesbykevin.havoc.decals.DecalCustom.TEXTURE_WIDTH;
+import static com.gamesbykevin.havoc.level.LevelHelper.RENDER_RANGE;
 import static com.gamesbykevin.havoc.level.LevelHelper.getDistance;
 import static com.gamesbykevin.havoc.player.Player.PLAYER_COLLISION;
 
@@ -148,6 +149,10 @@ public class Enemies {
 
             //update the enemy
             enemy.update(camera3d);
+
+            //if enemy is not close enough we won't render
+            if (getDistance(enemy.getCol(), enemy.getRow(), camera3d.position.x, camera3d.position.y) >= (RENDER_RANGE / 2))
+                continue;
 
             //render like a billboard
             enemy.getAnimation().getDecal().lookAt(camera3d.position, camera3d.up);

@@ -18,6 +18,9 @@ public class RoomHelper {
     //the size of the smaller rooms
     public static final int ROOM_SIZE_SMALL = 10;
 
+    //we split the room slightly off from the middle
+    public static final int SPLIT_ROOM_OFFSET = 3;
+
     //how wide are the hallways
     public static final int[] ROOM_SIZE_HALL = {3, 5, 7, 9, 11, 13};
 
@@ -219,6 +222,33 @@ public class RoomHelper {
         }
     }
 
+    protected static void splitRoom(Level level, Room room, int roomColStart, int roomRowStart) {
+
+        //add walls around the room
+        addEmptyRoom(level, room, roomColStart, roomRowStart);
+
+        if (room.hasWest() && room.hasEast()) {
+            createDoorHorizontal(level, roomColStart, roomColStart + ROOM_SIZE,  roomRowStart + (ROOM_SIZE / 2));
+        } else if (room.hasNorth() && room.hasSouth()) {
+            createDoorVertical(level, roomColStart + (ROOM_SIZE / 2), roomRowStart, roomRowStart + ROOM_SIZE);
+        } else {
+
+            if (Maze.getRandom().nextBoolean()) {
+                if (Maze.getRandom().nextBoolean()) {
+                    createDoorVertical(level, roomColStart + (ROOM_SIZE / 2) - SPLIT_ROOM_OFFSET, roomRowStart, roomRowStart + ROOM_SIZE);
+                } else {
+                    createDoorVertical(level, roomColStart + (ROOM_SIZE / 2) + SPLIT_ROOM_OFFSET, roomRowStart, roomRowStart + ROOM_SIZE);
+                }
+            } else {
+                if (Maze.getRandom().nextBoolean()) {
+                    createDoorHorizontal(level, roomColStart, roomColStart + ROOM_SIZE,roomRowStart + (ROOM_SIZE / 2) - SPLIT_ROOM_OFFSET);
+                } else {
+                    createDoorHorizontal(level, roomColStart, roomColStart + ROOM_SIZE, roomRowStart + (ROOM_SIZE / 2) + SPLIT_ROOM_OFFSET);
+                }
+            }
+        }
+    }
+
     protected static void addEmptyRoom(Level level, Room room, int roomColStart, int roomRowStart) {
 
         for (int roomRow = roomRowStart; roomRow < roomRowStart + ROOM_SIZE; roomRow++) {
@@ -251,11 +281,11 @@ public class RoomHelper {
         }
     }
 
-    protected static void createDoorVertical(Level level, int col, int roomRowStart) {
+    protected static void createDoorVertical(Level level, int col, int roomRowStart, int roomRowEnd) {
 
         int middleRow = roomRowStart + (ROOM_SIZE / 2);
 
-        for (int row = roomRowStart; row < roomRowStart + ROOM_SIZE; row++) {
+        for (int row = roomRowStart; row < roomRowEnd; row++) {
 
             //skip if a wall already exists
             if (level.hasWall(col, row))
@@ -269,11 +299,11 @@ public class RoomHelper {
         }
     }
 
-    protected static void createDoorHorizontal(Level level, int roomColStart, int row) {
+    protected static void createDoorHorizontal(Level level, int roomColStart, int roomColEnd, int row) {
 
         int middleCol = roomColStart + (ROOM_SIZE / 2);
 
-        for (int col = roomColStart; col < roomColStart + ROOM_SIZE; col++) {
+        for (int col = roomColStart; col < roomColEnd; col++) {
 
             //skip if a wall already exists
             if (level.hasWall(col, row))

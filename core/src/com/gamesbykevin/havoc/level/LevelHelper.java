@@ -1,13 +1,11 @@
 package com.gamesbykevin.havoc.level;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.gamesbykevin.havoc.decals.Background;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.DecalCustom.Type;
 import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.Room;
 
-import static com.gamesbykevin.havoc.decals.Background.createDecalBackground;
 import static com.gamesbykevin.havoc.decals.DecalCustom.*;
 import static com.gamesbykevin.havoc.level.RoomHelper.*;
 import static com.gamesbykevin.havoc.level.TextureHelper.addBackground;
@@ -17,7 +15,7 @@ import static com.gamesbykevin.havoc.maze.Maze.*;
 public class LevelHelper {
 
     //render decals within the specified range
-    public static final int RENDER_RANGE = (int)(ROOM_SIZE * 1.5);
+    public static final int RENDER_RANGE = (int)(ROOM_SIZE * 2.25);
 
     //how deep is the door placed
     public static final float DOOR_DEPTH = .5f;
@@ -50,31 +48,43 @@ public class LevelHelper {
 
                     //any opening in the goal will have a door
                     if (!room.hasWest())
-                        createDoorVertical(level, roomColStart, roomRowStart);
+                        createDoorVertical(level, roomColStart, roomRowStart, roomRowStart + ROOM_SIZE);
                     if (!room.hasEast())
-                        createDoorVertical(level, roomColStart + ROOM_SIZE - 1, roomRowStart);
+                        createDoorVertical(level, roomColStart + ROOM_SIZE - 1, roomRowStart, roomRowStart + ROOM_SIZE);
                     if (!room.hasNorth())
-                        createDoorHorizontal(level, roomColStart, roomRowStart + ROOM_SIZE - 1);
+                        createDoorHorizontal(level, roomColStart, roomColStart + ROOM_SIZE, roomRowStart + ROOM_SIZE - 1);
                     if (!room.hasSouth())
-                        createDoorHorizontal(level, roomColStart, roomRowStart);
-
+                        createDoorHorizontal(level, roomColStart, roomColStart + ROOM_SIZE, roomRowStart);
+                } else if (col == level.getMaze().getStartCol() && row == level.getMaze().getStartRow()) {
+                    addHallways(level, room, roomColStart, roomRowStart);
                 } else {
 
-                    if (Maze.getRandom().nextBoolean()) {
-                        addMiniRooms(level, room, roomColStart, roomRowStart);
-                    } else if (Maze.getRandom().nextBoolean() || Maze.getRandom().nextBoolean()) {
-                        addHallways(level, room, roomColStart, roomRowStart);
-                    } else {
-                        addEmptyRoom(level, room, roomColStart, roomRowStart);
+                    switch (Maze.getRandom().nextInt(4)) {
+
+                        case 0:
+                            addMiniRooms(level, room, roomColStart, roomRowStart);
+                            break;
+
+                        case 1:
+                            addHallways(level, room, roomColStart, roomRowStart);
+                            break;
+
+                        case 2:
+                            splitRoom(level, room, roomColStart, roomRowStart);
+                            break;
+
+                        case 3:
+                            addEmptyRoom(level, room, roomColStart, roomRowStart);
+                            break;
                     }
 
                     //if there is an opening and the neighbor room isn't the goal
                     if (!room.hasNorth() && (row + 1 != level.getMaze().getGoalRow() || col != level.getMaze().getGoalCol()))
-                        createDoorHorizontal(level, roomColStart, roomRowStart + ROOM_SIZE - 1);
+                        createDoorHorizontal(level, roomColStart, roomColStart + ROOM_SIZE, roomRowStart + ROOM_SIZE - 1);
 
                     //if there is an opening and the neighbor room isn't the goal
                     if (!room.hasEast() && (row != level.getMaze().getGoalRow() || col + 1 != level.getMaze().getGoalCol()))
-                        createDoorVertical(level, roomColStart + ROOM_SIZE - 1, roomRowStart);
+                        createDoorVertical(level, roomColStart + ROOM_SIZE - 1, roomRowStart, roomRowStart + ROOM_SIZE);
                 }
             }
         }
@@ -86,8 +96,7 @@ public class LevelHelper {
         addTextures(level);
 
         //add floor / ceiling
-        //addBackground(level);
-
+        addBackground(level);
 
         //spawn enemies etc... in the rooms
         for (int col = 0; col < level.getMaze().getCols(); col++) {

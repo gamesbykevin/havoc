@@ -3,11 +3,13 @@ package com.gamesbykevin.havoc.obstacles;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
+import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.maze.Maze;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.gamesbykevin.havoc.level.LevelHelper.RENDER_RANGE;
 import static com.gamesbykevin.havoc.level.LevelHelper.getDistance;
 import static com.gamesbykevin.havoc.player.Player.PLAYER_COLLISION;
 
@@ -68,13 +70,17 @@ public class Obstacles {
         for (int i = 0; i < getObstacles().size(); i++) {
 
             //get the current decal
-            Decal decal = getObstacles().get(i).getDecal();
+            Obstacle custom = getObstacles().get(i);
+
+            //if not close enough, don't render
+            if (getDistance(custom.getCol(), custom.getRow(), camera3d.position.x, camera3d.position.y) > RENDER_RANGE)
+                continue;
 
             //render like a billboard
-            decal.lookAt(camera3d.position, camera3d.up);
+            custom.getDecal().lookAt(camera3d.position, camera3d.up);
 
             //add to the batch to be rendered
-            decalBatch.add(decal);
+            decalBatch.add(custom.getDecal());
         }
     }
 }

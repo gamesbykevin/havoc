@@ -24,8 +24,16 @@ public final class Obstacle {
     //do we check for collision
     private final boolean solid;
 
+    //location of the obstacle
+    private float col, row;
+
     protected Obstacle(Obstacles.Type type, float x, float y) {
 
+        //store the location
+        this.col = x;
+        this.row = y;
+
+        //the type of obstacle
         this.type = type;
 
         switch (getType()) {
@@ -55,5 +63,13 @@ public final class Obstacle {
 
     public boolean isSolid() {
         return this.solid;
+    }
+
+    public float getCol() {
+        return this.col;
+    }
+
+    public float getRow() {
+        return this.row;
     }
 }

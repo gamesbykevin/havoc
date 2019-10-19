@@ -24,8 +24,8 @@ import static com.gamesbykevin.havoc.maze.MazeHelper.locateGoal;
 public class Level {
 
     //how big is our maze
-    public static final int MAZE_COLS = 4;
-    public static final int MAZE_ROWS = 4;
+    public static final int MAZE_COLS = 3;
+    public static final int MAZE_ROWS = 3;
 
     //our randomly created maze
     private Maze maze;
@@ -151,6 +151,12 @@ public class Level {
     }
 
     public void setFree(int col, int row, boolean value) {
+
+        if (row < 0 || row >= getFree().length)
+            return;
+        if (col < 0 || col >= getFree()[0].length)
+            return;
+
         getFree()[row][col] = value;
     }
 
@@ -202,9 +208,8 @@ public class Level {
             this.camera3d.direction.set(0, 0, -1);
             this.camera3d.up.set(0, 1, 0);
             this.camera3d.update();
-
             this.camera3d.position.set((ROOM_SIZE / 2) + .5f, (ROOM_SIZE / 2) + .5f,0);
-            this.camera3d.position.z = 1.50f;
+            //this.camera3d.position.z = 1.50f;
             this.camera3d.rotate(Vector3.X, 90);
         }
 
@@ -290,10 +295,16 @@ public class Level {
         float maxRowRoom = minRowRoom + ROOM_SIZE;
 
         //adjust the render range
+        float minCol = (room.hasWest()) ? roomCol * ROOM_SIZE : (getCamera3d().position.x - (RENDER_RANGE / 2));
+        float maxCol = (room.hasEast()) ? (roomCol * ROOM_SIZE) + ROOM_SIZE : (getCamera3d().position.x + (RENDER_RANGE / 2));
+        float maxRow = (room.hasNorth()) ? (roomRow * ROOM_SIZE) + ROOM_SIZE : (getCamera3d().position.y + (RENDER_RANGE / 2));
+        float minRow = (room.hasSouth()) ? (roomRow * ROOM_SIZE) : (getCamera3d().position.y - (RENDER_RANGE / 2));
+        /*
         float minCol = (room.hasWest()) ? roomCol * ROOM_SIZE : (roomCol - 1) * ROOM_SIZE;
         float maxCol = (room.hasEast()) ? (roomCol * ROOM_SIZE) + ROOM_SIZE : ((roomCol + 1) * ROOM_SIZE) + ROOM_SIZE;
         float maxRow = (room.hasNorth()) ? (roomRow * ROOM_SIZE) + ROOM_SIZE : ((roomRow + 1) * ROOM_SIZE) + ROOM_SIZE;
         float minRow = (room.hasSouth()) ? (roomRow * ROOM_SIZE) : (roomRow - 1) * ROOM_SIZE;
+        */
 
         int count = 0;
 
