@@ -13,6 +13,15 @@ import static com.gamesbykevin.havoc.entities.Entities.getDistance;
 
 public class WeaponHelper {
 
+    //where our guns are located
+    public static final int INDEX_LANCE = 0;
+    public static final int INDEX_GLOCK = 1;
+    public static final int INDEX_SMG = 2;
+    public static final int INDEX_IMPACT = 3;
+    public static final int INDEX_MAGNUM = 4;
+    public static final int INDEX_SHOTGUN = 5;
+    public static final int INDEX_BUZZ = 6;
+
     //how many bullets can we hold per weapon
     public static final int BULLETS_MAX_BUZZ = 500;
     public static final int BULLETS_MAX_GLOCK = 50;
@@ -55,7 +64,13 @@ public class WeaponHelper {
     //how close does the bullet need to be for collision detection
     private static final double BULLET_DISTANCE = 1.25d;
 
+    public static final int AMMO_SMALL = 25;
+    public static final int AMMO_LARGE = 75;
+
     public static void reset(Weapon weapon) {
+
+        if (weapon == null)
+            return;
 
         //flag that we want to switch on the weapon
         weapon.setSwitchingOff(false);

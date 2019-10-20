@@ -1,45 +1,43 @@
-package com.gamesbykevin.havoc.obstacles;
+package com.gamesbykevin.havoc.collectables;
 
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
 import com.gamesbykevin.havoc.entities.Entity;
 
-public final class Obstacle extends Entity {
+public final class Collectible extends Entity {
 
     //where the sprite image is located
-    public static final String ASSET_DIR = "obstacles/%s.bmp";
+    public static final String ASSET_DIR = "collect/%s.bmp";
 
     //the type of obstacle
-    public static Obstacles.Type TYPE;
+    public static Collectibles.Type TYPE;
+
+    private final Collectibles.Type type;
 
     //each obstacle has a single animation sprite
     private static final int SPRITES = 1;
 
-    protected Obstacle() {
+    public Collectible(Collectibles.Type type) {
 
+        //call parent
         super(SPRITES);
 
-        switch (TYPE) {
-            case GreenC:
-            case RedC:
-            case Chandelier:
-                setSolid(false);
-                break;
+        //store the type of collectible
+        this.type = type;
+    }
 
-            default:
-                setSolid(true);
-                break;
-        }
+    public Collectibles.Type getType() {
+        return this.type;
     }
 
     @Override
     public void reset() {
-        //do we need to do anything here
+        setSolid(true);
     }
 
     @Override
     public void update(PerspectiveCamera camera3d) {
-        //do we need to do anything here
+        //don't do anything here
     }
 
     @Override

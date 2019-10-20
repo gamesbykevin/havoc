@@ -54,11 +54,11 @@ public final class Obstacles extends Entities {
                 Location location = options.get(index);
 
                 //check if there are any other items
-                if (!getLevel().getEnemies().hasCollision(location)) {
+                if (!hasEntityLocation(location)) {
 
                     //add entity
                     Obstacle.TYPE = Type.SpecimenPod1;
-                    getEntityList().add(new Obstacle(location.col + OFFSET, location.row + OFFSET));
+                    add(new Obstacle(), location);
                 }
 
                 options.remove(index);

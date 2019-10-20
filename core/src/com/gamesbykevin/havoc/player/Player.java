@@ -6,8 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.player.weapon.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import static com.gamesbykevin.havoc.player.PlayerHelper.*;
 import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.*;
@@ -15,7 +14,7 @@ import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.*;
 public final class Player {
 
     //our weapons
-    private List<Weapon> weapons;
+    private Weapon[] weapons;
 
     //used to render images fast
     private SpriteBatch spriteBatch;
@@ -58,20 +57,23 @@ public final class Player {
         }
 
         //add weapon to our list
-        getWeapons().add(new Lance());
+        getWeapons()[0] = new Lance();
+
+        /*
         getWeapons().add(new Glock());
         getWeapons().add(new Smg());
         getWeapons().add(new Impact());
         getWeapons().add(new Magnum());
         getWeapons().add(new Shotgun());
         getWeapons().add(new Buzzsaw());
+        */
 
-        for (int i = 0; i < getWeapons().size(); i++) {
-            reset(getWeapons().get(i));
+        for (int i = 0; i < getWeapons().length; i++) {
+            reset(getWeapons()[i]);
         }
 
         //start with lance
-        setWeaponIndex(5);
+        setWeaponIndex(0);
 
         //start out with the max health
         setHealth(HEALTH_MAX);
@@ -86,6 +88,8 @@ public final class Player {
 
         if (this.health < HEALTH_MIN)
             this.health = HEALTH_MIN;
+        if (this.health > HEALTH_MAX)
+            this.health = HEALTH_MAX;
     }
 
     public MyController getController() {
@@ -93,7 +97,72 @@ public final class Player {
     }
 
     public Weapon getWeapon() {
-        return getWeapons().get(getWeaponIndex());
+        return getWeapons()[getWeaponIndex()];
+    }
+
+    public void addWeapon(Weapon.Type type) {
+
+        switch (type) {
+            case Smg:
+                if (getWeapons()[INDEX_SMG] == null) {
+                    getWeapons()[INDEX_SMG] = new Smg();
+                    setWeaponIndex(INDEX_SMG);
+                    getController().setChange(true);
+                } else {
+                    getWeapons()[INDEX_SMG].setBullets(getWeapons()[INDEX_SMG].getBullets() + AMMO_LARGE);
+                }
+                break;
+
+            case Shotgun:
+                if (getWeapons()[INDEX_SHOTGUN] == null) {
+                    getWeapons()[INDEX_SHOTGUN] = new Shotgun();
+                    setWeaponIndex(INDEX_SHOTGUN);
+                    getController().setChange(true);
+                } else {
+                    getWeapons()[INDEX_SHOTGUN].setBullets(getWeapons()[INDEX_SHOTGUN].getBullets() + AMMO_LARGE);
+                }
+                break;
+
+            case Magnum:
+                if (getWeapons()[INDEX_MAGNUM] == null) {
+                    getWeapons()[INDEX_MAGNUM] = new Magnum();
+                    setWeaponIndex(INDEX_MAGNUM);
+                    getController().setChange(true);
+                } else {
+                    getWeapons()[INDEX_MAGNUM].setBullets(getWeapons()[INDEX_MAGNUM].getBullets() + AMMO_LARGE);
+                }
+                break;
+
+            case Impact:
+                if (getWeapons()[INDEX_IMPACT] == null) {
+                    getWeapons()[INDEX_IMPACT] = new Impact();
+                    setWeaponIndex(INDEX_IMPACT);
+                    getController().setChange(true);
+                } else {
+                    getWeapons()[INDEX_IMPACT].setBullets(getWeapons()[INDEX_IMPACT].getBullets() + AMMO_LARGE);
+                }
+                break;
+
+            case Glock:
+                if (getWeapons()[INDEX_GLOCK] == null) {
+                    getWeapons()[INDEX_GLOCK] = new Glock();
+                    setWeaponIndex(INDEX_GLOCK);
+                    getController().setChange(true);
+                } else {
+                    getWeapons()[INDEX_GLOCK].setBullets(getWeapons()[INDEX_GLOCK].getBullets() + AMMO_LARGE);
+                }
+                break;
+
+            case Buzz:
+                if (getWeapons()[INDEX_BUZZ] == null) {
+                    getWeapons()[INDEX_BUZZ] = new Buzzsaw();
+                    setWeaponIndex(INDEX_BUZZ);
+                    getController().setChange(true);
+                } else {
+                    getWeapons()[INDEX_BUZZ].setBullets(getWeapons()[INDEX_BUZZ].getBullets() + AMMO_LARGE);
+                }
+                break;
+        }
     }
 
     public void update() {
@@ -107,6 +176,9 @@ public final class Player {
         //check for collision
         checkCollision(getController());
 
+        //check if we picked up a collectible
+        checkCollectible(getController(), this);
+
         //update the level
         updateLevel(this);
     }
@@ -114,18 +186,26 @@ public final class Player {
     public void setWeaponIndex(int weaponIndex) {
         this.weaponIndex = weaponIndex;
 
-        if (getWeaponIndex() >= getWeapons().size())
+        if (getWeaponIndex() >= getWeapons().length || getWeaponIndex() < 0)
             this.weaponIndex = 0;
+
+        //make sure we pick an index with an existing weapon
+        while (getWeapons()[this.weaponIndex] == null) {
+            this.weaponIndex++;
+
+            if (this.weaponIndex >= getWeapons().length)
+                this.weaponIndex = 0;
+        }
     }
 
     public int getWeaponIndex() {
         return this.weaponIndex;
     }
 
-    protected List<Weapon> getWeapons() {
+    protected Weapon[] getWeapons() {
 
         if (this.weapons == null)
-            this.weapons = new ArrayList<>();
+            this.weapons = new Weapon[Weapon.Type.values().length];
 
         return this.weapons;
     }
@@ -145,7 +225,7 @@ public final class Player {
         getController().getStage().getBatch().begin();
 
         //render weapon animation
-        getWeapons().get(getWeaponIndex()).render(getController().getStage().getBatch());
+        getWeapons()[getWeaponIndex()].render(getController().getStage().getBatch());
 
         //render ammo
         renderNumber(getWeapon().getBullets(), HUD_BULLET_X, HUD_BULLET_Y, HUD_NUMBER_WIDTH, HUD_NUMBER_HEIGHT, HUD_NUMBER_PAD);
@@ -192,5 +272,4 @@ public final class Player {
             x += width + padding;
         }
     }
-
 }

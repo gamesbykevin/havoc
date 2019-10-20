@@ -110,6 +110,9 @@ public class LevelHelper {
 
         //now we add obstacles
         level.getObstacles().spawn();
+
+        //and we add collectibles
+        level.getCollectibles().spawn();
     }
 
     protected static void addWall(Level level, Side side, Type type, TextureRegion textureRegion, final float col, final float row, boolean secret) {
@@ -137,22 +140,28 @@ public class LevelHelper {
         for (int col = startCol; col < startCol + ROOM_SIZE; col++) {
             for (int row = startRow; row < startRow + ROOM_SIZE; row++) {
 
-                //skip if not free
+                //skip if not freely open
                 if (!level.hasFree(col, row))
                     continue;
 
-                //skip if there is a door or wall
-                if (level.hasDoor(col, row) || level.hasWall(col, row))
+                //skip if there is a wall
+                if (level.hasWall(col, row))
                     continue;
 
+                boolean skip = false;
+
                 //we also want to avoid spaces next to a door otherwise the player could get blocked
-                if (level.hasDoor(col + 1, row))
-                    continue;
-                if (level.hasDoor(col - 1, row))
-                    continue;
-                if (level.hasDoor(col, row + 1))
-                    continue;
-                if (level.hasDoor(col, row - 1))
+                for (int x = -1; x <= 1; x++) {
+                    for (int y = -1; y <= 1; y++) {
+                        if (level.hasDoor(col + x, row + y) || skip) {
+                            skip = true;
+                            break;
+                        }
+                    }
+                }
+
+                //if we found a door we skip
+                if (skip)
                     continue;
 
                 //we passed all checks, add new location

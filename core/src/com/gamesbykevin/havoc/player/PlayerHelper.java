@@ -1,15 +1,19 @@
 package com.gamesbykevin.havoc.player;
 
 import com.badlogic.gdx.math.Vector3;
+import com.gamesbykevin.havoc.collectables.Collectible;
 import com.gamesbykevin.havoc.decals.Door;
+import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
+import com.gamesbykevin.havoc.player.weapon.*;
 
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
 import static com.gamesbykevin.havoc.input.MyController.*;
-import static com.gamesbykevin.havoc.input.MyController.VELOCITY_Z;
 import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE;
+import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.AMMO_LARGE;
+import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.AMMO_SMALL;
 
 public class PlayerHelper {
 
@@ -31,6 +35,9 @@ public class PlayerHelper {
     public static final int HUD_BULLET_Y = SIZE_HEIGHT - (HUD_NUMBER_HEIGHT);
     public static final int HUD_HEALTH_X = (3 * HUD_NUMBER_PAD);
     public static final int HUD_HEALTH_Y = SIZE_HEIGHT - HUD_NUMBER_HEIGHT - (HUD_NUMBER_PAD * 2);
+
+    public static final int HEALTH_SMALL = 10;
+    public static final int HEALTH_LARGE = 25;
 
     protected static void updateLocation(MyController controller) {
 
@@ -206,6 +213,81 @@ public class PlayerHelper {
 
         //no collision
         return false;
+    }
+
+    protected static void checkCollectible(MyController controller, Player player) {
+
+        Vector3 position = controller.getCamera3d().position;
+
+        //check the whole list
+        for (int i = 0; i < controller.getLevel().getCollectibles().getEntityList().size(); i++) {
+
+            //get the current entity
+            Entity entity = controller.getLevel().getCollectibles().getEntityList().get(i);
+
+            //skip if not solid
+            if (!entity.isSolid())
+                continue;
+
+            //if we have collision
+            if (entity.hasCollision(position.x, position.y)) {
+
+                //flag false so we can't collect again
+                entity.setSolid(false);
+
+                //check the collectible
+                Collectible collectible = (Collectible)entity;
+
+                switch (collectible.getType()) {
+
+                    case smg:
+                        player.addWeapon(Weapon.Type.Smg);
+                        break;
+
+                    case glock:
+                        player.addWeapon(Weapon.Type.Glock);
+                        break;
+
+                    case impact:
+                        player.addWeapon(Weapon.Type.Impact);
+                        break;
+
+                    case magnum:
+                        player.addWeapon(Weapon.Type.Magnum);
+                        break;
+
+                    case buzzsaw:
+                        player.addWeapon(Weapon.Type.Buzz);
+                        break;
+
+                    case shotgun:
+                        player.addWeapon(Weapon.Type.Shotgun);
+                        break;
+
+                    case ammo:
+                        player.getWeapon().setBullets(player.getWeapon().getBullets() + AMMO_SMALL);
+                        break;
+
+                    case ammo_crate:
+                        player.getWeapon().setBullets(player.getWeapon().getBullets() + AMMO_LARGE);
+                        break;
+
+                    case health_large:
+                        player.setHealth(player.getHealth() + HEALTH_LARGE);
+                        break;
+
+                    case health_small:
+                        player.setHealth(player.getHealth() + HEALTH_SMALL);
+                        break;
+
+                    case key_1:
+                        break;
+
+                    case key_2:
+                        break;
+                }
+            }
+        }
     }
 
     protected static void updateLevel(Player player) {

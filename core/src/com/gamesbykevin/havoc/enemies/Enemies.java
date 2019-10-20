@@ -15,17 +15,10 @@ import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE;
 public final class Enemies extends Entities {
 
     //how many enemies in each room
-    public static final int ENEMIES_PER_ROOM = 10;
+    public static final int ENEMIES_PER_ROOM_MAX = 4;
 
     public Enemies(Level level) {
         super(level);
-    }
-
-    private void add(Location location) {
-        Enemy enemy = new Enemy();
-        enemy.setCol(location.col + OFFSET);
-        enemy.setRow(location.row + OFFSET);
-        getEntityList().add(enemy);
     }
 
     public boolean hasCollision(float x, float y) {
@@ -70,8 +63,11 @@ public final class Enemies extends Entities {
 
                 int count = 0;
 
+                //pick random number of enemies
+                int limit = Maze.getRandom().nextInt(ENEMIES_PER_ROOM_MAX) + 1;
+
                 //how many enemies per room
-                while (!options.isEmpty() && count < ENEMIES_PER_ROOM) {
+                while (!options.isEmpty() && count < limit) {
 
                     //pick random index
                     int index = Maze.getRandom().nextInt(options.size());
@@ -80,10 +76,10 @@ public final class Enemies extends Entities {
                     Location location = options.get(index);
 
                     //check if there are any other items
-                    if (!getLevel().getObstacles().hasCollision(location)) {
+                    if (!hasEntityLocation(location)) {
 
                         //add enemy at the location
-                        add(location);
+                        add(new Enemy(), location);
 
                         //increase the count
                         count++;

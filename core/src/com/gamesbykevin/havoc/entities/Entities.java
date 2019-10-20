@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.maze.Location;
 
+import java.lang.reflect.GenericArrayType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,12 +57,38 @@ public abstract class Entities {
     //how do we spawn items
     public abstract void spawn();
 
+    //add to the list at the specified location
+    protected void add(Entity entity, Location location) {
+        entity.setCol(location.col + OFFSET);
+        entity.setRow(location.row + OFFSET);
+        entity.getAnimation().setPosition(entity.getCol(), entity.getRow(), 0);
+        getEntityList().add(entity);
+    }
+
     public boolean hasCollision(Location location) {
         return hasCollision(location.col, location.row);
     }
 
     //do we have collision with any of the objects
     public abstract boolean hasCollision(float x, float y);
+
+    protected boolean hasEntityLocation(Location location) {
+        return hasEntityLocation(location.col, location.row);
+    }
+
+    //check if we have collision with any of our entity lists
+    protected boolean hasEntityLocation(float x, float y) {
+
+        if (getLevel().getCollectibles().hasCollision(x, y))
+            return true;
+        if (getLevel().getEnemies().hasCollision(x, y))
+            return true;
+        if (getLevel().getObstacles().hasCollision(x, y))
+            return true;
+
+        //this location is not used
+        return false;
+    }
 
     //logic to render the entities
     public void render(DecalBatch decalBatch, PerspectiveCamera camera3d, float minCol, float maxCol, float minRow, float maxRow) {

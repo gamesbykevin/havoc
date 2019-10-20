@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.gamesbykevin.havoc.collectables.Collectibles;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.enemies.Enemies;
@@ -54,8 +55,11 @@ public class Level {
     //our enemies are contained here
     private Entities enemies;
 
-    //list of obstacles in the level
+    //obstacles in the level
     private Entities obstacles;
+
+    //items for pickup
+    private Entities collectibles;
 
     //the start of the maze
     public static final int START_COL = 0;
@@ -71,6 +75,14 @@ public class Level {
 
         //create the batch
         getDecalBatch();
+    }
+
+    public Entities getCollectibles() {
+
+        if (this.collectibles == null)
+            this.collectibles = new Collectibles(this);
+
+        return this.collectibles;
     }
 
     public Entities getObstacles() {
@@ -288,6 +300,27 @@ public class Level {
         createDecals(this);
     }
 
+    private boolean hasRange(DecalCustom decal, float minCol, float maxCol, float minRow, float maxRow, float minColRoom, float maxColRoom, float minRowRoom, float maxRowRoom) {
+
+        //nw & sw
+        if (decal.getCol() < minColRoom && (decal.getRow() > maxRowRoom || decal.getRow() < minRowRoom))
+            return false;
+
+        //ne & se
+        if (decal.getCol() > maxColRoom && (decal.getRow() > maxRowRoom || decal.getRow() < minRowRoom))
+            return false;
+
+        //west & east
+        if (decal.getCol() < minCol || decal.getCol() > maxCol)
+            return false;
+
+        //north & south
+        if (decal.getRow() < minRow || decal.getRow() > maxRow)
+            return false;
+
+        return true;
+    }
+
     private void drawDecals() {
 
         //figure out which room we are in
@@ -367,29 +400,11 @@ public class Level {
         //render the obstacles
         getObstacles().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
 
+        //render the collectibles
+        getCollectibles().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
+
         //call flush at the end to draw
         getDecalBatch().flush();
-    }
-
-    private boolean hasRange(DecalCustom decal, float minCol, float maxCol, float minRow, float maxRow, float minColRoom, float maxColRoom, float minRowRoom, float maxRowRoom) {
-
-        //nw & sw
-        if (decal.getCol() < minColRoom && (decal.getRow() > maxRowRoom || decal.getRow() < minRowRoom))
-            return false;
-
-        //ne & se
-        if (decal.getCol() > maxColRoom && (decal.getRow() > maxRowRoom || decal.getRow() < minRowRoom))
-            return false;
-
-        //west & east
-        if (decal.getCol() < minCol || decal.getCol() > maxCol)
-            return false;
-
-        //north & south
-        if (decal.getRow() < minRow || decal.getRow() > maxRow)
-            return false;
-
-        return true;
     }
 
     private void updateDecals() {
