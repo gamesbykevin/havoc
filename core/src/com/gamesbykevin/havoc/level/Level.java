@@ -57,6 +57,10 @@ public class Level {
     //list of obstacles in the level
     private Entities obstacles;
 
+    //the start of the maze
+    public static final int START_COL = 0;
+    public static final int START_ROW = 0;
+
     public Level() {
 
         //create our enemies container
@@ -256,13 +260,17 @@ public class Level {
         //generate the maze
         getMaze().generate();
 
+        //set the starting point
+        getMaze().setStartCol(START_COL);
+        getMaze().setStartRow(START_ROW);
+
         //calculate cost
         calculateCost(getMaze());
 
         //locate the goal
         locateGoal(getMaze());
 
-        //create the arrays for our collision detection
+        //create the arrays for our collision detection etc...
         this.walls = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
         this.doors = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
         this.free = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
@@ -298,14 +306,8 @@ public class Level {
         //adjust the render range
         float minCol = (room.hasWest()) ? roomCol * ROOM_SIZE : (getCamera3d().position.x - (RENDER_RANGE / 2));
         float maxCol = (room.hasEast()) ? (roomCol * ROOM_SIZE) + ROOM_SIZE : (getCamera3d().position.x + (RENDER_RANGE / 2));
-        float maxRow = (room.hasNorth()) ? (roomRow * ROOM_SIZE) + ROOM_SIZE : (getCamera3d().position.y + (RENDER_RANGE / 2));
         float minRow = (room.hasSouth()) ? (roomRow * ROOM_SIZE) : (getCamera3d().position.y - (RENDER_RANGE / 2));
-        /*
-        float minCol = (room.hasWest()) ? roomCol * ROOM_SIZE : (roomCol - 1) * ROOM_SIZE;
-        float maxCol = (room.hasEast()) ? (roomCol * ROOM_SIZE) + ROOM_SIZE : ((roomCol + 1) * ROOM_SIZE) + ROOM_SIZE;
-        float maxRow = (room.hasNorth()) ? (roomRow * ROOM_SIZE) + ROOM_SIZE : ((roomRow + 1) * ROOM_SIZE) + ROOM_SIZE;
-        float minRow = (room.hasSouth()) ? (roomRow * ROOM_SIZE) : (roomRow - 1) * ROOM_SIZE;
-        */
+        float maxRow = (room.hasNorth()) ? (roomRow * ROOM_SIZE) + ROOM_SIZE : (getCamera3d().position.y + (RENDER_RANGE / 2));
 
         int count = 0;
 
@@ -360,10 +362,10 @@ public class Level {
         System.out.println("decal count: " + count);
 
         //render the enemies
-        getEnemies().render(getDecalBatch(), getCamera3d());
+        getEnemies().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
 
         //render the obstacles
-        getObstacles().render(getDecalBatch(), getCamera3d());
+        getObstacles().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
 
         //call flush at the end to draw
         getDecalBatch().flush();

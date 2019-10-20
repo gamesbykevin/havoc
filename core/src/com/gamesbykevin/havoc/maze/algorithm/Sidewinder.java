@@ -60,7 +60,6 @@ public class Sidewinder extends Maze {
 
                     start = 0;
                 }
-
             }
         }
     }

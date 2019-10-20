@@ -9,12 +9,13 @@ import com.gamesbykevin.havoc.maze.Maze;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.gamesbykevin.havoc.level.LevelHelper.getLocationOptions;
 import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE;
 
 public final class Enemies extends Entities {
 
     //how many enemies in each room
-    public static final int ENEMIES_PER_ROOM = 3;
+    public static final int ENEMIES_PER_ROOM = 10;
 
     public Enemies(Level level) {
         super(level);
@@ -22,8 +23,8 @@ public final class Enemies extends Entities {
 
     private void add(Location location) {
         Enemy enemy = new Enemy();
-        enemy.setCol(location.col);
-        enemy.setRow(location.row);
+        enemy.setCol(location.col + OFFSET);
+        enemy.setRow(location.row + OFFSET);
         getEntityList().add(enemy);
     }
 
@@ -61,16 +62,11 @@ public final class Enemies extends Entities {
                     continue;
 
                 //where we are starting for the current location
-                int sCol = (col * ROOM_SIZE);
-                int sRow = (row * ROOM_SIZE);
+                int startCol = (col * ROOM_SIZE);
+                int startRow = (row * ROOM_SIZE);
 
-                for (int startCol = sCol; startCol < sCol + ROOM_SIZE; startCol++) {
-                    for (int startRow = sRow; startRow < sRow + ROOM_SIZE; startRow++) {
-
-                        if (getLevel().hasFree(startCol, startRow))
-                            options.add(new Location(startCol, startRow));
-                    }
-                }
+                //get our available options
+                options = getLocationOptions(getLevel(), startCol, startRow, options);
 
                 int count = 0;
 
@@ -80,14 +76,21 @@ public final class Enemies extends Entities {
                     //pick random index
                     int index = Maze.getRandom().nextInt(options.size());
 
-                    //add enemy to the location
-                    add(options.get(index));
+                    //get the location
+                    Location location = options.get(index);
+
+                    //check if there are any other items
+                    if (!getLevel().getObstacles().hasCollision(location)) {
+
+                        //add enemy at the location
+                        add(location);
+
+                        //increase the count
+                        count++;
+                    }
 
                     //remove the option from the list
                     options.remove(index);
-
-                    //increase the count
-                    count++;
                 }
 
                 //clear the list

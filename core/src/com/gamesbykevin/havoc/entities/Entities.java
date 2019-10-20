@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.level.Level;
+import com.gamesbykevin.havoc.maze.Location;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,9 @@ public abstract class Entities {
 
     //store reference to the level
     private final Level level;
+
+    //we offset the position
+    public static final float OFFSET = .5f;
 
     public Entities(Level level) {
         this.level = level;
@@ -52,11 +56,15 @@ public abstract class Entities {
     //how do we spawn items
     public abstract void spawn();
 
+    public boolean hasCollision(Location location) {
+        return hasCollision(location.col, location.row);
+    }
+
     //do we have collision with any of the objects
     public abstract boolean hasCollision(float x, float y);
 
     //logic to render the entities
-    public void render(DecalBatch decalBatch, PerspectiveCamera camera3d) {
+    public void render(DecalBatch decalBatch, PerspectiveCamera camera3d, float minCol, float maxCol, float minRow, float maxRow) {
 
         for (int i = 0; i < getEntityList().size(); i++) {
 
@@ -65,6 +73,15 @@ public abstract class Entities {
 
             //update the entity
             entity.update(camera3d);
+
+            //get the position of the entity
+            Vector3 position = entity.getAnimation().getDecal().getPosition();
+
+            //if too far away there is no reason to render
+            if (position.x < minCol || position.x > maxCol)
+                continue;
+            if (position.y < minRow || position.y > maxRow)
+                continue;
 
             //if entity is not close enough we won't render
             if (getDistance(entity, camera3d.position) >= (RENDER_RANGE / 2))

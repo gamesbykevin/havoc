@@ -3,8 +3,11 @@ package com.gamesbykevin.havoc.level;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.DecalCustom.Type;
+import com.gamesbykevin.havoc.maze.Location;
 import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.Room;
+
+import java.util.List;
 
 import static com.gamesbykevin.havoc.decals.DecalCustom.*;
 import static com.gamesbykevin.havoc.level.RoomHelper.*;
@@ -126,5 +129,37 @@ public class LevelHelper {
                 level.setDoor((int)col, (int)row, true);
                 break;
         }
+    }
+
+    //return list of valid places that are open
+    public static List<Location> getLocationOptions(Level level, int startCol, int startRow, List<Location> options) {
+
+        for (int col = startCol; col < startCol + ROOM_SIZE; col++) {
+            for (int row = startRow; row < startRow + ROOM_SIZE; row++) {
+
+                //skip if not free
+                if (!level.hasFree(col, row))
+                    continue;
+
+                //skip if there is a door or wall
+                if (level.hasDoor(col, row) || level.hasWall(col, row))
+                    continue;
+
+                //we also want to avoid spaces next to a door otherwise the player could get blocked
+                if (level.hasDoor(col + 1, row))
+                    continue;
+                if (level.hasDoor(col - 1, row))
+                    continue;
+                if (level.hasDoor(col, row + 1))
+                    continue;
+                if (level.hasDoor(col, row - 1))
+                    continue;
+
+                //we passed all checks, add new location
+                options.add(new Location(col, row));
+            }
+        }
+
+        return options;
     }
 }

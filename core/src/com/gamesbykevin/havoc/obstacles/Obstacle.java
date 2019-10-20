@@ -26,7 +26,7 @@ public final class Obstacle extends Entity {
         switch (TYPE) {
             case GreenC:
             case RedC:
-            case Chandalier:
+            case Chandelier:
                 setSolid(false);
                 break;
 

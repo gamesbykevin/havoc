@@ -10,12 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.gamesbykevin.havoc.entities.Entity.PLAYER_COLLISION;
+import static com.gamesbykevin.havoc.level.LevelHelper.getLocationOptions;
 import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE;
 
 public final class Obstacles extends Entities {
 
     public enum Type {
-        BluePot, BluePotPlant, BronzeCol, Chandalier, DogFood, FloorLamp, GreenC, RedC,
+        BluePot, BluePotPlant, BronzeCol, Chandelier, DogFood, FloorLamp, GreenC, RedC,
         SilverCol, SpecimenPod1, SpecimenPod2, SpecimenPod3, Well, WellBlood, WellWater
     }
 
@@ -40,24 +41,25 @@ public final class Obstacles extends Entities {
                     continue;
 
                 //where we are starting for the current location
-                int sCol = (col * ROOM_SIZE);
-                int sRow = (row * ROOM_SIZE);
+                int startCol = (col * ROOM_SIZE);
+                int startRow = (row * ROOM_SIZE);
 
-                for (int startCol = sCol; startCol < sCol + ROOM_SIZE; startCol++) {
-                    for (int startRow = sRow; startRow < sRow + ROOM_SIZE; startRow++) {
-
-                        if (getLevel().hasFree(startCol, startRow))
-                            options.add(new Location(startCol, startRow));
-                    }
-                }
+                //get our available options
+                options = getLocationOptions(getLevel(), startCol, startRow, options);
 
                 //pick random index
                 int index = Maze.getRandom().nextInt(options.size());
 
+                //get the location
                 Location location = options.get(index);
 
-                Obstacle.TYPE = Type.SpecimenPod1;
-                getEntityList().add(new Obstacle(location.col, location.row));
+                //check if there are any other items
+                if (!getLevel().getEnemies().hasCollision(location)) {
+
+                    //add entity
+                    Obstacle.TYPE = Type.SpecimenPod1;
+                    getEntityList().add(new Obstacle(location.col + OFFSET, location.row + OFFSET));
+                }
 
                 options.remove(index);
 
