@@ -55,8 +55,12 @@ public class LevelHelper {
                         createDoorHorizontal(level, roomColStart, roomColStart + ROOM_SIZE, roomRowStart + ROOM_SIZE - 1);
                     if (!room.hasSouth())
                         createDoorHorizontal(level, roomColStart, roomColStart + ROOM_SIZE, roomRowStart);
+
                 } else if (col == level.getMaze().getStartCol() && row == level.getMaze().getStartRow()) {
+
+                    //starting room will be a hallway
                     addHallways(level, room, roomColStart, roomRowStart);
+
                 } else {
 
                     switch (Maze.getRandom().nextInt(4)) {
@@ -96,42 +100,13 @@ public class LevelHelper {
         addTextures(level);
 
         //add floor / ceiling
-        addBackground(level);
+        //addBackground(level);
 
-        //spawn enemies etc... in the rooms
-        for (int col = 0; col < level.getMaze().getCols(); col++) {
-            for (int row = 0; row < level.getMaze().getRows(); row++) {
+        //add enemies
+        level.getEnemies().spawn();
 
-                //where does the room start
-                int roomColStart = ROOM_SIZE * col;
-                int roomRowStart = ROOM_SIZE * row;
-
-                boolean start = (col == level.getMaze().getStartCol() && row == level.getMaze().getStartRow());
-                boolean goal = (col == level.getMaze().getGoalCol() && row == level.getMaze().getGoalRow());
-
-                //add for each room but avoid the start and goal
-                if (!start && !goal) {
-                    addEnemy(level, roomColStart, roomRowStart);
-                    addEnemy(level, roomColStart, roomRowStart);
-                    addEnemy(level, roomColStart, roomRowStart);
-                    //addObstacle(level, roomColStart, roomRowStart);
-                    //addObstacle(level, roomColStart, roomRowStart);
-                    //addObstacle(level, roomColStart, roomRowStart);
-                }
-            }
-        }
-    }
-
-    private static void addObstacle(Level level, int roomColStart, int roomRowStart) {
-        int randomCol = roomColStart + getRandom().nextInt(ROOM_SIZE - 4) + 2;
-        int randomRow = roomRowStart + getRandom().nextInt(ROOM_SIZE - 4) + 2;
-        level.getObstacles().add(randomCol, randomRow);
-    }
-
-    private static void addEnemy(Level level, int roomColStart, int roomRowStart) {
-        int randomCol = roomColStart + getRandom().nextInt(ROOM_SIZE - 4) + 2;
-        int randomRow = roomRowStart + getRandom().nextInt(ROOM_SIZE - 4) + 2;
-        level.getEnemies().add(randomCol, randomRow);
+        //now we add obstacles
+        level.getObstacles().spawn();
     }
 
     protected static void addWall(Level level, Side side, Type type, TextureRegion textureRegion, final float col, final float row, boolean secret) {
@@ -151,9 +126,5 @@ public class LevelHelper {
                 level.setDoor((int)col, (int)row, true);
                 break;
         }
-    }
-
-    public static double getDistance(float x1, float y1, float x2, float y2) {
-        return Math.sqrt(Math.pow(x2 - x1, 2) + (Math.pow(y2 - y1, 2)));
     }
 }

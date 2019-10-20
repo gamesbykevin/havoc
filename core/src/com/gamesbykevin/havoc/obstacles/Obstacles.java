@@ -1,25 +1,18 @@
 package com.gamesbykevin.havoc.obstacles;
 
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g3d.decals.Decal;
-import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
-import com.gamesbykevin.havoc.decals.DecalCustom;
+import com.gamesbykevin.havoc.entities.Entities;
+import com.gamesbykevin.havoc.entities.Entity;
+import com.gamesbykevin.havoc.level.Level;
+import com.gamesbykevin.havoc.maze.Location;
 import com.gamesbykevin.havoc.maze.Maze;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gamesbykevin.havoc.level.LevelHelper.RENDER_RANGE;
-import static com.gamesbykevin.havoc.level.LevelHelper.getDistance;
-import static com.gamesbykevin.havoc.player.Player.PLAYER_COLLISION;
+import static com.gamesbykevin.havoc.entities.Entity.PLAYER_COLLISION;
+import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE;
 
-public class Obstacles {
-
-    //list of obstacles
-    private List<Obstacle> obstacles;
-
-    protected static final float DEFAULT_WIDTH = 1.0f;
-    protected static final float DEFAULT_HEIGHT = 1.0f;
+public final class Obstacles extends Entities {
 
     public enum Type {
         BluePot, BluePotPlant, BronzeCol, Chandalier, DogFood, FloorLamp, GreenC, RedC,
@@ -29,58 +22,66 @@ public class Obstacles {
     //total number of obstacles
     private static final int COUNT = Type.values().length;
 
-    public Obstacles() {
-        getObstacles();
+    public Obstacles(Level level) {
+        super(level);
     }
 
-    public void add(float x, float y) {
-        add(Type.values()[Maze.getRandom().nextInt(COUNT)], x, y);
+    @Override
+    public void spawn() {
+
+        //create list of options to place the enemy(ies)
+        List<Location> options = new ArrayList<>();
+
+        for (int col = 0; col < getLevel().getMaze().getCols(); col++) {
+            for (int row = 0; row < getLevel().getMaze().getRows(); row++) {
+
+                //skip the starting room
+                if (col == getLevel().getMaze().getStartCol() && row == getLevel().getMaze().getStartRow())
+                    continue;
+
+                //where we are starting for the current location
+                int sCol = (col * ROOM_SIZE);
+                int sRow = (row * ROOM_SIZE);
+
+                for (int startCol = sCol; startCol < sCol + ROOM_SIZE; startCol++) {
+                    for (int startRow = sRow; startRow < sRow + ROOM_SIZE; startRow++) {
+
+                        if (getLevel().hasFree(startCol, startRow))
+                            options.add(new Location(startCol, startRow));
+                    }
+                }
+
+                //pick random index
+                int index = Maze.getRandom().nextInt(options.size());
+
+                Location location = options.get(index);
+
+                Obstacle.TYPE = Type.SpecimenPod1;
+                getEntityList().add(new Obstacle(location.col, location.row));
+
+                options.remove(index);
+
+                //clear the list
+                options.clear();
+            }
+        }
+
+        options.clear();
+        options = null;
     }
 
-    public void add(Type type, float x, float y) {
-        getObstacles().add(new Obstacle(type, x, y));
-    }
-
+    @Override
     public boolean hasCollision(float x, float y) {
 
-        for (int i = 0; i < getObstacles().size(); i++) {
+        for (int i = 0; i < getEntityList().size(); i++) {
 
-            Obstacle obstacle = getObstacles().get(i);
+            //get the current entity
+            Entity entity = getEntityList().get(i);
 
-            if (!obstacle.isSolid())
-                continue;
-
-            if (getDistance(obstacle.getDecal().getPosition().x, obstacle.getDecal().getPosition().y, x, y) <= PLAYER_COLLISION)
+            if (getDistance(entity, x, y) < PLAYER_COLLISION)
                 return true;
         }
 
         return false;
-    }
-    private List<Obstacle> getObstacles() {
-
-        if (this.obstacles == null)
-            this.obstacles = new ArrayList<>();
-
-        return this.obstacles;
-    }
-
-    public void render(DecalBatch decalBatch, PerspectiveCamera camera3d) {
-
-        //render all the obstacles
-        for (int i = 0; i < getObstacles().size(); i++) {
-
-            //get the current decal
-            Obstacle custom = getObstacles().get(i);
-
-            //if not close enough, don't render
-            if (getDistance(custom.getCol(), custom.getRow(), camera3d.position.x, camera3d.position.y) > RENDER_RANGE)
-                continue;
-
-            //render like a billboard
-            custom.getDecal().lookAt(camera3d.position, camera3d.up);
-
-            //add to the batch to be rendered
-            decalBatch.add(custom.getDecal());
-        }
     }
 }

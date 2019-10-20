@@ -1,75 +1,58 @@
 package com.gamesbykevin.havoc.obstacles;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.decals.Decal;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.gamesbykevin.havoc.animation.DecalAnimation;
+import com.gamesbykevin.havoc.entities.Entity;
 
-import static com.gamesbykevin.havoc.decals.DecalCustom.TEXTURE_HEIGHT;
-import static com.gamesbykevin.havoc.decals.DecalCustom.TEXTURE_WIDTH;
-import static com.gamesbykevin.havoc.obstacles.Obstacles.DEFAULT_HEIGHT;
-import static com.gamesbykevin.havoc.obstacles.Obstacles.DEFAULT_WIDTH;
-
-public final class Obstacle {
-
-    //the decal to render
-    private Decal decal;
-
-    //what type of obstacle is this?
-    private final Obstacles.Type type;
+public final class Obstacle extends Entity {
 
     //where the sprite image is located
     public static final String ASSET_DIR = "obstacles/%s.bmp";
 
-    //do we check for collision
-    private final boolean solid;
+    //the type of obstacle
+    public static Obstacles.Type TYPE;
 
-    //location of the obstacle
-    private float col, row;
+    //each obstacle has a single animation sprite
+    private static final int SPRITES = 1;
 
-    protected Obstacle(Obstacles.Type type, float x, float y) {
+    protected Obstacle(float x, float y) {
+
+        super(SPRITES);
 
         //store the location
-        this.col = x;
-        this.row = y;
+        setCol(x);
+        setRow(y);
 
-        //the type of obstacle
-        this.type = type;
-
-        switch (getType()) {
+        switch (TYPE) {
             case GreenC:
             case RedC:
             case Chandalier:
-                solid = false;
+                setSolid(false);
                 break;
 
             default:
-                solid = true;
+                setSolid(true);
                 break;
         }
 
-        Texture texture = new Texture(Gdx.files.internal(String.format(ASSET_DIR, getType().toString())));
-        this.decal = Decal.newDecal(DEFAULT_WIDTH, DEFAULT_HEIGHT, new TextureRegion(texture), true);
-        getDecal().setPosition(x - (TEXTURE_WIDTH / 2), y - (TEXTURE_HEIGHT / 2), 0);
+        //position correctly
+        getAnimation().setPosition(x, y, 0);
     }
 
-    public Decal getDecal() {
-        return this.decal;
+    @Override
+    public void reset() {
+        //do we need to do anything here
     }
 
-    public Obstacles.Type getType() {
-        return this.type;
+    @Override
+    public void update(PerspectiveCamera camera3d) {
+        //do we need to do anything here
     }
 
-    public boolean isSolid() {
-        return this.solid;
-    }
+    @Override
+    public void createAnimations() {
 
-    public float getCol() {
-        return this.col;
-    }
-
-    public float getRow() {
-        return this.row;
+        //obstacle animations are a single frame
+        getAnimations()[0] = new DecalAnimation(String.format(ASSET_DIR, TYPE.toString()));
     }
 }

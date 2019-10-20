@@ -1,8 +1,15 @@
 package com.gamesbykevin.havoc.player.weapon;
 
+import com.badlogic.gdx.math.Vector3;
+import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.enemies.Enemies;
+import com.gamesbykevin.havoc.enemies.Enemy;
+import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.input.MyController;
+import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.player.Player;
+
+import static com.gamesbykevin.havoc.entities.Entities.getDistance;
 
 public class WeaponHelper {
 
@@ -42,6 +49,12 @@ public class WeaponHelper {
     //where our weapon images are located
     protected static final String WEAPONS_DIR = "weapons/";
 
+    //how many times do we check for collision
+    private static final int ATTEMPT_LIMIT = 200;
+
+    //how close does the bullet need to be for collision detection
+    private static final double BULLET_DISTANCE = 1.25d;
+
     public static void reset(Weapon weapon) {
 
         //flag that we want to switch on the weapon
@@ -73,15 +86,84 @@ public class WeaponHelper {
     }
 
     public static void checkAttack(MyController controller, Weapon weapon) {
-        Enemies enemies = controller.getLevel().getEnemies();
 
-        enemies.checkAttack(
-            weapon,
-            controller.getLevel(),
-            Math.toRadians(controller.getRotation()),
-            controller.getCamera3d().position,
-            controller.getSpeed()
-        );
+        //level instance
+        Level level = controller.getLevel();
+
+        //what direction are we facing
+        double angle = Math.toRadians(controller.getRotation());
+
+        //start position of attack
+        float col = controller.getCamera3d().position.x;
+        float row = controller.getCamera3d().position.y;
+
+        //calculate the distance moved
+        double xa = (0 * Math.cos(angle)) - (1 * Math.sin(angle));
+        double ya = (1 * Math.cos(angle)) + (0 * Math.sin(angle));
+        xa *= controller.getSpeed();
+        ya *= controller.getSpeed();
+
+        int attempts = 0;
+
+        //do we have range
+        boolean range = false;
+
+        while (attempts < ATTEMPT_LIMIT) {
+
+            for (int i = 0; i < level.getEnemies().getEntityList().size(); i++) {
+
+                Entity entity = level.getEnemies().getEntityList().get(i);
+
+                //skip if dead
+                if (!entity.isSolid())
+                    continue;
+
+                //how far are we from the enemy
+                double playerDistance = getDistance(entity, controller.getCamera3d().position);
+
+                //if too far away to attack skip this enemy
+                if (playerDistance >= weapon.getRange())
+                    continue;
+
+                //flag that we have range with at least 1 enemy
+                range = true;
+
+                //calculate distance
+                double dist = getDistance(entity, col, row);
+
+                //if close enough, we hit the enemy
+                if (dist <= BULLET_DISTANCE) {
+                    Enemy enemy = (Enemy)entity;
+                    enemy.setHealth(enemy.getHealth() - weapon.getDamage());
+                    return;
+                }
+            }
+
+            //if we don't have range with any enemies skip this
+            if (!range)
+                break;
+
+            //move to the next position
+            col += xa;
+            row += ya;
+
+            //check if we hit a wall
+            if (level.hasWall((int)col, (int)row))
+                return;
+
+            if (level.hasDoor((int)col, (int)row)) {
+
+                //get the door at the current location
+                Door door = level.getDoorDecal((int)col, (int)row);
+
+                //if the door is closed then we hit the door
+                if (door != null && !door.isOpen())
+                    return;
+            }
+
+            //keep track of the attempts
+            attempts++;
+        }
     }
 
     public static void updateWeapon(Player player) {

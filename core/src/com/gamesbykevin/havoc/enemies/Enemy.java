@@ -1,14 +1,12 @@
 package com.gamesbykevin.havoc.enemies;
 
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
+import com.gamesbykevin.havoc.entities.Entity;
 
-import static com.gamesbykevin.havoc.level.LevelHelper.getDistance;
+import static com.gamesbykevin.havoc.entities.Entities.getDistance;
 
-public class Enemy {
-
-    private DecalAnimation[] animations;
+public final class Enemy extends Entity {
 
     //animation delay
     private static final float DURATION = 250f;
@@ -16,54 +14,54 @@ public class Enemy {
     //how close to notice the player
     private static final float RANGE = 7f;
 
-    private int index = 1;
-
+    //what is the health
     private float health = 100f;
-
-    //where is the enemy located
-    private float col, row;
-
-    //is the enemy dead
-    private boolean dead = false;
 
     //different animations
     public static final int INDEX_IDLE = 1;
     public static final int INDEX_ATTACK = 2;
     public static final int INDEX_DEAD = 0;
 
-    public Enemy() {
+    //how many animations are there?
+    public static final int ANIMATION_COUNT = 3;
 
-        //our animations
-        this.animations = new DecalAnimation[3];
-        this.animations[INDEX_DEAD] = new DecalAnimation("enemies/enemy1/", "", ".png", 7, 4, DURATION);
-        this.animations[INDEX_IDLE] = new DecalAnimation("enemies/enemy1/", "", ".png", 0, 4, DURATION);
-        this.animations[INDEX_ATTACK] = new DecalAnimation("enemies/enemy1/", "", ".png", 4, 3, DURATION);
+    public Enemy() {
+        super(ANIMATION_COUNT);
 
         reset();
     }
 
+    @Override
+    public void createAnimations() {
+        getAnimations()[INDEX_DEAD] = new DecalAnimation("enemies/enemy1/", "", ".png", 7, 4, DURATION);
+        getAnimations()[INDEX_IDLE] = new DecalAnimation("enemies/enemy1/", "", ".png", 0, 4, DURATION);
+        getAnimations()[INDEX_ATTACK] = new DecalAnimation("enemies/enemy1/", "", ".png", 4, 3, DURATION);
+    }
+
+    @Override
     public void reset() {
         setHealth(100f);
-        setDead(false);
+        setSolid(true);
         setIndex(INDEX_IDLE);
         getAnimation().reset();
         getAnimation().setPosition(getCol(), getRow(), 0);
     }
 
+    @Override
     public void update(PerspectiveCamera camera3d) {
 
-        if (!isDead()) {
+        if (isSolid()) {
 
             if (getHealth() <= 0) {
 
-                setDead(true);
+                setSolid(false);
                 setIndex(INDEX_DEAD);
                 getAnimation().reset();
 
             } else {
 
                 //calculate distance
-                double dist = getDistance(getCol(), getRow(), camera3d.position.x, camera3d.position.y);
+                double dist = getDistance(this, camera3d.position);
 
                 //if the enemy isn't close enough
                 if (dist > RANGE) {
@@ -96,51 +94,11 @@ public class Enemy {
         getAnimation().setPosition(getCol(), getRow(), 0);
     }
 
-    public boolean isDead() {
-        return this.dead;
-    }
-
-    public void setDead(boolean dead) {
-        this.dead = dead;
-    }
-
-    public float getCol() {
-        return this.col;
-    }
-
-    public void setCol(float col) {
-        this.col = col;
-    }
-
-    public float getRow() {
-        return this.row;
-    }
-
-    public void setRow(float row) {
-        this.row = row;
-    }
-
     public float getHealth() {
         return this.health;
     }
 
     public void setHealth(float health) {
         this.health = health;
-    }
-
-    public int getIndex() {
-        return this.index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-    public DecalAnimation getAnimation() {
-        return this.animations[getIndex()];
-    }
-
-    public void render(DecalBatch decalBatch) {
-        decalBatch.add(getAnimation().getDecal());
     }
 }

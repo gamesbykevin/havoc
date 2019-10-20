@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.enemies.Enemies;
+import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.Room;
 import com.gamesbykevin.havoc.maze.algorithm.*;
@@ -51,10 +52,10 @@ public class Level {
     private Door[][] doorDecals;
 
     //our enemies are contained here
-    private Enemies enemies;
+    private Entities enemies;
 
     //list of obstacles in the level
-    private Obstacles obstacles;
+    private Entities obstacles;
 
     public Level() {
 
@@ -68,18 +69,18 @@ public class Level {
         getDecalBatch();
     }
 
-    public Obstacles getObstacles() {
+    public Entities getObstacles() {
 
         if (this.obstacles == null)
-            this.obstacles = new Obstacles();
+            this.obstacles = new Obstacles(this);
 
         return this.obstacles;
     }
 
-    public Enemies getEnemies() {
+    public Entities getEnemies() {
 
         if (this.enemies == null)
-            this.enemies = new Enemies();
+            this.enemies = new Enemies(this);
 
         return this.enemies;
     }
@@ -209,7 +210,7 @@ public class Level {
             this.camera3d.up.set(0, 1, 0);
             this.camera3d.update();
             this.camera3d.position.set((ROOM_SIZE / 2) + .5f, (ROOM_SIZE / 2) + .5f,0);
-            //this.camera3d.position.z = 1.50f;
+            this.camera3d.position.z = 1.50f;
             this.camera3d.rotate(Vector3.X, 90);
         }
 

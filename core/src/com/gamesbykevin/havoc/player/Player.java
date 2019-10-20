@@ -26,9 +26,6 @@ public final class Player {
     //controller reference
     private final MyController controller;
 
-    //how close can the player get to an object
-    public static final double PLAYER_COLLISION = 0.75d;
-
     //array of numbers
     private Texture[] numbers;
 
