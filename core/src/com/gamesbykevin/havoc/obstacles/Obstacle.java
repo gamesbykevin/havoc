@@ -7,7 +7,9 @@ import com.gamesbykevin.havoc.entities.Entity;
 public final class Obstacle extends Entity {
 
     //where the sprite image is located
-    public static final String ASSET_DIR = "obstacles/%s.bmp";
+    public static final String ASSET_DIR = "obstacles/";
+
+    public static final String ASSET_EXT = ".bmp";
 
     //the type of obstacle
     public static Obstacles.Type TYPE;
@@ -46,6 +48,6 @@ public final class Obstacle extends Entity {
     public void createAnimations() {
 
         //animations are a single frame
-        getAnimations()[0] = new DecalAnimation(String.format(ASSET_DIR, TYPE.toString()));
+        getAnimations()[0] = new DecalAnimation(ASSET_DIR + TYPE.toString() + ASSET_EXT);
     }
 }
