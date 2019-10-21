@@ -122,9 +122,14 @@ public class MyController implements InputProcessor {
         //Gdx.input.setInputProcessor(getStage());
 
         switch (Gdx.app.getType()) {
+
             case Android:
             case iOS:
                 Gdx.input.setInputProcessor(this.stage);
+                break;
+
+            case Desktop:
+                Gdx.input.setInputProcessor(this);
                 break;
 
             default:
