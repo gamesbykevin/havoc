@@ -93,72 +93,57 @@ public final class Player {
 
     public void addWeapon(Weapon.Type type) {
 
+        int index = -1;
+
         switch (type) {
             case Smg:
-                if (getWeapons()[INDEX_SMG] == null) {
-                    getWeapons()[INDEX_SMG] = new Smg();
-                    setWeaponIndex(INDEX_SMG);
-                    reset(getWeapon());
-                    getController().setChange(true);
-                } else {
-                    getWeapons()[INDEX_SMG].setBullets(getWeapons()[INDEX_SMG].getBullets() + AMMO_LARGE);
-                }
+                index = INDEX_SMG;
                 break;
-
             case Shotgun:
-                if (getWeapons()[INDEX_SHOTGUN] == null) {
-                    getWeapons()[INDEX_SHOTGUN] = new Shotgun();
-                    setWeaponIndex(INDEX_SHOTGUN);
-                    reset(getWeapon());
-                    getController().setChange(true);
-                } else {
-                    getWeapons()[INDEX_SHOTGUN].setBullets(getWeapons()[INDEX_SHOTGUN].getBullets() + AMMO_LARGE);
-                }
+                index = INDEX_SHOTGUN;
                 break;
-
             case Magnum:
-                if (getWeapons()[INDEX_MAGNUM] == null) {
-                    getWeapons()[INDEX_MAGNUM] = new Magnum();
-                    setWeaponIndex(INDEX_MAGNUM);
-                    reset(getWeapon());
-                    getController().setChange(true);
-                } else {
-                    getWeapons()[INDEX_MAGNUM].setBullets(getWeapons()[INDEX_MAGNUM].getBullets() + AMMO_LARGE);
-                }
+                index = INDEX_MAGNUM;
                 break;
-
             case Impact:
-                if (getWeapons()[INDEX_IMPACT] == null) {
-                    getWeapons()[INDEX_IMPACT] = new Impact();
-                    setWeaponIndex(INDEX_IMPACT);
-                    reset(getWeapon());
-                    getController().setChange(true);
-                } else {
-                    getWeapons()[INDEX_IMPACT].setBullets(getWeapons()[INDEX_IMPACT].getBullets() + AMMO_LARGE);
-                }
+                index = INDEX_IMPACT;
                 break;
-
             case Glock:
-                if (getWeapons()[INDEX_GLOCK] == null) {
-                    getWeapons()[INDEX_GLOCK] = new Glock();
-                    setWeaponIndex(INDEX_GLOCK);
-                    reset(getWeapon());
-                    getController().setChange(true);
-                } else {
-                    getWeapons()[INDEX_GLOCK].setBullets(getWeapons()[INDEX_GLOCK].getBullets() + AMMO_LARGE);
-                }
+                index = INDEX_GLOCK;
                 break;
-
             case Buzz:
-                if (getWeapons()[INDEX_BUZZ] == null) {
-                    getWeapons()[INDEX_BUZZ] = new Buzzsaw();
-                    setWeaponIndex(INDEX_BUZZ);
-                    reset(getWeapon());
-                    getController().setChange(true);
-                } else {
-                    getWeapons()[INDEX_BUZZ].setBullets(getWeapons()[INDEX_BUZZ].getBullets() + AMMO_LARGE);
-                }
+                index = INDEX_BUZZ;
                 break;
+        }
+
+        //if we don't have the weapon we will create and add to the list
+        if (getWeapons()[index] == null) {
+            switch (type) {
+                case Buzz:
+                    getWeapons()[index] = new Buzzsaw();
+                    break;
+                case Glock:
+                    getWeapons()[index] = new Glock();
+                    break;
+                case Impact:
+                    getWeapons()[index] = new Impact();
+                    break;
+                case Magnum:
+                    getWeapons()[index] = new Magnum();
+                    break;
+                case Shotgun:
+                    getWeapons()[index] = new Shotgun();
+                    break;
+                case Smg:
+                    getWeapons()[index] = new Smg();
+                    break;
+            }
+            setWeaponIndex(index);
+            reset(getWeapon());
+            getController().setChange(true);
+        } else {
+            //if weapon exists we will add the bullets
+            getWeapons()[index].setBullets(getWeapons()[index].getBullets() + AMMO_LARGE);
         }
     }
 

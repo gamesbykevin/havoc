@@ -37,7 +37,7 @@ public class TextureHelper {
     public static final int TILES_WALL = 180;
 
     //chance we add a door or secret
-    public static final float DOOR_PROBABILITY = 1.6f;
+    public static final float DOOR_PROBABILITY = 0.7f;
 
     private static TextureRegion getTextureRegion(String path) {
         return new TextureRegion(new Texture(Gdx.files.internal(path)));

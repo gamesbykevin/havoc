@@ -392,7 +392,7 @@ public class Level {
             }
         }
 
-        System.out.println("decal count: " + count);
+        //System.out.println("decal count: " + count);
 
         //render the enemies
         getEnemies().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);

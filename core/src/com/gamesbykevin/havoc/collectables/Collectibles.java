@@ -50,8 +50,10 @@ public final class Collectibles extends Entities {
         for (int col = 0; col < getLevel().getMaze().getCols(); col++) {
             for (int row = 0; row < getLevel().getMaze().getRows(); row++) {
 
-                //skip the start of the level
+                //skip the start/goal of the level
                 if (col == getLevel().getMaze().getStartCol() && row == getLevel().getMaze().getStartRow())
+                    continue;
+                if (col == getLevel().getMaze().getGoalCol() && row == getLevel().getMaze().getGoalRow())
                     continue;
 
                 //where we are starting for the current location

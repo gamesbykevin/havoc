@@ -46,8 +46,7 @@ public final class Obstacles extends Entities {
                     case 0:
                     default:
 
-                        int index = Maze.getRandom().nextInt(7);
-
+                        int index = Maze.getRandom().nextInt(10);
                         switch (index) {
                             case 0:
                                 Obstacle.TYPE = Type.SpecimenPod1;
@@ -76,9 +75,21 @@ public final class Obstacles extends Entities {
                             case 6:
                                 Obstacle.TYPE = Type.DogFood;
                                 break;
+
+                            case 7:
+                                Obstacle.TYPE = Type.Well;
+                                break;
+
+                            case 8:
+                                Obstacle.TYPE = Type.WellBlood;
+                                break;
+
+                            case 9:
+                                Obstacle.TYPE = Type.WellWater;
+                                break;
                         }
 
-                        for (int offset = 1; offset < ROOM_SIZE_SMALL; offset++) {
+                        for (int offset = ROOM_SIZE_SMALL - 1; offset >= 1; offset--) {
 
                             if (!hasEntityLocationCorner(startCol + offset, startRow + offset) &&
                                     !hasEntityLocationCorner(startCol + offset, startRow + ROOM_SIZE - (offset + 1)) &&
@@ -143,7 +154,7 @@ public final class Obstacles extends Entities {
                     case 2:
 
                         //frequency of lights
-                        int frequency = Maze.getRandom().nextInt(4) + 2;
+                        int frequency = Maze.getRandom().nextInt(3) + 2;
 
                         //pick random light
                         switch (Maze.getRandom().nextInt(3)) {
@@ -197,10 +208,8 @@ public final class Obstacles extends Entities {
                                     add(new Obstacle(), startCol + ROOM_SIZE - offset, startRow + offset);
                                 if (!hasEntityLocation(startCol + offset, startRow + ROOM_SIZE - offset))
                                     add(new Obstacle(), startCol + offset, startRow + ROOM_SIZE - offset);
-
                                 break;
                         }
-
                         break;
                 }
             }
