@@ -6,8 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.player.weapon.*;
 
-import java.util.HashMap;
-
 import static com.gamesbykevin.havoc.player.PlayerHelper.*;
 import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.*;
 
@@ -34,6 +32,8 @@ public final class Player {
     //what is our health
     private int health = 0;
 
+    private boolean key1 = false, key2 = false;
+
     public Player(MyController controller) {
 
         //store reference to controller
@@ -58,15 +58,6 @@ public final class Player {
 
         //add weapon to our list
         getWeapons()[0] = new Lance();
-
-        /*
-        getWeapons().add(new Glock());
-        getWeapons().add(new Smg());
-        getWeapons().add(new Impact());
-        getWeapons().add(new Magnum());
-        getWeapons().add(new Shotgun());
-        getWeapons().add(new Buzzsaw());
-        */
 
         for (int i = 0; i < getWeapons().length; i++) {
             reset(getWeapons()[i]);
@@ -107,6 +98,7 @@ public final class Player {
                 if (getWeapons()[INDEX_SMG] == null) {
                     getWeapons()[INDEX_SMG] = new Smg();
                     setWeaponIndex(INDEX_SMG);
+                    reset(getWeapon());
                     getController().setChange(true);
                 } else {
                     getWeapons()[INDEX_SMG].setBullets(getWeapons()[INDEX_SMG].getBullets() + AMMO_LARGE);
@@ -117,6 +109,7 @@ public final class Player {
                 if (getWeapons()[INDEX_SHOTGUN] == null) {
                     getWeapons()[INDEX_SHOTGUN] = new Shotgun();
                     setWeaponIndex(INDEX_SHOTGUN);
+                    reset(getWeapon());
                     getController().setChange(true);
                 } else {
                     getWeapons()[INDEX_SHOTGUN].setBullets(getWeapons()[INDEX_SHOTGUN].getBullets() + AMMO_LARGE);
@@ -127,6 +120,7 @@ public final class Player {
                 if (getWeapons()[INDEX_MAGNUM] == null) {
                     getWeapons()[INDEX_MAGNUM] = new Magnum();
                     setWeaponIndex(INDEX_MAGNUM);
+                    reset(getWeapon());
                     getController().setChange(true);
                 } else {
                     getWeapons()[INDEX_MAGNUM].setBullets(getWeapons()[INDEX_MAGNUM].getBullets() + AMMO_LARGE);
@@ -137,6 +131,7 @@ public final class Player {
                 if (getWeapons()[INDEX_IMPACT] == null) {
                     getWeapons()[INDEX_IMPACT] = new Impact();
                     setWeaponIndex(INDEX_IMPACT);
+                    reset(getWeapon());
                     getController().setChange(true);
                 } else {
                     getWeapons()[INDEX_IMPACT].setBullets(getWeapons()[INDEX_IMPACT].getBullets() + AMMO_LARGE);
@@ -147,6 +142,7 @@ public final class Player {
                 if (getWeapons()[INDEX_GLOCK] == null) {
                     getWeapons()[INDEX_GLOCK] = new Glock();
                     setWeaponIndex(INDEX_GLOCK);
+                    reset(getWeapon());
                     getController().setChange(true);
                 } else {
                     getWeapons()[INDEX_GLOCK].setBullets(getWeapons()[INDEX_GLOCK].getBullets() + AMMO_LARGE);
@@ -157,6 +153,7 @@ public final class Player {
                 if (getWeapons()[INDEX_BUZZ] == null) {
                     getWeapons()[INDEX_BUZZ] = new Buzzsaw();
                     setWeaponIndex(INDEX_BUZZ);
+                    reset(getWeapon());
                     getController().setChange(true);
                 } else {
                     getWeapons()[INDEX_BUZZ].setBullets(getWeapons()[INDEX_BUZZ].getBullets() + AMMO_LARGE);
@@ -210,6 +207,22 @@ public final class Player {
         return this.weapons;
     }
 
+    public boolean hasKey1() {
+        return this.key1;
+    }
+
+    public void setKey1(boolean key1) {
+        this.key1 = key1;
+    }
+
+    public boolean hasKey2() {
+        return this.key2;
+    }
+
+    public void setKey2(boolean key2) {
+        this.key2 = key2;
+    }
+
     public SpriteBatch getSpriteBatch() {
 
         if (this.spriteBatch == null)
@@ -219,6 +232,7 @@ public final class Player {
     }
 
     public void render() {
+
         getSpriteBatch().setProjectionMatrix(getController().getCamera2d().combined);
 
         //start rendering
@@ -234,12 +248,21 @@ public final class Player {
         renderNumber(getHealth(), HUD_HEALTH_X, HUD_HEALTH_Y, HUD_NUMBER_WIDTH, HUD_NUMBER_HEIGHT, HUD_NUMBER_PAD);
 
         //render keys?
+        renderKeys();
 
         //done rendering
         getController().getStage().getBatch().end();
     }
 
-    public void renderNumber(final int number, int renderX, int renderY, int width, int height, int padding) {
+    private void renderKeys() {
+
+        if (hasKey1())
+            getController().getStage().getBatch().draw(this.numbers[10], HUD_HEALTH_X, HUD_HEALTH_Y - (HUD_KEY_HEIGHT * 1), HUD_KEY_WIDTH, HUD_KEY_HEIGHT);
+        if (hasKey2())
+            getController().getStage().getBatch().draw(this.numbers[11], HUD_HEALTH_X, HUD_HEALTH_Y - (HUD_KEY_HEIGHT * 2), HUD_KEY_WIDTH, HUD_KEY_HEIGHT);
+    }
+
+    private final void renderNumber(final int number, int renderX, int renderY, int width, int height, int padding) {
 
         float x = renderX;
 

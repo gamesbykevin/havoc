@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.maze.Location;
 
-import java.lang.reflect.GenericArrayType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,16 +56,16 @@ public abstract class Entities {
     //how do we spawn items
     public abstract void spawn();
 
-    //add to the list at the specified location
-    protected void add(Entity entity, Location location) {
-        entity.setCol(location.col + OFFSET);
-        entity.setRow(location.row + OFFSET);
+    protected void add(Entity entity, float col, float row) {
+        entity.setCol(col + OFFSET);
+        entity.setRow(row + OFFSET);
         entity.getAnimation().setPosition(entity.getCol(), entity.getRow(), 0);
         getEntityList().add(entity);
     }
 
-    public boolean hasCollision(Location location) {
-        return hasCollision(location.col, location.row);
+    //add to the list at the specified location
+    protected void add(Entity entity, Location location) {
+        add(entity, location.col, location.row);
     }
 
     //do we have collision with any of the objects
@@ -84,6 +83,10 @@ public abstract class Entities {
         if (getLevel().getEnemies().hasCollision(x, y))
             return true;
         if (getLevel().getObstacles().hasCollision(x, y))
+            return true;
+        if (getLevel().hasDoor((int)x, (int)y))
+            return true;
+        if (!getLevel().hasFree((int)x, (int)y))
             return true;
 
         //this location is not used

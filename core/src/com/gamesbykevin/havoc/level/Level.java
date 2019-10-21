@@ -226,7 +226,7 @@ public class Level {
             this.camera3d.up.set(0, 1, 0);
             this.camera3d.update();
             this.camera3d.position.set((ROOM_SIZE / 2) + .5f, (ROOM_SIZE / 2) + .5f,0);
-            this.camera3d.position.z = 1.50f;
+            //this.camera3d.position.z = 1.50f;
             this.camera3d.rotate(Vector3.X, 90);
         }
 

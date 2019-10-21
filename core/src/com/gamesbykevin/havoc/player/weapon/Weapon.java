@@ -20,6 +20,9 @@ public abstract class Weapon {
     //how many bullets do we have
     private int bullets;
 
+    //maximum amount of bullets we can carry
+    private final int bulletsMax;
+
     //how much damage does each bullet inflict
     private float damage;
 
@@ -46,8 +49,13 @@ public abstract class Weapon {
     //render animation when we stop attacking
     protected SpriteAnimation stopping;
 
-    public Weapon(Type type) {
+    public Weapon(Type type, int bulletsMax) {
         this.type = type;
+        this.bulletsMax = bulletsMax;
+    }
+
+    public int getBulletsMax() {
+        return this.bulletsMax;
     }
 
     public Type getType() {
@@ -68,6 +76,9 @@ public abstract class Weapon {
 
     public void setBullets(int bullets) {
         this.bullets = bullets;
+
+        if (this.bullets > getBulletsMax())
+            this.bullets = getBulletsMax();
     }
 
     public float getDamage() {

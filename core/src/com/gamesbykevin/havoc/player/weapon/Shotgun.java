@@ -17,7 +17,7 @@ public class Shotgun extends Weapon {
 
     public Shotgun() {
 
-        super(Type.Shotgun);
+        super(Type.Shotgun, BULLETS_MAX_SHOTGUN);
 
         //assign the attack range
         setRange(DEFAULT_RANGE);

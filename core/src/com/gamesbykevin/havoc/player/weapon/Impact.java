@@ -17,7 +17,7 @@ public class Impact extends Weapon {
 
     public Impact() {
 
-        super(Type.Impact);
+        super(Type.Impact, BULLETS_MAX_IMPACT);
 
         //assign the attack range
         setRange(DEFAULT_RANGE);

@@ -24,13 +24,16 @@ public class PlayerHelper {
     public static final float DOOR_DISTANCE = 1.0f;
 
     //if we aren't moving the joystick enough we will ignore
-    private static final float DEADZONE_IGNORE = .33f;
+    private static final float DEADZONE_IGNORE = .2f;
 
     //where to render our hud items
-    public static final float HUD_NUMBER_RATIO = .5f;
-    public static final int HUD_NUMBER_WIDTH = (int)(58 * HUD_NUMBER_RATIO);
-    public static final int HUD_NUMBER_HEIGHT = (int)(70 * HUD_NUMBER_RATIO);
-    public static final int HUD_NUMBER_PAD = (int)(5 * HUD_NUMBER_RATIO);
+    public static final float HUD_RATIO = .5f;
+    public static final int HUD_NUMBER_WIDTH = (int)(58 * HUD_RATIO);
+    public static final int HUD_NUMBER_HEIGHT = (int)(70 * HUD_RATIO);
+    public static final int HUD_KEY_WIDTH = (int)(20 * HUD_RATIO);
+    public static final int HUD_KEY_HEIGHT = (int)(54 * HUD_RATIO);
+
+    public static final int HUD_NUMBER_PAD = (int)(5 * HUD_RATIO);
     public static final int HUD_BULLET_X = SIZE_WIDTH - (3 * HUD_NUMBER_WIDTH) - (3 * HUD_NUMBER_PAD);
     public static final int HUD_BULLET_Y = SIZE_HEIGHT - (HUD_NUMBER_HEIGHT);
     public static final int HUD_HEALTH_X = (3 * HUD_NUMBER_PAD);
@@ -281,9 +284,11 @@ public class PlayerHelper {
                         break;
 
                     case key_1:
+                        player.setKey1(true);
                         break;
 
                     case key_2:
+                        player.setKey2(true);
                         break;
                 }
             }

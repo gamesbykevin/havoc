@@ -17,7 +17,7 @@ public class Smg extends Weapon {
 
     public Smg() {
 
-        super(Type.Smg);
+        super(Type.Smg, BULLETS_MAX_SMG);
 
         //assign the attack range
         setRange(DEFAULT_RANGE);

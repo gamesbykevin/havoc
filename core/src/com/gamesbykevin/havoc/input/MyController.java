@@ -292,7 +292,7 @@ public class MyController implements InputProcessor {
         if (this.stage == null)
             this.stage = new Stage(new StretchViewport(SIZE_WIDTH, SIZE_HEIGHT));
 
-        return stage;
+        return this.stage;
     }
 
     public void render() {

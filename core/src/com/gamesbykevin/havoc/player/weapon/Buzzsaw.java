@@ -17,7 +17,7 @@ public class Buzzsaw extends Weapon {
 
     public Buzzsaw() {
 
-        super(Type.Buzz);
+        super(Type.Buzz, BULLETS_MAX_BUZZ);
 
         //assign the attack range
         setRange(DEFAULT_RANGE);

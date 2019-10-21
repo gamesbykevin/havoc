@@ -17,7 +17,7 @@ public class Lance extends Weapon {
 
     public Lance() {
 
-        super(Type.Lance);
+        super(Type.Lance, BULLETS_MAX_LANCE);
 
         //assign the attack range
         setRange(DEFAULT_RANGE);

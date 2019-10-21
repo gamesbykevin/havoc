@@ -17,7 +17,7 @@ public class Magnum extends Weapon {
 
     public Magnum() {
 
-        super(Type.Magnum);
+        super(Type.Magnum, BULLETS_MAX_MAGNUM);
 
         //assign the attack range
         setRange(DEFAULT_RANGE);

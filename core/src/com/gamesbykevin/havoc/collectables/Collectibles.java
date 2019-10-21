@@ -35,7 +35,7 @@ public final class Collectibles extends Entities {
     }
 
     //how many collectibles per room
-    public static final int COLLECTIBLES_PER_ROOM_MAX = 3;
+    public static final int COLLECTIBLES_PER_ROOM_MAX = 2;
 
     public Collectibles(Level level) {
         super(level);
@@ -64,7 +64,7 @@ public final class Collectibles extends Entities {
                 int count = 0;
 
                 //pick random number of enemies
-                int limit = Maze.getRandom().nextInt(COLLECTIBLES_PER_ROOM_MAX) + 10;
+                int limit = Maze.getRandom().nextInt(COLLECTIBLES_PER_ROOM_MAX) + 1;
 
                 //continue until we reach limit or no move options
                 while (!options.isEmpty() && count < limit) {
@@ -78,7 +78,7 @@ public final class Collectibles extends Entities {
                     //check if there are any other items
                     if (!hasEntityLocation(location)) {
 
-                        TYPE = Type.values()[Maze.getRandom().nextInt(Type.values().length)];//Type.ammo_crate;
+                        TYPE = Type.values()[Maze.getRandom().nextInt(Type.values().length)];
 
                         Collectible collectible = new Collectible(TYPE);
                         collectible.setSolid(true);

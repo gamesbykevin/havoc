@@ -17,7 +17,7 @@ public class Glock extends Weapon {
 
     public Glock() {
 
-        super(Type.Glock);
+        super(Type.Glock, BULLETS_MAX_GLOCK);
 
         //assign the attack range
         setRange(DEFAULT_RANGE);

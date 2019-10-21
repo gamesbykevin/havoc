@@ -103,7 +103,7 @@ public class LevelHelper {
         addTextures(level);
 
         //add floor / ceiling
-        //addBackground(level);
+        addBackground(level);
 
         //add enemies
         level.getEnemies().spawn();
