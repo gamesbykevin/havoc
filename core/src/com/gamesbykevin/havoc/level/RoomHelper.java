@@ -249,6 +249,71 @@ public class RoomHelper {
         }
     }
 
+    protected static void addDiamondRoom(Level level, Room room, int roomColStart, int roomRowStart) {
+
+        int middleRow = roomRowStart + (ROOM_SIZE / 2);
+        int middleCol = roomColStart + (ROOM_SIZE / 2);
+
+        int endRow = (roomRowStart + ROOM_SIZE - 1);
+        int endCol = (roomColStart + ROOM_SIZE - 1);
+
+        for (int roomRow = roomRowStart; roomRow <= endRow; roomRow++) {
+            for (int roomCol = roomColStart; roomCol <= endCol; roomCol++) {
+
+                int minCol, maxCol;
+                int minRow, maxRow;
+
+                if (roomRow < middleRow) {
+                    minCol = middleCol - (roomRow - roomRowStart);
+                    maxCol = middleCol + (roomRow - roomRowStart);
+                } else if (roomRow > middleRow) {
+                    minCol = middleCol - (endRow - roomRow);
+                    maxCol = middleCol + (endRow - roomRow);
+                } else {
+                    minCol = roomColStart;
+                    maxCol = endCol;
+                }
+
+                if (roomCol < middleCol) {
+                    minRow = middleRow - (roomCol - roomColStart);
+                    maxRow = middleRow + (roomCol - roomColStart);
+                } else if (roomCol > middleCol) {
+                    minRow = middleRow - (endCol - roomCol);
+                    maxRow = middleRow + (endCol - roomCol);
+                } else {
+                    minRow = roomRowStart;
+                    maxRow = endRow;
+                }
+
+                if (roomCol <= minCol && roomRow <= minRow)
+                    level.setWall(roomCol, roomRow, true);
+                if (roomCol <= minCol && roomRow >= maxRow)
+                    level.setWall(roomCol, roomRow, true);
+
+                if (roomCol >= maxCol && roomRow <= minRow)
+                    level.setWall(roomCol, roomRow, true);
+                if (roomCol >= maxCol && roomRow >= maxRow)
+                    level.setWall(roomCol, roomRow, true);
+
+                //make sure we don't block an opening
+                if (roomRow == middleRow) {
+                    if (!room.hasWest() && roomCol == roomColStart)
+                        level.setWall(roomCol, roomRow, false);
+                    if (!room.hasEast() && roomCol == endCol)
+                        level.setWall(roomCol, roomRow, false);
+                }
+
+                if (roomCol == middleCol) {
+                    if (!room.hasNorth() && roomRow == endRow)
+                        level.setWall(roomCol, roomRow, false);
+                    if (!room.hasSouth() && roomRow == roomRowStart)
+                        level.setWall(roomCol, roomRow, false);
+                }
+            }
+        }
+    }
+
+    //room will be full size with no walls within
     protected static void addEmptyRoom(Level level, Room room, int roomColStart, int roomRowStart) {
 
         for (int roomRow = roomRowStart; roomRow < roomRowStart + ROOM_SIZE; roomRow++) {

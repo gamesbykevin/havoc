@@ -29,6 +29,15 @@ public class Level {
     public static final int MAZE_COLS = 3;
     public static final int MAZE_ROWS = 3;
 
+    //different maze generation algorithms
+    public static final int ALGORITHM_BINARY = 0;
+    public static final int ALGORITHM_ELLERS = 1;
+    public static final int ALGORITHM_HUNT = 2;
+    public static final int ALGORITHM_KRUSKAL = 3;
+    public static final int ALGORITHM_RECURSIVE = 4;
+    public static final int ALGORITHM_SIDEWINDER = 5;
+    public static final int ALGORITHM_ALDOUS = 6;
+
     //our randomly created maze
     private Maze maze;
 
@@ -240,31 +249,31 @@ public class Level {
 
         switch ((int)(Math.random() * 7)) {
 
-            case 0:
+            case ALGORITHM_BINARY:
                 this.maze = new BinaryTree(MAZE_COLS, MAZE_ROWS);
                 break;
 
-            case 1:
+            case ALGORITHM_ELLERS:
                 this.maze = new Ellers(MAZE_COLS, MAZE_ROWS);
                 break;
 
-            case 2:
+            case ALGORITHM_HUNT:
                 this.maze = new HuntKill(MAZE_COLS, MAZE_ROWS);
                 break;
 
-            case 3:
+            case ALGORITHM_KRUSKAL:
                 this.maze = new Kruskal(MAZE_COLS, MAZE_ROWS);
                 break;
 
-            case 4:
+            case ALGORITHM_RECURSIVE:
                 this.maze = new Recursive(MAZE_COLS, MAZE_ROWS);
                 break;
 
-            case 5:
+            case ALGORITHM_SIDEWINDER:
                 this.maze = new Sidewinder(MAZE_COLS, MAZE_ROWS);
                 break;
 
-            case 6:
+            case ALGORITHM_ALDOUS:
                 this.maze = new AldousBroder(MAZE_COLS, MAZE_ROWS);
                 break;
         }
@@ -392,7 +401,7 @@ public class Level {
             }
         }
 
-        //System.out.println("decal count: " + count);
+        System.out.println("decal count: " + count);
 
         //render the enemies
         getEnemies().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);

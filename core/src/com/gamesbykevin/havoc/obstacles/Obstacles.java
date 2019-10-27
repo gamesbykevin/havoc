@@ -6,7 +6,6 @@ import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.Room;
 
-import static com.gamesbykevin.havoc.entities.Entity.PLAYER_COLLISION;
 import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE;
 import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE_SMALL;
 

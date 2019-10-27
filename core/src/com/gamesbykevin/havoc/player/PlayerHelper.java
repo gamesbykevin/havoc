@@ -112,9 +112,9 @@ public class PlayerHelper {
         controller.getCamera3d().position.y += ya;
         controller.getCamera3d().rotate(Vector3.Z, rotationA);
 
+        /*
         if (controller.isMoveForward() || controller.isMoveBackward()) {
 
-            /*
             controller.getCamera3d().position.z += VELOCITY_Z;
 
             if (controller.getCamera3d().position.z <= MIN_Z) {
@@ -124,8 +124,8 @@ public class PlayerHelper {
                 controller.getCamera3d().position.z = MAX_Z;
                 VELOCITY_Z = -VELOCITY_Z;
             }
-            */
         }
+        */
 
         if (rotationA != 0) {
 

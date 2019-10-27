@@ -57,14 +57,15 @@ public final class Player {
         }
 
         //add weapon to our list
-        getWeapons()[0] = new Lance();
+        getWeapons()[INDEX_LANCE] = new Lance();
+        getWeapons()[INDEX_GLOCK] = new Glock();
 
         for (int i = 0; i < getWeapons().length; i++) {
             reset(getWeapons()[i]);
         }
 
-        //start with lance
-        setWeaponIndex(0);
+        //start with glock
+        setWeaponIndex(1);
 
         //start out with the max health
         setHealth(HEALTH_MAX);
@@ -138,10 +139,13 @@ public final class Player {
                     getWeapons()[index] = new Smg();
                     break;
             }
+
             setWeaponIndex(index);
             reset(getWeapon());
             getController().setChange(true);
+
         } else {
+
             //if weapon exists we will add the bullets
             getWeapons()[index].setBullets(getWeapons()[index].getBullets() + AMMO_LARGE);
         }

@@ -46,8 +46,8 @@ public class LevelHelper {
                     //add switch in the middle of the room
                     level.setWall(roomColStart + (ROOM_SIZE / 2), roomRowStart + (ROOM_SIZE / 2), true);
 
-                    //add walls around the room
-                    addEmptyRoom(level, room, roomColStart, roomRowStart);
+                    //goal will be a hallway
+                    addHallways(level, room, roomColStart, roomRowStart);
 
                     //any opening in the goal will have a door
                     if (!room.hasWest())
@@ -81,6 +81,10 @@ public class LevelHelper {
                             break;
 
                         case 3:
+                            addDiamondRoom(level, room, roomColStart, roomRowStart);
+                            break;
+
+                        case 4:
                             addEmptyRoom(level, room, roomColStart, roomRowStart);
                             break;
                     }
