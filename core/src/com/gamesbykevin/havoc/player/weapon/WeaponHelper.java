@@ -150,6 +150,8 @@ public class WeaponHelper {
                 if (dist <= BULLET_DISTANCE) {
                     Enemy enemy = (Enemy)entity;
                     enemy.setHealth(enemy.getHealth() - weapon.getDamage());
+                    enemy.setCol(enemy.getCol() + (float)xa);
+                    enemy.setRow(enemy.getRow() + (float)ya);
                     return;
                 }
             }
