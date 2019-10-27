@@ -13,7 +13,6 @@ import static com.gamesbykevin.havoc.decals.DecalCustom.*;
 import static com.gamesbykevin.havoc.level.RoomHelper.*;
 import static com.gamesbykevin.havoc.level.TextureHelper.addBackground;
 import static com.gamesbykevin.havoc.level.TextureHelper.addTextures;
-import static com.gamesbykevin.havoc.maze.Maze.*;
 
 public class LevelHelper {
 
@@ -26,7 +25,7 @@ public class LevelHelper {
     //how deep is the secret placed
     public static final float SECRET_DEPTH = .075f;
 
-    protected static void createDecals(Level level) {
+    protected static void setupBoundaries(Level level) {
 
         for (int col = 0; col < level.getMaze().getCols(); col++) {
             for (int row = 0; row < level.getMaze().getRows(); row++) {
@@ -99,9 +98,15 @@ public class LevelHelper {
                 }
             }
         }
+    }
+
+    protected static void setupLevel(Level level) {
 
         //check for free space
         checkFreeSpace(level);
+
+        //now we can set our AStar map
+        level.setupAStar();
 
         //add wall textures to the level
         addTextures(level);

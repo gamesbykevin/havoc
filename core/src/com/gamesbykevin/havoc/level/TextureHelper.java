@@ -34,7 +34,7 @@ public class TextureHelper {
     public static final int TILES_BACKGROUND = 73;
 
     //how many tiles can we choose from for the walls
-    public static final int TILES_WALL = 180;
+    public static final int TILES_WALL = 233;
 
     //chance we add a door or secret
     public static final float DOOR_PROBABILITY = 0.7f;

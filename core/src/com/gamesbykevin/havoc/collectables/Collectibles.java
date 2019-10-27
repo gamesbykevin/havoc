@@ -27,11 +27,11 @@ public final class Collectibles extends Entities {
         health_large,
         health_small,
         impact,
-        key_1,
-        key_2,
         magnum,
         shotgun,
-        smg
+        smg,
+        key_1,
+        key_2
     }
 
     //how many collectibles per room
@@ -80,7 +80,8 @@ public final class Collectibles extends Entities {
                     //check if there are any other items
                     if (!hasEntityLocation(location)) {
 
-                        TYPE = Type.values()[Maze.getRandom().nextInt(Type.values().length)];
+                        //pick a random collectible, but skip the keys
+                        TYPE = Type.values()[Maze.getRandom().nextInt(Type.values().length - 2)];
 
                         Collectible collectible = new Collectible(TYPE);
                         collectible.setSolid(true);

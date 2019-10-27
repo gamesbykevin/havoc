@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.gamesbykevin.havoc.astar.AStar;
 import com.gamesbykevin.havoc.collectables.Collectibles;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
@@ -74,6 +75,9 @@ public class Level {
     public static final int START_COL = 0;
     public static final int START_ROW = 0;
 
+    //calculate path to a specified goal
+    private AStar aStar;
+
     public Level() {
 
         //create our enemies container
@@ -84,6 +88,17 @@ public class Level {
 
         //create the batch
         getDecalBatch();
+
+        //create aStar object
+        this.aStar = new AStar();
+    }
+
+    public void setupAStar() {
+        getAStar().setMap(getFree());
+    }
+
+    public AStar getAStar() {
+        return this.aStar;
     }
 
     public Entities getCollectibles() {
@@ -176,7 +191,7 @@ public class Level {
         return this.walls;
     }
 
-    public void setFree(int col, int row, boolean value) {
+    protected void setFree(int col, int row, boolean value) {
 
         if (row < 0 || row >= getFree().length)
             return;
@@ -305,8 +320,11 @@ public class Level {
             }
         }
 
-        //add the decals and boundaries for our maze
-        createDecals(this);
+        //add the boundaries for our maze
+        setupBoundaries(this);
+
+        //add everything else
+        setupLevel(this);
     }
 
     private boolean hasRange(DecalCustom decal, float minCol, float maxCol, float minRow, float maxRow, float minColRoom, float maxColRoom, float minRowRoom, float maxRowRoom) {
@@ -401,7 +419,7 @@ public class Level {
             }
         }
 
-        System.out.println("decal count: " + count);
+        //System.out.println("decal count: " + count);
 
         //render the enemies
         getEnemies().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);

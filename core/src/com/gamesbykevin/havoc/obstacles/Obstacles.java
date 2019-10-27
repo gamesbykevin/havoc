@@ -13,7 +13,9 @@ public final class Obstacles extends Entities {
 
     public enum Type {
         BluePot, BluePotPlant, BronzeCol, Chandelier, DogFood, FloorLamp, GreenC, RedC,
-        SilverCol, SpecimenPod1, SpecimenPod2, SpecimenPod3, Well, WellBlood, WellWater
+        SilverCol, SpecimenPod1, SpecimenPod2, SpecimenPod3, Well, WellBlood, WellWater,
+        Grass1, Grass2, Grass3, Grass4, Grass5, Grass6, Grass7, Grass8, Grass9, Grass10, Grass11,
+        Candlestand, Fountain, Light1, Light2, Light3, Pillar
     }
 
     //how close can we get to the obstacle
@@ -45,7 +47,7 @@ public final class Obstacles extends Entities {
                     case 0:
                     default:
 
-                        int index = Maze.getRandom().nextInt(10);
+                        int index = Maze.getRandom().nextInt(23);
                         switch (index) {
                             case 0:
                                 Obstacle.TYPE = Type.SpecimenPod1;
@@ -86,6 +88,59 @@ public final class Obstacles extends Entities {
                             case 9:
                                 Obstacle.TYPE = Type.WellWater;
                                 break;
+
+                            case 10:
+                            default:
+                                Obstacle.TYPE = Type.Grass1;
+                                break;
+
+                            case 11:
+                                Obstacle.TYPE = Type.Grass2;
+                                break;
+
+                            case 12:
+                                Obstacle.TYPE = Type.Grass3;
+                                break;
+
+                            case 13:
+                                Obstacle.TYPE = Type.Grass4;
+                                break;
+
+                            case 14:
+                                Obstacle.TYPE = Type.Grass5;
+                                break;
+
+                            case 15:
+                                Obstacle.TYPE = Type.Grass6;
+                                break;
+
+                            case 16:
+                                Obstacle.TYPE = Type.Grass7;
+                                break;
+
+                            case 17:
+                                Obstacle.TYPE = Type.Grass8;
+                                break;
+
+                            case 18:
+                                Obstacle.TYPE = Type.Grass9;
+                                break;
+
+                            case 19:
+                                Obstacle.TYPE = Type.Grass10;
+                                break;
+
+                            case 20:
+                                Obstacle.TYPE = Type.Grass11;
+                                break;
+
+                            case 21:
+                                Obstacle.TYPE = Type.Candlestand;
+                                break;
+
+                            case 22:
+                                Obstacle.TYPE = Type.Fountain;
+                                break;
                         }
 
                         for (int offset = ROOM_SIZE_SMALL - 1; offset >= 1; offset--) {
@@ -107,8 +162,20 @@ public final class Obstacles extends Entities {
                     //add pillars
                     case 1:
 
-                        //pick a random pillar
-                        Obstacle.TYPE = (Maze.getRandom().nextBoolean()) ? Type.BronzeCol : Type.SilverCol;
+                        switch (Maze.getRandom().nextInt(3)) {
+                            case 0:
+                            default:
+                                Obstacle.TYPE = Type.BronzeCol;
+                                break;
+
+                            case 1:
+                                Obstacle.TYPE = Type.SilverCol;
+                                break;
+
+                            case 2:
+                                Obstacle.TYPE = Type.Pillar;
+                                break;
+                        }
 
                         if (room.hasWest() && room.hasEast()) {
 
@@ -156,7 +223,7 @@ public final class Obstacles extends Entities {
                         int frequency = Maze.getRandom().nextInt(3) + 2;
 
                         //pick random light
-                        switch (Maze.getRandom().nextInt(3)) {
+                        switch (Maze.getRandom().nextInt(6)) {
 
                             case 0:
                                 Obstacle.TYPE = Type.Chandelier;
@@ -168,6 +235,18 @@ public final class Obstacles extends Entities {
 
                             case 2:
                                 Obstacle.TYPE = Type.RedC;
+                                break;
+
+                            case 3:
+                                Obstacle.TYPE = Type.Light1;
+                                break;
+
+                            case 4:
+                                Obstacle.TYPE = Type.Light2;
+                                break;
+
+                            case 5:
+                                Obstacle.TYPE = Type.Light3;
                                 break;
                         }
 
