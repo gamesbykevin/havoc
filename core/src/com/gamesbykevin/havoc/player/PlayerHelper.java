@@ -206,6 +206,17 @@ public class PlayerHelper {
                 return true;
         }
 
+        if (yDiff != 0 || xDiff != 0) {
+            if (checkBounds(controller.getLevel(), roomRow + WALL_DISTANCE, roomCol + WALL_DISTANCE))
+                return true;
+            if (checkBounds(controller.getLevel(), roomRow - WALL_DISTANCE, roomCol + WALL_DISTANCE))
+                return true;
+            if (checkBounds(controller.getLevel(), roomRow + WALL_DISTANCE, roomCol - WALL_DISTANCE))
+                return true;
+            if (checkBounds(controller.getLevel(), roomRow - WALL_DISTANCE, roomCol - WALL_DISTANCE))
+                return true;
+        }
+
         //if collision with an enemy return true
         if (controller.getLevel().getEnemies().hasCollision(x, y))
             return true;
