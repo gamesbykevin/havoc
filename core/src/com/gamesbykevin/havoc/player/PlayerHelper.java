@@ -294,12 +294,8 @@ public class PlayerHelper {
                         player.setHealth(player.getHealth() + HEALTH_SMALL);
                         break;
 
-                    case key_1:
-                        player.setKey1(true);
-                        break;
-
-                    case key_2:
-                        player.setKey2(true);
+                    case key:
+                        player.setKey(true);
                         break;
                 }
             }
@@ -341,9 +337,13 @@ public class PlayerHelper {
 
             //we can only open the door if it exists and it's closed
             if (door != null && door.isClosed()) {
-                door.setClosed(false);
-                door.setOpening(true);
-                door.setLapsed(0);
+
+                //also make sure if it's locked that we have a key
+                if (!door.isLocked() || (door.isLocked() && player.hasKey())) {
+                    door.setClosed(false);
+                    door.setOpening(true);
+                    door.setLapsed(0);
+                }
             }
 
             //set to false

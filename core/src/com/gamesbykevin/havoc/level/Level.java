@@ -20,15 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.gamesbykevin.havoc.level.LevelHelper.*;
-import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE;
+import static com.gamesbykevin.havoc.level.RoomHelper.*;
 import static com.gamesbykevin.havoc.maze.MazeHelper.calculateCost;
 import static com.gamesbykevin.havoc.maze.MazeHelper.locateGoal;
 
 public class Level {
 
     //how big is our maze
-    public static final int MAZE_COLS = 3;
-    public static final int MAZE_ROWS = 3;
+    public static final int MAZE_COLS = 7;
+    public static final int MAZE_ROWS = 7;
 
     //different maze generation algorithms
     public static final int ALGORITHM_BINARY = 0;
@@ -72,11 +72,15 @@ public class Level {
     private Entities collectibles;
 
     //the start of the maze
-    public static final int START_COL = 0;
-    public static final int START_ROW = 0;
+    public static int START_COL = 0;
+    public static int START_ROW = 0;
 
     //calculate path to a specified goal
     private AStar aStar;
+
+    //where is the locked door?
+    private int lockDoorCol;
+    private int lockDoorRow;
 
     public Level() {
 
@@ -93,8 +97,20 @@ public class Level {
         this.aStar = new AStar();
     }
 
-    public void setupAStar() {
-        getAStar().setMap(getFree());
+    public int getLockDoorCol() {
+        return this.lockDoorCol;
+    }
+
+    public void setLockDoorCol(int lockDoorCol) {
+        this.lockDoorCol = lockDoorCol;
+    }
+
+    public int getLockDoorRow() {
+        return this.lockDoorRow;
+    }
+
+    public void setLockDoorRow(int lockDoorRow) {
+        this.lockDoorRow = lockDoorRow;
     }
 
     public AStar getAStar() {
@@ -209,6 +225,10 @@ public class Level {
         return this.free;
     }
 
+    public void setMap() {
+        getAStar().setMap(getFree());
+    }
+
     public void setDoor(int col, int row, boolean value) {
         getDoors()[row][col] = value;
     }
@@ -249,7 +269,13 @@ public class Level {
             this.camera3d.direction.set(0, 0, -1);
             this.camera3d.up.set(0, 1, 0);
             this.camera3d.update();
-            this.camera3d.position.set((ROOM_SIZE / 2) + .5f, (ROOM_SIZE / 2) + .5f,0);
+
+            //start where we marked start in our maze
+            float x = (START_COL * ROOM_SIZE) + (ROOM_SIZE / 2) + .5f;
+            float y = (START_ROW * ROOM_SIZE) + (ROOM_SIZE / 2) + .5f;
+
+            //this.camera3d.position.set((ROOM_SIZE / 2) + .5f, (ROOM_SIZE / 2) + .5f,0);
+            this.camera3d.position.set(x, y,0);
             //this.camera3d.position.z = 1.50f;
             this.camera3d.rotate(Vector3.X, 90);
         }

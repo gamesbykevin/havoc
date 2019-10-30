@@ -32,7 +32,8 @@ public final class Player {
     //what is our health
     private int health = 0;
 
-    private boolean key1 = false, key2 = false;
+    //do we have the key
+    private boolean key = false;
 
     public Player(MyController controller) {
 
@@ -196,20 +197,12 @@ public final class Player {
         return this.weapons;
     }
 
-    public boolean hasKey1() {
-        return this.key1;
+    public boolean hasKey() {
+        return this.key;
     }
 
-    public void setKey1(boolean key1) {
-        this.key1 = key1;
-    }
-
-    public boolean hasKey2() {
-        return this.key2;
-    }
-
-    public void setKey2(boolean key2) {
-        this.key2 = key2;
+    public void setKey(boolean key) {
+        this.key = key;
     }
 
     public SpriteBatch getSpriteBatch() {
@@ -236,19 +229,12 @@ public final class Player {
         //render health
         renderNumber(getHealth(), HUD_HEALTH_X, HUD_HEALTH_Y, HUD_NUMBER_WIDTH, HUD_NUMBER_HEIGHT, HUD_NUMBER_PAD);
 
-        //render keys?
-        renderKeys();
+        //render key?
+        if (hasKey())
+            getController().getStage().getBatch().draw(this.numbers[10], HUD_HEALTH_X, HUD_HEALTH_Y - (HUD_KEY_HEIGHT * 1), HUD_KEY_WIDTH, HUD_KEY_HEIGHT);
 
         //done rendering
         getController().getStage().getBatch().end();
-    }
-
-    private void renderKeys() {
-
-        if (hasKey1())
-            getController().getStage().getBatch().draw(this.numbers[10], HUD_HEALTH_X, HUD_HEALTH_Y - (HUD_KEY_HEIGHT * 1), HUD_KEY_WIDTH, HUD_KEY_HEIGHT);
-        if (hasKey2())
-            getController().getStage().getBatch().draw(this.numbers[11], HUD_HEALTH_X, HUD_HEALTH_Y - (HUD_KEY_HEIGHT * 2), HUD_KEY_WIDTH, HUD_KEY_HEIGHT);
     }
 
     private final void renderNumber(final int number, int renderX, int renderY, int width, int height, int padding) {

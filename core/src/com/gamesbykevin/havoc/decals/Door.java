@@ -34,6 +34,9 @@ public class Door extends DecalCustom {
     //is this door a secret
     private boolean secret;
 
+    //is the door locked?
+    private boolean locked = false;
+
     public Door(TextureRegion texture, Side side, boolean secret) {
         super(texture, Type.Door, side, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         setOpen(false);
@@ -41,6 +44,14 @@ public class Door extends DecalCustom {
         setClosing(false);
         setClosed(true);
         setSecret(secret);
+    }
+
+    public boolean isLocked() {
+        return this.locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 
     public boolean isSecret() {

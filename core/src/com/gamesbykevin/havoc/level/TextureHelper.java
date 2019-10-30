@@ -21,6 +21,7 @@ public class TextureHelper {
 
     //locations of some of our textures
     public static final String PATH_DOOR = "door/door.bmp";
+    public static final String PATH_DOOR_LOCKED = "door/door_locked_1.bmp";
     public static final String PATH_SIDE = "door/door_side.bmp";
     public static final String PATH_DOOR_GOAL = "goal/door.bmp";
     public static final String PATH_WALL_GOAL = "goal/wall.bmp";
@@ -28,6 +29,7 @@ public class TextureHelper {
     public static final String PATH_SWITCH_ON = "goal/switch_on.bmp";
 
     private static TextureRegion TEXTURE_DOOR;
+    private static TextureRegion TEXTURE_DOOR_LOCKED;
     private static TextureRegion TEXTURE_SIDE;
 
     //how many tiles can we choose from for the floor ceiling?
@@ -41,6 +43,14 @@ public class TextureHelper {
 
     private static TextureRegion getTextureRegion(String path) {
         return new TextureRegion(new Texture(Gdx.files.internal(path)));
+    }
+
+    protected static TextureRegion getTextureDoorLocked() {
+
+        if (TEXTURE_DOOR_LOCKED == null)
+            TEXTURE_DOOR_LOCKED = getTextureRegion(PATH_DOOR_LOCKED);
+
+        return TEXTURE_DOOR_LOCKED;
     }
 
     protected static TextureRegion getTextureDoor() {
@@ -192,10 +202,22 @@ public class TextureHelper {
 
                     } else {
 
+                        TextureRegion textureRegion;
+
+                        if (goal) {
+                            textureRegion = getDoorGoal();
+                        } else {
+                            if (level.getLockDoorCol() == col && level.getLockDoorRow() == row) {
+                                textureRegion = getTextureDoorLocked();
+                            } else {
+                                textureRegion = getTextureDoor();
+                            }
+                        }
+
                         if (wallS && wallN)
-                            addWall(level, Side.East, Type.Door, (goal) ? getDoorGoal() : getTextureDoor(), col, row, false);
+                            addWall(level, Side.East, Type.Door, textureRegion, col, row, false);
                         if (wallW && wallE)
-                            addWall(level, Side.South, Type.Door, (goal) ? getDoorGoal() : getTextureDoor(), col, row, false);
+                            addWall(level, Side.South, Type.Door, textureRegion, col, row, false);
                     }
                 }
             }

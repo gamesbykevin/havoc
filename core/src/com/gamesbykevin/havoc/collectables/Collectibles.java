@@ -30,8 +30,7 @@ public final class Collectibles extends Entities {
         magnum,
         shotgun,
         smg,
-        key_1,
-        key_2
+        key,
     }
 
     //how many collectibles per room
@@ -39,6 +38,14 @@ public final class Collectibles extends Entities {
 
     public Collectibles(Level level) {
         super(level);
+    }
+
+    public void addKey(float col, float row) {
+
+        Collectible.TYPE = Type.key;
+        Collectible collectible = new Collectible(TYPE);
+        collectible.setSolid(true);
+        add(collectible, col, row);
     }
 
     @Override
@@ -80,8 +87,8 @@ public final class Collectibles extends Entities {
                     //check if there are any other items
                     if (!hasEntityLocation(location)) {
 
-                        //pick a random collectible, but skip the keys
-                        TYPE = Type.values()[Maze.getRandom().nextInt(Type.values().length - 2)];
+                        //pick a random collectible, but skip the key
+                        TYPE = Type.values()[Maze.getRandom().nextInt(Type.values().length - 1)];
 
                         Collectible collectible = new Collectible(TYPE);
                         collectible.setSolid(true);

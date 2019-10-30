@@ -3,6 +3,7 @@ package com.gamesbykevin.havoc.level;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.DecalCustom.Type;
+import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.maze.Location;
 import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.Room;
@@ -11,8 +12,7 @@ import java.util.List;
 
 import static com.gamesbykevin.havoc.decals.DecalCustom.*;
 import static com.gamesbykevin.havoc.level.RoomHelper.*;
-import static com.gamesbykevin.havoc.level.TextureHelper.addBackground;
-import static com.gamesbykevin.havoc.level.TextureHelper.addTextures;
+import static com.gamesbykevin.havoc.level.TextureHelper.*;
 
 public class LevelHelper {
 
@@ -105,8 +105,8 @@ public class LevelHelper {
         //check for free space
         checkFreeSpace(level);
 
-        //now we can set our AStar map
-        level.setupAStar();
+        //now we can lock a door
+        lockDoor(level);
 
         //add wall textures to the level
         addTextures(level);
@@ -137,7 +137,15 @@ public class LevelHelper {
 
             //create and flag door here
             case Door:
-                level.setDoorDecal(DecalCustom.createDecalDoor(col, row, textureRegion, side, secret), (int)col, (int)row);
+
+                //create our door
+                Door door = DecalCustom.createDecalDoor(col, row, textureRegion, side, secret);
+
+                //if the location matches flag the door to be locked
+                if (level.getLockDoorCol() == col && level.getLockDoorRow() == row)
+                    door.setLocked(true);
+
+                level.setDoorDecal(door, (int)col, (int)row);
                 level.setDoor((int)col, (int)row, true);
                 break;
         }
