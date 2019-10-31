@@ -15,7 +15,7 @@ import static com.gamesbykevin.havoc.maze.Maze.*;
 public class RoomHelper {
 
     //how big is each room
-    public static final int ROOM_SIZE = 25;
+    public static final int ROOM_SIZE = 23;
 
     //the size of the smaller rooms
     public static final int ROOM_SIZE_SMALL = 10;
@@ -24,7 +24,7 @@ public class RoomHelper {
     public static final int SPLIT_ROOM_OFFSET = 3;
 
     //how wide are the hallways
-    public static final int[] ROOM_SIZE_HALL = {3, 5, 7, 9, 11, 13};
+    public static final int[] ROOM_SIZE_HALL = {5, 7, 9, 11, 13};
 
     protected static void addHallways(Level level, Room room, int roomColStart, int roomRowStart) {
 

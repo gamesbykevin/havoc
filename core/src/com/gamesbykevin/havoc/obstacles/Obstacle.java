@@ -22,12 +22,13 @@ public final class Obstacle extends Entity {
         super(SPRITES);
 
         switch (TYPE) {
-            case GreenC:
-            case RedC:
-            case Chandelier:
             case Light1:
             case Light2:
             case Light3:
+            case Light4:
+            case Light5:
+            case Light6:
+            case Light7:
                 setSolid(false);
                 break;
 

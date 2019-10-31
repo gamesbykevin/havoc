@@ -76,17 +76,17 @@ public abstract class Entities {
     }
 
     //check if we have collision with any of our entity lists
-    protected boolean hasEntityLocation(float x, float y) {
+    protected boolean hasEntityLocation(float col, float row) {
 
-        if (getLevel().getCollectibles().hasCollision(x, y))
+        if (getLevel().getCollectibles().hasCollision(col, row))
             return true;
-        if (getLevel().getEnemies().hasCollision(x, y))
+        if (getLevel().getEnemies().hasCollision(col, row))
             return true;
-        if (getLevel().getObstacles().hasCollision(x, y))
+        if (getLevel().getObstacles().hasCollision(col, row))
             return true;
-        if (getLevel().hasDoor((int)x, (int)y))
+        if (getLevel().hasDoor((int)col, (int)row))
             return true;
-        if (!getLevel().hasFree((int)x, (int)y))
+        if (!getLevel().hasFree((int)col, (int)row))
             return true;
 
         //this location is not used

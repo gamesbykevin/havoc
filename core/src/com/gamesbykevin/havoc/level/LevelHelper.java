@@ -17,7 +17,7 @@ import static com.gamesbykevin.havoc.level.TextureHelper.*;
 public class LevelHelper {
 
     //render decals within the specified range
-    public static final int RENDER_RANGE = (int)(ROOM_SIZE * 2.25);
+    public static final int RENDER_RANGE = (int)(ROOM_SIZE * 3.0);
 
     //how deep is the door placed
     public static final float DOOR_DEPTH = .5f;

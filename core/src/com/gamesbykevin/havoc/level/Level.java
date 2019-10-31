@@ -72,8 +72,8 @@ public class Level {
     private Entities collectibles;
 
     //the start of the maze
-    public static int START_COL = 0;
-    public static int START_ROW = 0;
+    public static final int START_COL = 0;
+    public static final int START_ROW = 0;
 
     //calculate path to a specified goal
     private AStar aStar;
