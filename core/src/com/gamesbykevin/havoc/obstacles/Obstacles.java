@@ -21,15 +21,14 @@ public final class Obstacles extends Entities {
         statue1, statue2, statue3, statue4, statue5,
         well1, well2, well3, well4, well5,
         BluePotEmpty, BluePotLargeEmpty, BluePotPlant1, BluePotPlant2, YellowPotPlant,
-        Candle, Fountain,
+        Candle,
         spear1, spear2,
         flag1, flag2,
         barrel1, barrel2,
         pots1, pots2,
-        oven1, oven2,
         DogFood, table,
         FloorLamp1, FloorLamp2,
-        SpecimenPod1, SpecimenPod2, SpecimenPod3
+        SpecimenPod1, SpecimenPod2
     }
 
     //how close can we get to the obstacle
@@ -55,28 +54,9 @@ public final class Obstacles extends Entities {
                 int startCol = (col * ROOM_SIZE);
                 int startRow = (row * ROOM_SIZE);
 
-                /*
-                switch (Maze.getRandom().nextInt(3)) {
-
-                    //corners
-                    case 0:
-                        addCorners(startCol, startRow);
-                        break;
-
-                    //add pillars
-                    case 1:
-                        addPillars(startCol, startRow, room);
-                        break;
-
-                    //add lights
-                    case 2:
-                        addLights(startCol, startRow);
-                        break;
-                }
-                */
-
                 //add pillars
-                addPillars(startCol, startRow, room);
+                if (Maze.getRandom().nextBoolean())
+                    addPillars(startCol, startRow, room);
 
                 //add lights
                 addLights(startCol, startRow);
@@ -85,9 +65,12 @@ public final class Obstacles extends Entities {
                 addCorners(startCol, startRow);
 
                 //assign random type next to the walls
-                addNextToWalls(startCol, startRow, room);
+                if (Maze.getRandom().nextBoolean())
+                    addNextToWalls(startCol, startRow, room);
             }
         }
+
+        recycle();
     }
 
     private void addCorners(int startCol, int startRow) {
@@ -174,7 +157,7 @@ public final class Obstacles extends Entities {
 
     private void addPillars(int startCol, int startRow, Room room) {
 
-        assignRandomPillar();
+        Obstacle.TYPE = getRandomPillar();
 
         if (room.hasWest() && room.hasEast()) {
 
@@ -218,11 +201,11 @@ public final class Obstacles extends Entities {
     private void addLights(int startCol, int startRow) {
 
         //frequency of lights
-        int frequency = Maze.getRandom().nextInt(4) + 1;
+        int frequency = Maze.getRandom().nextInt(4) + 2;
 
-        assignRandomLight();
+        Obstacle.TYPE = getRandomLight();
 
-        switch (Maze.getRandom().nextInt(4)) {
+        switch (Maze.getRandom().nextInt(5)) {
 
             case 0:
                 for (int tmpCol = startCol; tmpCol < startCol + ROOM_SIZE; tmpCol++) {
@@ -261,6 +244,27 @@ public final class Obstacles extends Entities {
                 break;
 
             case 3:
+
+                for (int tmpCol = startCol; tmpCol < startCol + ROOM_SIZE; tmpCol++) {
+
+                    if (tmpCol % frequency == 0)
+                        continue;
+
+                    if (!hasEntityLocation(tmpCol, startRow + (ROOM_SIZE / 2)))
+                        add(new Obstacle(), tmpCol, startRow + (ROOM_SIZE / 2));
+                }
+
+                for (int tmpRow = startRow; tmpRow < startRow + ROOM_SIZE; tmpRow++) {
+
+                    if (tmpRow % frequency == 0)
+                        continue;
+
+                    if (!hasEntityLocation(startCol + (ROOM_SIZE / 2), tmpRow))
+                        add(new Obstacle(), startCol + (ROOM_SIZE / 2), tmpRow);
+                }
+                break;
+
+            case 4:
                 int offset = (ROOM_SIZE_SMALL / 2);
                 if (!hasEntityLocation(startCol + offset, startRow + offset))
                     add(new Obstacle(), startCol + offset, startRow + offset);

@@ -94,7 +94,9 @@ public abstract class Entities {
     }
 
     //logic to render the entities
-    public void render(DecalBatch decalBatch, PerspectiveCamera camera3d, float minCol, float maxCol, float minRow, float maxRow) {
+    public int render(DecalBatch decalBatch, PerspectiveCamera camera3d, float minCol, float maxCol, float minRow, float maxRow) {
+
+        int count = 0;
 
         for (int i = 0; i < getEntityList().size(); i++) {
 
@@ -122,6 +124,11 @@ public abstract class Entities {
 
             //add to the batch to be rendered
             entity.render(decalBatch);
+
+            count++;
         }
+
+        //return the number of entities rendered
+        return count;
     }
 }

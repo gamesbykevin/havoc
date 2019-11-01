@@ -33,7 +33,8 @@ public class TextureHelper {
     private static TextureRegion TEXTURE_SIDE;
 
     //how many tiles can we choose from for the floor ceiling?
-    public static final int TILES_BACKGROUND = 73;
+    public static final int TILES_BACKGROUND_LIGHT = 29;
+    public static final int TILES_BACKGROUND_DARK = 44;
 
     //how many tiles can we choose from for the walls
     public static final int TILES_WALL = 233;
@@ -69,8 +70,20 @@ public class TextureHelper {
         return TEXTURE_SIDE;
     }
 
-    private static TextureRegion getBackground(int index) {
-        return getTextureRegion("background/tile" + index + ".bmp");
+    private static TextureRegion getBackgroundRandomLight() {
+        return getBackgroundLight(Maze.getRandom().nextInt(TILES_BACKGROUND_LIGHT));
+    }
+
+    private static TextureRegion getBackgroundLight(int index) {
+        return getTextureRegion("background/light/tile" + index + ".bmp");
+    }
+
+    private static TextureRegion getBackgroundRandomDark() {
+        return getBackgroundDark(Maze.getRandom().nextInt(TILES_BACKGROUND_DARK));
+    }
+
+    private static TextureRegion getBackgroundDark(int index) {
+        return getTextureRegion("background/dark/tile" + index + ".bmp");
     }
 
     private static TextureRegion getWall(int index) {
@@ -256,31 +269,26 @@ public class TextureHelper {
     //add floors and ceiling
     protected static void addBackground(Level level) {
 
-        List<Integer> backgrounds = new ArrayList<>();
-        for (int i = 1; i < TILES_BACKGROUND; i++) {
-            backgrounds.add(i);
+        //texture for top and bottom
+        TextureRegion ceiling, floor;
+
+        //choose the floor and ceiling at random
+        if (Maze.getRandom().nextBoolean()) {
+            ceiling = getBackgroundRandomDark();
+            floor = getBackgroundRandomLight();
+        } else {
+            ceiling = getBackgroundRandomLight();
+            floor = getBackgroundRandomDark();
         }
-
-        int index = getRandom().nextInt(backgrounds.size());
-
-        //choose the floor and ceiling
-        TextureRegion textureRegionCeiling = getBackground(backgrounds.get(index));
-        backgrounds.remove(index);
-        index = getRandom().nextInt(backgrounds.size());
-        TextureRegion textureRegionFloor = getBackground(backgrounds.get(index));
-        backgrounds.remove(index);
 
         int cols = (int)((level.getMaze().getCols() * ROOM_SIZE) / Background.TEXTURE_WIDTH) + 1;
         int rows = (int)((level.getMaze().getRows() * ROOM_SIZE) / Background.TEXTURE_HEIGHT) + 1;
 
         for (int col = 0; col < cols; col++) {
             for (int row = 0; row < rows; row++) {
-                level.getBackgrounds().add(createDecalBackground(col * Background.TEXTURE_WIDTH, row * Background.TEXTURE_HEIGHT, textureRegionFloor, true));
-                level.getBackgrounds().add(createDecalBackground(col * Background.TEXTURE_WIDTH, row * Background.TEXTURE_HEIGHT, textureRegionCeiling, false));
+                level.getBackgrounds().add(createDecalBackground(col * Background.TEXTURE_WIDTH, row * Background.TEXTURE_HEIGHT, floor, true));
+                level.getBackgrounds().add(createDecalBackground(col * Background.TEXTURE_WIDTH, row * Background.TEXTURE_HEIGHT, ceiling, false));
             }
         }
-
-        backgrounds.clear();
-        backgrounds = null;
     }
 }

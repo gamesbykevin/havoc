@@ -19,6 +19,7 @@ import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE;
 
 public final class Collectibles extends Entities {
 
+    //different type of collectibles
     public enum Type {
         ammo,
         ammo_crate,
@@ -32,6 +33,12 @@ public final class Collectibles extends Entities {
         smg,
         key,
     }
+
+    //how many of these types can we spawn?
+    public static final int MAX_HEALTH_SMALL = 10;
+    public static final int MAX_HEALTH_LARGE = 3;
+    public static final int MAX_AMMO = 10;
+    public static final int MAX_AMMO_CRATE = 5;
 
     //how many collectibles per room
     public static final int COLLECTIBLES_PER_ROOM_MAX = 2;
@@ -51,8 +58,28 @@ public final class Collectibles extends Entities {
     @Override
     public void spawn() {
 
-        //create list of options to place the enemy(ies)
+        //create list of options to place the entity(ies)
         List<Location> options = new ArrayList<>();
+
+        //create a new list of collectibles
+        List<Type> collectibles = new ArrayList<>();
+        collectibles.add(Type.ammo);
+        collectibles.add(Type.ammo_crate);
+        collectibles.add(Type.health_small);
+        collectibles.add(Type.health_large);
+        //collectibles.add(Type.glock);
+        collectibles.add(Type.smg);
+        collectibles.add(Type.impact);
+        collectibles.add(Type.magnum);
+        collectibles.add(Type.buzzsaw);
+        collectibles.add(Type.shotgun);
+
+        int countAmmo = 0;
+        int countAmmCrate = 0;
+        int countHealthSmall = 0;
+        int countHealthLarge = 0;
+
+        List<Location> rooms = new ArrayList<>();
 
         for (int col = 0; col < getLevel().getMaze().getCols(); col++) {
             for (int row = 0; row < getLevel().getMaze().getRows(); row++) {
@@ -63,50 +90,114 @@ public final class Collectibles extends Entities {
                 if (col == getLevel().getMaze().getGoalCol() && row == getLevel().getMaze().getGoalRow())
                     continue;
 
-                //where we are starting for the current location
-                int startCol = (col * ROOM_SIZE);
-                int startRow = (row * ROOM_SIZE);
+                //add room as option for adding collectibles
+                rooms.add(new Location(col, row));
+            }
+        }
 
-                //get our available options
-                options = getLocationOptions(getLevel(), startCol, startRow, options);
+        while (!rooms.isEmpty()) {
 
-                int count = 0;
+            int randomIndex = Maze.getRandom().nextInt(rooms.size());
 
-                //pick random number of enemies
-                int limit = Maze.getRandom().nextInt(COLLECTIBLES_PER_ROOM_MAX) + 1;
+            //pick a random location
+            Location tmp = rooms.get(randomIndex);
+            int col = tmp.col;
+            int row = tmp.row;
 
-                //continue until we reach limit or no move options
-                while (!options.isEmpty() && count < limit) {
+            //remove the location
+            rooms.remove(randomIndex);
 
-                    //pick random index
-                    int index = Maze.getRandom().nextInt(options.size());
+            //where we are starting for the current location
+            int startCol = (col * ROOM_SIZE);
+            int startRow = (row * ROOM_SIZE);
 
-                    //get the location
-                    Location location = options.get(index);
+            //get our available options
+            options = getLocationOptions(getLevel(), startCol, startRow, options);
 
-                    //check if there are any other items
-                    if (!hasEntityLocation(location)) {
+            int count = 0;
 
-                        //pick a random collectible, but skip the key
-                        TYPE = Type.values()[Maze.getRandom().nextInt(Type.values().length - 1)];
+            //pick random number of enemies
+            int limit = Maze.getRandom().nextInt(COLLECTIBLES_PER_ROOM_MAX) + 1;
 
-                        Collectible collectible = new Collectible(TYPE);
-                        collectible.setSolid(true);
+            //continue until we reach limit or no move options
+            while (!options.isEmpty() && count < limit) {
 
-                        //add at the location
-                        add(collectible, location);
+                if (collectibles.isEmpty())
+                    break;
 
-                        //increase the count
-                        count++;
+                //pick random index
+                int index = Maze.getRandom().nextInt(options.size());
+
+                //get the location
+                Location location = options.get(index);
+
+                //check if there are any other items
+                if (!hasEntityLocation(location)) {
+
+                    //pick a random collectible
+                    int collectibleIndex = Maze.getRandom().nextInt(collectibles.size());
+
+                    //get the collectible
+                    TYPE = collectibles.get(collectibleIndex);
+
+                    //some collectibles should only exist once
+                    switch (collectibles.get(collectibleIndex)) {
+
+                        //these can only be added once
+                        case glock:
+                        case impact:
+                        case buzzsaw:
+                        case magnum:
+                        case smg:
+                        case shotgun:
+                            collectibles.remove(collectibleIndex);
+                            break;
+
+                        case ammo:
+                            countAmmo++;
+
+                            if (countAmmo >= MAX_AMMO)
+                                collectibles.remove(collectibleIndex);
+                            break;
+
+                        case ammo_crate:
+                            countAmmCrate++;
+
+                            if (countAmmCrate >= MAX_AMMO_CRATE)
+                                collectibles.remove(collectibleIndex);
+                            break;
+
+                        case health_small:
+                            countHealthSmall++;
+
+                            if (countHealthSmall >= MAX_HEALTH_SMALL)
+                                collectibles.remove(collectibleIndex);
+                            break;
+
+                        case health_large:
+                            countHealthLarge++;
+
+                            if (countHealthLarge >= MAX_HEALTH_LARGE)
+                                collectibles.remove(collectibleIndex);
+                            break;
                     }
 
-                    //remove the option from the list
-                    options.remove(index);
+                    Collectible collectible = new Collectible(TYPE);
+                    collectible.setSolid(true);
+
+                    //add at the location
+                    add(collectible, location);
+
+                    //increase the count
+                    count++;
                 }
 
-                //clear the list
-                options.clear();
+                //remove the option from the list
+                options.remove(index);
             }
+
+            //clear the list
+            options.clear();
         }
 
         options.clear();
@@ -136,7 +227,9 @@ public final class Collectibles extends Entities {
 
     //logic to render the entities
     @Override
-    public void render(DecalBatch decalBatch, PerspectiveCamera camera3d, float minCol, float maxCol, float minRow, float maxRow) {
+    public int render(DecalBatch decalBatch, PerspectiveCamera camera3d, float minCol, float maxCol, float minRow, float maxRow) {
+
+        int count = 0;
 
         for (int i = 0; i < getEntityList().size(); i++) {
 
@@ -160,7 +253,7 @@ public final class Collectibles extends Entities {
                 continue;
 
             //if entity is not close enough we won't render
-            if (getDistance(entity, camera3d.position) >= (RENDER_RANGE / 2))
+            if (getDistance(entity, camera3d.position) >= RENDER_RANGE)
                 continue;
 
             //render like a billboard
@@ -168,6 +261,11 @@ public final class Collectibles extends Entities {
 
             //add to the batch to be rendered
             entity.render(decalBatch);
+
+            count++;
         }
+
+        //return total number of items rendered
+        return count;
     }
 }

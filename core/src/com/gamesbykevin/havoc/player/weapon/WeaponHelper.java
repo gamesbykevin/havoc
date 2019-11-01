@@ -113,8 +113,8 @@ public class WeaponHelper {
         float row = controller.getCamera3d().position.y;
 
         //calculate the distance moved
-        double xa = (0 * Math.cos(angle)) - (1 * Math.sin(angle));
-        double ya = (1 * Math.cos(angle)) + (0 * Math.sin(angle));
+        float xa = (float)((0 * Math.cos(angle)) - (1 * Math.sin(angle)));
+        float ya = (float)((1 * Math.cos(angle)) + (0 * Math.sin(angle)));
         xa *= controller.getSpeed();
         ya *= controller.getSpeed();
 
@@ -148,10 +148,12 @@ public class WeaponHelper {
 
                 //if close enough, we hit the enemy
                 if (dist <= BULLET_DISTANCE) {
+
+                    //get our enemy
                     Enemy enemy = (Enemy)entity;
+
+                    //deduct the enemies health
                     enemy.setHealth(enemy.getHealth() - weapon.getDamage());
-                    enemy.setCol(enemy.getCol() + (float)xa);
-                    enemy.setRow(enemy.getRow() + (float)ya);
                     return;
                 }
             }

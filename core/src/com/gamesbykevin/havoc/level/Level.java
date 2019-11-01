@@ -384,16 +384,37 @@ public class Level {
         Room room = getMaze().getRoom(roomCol, roomRow);
 
         //get the bounds of the current room
-        float minColRoom = roomCol * ROOM_SIZE;
-        float maxColRoom = minColRoom + ROOM_SIZE;
-        float minRowRoom = roomRow * ROOM_SIZE;
-        float maxRowRoom = minRowRoom + ROOM_SIZE;
+        int minColRoom = roomCol * ROOM_SIZE;
+        int maxColRoom = minColRoom + ROOM_SIZE;
+        int minRowRoom = roomRow * ROOM_SIZE;
+        int maxRowRoom = minRowRoom + ROOM_SIZE;
 
-        //adjust the render range
-        float minCol = (room.hasWest()) ? roomCol * ROOM_SIZE : (getCamera3d().position.x - (RENDER_RANGE / 2));
-        float maxCol = (room.hasEast()) ? (roomCol * ROOM_SIZE) + ROOM_SIZE : (getCamera3d().position.x + (RENDER_RANGE / 2));
-        float minRow = (room.hasSouth()) ? (roomRow * ROOM_SIZE) : (getCamera3d().position.y - (RENDER_RANGE / 2));
-        float maxRow = (room.hasNorth()) ? (roomRow * ROOM_SIZE) + ROOM_SIZE : (getCamera3d().position.y + (RENDER_RANGE / 2));
+        //adjust the render range based on
+        float minCol = (room.hasWest()) ? minColRoom : (getCamera3d().position.x - RENDER_RANGE);
+        float maxCol = (room.hasEast()) ? maxColRoom : (getCamera3d().position.x + RENDER_RANGE);
+        float minRow = (room.hasSouth()) ? minRowRoom : (getCamera3d().position.y - RENDER_RANGE);
+        float maxRow = (room.hasNorth()) ? maxRowRoom : (getCamera3d().position.y + RENDER_RANGE);
+
+        //if the door is closed we don't need to render
+        if (!room.hasWest() && hasDoor(minColRoom, minRowRoom + (ROOM_SIZE / 2))) {
+            if (getDoorDecal(minColRoom, minRowRoom + (ROOM_SIZE / 2)).isClosed())
+                minCol = minColRoom;
+        }
+
+        if (!room.hasEast() && hasDoor(maxColRoom - 1, minRowRoom + (ROOM_SIZE / 2))) {
+            if (getDoorDecal(maxColRoom - 1,minRowRoom + (ROOM_SIZE / 2)).isClosed())
+                maxCol = maxColRoom;
+        }
+
+        if (!room.hasSouth() && hasDoor(minColRoom + (ROOM_SIZE / 2), minRowRoom)) {
+            if (getDoorDecal(minColRoom + (ROOM_SIZE / 2), minRowRoom).isClosed())
+                minRow = minRowRoom;
+        }
+
+        if (!room.hasNorth() && hasDoor(minColRoom + (ROOM_SIZE / 2), maxRowRoom - 1)) {
+            if (getDoorDecal(minColRoom + (ROOM_SIZE / 2), maxRowRoom - 1).isClosed())
+                maxRow = maxRowRoom;
+        }
 
         int count = 0;
 
@@ -445,16 +466,17 @@ public class Level {
             }
         }
 
-        //System.out.println("decal count: " + count);
 
         //render the enemies
-        getEnemies().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
+        count += getEnemies().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
 
         //render the obstacles
-        getObstacles().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
+        count += getObstacles().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
 
         //render the collectibles
-        getCollectibles().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
+        count += getCollectibles().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
+
+        System.out.println("decal count: " + count);
 
         //call flush at the end to draw
         getDecalBatch().flush();

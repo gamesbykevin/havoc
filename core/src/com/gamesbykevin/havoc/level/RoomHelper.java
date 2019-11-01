@@ -5,7 +5,6 @@ import com.gamesbykevin.havoc.maze.Location;
 import com.gamesbykevin.havoc.maze.Maze;
 import com.gamesbykevin.havoc.maze.Room;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,16 +14,16 @@ import static com.gamesbykevin.havoc.maze.Maze.*;
 public class RoomHelper {
 
     //how big is each room
-    public static final int ROOM_SIZE = 23;
+    public static final int ROOM_SIZE = 19;
 
     //the size of the smaller rooms
-    public static final int ROOM_SIZE_SMALL = 10;
+    public static final int ROOM_SIZE_SMALL = 6;
 
     //we split the room slightly off from the middle
     public static final int SPLIT_ROOM_OFFSET = 3;
 
     //how wide are the hallways
-    public static final int[] ROOM_SIZE_HALL = {5, 7, 9, 11, 13};
+    public static final int[] ROOM_SIZE_HALL = {5, 7, 9, 11};
 
     protected static void addHallways(Level level, Room room, int roomColStart, int roomRowStart) {
 
