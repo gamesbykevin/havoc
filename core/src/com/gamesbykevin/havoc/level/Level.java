@@ -27,8 +27,8 @@ import static com.gamesbykevin.havoc.maze.MazeHelper.locateGoal;
 public class Level {
 
     //how big is our maze
-    public static final int MAZE_COLS = 7;
-    public static final int MAZE_ROWS = 7;
+    public static final int MAZE_COLS = 3;
+    public static final int MAZE_ROWS = 3;
 
     //different maze generation algorithms
     public static final int ALGORITHM_BINARY = 0;
@@ -58,6 +58,7 @@ public class Level {
     private boolean[][] walls;
     private boolean[][] doors;
     private boolean[][] free;
+    private boolean[][] locked;
 
     //contains our doors
     private Door[][] doorDecals;
@@ -78,10 +79,6 @@ public class Level {
     //calculate path to a specified goal
     private AStar aStar;
 
-    //where is the locked door?
-    private int lockDoorCol;
-    private int lockDoorRow;
-
     public Level() {
 
         //create our enemies container
@@ -95,22 +92,6 @@ public class Level {
 
         //create aStar object
         this.aStar = new AStar();
-    }
-
-    public int getLockDoorCol() {
-        return this.lockDoorCol;
-    }
-
-    public void setLockDoorCol(int lockDoorCol) {
-        this.lockDoorCol = lockDoorCol;
-    }
-
-    public int getLockDoorRow() {
-        return this.lockDoorRow;
-    }
-
-    public void setLockDoorRow(int lockDoorRow) {
-        this.lockDoorRow = lockDoorRow;
     }
 
     public AStar getAStar() {
@@ -207,6 +188,25 @@ public class Level {
         return this.walls;
     }
 
+
+    protected void setLocked(int col, int row, boolean value) {
+
+        if (row < 0 || row >= getLocked().length)
+            return;
+        if (col < 0 || col >= getLocked()[0].length)
+            return;
+
+        getLocked()[row][col] = value;
+    }
+
+    public boolean hasLocked(int col, int row) {
+        return hasValue(getLocked(), col, row);
+    }
+
+    private boolean[][] getLocked() {
+        return this.locked;
+    }
+
     protected void setFree(int col, int row, boolean value) {
 
         if (row < 0 || row >= getFree().length)
@@ -225,8 +225,17 @@ public class Level {
         return this.free;
     }
 
-    public void setMap() {
+    public void calculate() {
+
+        //make sure our map is set
         getAStar().setMap(getFree());
+
+        getAStar().calculate(
+    (getMaze().getStartCol() * ROOM_SIZE) + (ROOM_SIZE / 2),
+    (getMaze().getStartRow() * ROOM_SIZE) + (ROOM_SIZE / 2),
+    (getMaze().getGoalCol() * ROOM_SIZE) + (ROOM_SIZE / 2),
+    (getMaze().getGoalRow() * ROOM_SIZE) + (ROOM_SIZE / 2)
+        );
     }
 
     public void setDoor(int col, int row, boolean value) {
@@ -336,6 +345,7 @@ public class Level {
         this.walls = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
         this.doors = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
         this.free = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
+        this.locked = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
 
         //default to false
         for (int row = 0 ; row < getWalls().length; row++) {
@@ -343,6 +353,7 @@ public class Level {
                 getWalls()[row][col] = false;
                 getDoors()[row][col] = false;
                 getFree()[row][col] = false;
+                getLocked()[row][col] = false;
             }
         }
 

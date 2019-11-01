@@ -39,7 +39,7 @@ public class TextureHelper {
     //how many tiles can we choose from for the walls
     public static final int TILES_WALL = 233;
 
-    //chance we add a door or secret
+    //chance we add a secret door
     public static final float DOOR_PROBABILITY = 0.7f;
 
     private static TextureRegion getTextureRegion(String path) {
@@ -220,7 +220,7 @@ public class TextureHelper {
                         if (goal) {
                             textureRegion = getDoorGoal();
                         } else {
-                            if (level.getLockDoorCol() == col && level.getLockDoorRow() == row) {
+                            if (level.hasLocked(col, row)) {
                                 textureRegion = getTextureDoorLocked();
                             } else {
                                 textureRegion = getTextureDoor();

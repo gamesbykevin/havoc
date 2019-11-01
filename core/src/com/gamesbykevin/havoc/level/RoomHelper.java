@@ -1,5 +1,6 @@
 package com.gamesbykevin.havoc.level;
 
+import com.gamesbykevin.havoc.astar.Node;
 import com.gamesbykevin.havoc.collectables.Collectibles;
 import com.gamesbykevin.havoc.maze.Location;
 import com.gamesbykevin.havoc.maze.Maze;
@@ -23,7 +24,7 @@ public class RoomHelper {
     public static final int SPLIT_ROOM_OFFSET = 3;
 
     //how wide are the hallways
-    public static final int[] ROOM_SIZE_HALL = {5, 7, 9, 11};
+    public static final int[] ROOM_SIZE_HALL = {7, 9, 11, 13};
 
     protected static void addHallways(Level level, Room room, int roomColStart, int roomRowStart) {
 
@@ -446,90 +447,59 @@ public class RoomHelper {
 
     protected static void lockDoor(Level level) {
 
-        //set the free spaces for our level
-        level.setMap();
-
         //calculate the shortest path from start to finish
-        level.getAStar().calculate(
-                (level.getMaze().getStartCol() * ROOM_SIZE) + (ROOM_SIZE / 2),
-                (level.getMaze().getStartRow() * ROOM_SIZE) + (ROOM_SIZE / 2),
-                (level.getMaze().getGoalCol() * ROOM_SIZE) + (ROOM_SIZE / 2),
-                (level.getMaze().getGoalRow() * ROOM_SIZE) + (ROOM_SIZE / 2)
-        );
+        level.calculate();
 
-        //create a list of rooms on our path to the goal
+        //create a list of doors on our path to the goal
         List<Location> options = new ArrayList<>();
 
         for (int i = 0; i < level.getAStar().getPath().size(); i++) {
 
-            int col = (level.getAStar().getPath().get(i).getCol() / ROOM_SIZE);
-            int row = (level.getAStar().getPath().get(i).getRow() / ROOM_SIZE);
+            Node node = level.getAStar().getPath().get(i);
 
-            boolean found = false;
+            //make sure location is a door
+            if (!level.hasDoor(node.getCol(), node.getRow()))
+                continue;
 
-            for (int x = 0; x < options.size(); x++) {
+            //make sure we avoid the start room and the goal room
+            if ((node.getCol() / ROOM_SIZE) == level.getMaze().getStartCol() && (node.getRow() / ROOM_SIZE) == level.getMaze().getStartRow())
+                continue;
+            if ((node.getCol() / ROOM_SIZE) == level.getMaze().getGoalCol() && (node.getRow() / ROOM_SIZE) == level.getMaze().getGoalRow())
+                continue;
 
-                if (options.get(x).col == col && options.get(x).row == row) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-                options.add(new Location(col, row));
+            //now we can add to the list
+            options.add(new Location(node.getCol(), node.getRow()));
         }
 
-        //pick a random room location skipping the 1st and last location
-        int index = Maze.getRandom().nextInt(options.size() - 3) + 2;
-
-        //get the room
+        //pick a random door from the list so we can lock it
+        int index = Maze.getRandom().nextInt(options.size());
         Location location = options.get(index);
+        level.setLocked(location.col, location.row, true);
 
-        //get the neighbor next to it
-        Location neighbor = options.get(index + 1);
+        //get the current room of that locked door
+        Room room = level.getMaze().getRoom(location.col / ROOM_SIZE, location.row / ROOM_SIZE);
 
-        //figure out where the col, row is
-        int roomColStart = location.col * ROOM_SIZE;
-        int roomRowStart = location.row * ROOM_SIZE;
-
-        //determine where to lock the door at
-        if (location.col < neighbor.col) {
-            level.setLockDoorCol(roomColStart + ROOM_SIZE - 1);
-            level.setLockDoorRow(roomRowStart + (ROOM_SIZE / 2));
-        } else if (location.col > neighbor.col) {
-            level.setLockDoorCol(roomColStart);
-            level.setLockDoorRow(roomRowStart + (ROOM_SIZE / 2));
-        } else if (location.row < neighbor.row) {
-            level.setLockDoorCol(roomColStart + (ROOM_SIZE / 2));
-            level.setLockDoorRow(roomRowStart + ROOM_SIZE - 1);
-        } else if (location.row > neighbor.row) {
-            level.setLockDoorCol(roomColStart + (ROOM_SIZE / 2));
-            level.setLockDoorRow(roomRowStart);
-        }
-
-        //clear list
+        //clear existing list
         options.clear();
 
-        int randomCol = 0;
-        int randomRow = 0;
-
-        Room room = level.getMaze().getRoom(location);
-
-        //find a random room to place the key
+        //find a random room to place the key in
         for (int col = 0; col < level.getMaze().getCols(); col++) {
             for (int row = 0; row < level.getMaze().getRows(); row++) {
 
-                //if the cost is less then we can get to the room
-                if (level.getMaze().getRoom(col, row).getCost() < room.getCost()) {
+                //skip the start
+                //if (col == level.getMaze().getStartCol() && row == level.getMaze().getStartRow())
+                //    continue;
+
+                //if the cost is less then we can access the room
+                if (level.getMaze().getRoom(col, row).getCost() < room.getCost())
                     options.add(new Location(col, row));
-                }
             }
         }
 
-        //pick a random room location to place the key
+        //pick a random room to place the key
         index = Maze.getRandom().nextInt(options.size());
-        randomCol = options.get(index).col;
-        randomRow = options.get(index).row;
+        int randomCol = options.get(index).col;
+        int randomRow = options.get(index).row;
 
         //clear list again for re-use
         options.clear();

@@ -65,7 +65,7 @@ public class LevelHelper {
 
                 } else {
 
-                    switch (Maze.getRandom().nextInt(4)) {
+                    switch (Maze.getRandom().nextInt(5)) {
 
                         case 0:
                             addMiniRooms(level, room, roomColStart, roomRowStart);
@@ -142,7 +142,7 @@ public class LevelHelper {
                 Door door = DecalCustom.createDecalDoor(col, row, textureRegion, side, secret);
 
                 //if the location matches flag the door to be locked
-                if (level.getLockDoorCol() == col && level.getLockDoorRow() == row)
+                if (level.hasLocked((int)col, (int)row))
                     door.setLocked(true);
 
                 level.setDoorDecal(door, (int)col, (int)row);
