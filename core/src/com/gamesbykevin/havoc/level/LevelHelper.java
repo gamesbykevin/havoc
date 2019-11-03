@@ -90,11 +90,13 @@ public class LevelHelper {
 
                     //if there is an opening and the neighbor room isn't the goal
                     if (!room.hasNorth() && (row + 1 != level.getMaze().getGoalRow() || col != level.getMaze().getGoalCol()))
-                        createDoorHorizontal(level, roomColStart, roomColStart + ROOM_SIZE, roomRowStart + ROOM_SIZE - 1);
-
-                    //if there is an opening and the neighbor room isn't the goal
+                        createDoorHorizontal(level, roomColStart, roomColStart + ROOM_SIZE, roomRowStart + ROOM_SIZE);
+                    if (!room.hasSouth() && (row - 1 != level.getMaze().getGoalRow() || col != level.getMaze().getGoalCol()))
+                        createDoorHorizontal(level, roomColStart, roomColStart + ROOM_SIZE, roomRowStart);
                     if (!room.hasEast() && (row != level.getMaze().getGoalRow() || col + 1 != level.getMaze().getGoalCol()))
-                        createDoorVertical(level, roomColStart + ROOM_SIZE - 1, roomRowStart, roomRowStart + ROOM_SIZE);
+                        createDoorVertical(level, roomColStart + ROOM_SIZE, roomRowStart, roomRowStart + ROOM_SIZE);
+                    if (!room.hasWest() && (row != level.getMaze().getGoalRow() || col - 1 != level.getMaze().getGoalCol()))
+                        createDoorVertical(level, roomColStart, roomRowStart, roomRowStart + ROOM_SIZE);
                 }
             }
         }
@@ -170,11 +172,14 @@ public class LevelHelper {
                 //we also want to avoid spaces next to a door otherwise the player could get blocked
                 for (int x = -1; x <= 1; x++) {
                     for (int y = -1; y <= 1; y++) {
-                        if (level.hasDoor(col + x, row + y) || skip) {
+                        if (level.hasDoor(col + x, row + y)) {
                             skip = true;
                             break;
                         }
                     }
+
+                    if (skip)
+                        break;
                 }
 
                 //if we found a door we skip

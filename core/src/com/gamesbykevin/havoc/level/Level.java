@@ -230,12 +230,13 @@ public class Level {
         //make sure our map is set
         getAStar().setMap(getFree());
 
-        getAStar().calculate(
-    (getMaze().getStartCol() * ROOM_SIZE) + (ROOM_SIZE / 2),
-    (getMaze().getStartRow() * ROOM_SIZE) + (ROOM_SIZE / 2),
-    (getMaze().getGoalCol() * ROOM_SIZE) + (ROOM_SIZE / 2),
-    (getMaze().getGoalRow() * ROOM_SIZE) + (ROOM_SIZE / 2)
-        );
+        int startCol = (getMaze().getStartCol() * ROOM_SIZE) + (ROOM_SIZE / 2);
+        int startRow = (getMaze().getStartRow() * ROOM_SIZE) + (ROOM_SIZE / 2);
+
+        int endCol = (getMaze().getGoalCol() * ROOM_SIZE) + (ROOM_SIZE / 2);
+        int endRow = (getMaze().getGoalRow() * ROOM_SIZE) + (ROOM_SIZE / 2) - 1;
+
+        getAStar().calculate(startCol, startRow, endCol, endRow);
     }
 
     public void setDoor(int col, int row, boolean value) {
@@ -477,7 +478,6 @@ public class Level {
             }
         }
 
-
         //render the enemies
         count += getEnemies().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
 
@@ -487,7 +487,7 @@ public class Level {
         //render the collectibles
         count += getCollectibles().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
 
-        System.out.println("decal count: " + count);
+        //System.out.println("decal count: " + count);
 
         //call flush at the end to draw
         getDecalBatch().flush();

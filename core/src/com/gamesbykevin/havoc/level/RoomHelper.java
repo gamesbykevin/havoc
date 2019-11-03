@@ -18,13 +18,16 @@ public class RoomHelper {
     public static final int ROOM_SIZE = 19;
 
     //the size of the smaller rooms
-    public static final int ROOM_SIZE_SMALL = 6;
+    public static final int ROOM_SIZE_SMALL = 8;
 
-    //we split the room slightly off from the middle
+    //when we split the room we will do it slightly from the middle
     public static final int SPLIT_ROOM_OFFSET = 3;
 
     //how wide are the hallways
-    public static final int[] ROOM_SIZE_HALL = {7, 9, 11, 13};
+    public static final int[] ROOM_SIZE_HALL = {5, 7, 9, 11};
+
+    //how many doors do we skip before we attempt to lock a door?
+    public static final int DOOR_COUNT_MIN = 3;
 
     protected static void addHallways(Level level, Room room, int roomColStart, int roomRowStart) {
 
@@ -453,6 +456,9 @@ public class RoomHelper {
         //create a list of doors on our path to the goal
         List<Location> options = new ArrayList<>();
 
+        //count the number of doors
+        int count = 0;
+
         for (int i = 0; i < level.getAStar().getPath().size(); i++) {
 
             Node node = level.getAStar().getPath().get(i);
@@ -467,8 +473,12 @@ public class RoomHelper {
             if ((node.getCol() / ROOM_SIZE) == level.getMaze().getGoalCol() && (node.getRow() / ROOM_SIZE) == level.getMaze().getGoalRow())
                 continue;
 
-            //now we can add to the list
-            options.add(new Location(node.getCol(), node.getRow()));
+            //keep track of door count
+            count++;
+
+            //we don't want to lock a door close to the start
+            if (count >= DOOR_COUNT_MIN)
+                options.add(new Location(node.getCol(), node.getRow()));
         }
 
         //pick a random door from the list so we can lock it
@@ -476,43 +486,88 @@ public class RoomHelper {
         Location location = options.get(index);
         level.setLocked(location.col, location.row, true);
 
-        //get the current room of that locked door
-        Room room = level.getMaze().getRoom(location.col / ROOM_SIZE, location.row / ROOM_SIZE);
+        //room we locked the door
+        int lockedCol = (location.col / ROOM_SIZE);
+        int lockedRow = (location.row / ROOM_SIZE);
+
+        //where we start
+        int startCol = level.getMaze().getStartCol();
+        int startRow = level.getMaze().getStartRow();
 
         //clear existing list
         options.clear();
+        options.add(new Location(startCol, startRow));
 
-        //find a random room to place the key in
-        for (int col = 0; col < level.getMaze().getCols(); col++) {
-            for (int row = 0; row < level.getMaze().getRows(); row++) {
+        //list of valid locations
+        List<Location> valid = new ArrayList<>();
 
-                //skip the start
-                //if (col == level.getMaze().getStartCol() && row == level.getMaze().getStartRow())
-                //    continue;
+        //continue until we don't have any other options
+        while (!options.isEmpty()) {
 
-                //if the cost is less then we can access the room
-                if (level.getMaze().getRoom(col, row).getCost() < room.getCost())
-                    options.add(new Location(col, row));
-            }
+            Room room = level.getMaze().getRoom(options.get(0));
+            options.remove(0);
+
+            if (!room.hasWest())
+                checkList(options, valid, room, -1, 0, lockedCol, lockedRow, startCol, startRow);
+            if (!room.hasEast())
+                checkList(options, valid, room, 1, 0, lockedCol, lockedRow, startCol, startRow);
+            if (!room.hasNorth())
+                checkList(options, valid, room, 0, 1, lockedCol, lockedRow, startCol, startRow);
+            if (!room.hasSouth())
+                checkList(options, valid, room, 0, -1, lockedCol, lockedRow, startCol, startRow);
         }
 
         //pick a random room to place the key
-        index = Maze.getRandom().nextInt(options.size());
-        int randomCol = options.get(index).col;
-        int randomRow = options.get(index).row;
+        Location tmp = valid.get(Maze.getRandom().nextInt(valid.size()));
+        int randomCol = tmp.col;
+        int randomRow = tmp.row;
+
+        valid.clear();
+        valid = null;
 
         //clear list again for re-use
         options.clear();
 
-        //get list of open spaces
+        //get list of open spaces in the specified room
         options = getLocationOptions(level, randomCol * ROOM_SIZE, randomRow * ROOM_SIZE, options);
 
         //we pick a random location and add a key
         location = options.get(Maze.getRandom().nextInt(options.size()));
 
-        System.out.println("key: " + location.col + ", " + location.row);
-
         //add a key at this location
         ((Collectibles) level.getCollectibles()).addKey(location.col, location.row);
+
+        options.clear();
+        options = null;
+    }
+
+    private static void checkList(List<Location> options, List<Location> valid, Room room, int offCol, int offRow, int lockedCol, int lockedRow, int startCol, int startRow) {
+
+        int newCol = room.getCol() + offCol;
+        int newRow = room.getRow() + offRow;
+
+        //don't add these to the list of valid locations
+        if (newCol == lockedCol && newRow == lockedRow)
+            return;
+        if (newCol == startCol && newRow == startRow)
+            return;
+
+        boolean match = false;
+
+        //check if we already have the valid location
+        for (int i = 0; i < valid.size(); i++) {
+            Location tmp = valid.get(i);
+
+            if (newCol == tmp.col && newRow == tmp.row) {
+                match = true;
+                break;
+            }
+        }
+
+        //if we don't have it, add to the list
+        if (!match) {
+            options.add(new Location(newCol, newRow));
+            valid.add(new Location(newCol, newRow));
+        }
     }
 }

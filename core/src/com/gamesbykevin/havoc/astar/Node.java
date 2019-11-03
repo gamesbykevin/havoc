@@ -9,13 +9,13 @@ public class Node {
     private final long id;
 
     //what is the parent of this node
-    private long parent = 0;
+    private long parent = -1;
 
     //cost from start to this node
-    private int distance = 0;
+    private float distance = 0;
 
     //cost from this node to finish
-    private int heuristic = 0;
+    private float heuristic = 0;
 
     public Node(int col, int row) {
 
@@ -27,40 +27,27 @@ public class Node {
         this.row = row;
     }
 
-    public int getCost() {
+    public float getCost() {
         return getDistance() + getHeuristic();
     }
 
-    public int getDistance() {
+    public float getDistance() {
         return this.distance;
     }
 
-    public void setDistance(int distance) {
+    public void setDistance(float distance) {
         this.distance = distance;
     }
 
-    public void calculateHeuristic(int col, int row) {
-
-        int x = 0;
-        int y = 0;
-
-        if (getCol() > col) {
-            x = getCol() - col;
-        } else {
-            x = col - getCol();
-        }
-
-        if (getRow() > row) {
-            y = getRow() - row;
-        } else {
-            y = row - getRow();
-        }
-
-        //pythagorean theorem
-        this.heuristic = (x * x) + (y * y);
+    public void calculateHeuristicManhattan(int col, int row) {
+        this.heuristic = (Math.abs(getCol() - col) + Math.abs(getRow() - row));
     }
 
-    public int getHeuristic() {
+    public void calculateHeuristicDiagonal(int col, int row) {
+        this.heuristic = Math.max(Math.abs(getCol() - col), Math.abs(getRow() - row));
+    }
+
+    public float getHeuristic() {
         return this.heuristic;
     }
 

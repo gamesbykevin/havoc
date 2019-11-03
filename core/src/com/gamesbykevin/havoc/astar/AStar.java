@@ -14,6 +14,10 @@ public class AStar {
     //do we allow diagonal movement
     private boolean diagonal = false;
 
+    //how much does each move cost
+    public static final float MOVE_COST_NORMAL = 1.0f;
+    public static final float MOVE_COST_DIAGONAL = 1.4f;
+
     public AStar() {
 
         //create our lists
@@ -49,96 +53,141 @@ public class AStar {
         //continue while we have open nodes
         while (!getOpen().isEmpty()) {
 
-            //index of lowest cost node
+            //the lowest cost node
+            Node lowest = null;
+
             int index = -1;
 
-            //lowest cost to beat
-            int cost = 0;
-
-            //get the node with the lowest score
+            //get the node with the lowest score on our open list
             for (int i = 0; i < getOpen().size(); i++) {
 
-                if (index < 0 || getOpen().get(i).getCost() < cost) {
+                //get the current node
+                Node current = getOpen().get(i);
 
-                    //this is the best node
+                //if the cost is lower, this is the best node (currently)
+                if (lowest == null || current.getCost() < lowest.getCost()) {
+                    lowest = current;
                     index = i;
-
-                    //and this is the lowest cost
-                    cost = getOpen().get(i).getCost();
                 }
             }
 
-            //get the lowest cost node
-            Node currentNode = getOpen().get(index);
-
-            //remove node from the open list
+            //now that we have the lowest cost node, remove it from the open list
             getOpen().remove(index);
 
-            //and add it to the closed
-            getClosed().add(currentNode);
+            //and add it to the closed list
+            getClosed().add(lowest);
 
-            //no need to continue now that we got our path
-            if (currentNode.getCol() == endCol && currentNode.getRow() == endRow)
+            //when we add the target to the closed list we are done looping
+            if (lowest.getCol() == endCol && lowest.getRow() == endRow)
                 break;
 
-            for (int x = -1; x <= 1; x++) {
-                for (int y = -1; y <= 1; y++) {
+            //generate the successors for the lowest cost node
+            checkSuccessor(lowest, 1, 0, endCol, endRow);
+            checkSuccessor(lowest, -1, 0, endCol, endRow);
+            checkSuccessor(lowest, 0, 1, endCol, endRow);
+            checkSuccessor(lowest, 0, -1, endCol, endRow);
 
-                    //skip diagonal direction and center
-                    if (x != 0 && y != 0)
-                        continue;
-                    if (x == 0 && y == 0)
-                        continue;
-
-                    //skip if out of bounds
-                    if (currentNode.getRow() + y < 0 || currentNode.getRow() + y >= getMap().length)
-                        continue;
-                    if (currentNode.getCol() + x < 0 || currentNode.getCol() + x >= getMap()[0].length)
-                        continue;
-
-                    //ignore the location if its part of the closed list
-                    if (getClosedNode(currentNode.getCol() + x, currentNode.getRow() + y) != null)
-                        continue;
-
-                    //ignore if location is not allowed
-                    if (!getMap()[currentNode.getRow() + y][currentNode.getCol() + x])
-                        continue;
-
-                    //create the new node
-                    Node newNode = new Node(currentNode.getCol() + x, currentNode.getRow() + y);
-
-                    //mark current node as the parent
-                    newNode.setParent(currentNode);
-
-                    //increase by 1 for the distance cost of the new node
-                    newNode.setDistance(currentNode.getCost() + 1);
-
-                    //calculate our distance from the end
-                    newNode.calculateHeuristic(endCol, endRow);
-
-                    //get the existing open node (if it exists)
-                    Node tmp = getOpenNode(newNode);
-
-                    //add the node if not already in the open list
-                    if (tmp == null) {
-
-                        getOpen().add(newNode);
-
-                    } else {
-
-                        //if the distance cost is less than the existing
-                        if (newNode.getDistance() < tmp.getDistance()) {
-                            tmp.setParent(currentNode);
-                            tmp.setDistance(newNode.getDistance());
-                            tmp.calculateHeuristic(endCol, endRow);
-                        }
-                    }
-                }
+            //if diagonal movement is allowed
+            if (isDiagonal()) {
+                checkSuccessor(lowest, 1, -1, endCol, endRow);
+                checkSuccessor(lowest, 1, 1, endCol, endRow);
+                checkSuccessor(lowest, -1, 1, endCol, endRow);
+                checkSuccessor(lowest, -1, -1, endCol, endRow);
             }
         }
 
-        //we added the target to the closed list now follow it to get the solution path
+        //create the solution path
         calculatePath();
+    }
+
+    private void checkSuccessor(Node lowest, int col, int row, int endCol, int endRow) {
+
+        //skip the current location
+        if (col == 0 && row == 0)
+            return;
+
+        //if we aren't checking diagonal then skip this one
+        if (!isDiagonal() && (col != 0 && row != 0))
+            return;
+
+        int newCol = lowest.getCol() + col;
+        int newRow = lowest.getRow() + row;
+
+        //if the location is out of bounds we will skip it
+        if (newRow < 0 || newRow >= getMap().length)
+            return;
+        if (newCol < 0 || newCol >= getMap()[0].length)
+            return;
+
+        //is the location free on our map? if not we will skip it
+        if (!getMap()[newRow][newCol])
+            return;
+
+        boolean ignore = false;
+
+        //check the closed list to see if we have this location
+        for (int i = 0; i < getClosed().size(); i++) {
+
+            Node check = getClosed().get(i);
+
+            //we are looking for the same location
+            if (check.getCol() != newCol || check.getRow() != newRow)
+                continue;
+
+            ignore = true;
+            break;
+        }
+
+        //skip if we want to ignore
+        if (ignore)
+            return;
+
+        Node match = null;
+
+        //check the open list to see if we have this location
+        for (int i = 0; i < getOpen().size(); i++) {
+
+            Node check = getOpen().get(i);
+
+            //we are looking for the same location
+            if (check.getCol() != newCol || check.getRow() != newRow)
+                continue;
+
+            //we found a match
+            match = check;
+            break;
+        }
+
+        Node successor = new Node(newCol, newRow);
+        successor.setParent(lowest);
+
+        //calculate distance from start differently depending on what direction we are going
+        if (col != 0 && row != 0) {
+            successor.setDistance(lowest.getDistance() + MOVE_COST_DIAGONAL);
+        } else {
+            successor.setDistance(lowest.getDistance() + MOVE_COST_NORMAL);
+        }
+
+        //calculate the heuristic accordingly
+        if (isDiagonal()) {
+            successor.calculateHeuristicDiagonal(endCol, endRow);
+        } else {
+            successor.calculateHeuristicManhattan(endCol, endRow);
+        }
+
+        if (match == null) {
+
+            //if it doesn't exist add it to the open list
+            getOpen().add(successor);
+
+        } else {
+
+            //else if the successor has a lower distance cost we update the parent and the parent cost
+            if (successor.getDistance() < match.getDistance()) {
+                match.setParent(lowest);
+                match.setDistance(successor.getDistance());
+            }
+        }
     }
 
     private void calculatePath() {
@@ -147,74 +196,41 @@ public class AStar {
         getPath().clear();
 
         //get the latest node added to the closed list
-        Node node = getClosed().get(getClosed().size() - 1);
+        Node child = getClosed().get(getClosed().size() - 1);
 
         //add the node to the path
-        getPath().add(node);
+        getPath().add(child);
 
         while (true) {
 
-            //get the parent node
-            node = getClosedNode(node.getParent());
+            Node parent = null;
 
-            //if not found we have our path
-            if (node == null)
+            //look for the parent of the current node
+            for (int i = 0; i < getClosed().size(); i++) {
+
+                Node tmp = getClosed().get(i);
+
+                //we found the parent
+                if (tmp.getId() == child.getParent()) {
+                    parent = tmp;
+                    break;
+                }
+            }
+
+            //if the parent is null we are done
+            if (parent == null)
                 break;
 
-            //add the parent to the list
-            getPath().add(0, node);
+            //the parent now becomes the child
+            child = parent;
+
+            //add the child to the list
+            getPath().add(0, child);
         }
 
         //clear the lists
         getOpen().clear();
         getClosed().clear();
-    }
-
-    private Node getOpenNode(Node node) {
-        return getOpenNode(node.getCol(), node.getRow());
-    }
-
-    private Node getOpenNode(int col, int row) {
-
-        for (int i = 0; i < getOpen().size(); i++) {
-
-            Node node = getOpen().get(i);
-
-            if (node.getRow() == row && node.getCol() == col)
-                return node;
-        }
-
-        return null;
-    }
-
-    private Node getClosedNode(long id) {
-
-        for (int i = 0; i < getClosed().size(); i++) {
-
-            Node node = getClosed().get(i);
-
-            if (node.getId() == id)
-                return node;
-        }
-
-        return null;
-    }
-
-    private Node getClosedNode(Node node) {
-        return getClosedNode(node.getCol(), node.getRow());
-    }
-
-    private Node getClosedNode(int col, int row) {
-
-        for (int i = 0; i < getClosed().size(); i++) {
-
-            Node node = getClosed().get(i);
-
-            if (node.getRow() == row && node.getCol() == col)
-                return node;
-        }
-
-        return null;
     }
 
     private List<Node> getOpen() {
