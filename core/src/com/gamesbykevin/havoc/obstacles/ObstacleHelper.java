@@ -1,9 +1,9 @@
 package com.gamesbykevin.havoc.obstacles;
 
-import com.gamesbykevin.havoc.maze.Maze;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 
 public class ObstacleHelper {
 
@@ -23,40 +23,52 @@ public class ObstacleHelper {
 
     protected static void recycle() {
 
-        OPTIONS_OTHER.clear();
+        if (OPTIONS_OTHER != null)
+           OPTIONS_OTHER.clear();
         OPTIONS_OTHER = null;
 
-        OPTIONS_PLANT.clear();
+        if (OPTIONS_PLANT != null)
+            OPTIONS_PLANT.clear();
         OPTIONS_PLANT = null;
 
-        OPTIONS_SPECIMEN.clear();
+        if (OPTIONS_SPECIMEN != null)
+            OPTIONS_SPECIMEN.clear();
         OPTIONS_SPECIMEN = null;
 
-        OPTIONS_WELL.clear();
+        if (OPTIONS_WELL != null)
+            OPTIONS_WELL.clear();
         OPTIONS_WELL = null;
 
-        OPTIONS_CAGE.clear();
+        if (OPTIONS_CAGE != null)
+            OPTIONS_CAGE.clear();
         OPTIONS_CAGE = null;
 
-        OPTIONS_BARREL.clear();
+        if (OPTIONS_BARREL != null)
+            OPTIONS_BARREL.clear();
         OPTIONS_BARREL = null;
 
-        OPTIONS_FLAG.clear();
+        if (OPTIONS_FLAG != null)
+            OPTIONS_FLAG.clear();
         OPTIONS_FLAG = null;
 
-        OPTIONS_STATUE.clear();
+        if (OPTIONS_STATUE != null)
+            OPTIONS_STATUE.clear();
         OPTIONS_STATUE = null;
 
-        OPTIONS_LIGHT.clear();
+        if (OPTIONS_LIGHT != null)
+            OPTIONS_LIGHT.clear();
         OPTIONS_LIGHT = null;
 
-        OPTIONS_PILLAR.clear();
+        if (OPTIONS_PILLAR != null)
+            OPTIONS_PILLAR.clear();
         OPTIONS_PILLAR = null;
 
-        OPTIONS_GRASS.clear();
+        if (OPTIONS_GRASS != null)
+            OPTIONS_GRASS.clear();
         OPTIONS_GRASS = null;
 
-        OPTIONS_RANDOM_TYPE.clear();
+        if (OPTIONS_RANDOM_TYPE != null)
+            OPTIONS_RANDOM_TYPE.clear();
         OPTIONS_RANDOM_TYPE = null;
     }
 
@@ -243,7 +255,7 @@ public class ObstacleHelper {
     }
 
     private static Obstacles.Type getType(List<Obstacles.Type> list) {
-        int index = Maze.getRandom().nextInt(list.size());
+        int index = getRandom().nextInt(list.size());
         Obstacles.Type type = list.get(index);
         list.remove(index);
         return type;
@@ -260,7 +272,7 @@ public class ObstacleHelper {
             }
         }
 
-        int index = Maze.getRandom().nextInt(OPTIONS_RANDOM_TYPE.size());
+        int index = getRandom().nextInt(OPTIONS_RANDOM_TYPE.size());
 
         switch (OPTIONS_RANDOM_TYPE.get(index)) {
 

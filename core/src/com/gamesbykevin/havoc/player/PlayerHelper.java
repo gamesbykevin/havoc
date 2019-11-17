@@ -11,7 +11,6 @@ import com.gamesbykevin.havoc.player.weapon.*;
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
 import static com.gamesbykevin.havoc.input.MyController.*;
-import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE;
 import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.AMMO_LARGE;
 import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.AMMO_SMALL;
 
@@ -155,12 +154,12 @@ public class PlayerHelper {
 
     private static boolean checkBounds(Level level, int row, int col) {
 
-        //if true we hit a wall
-        if (level.hasWall(col, row))
+        //if not true we aren't in open space
+        if (!level.getDungeon().hasMap(col, row))
             return true;
 
-        //is there a door here
-        if (level.hasDoor(col, row)) {
+        //is there a door/switch here
+        if (level.getDungeon().hasInteract(col, row)) {
 
             Door door = level.getDoorDecal(col, row);
 
@@ -181,13 +180,9 @@ public class PlayerHelper {
         final float xDiff = x - controller.getPreviousPosition().x;
         final float yDiff = y - controller.getPreviousPosition().y;
 
-        //figure out which room we are in
-        float col = (x / ROOM_SIZE);
-        float row = (y / ROOM_SIZE);
-
         //and then what specific column in the room
-        float roomCol = (col * ROOM_SIZE);
-        float roomRow = (row * ROOM_SIZE);
+        float roomCol = controller.getLevel().getCamera3d().position.x;
+        float roomRow = controller.getLevel().getCamera3d().position.y;
 
         if (checkBounds(controller.getLevel(), roomRow, roomCol))
             return true;
@@ -304,95 +299,55 @@ public class PlayerHelper {
 
     protected static void updateLevel(Player player) {
 
-        //if we are performing action check if we can open a door
+        //if we are performing action check if we can open a door or hit a switch
         if (player.getController().isAction()) {
 
             //level instance
             Level level = player.getController().getLevel();
 
-            //figure out which room we are in
-            float col = (level.getCamera3d().position.x / ROOM_SIZE);
-            float row = (level.getCamera3d().position.y / ROOM_SIZE);
+            for (float colDiff = -DOOR_DISTANCE; colDiff <= DOOR_DISTANCE; colDiff += DOOR_DISTANCE) {
+                for (float rowDiff = -DOOR_DISTANCE; rowDiff <= DOOR_DISTANCE; rowDiff += DOOR_DISTANCE) {
 
-            //and then what specific column in the room
-            float roomCol = (col * ROOM_SIZE);
-            float roomRow = (row * ROOM_SIZE);
+                    //avoid checking diagonally
+                    if (colDiff != 0 && rowDiff != 0)
+                        continue;
 
-            //is this room the goal
-            boolean goal = ((int)col == level.getMaze().getGoalCol() && (int)row == level.getMaze().getGoalRow());
+                    int col = (int)(level.getCamera3d().position.x + colDiff);
+                    int row = (int)(level.getCamera3d().position.y + rowDiff);
 
-            //if this is the goal
-            if (goal) {
+                    //if we can't interact skip to the next
+                    if (!level.getDungeon().hasInteract(col, row))
+                        continue;
 
-                if (hasNeighborWall(level, roomCol, roomRow)) {
-                    player.getController().setRotation(0);
-                    level.resetPosition();
-                    level.getEnemies().reset();
-                    return;
+                    switch (level.getDungeon().getCells()[row][col].getType()) {
+                        case Door:
+                        case DoorLocked:
+                        case Secret:
+                            Door door = level.getDoorDecal(col, row);
+
+                            //we can only open the door if it exists and it's closed
+                            if (door != null && door.isClosed()) {
+
+                                //also make sure if it's locked that we have a key
+                                if (!door.isLocked() || (door.isLocked() && player.hasKey())) {
+                                    door.setClosed(false);
+                                    door.setOpening(true);
+                                    door.setLapsed(0);
+                                }
+                            }
+                            break;
+
+                        case Goal:
+                            player.getController().setRotation(0);
+                            level.resetPosition();
+                            level.getEnemies().reset();
+                            break;
+                    }
                 }
             }
 
-            //is their a neighbor door?
-            Door door = getNeighborDoor(level, roomCol, roomRow);
-
-            //we can only open the door if it exists and it's closed
-            if (door != null && door.isClosed()) {
-
-                //also make sure if it's locked that we have a key
-                if (!door.isLocked() || (door.isLocked() && player.hasKey())) {
-                    door.setClosed(false);
-                    door.setOpening(true);
-                    door.setLapsed(0);
-                }
-            }
-
-            //set to false
+            //set action back to false
             player.getController().setAction(false);
         }
-    }
-
-    private static Door getNeighborDoor(Level level, float col, float row) {
-
-        Door door = null;
-
-        for (float colDiff = -DOOR_DISTANCE; colDiff <= DOOR_DISTANCE; colDiff += DOOR_DISTANCE) {
-
-            for (float rowDiff = -DOOR_DISTANCE; rowDiff <= DOOR_DISTANCE; rowDiff += DOOR_DISTANCE) {
-
-                //avoid checking diagonally
-                if (colDiff != 0 && rowDiff != 0)
-                    continue;
-
-                //once we find our door we are done
-                if (door != null)
-                    break;
-
-                //if we have flagged a door here, get it
-                if (level.hasDoor((int)(col + colDiff), (int)(row + rowDiff)))
-                    door = level.getDoorDecal((int)(col + colDiff), (int)(row + rowDiff));
-            }
-        }
-
-        //return the result
-        return door;
-    }
-
-    private static boolean hasNeighborWall(Level level, float col, float row) {
-
-        for (float colDiff = -DOOR_DISTANCE; colDiff <= DOOR_DISTANCE; colDiff += DOOR_DISTANCE) {
-
-            for (float rowDiff = -DOOR_DISTANCE; rowDiff <= DOOR_DISTANCE; rowDiff += DOOR_DISTANCE) {
-
-                //avoid checking diagonally
-                if (colDiff != 0 && rowDiff != 0)
-                    continue;
-
-                if (level.hasWall((int)(col + colDiff), (int)(row + rowDiff)))
-                    return true;
-            }
-        }
-
-        //no neighbor walls found
-        return false;
     }
 }

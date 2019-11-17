@@ -33,7 +33,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	public void create () {
 
 		//create our level
-		getLevel().generateMaze();
+		getLevel();
 
 		//create the controller
 		getController();

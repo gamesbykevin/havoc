@@ -166,18 +166,26 @@ public class WeaponHelper {
             col += xa;
             row += ya;
 
-            //check if we hit a wall
-            if (level.hasWall((int)col, (int)row))
+            //check if we went out of bounds
+            if (!level.getDungeon().hasMap((int)col, (int)row))
                 return;
 
-            if (level.hasDoor((int)col, (int)row)) {
+            if (level.getDungeon().hasInteract((int)col, (int)row)) {
 
                 //get the door at the current location
                 Door door = level.getDoorDecal((int)col, (int)row);
 
-                //if the door is closed then we hit the door
-                if (door != null && !door.isOpen())
+                if (door != null) {
+
+                    //we hit the door
+                    if (!door.isOpen())
+                        return;
+
+                } else {
+
+                    //we hit something else
                     return;
+                }
             }
 
             //keep track of the attempts

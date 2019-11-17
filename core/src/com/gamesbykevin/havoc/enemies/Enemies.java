@@ -1,16 +1,15 @@
 package com.gamesbykevin.havoc.enemies;
 
+import com.gamesbykevin.havoc.dungeon.Cell;
+import com.gamesbykevin.havoc.dungeon.Leaf;
 import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.level.Level;
-import com.gamesbykevin.havoc.maze.Location;
-import com.gamesbykevin.havoc.maze.Maze;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static com.gamesbykevin.havoc.level.LevelHelper.getLocationOptions;
-import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE;
+import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
+import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
 
 public final class Enemies extends Entities {
 
@@ -44,57 +43,52 @@ public final class Enemies extends Entities {
     @Override
     public void spawn() {
 
-        //create list of options to place the enemy(ies)
-        List<Location> options = new ArrayList<>();
+        //list of valid leaves for spawning
+        List<Leaf> leaves = getLeafRooms(getLevel().getDungeon());
 
-        for (int col = 0; col < getLevel().getMaze().getCols(); col++) {
-            for (int row = 0; row < getLevel().getMaze().getRows(); row++) {
+        while (!leaves.isEmpty()) {
 
-                //skip the start of the level
-                if (col == getLevel().getMaze().getStartCol() && row == getLevel().getMaze().getStartRow())
-                    continue;
+            int randomIndex = getRandom().nextInt(leaves.size());
 
-                //where we are starting for the current location
-                int startCol = (col * ROOM_SIZE);
-                int startRow = (row * ROOM_SIZE);
+            //get random leaf
+            Leaf leaf = leaves.get(randomIndex);
 
-                //get our available options
-                options = getLocationOptions(getLevel(), startCol, startRow, options);
+            //remove from the list
+            leaves.remove(randomIndex);
 
-                int count = 0;
+            List<Cell> options = getLocationOptions(leaf.getRoom());
 
-                //pick random number of enemies
-                int limit = Maze.getRandom().nextInt(ENEMIES_PER_ROOM_MAX) + 1;
+            int count = 0;
 
-                //how many enemies per room
-                while (!options.isEmpty() && count < limit) {
+            //pick random number of enemies
+            int limit = getRandom().nextInt(ENEMIES_PER_ROOM_MAX) + 1;
 
-                    //pick random index
-                    int index = Maze.getRandom().nextInt(options.size());
+            //how many enemies per room
+            while (!options.isEmpty() && count < limit) {
 
-                    //get the location
-                    Location location = options.get(index);
+                //pick random index
+                int index = getRandom().nextInt(options.size());
 
-                    //check if there are any other items
-                    if (!hasEntityLocation(location)) {
+                //get the location
+                Cell location = options.get(index);
 
-                        //add enemy at the location
-                        add(new Enemy(), location);
+                //check if there are any other items
+                if (!hasEntityLocation(location.getCol(), location.getRow())) {
 
-                        //increase the count
-                        count++;
-                    }
+                    //add enemy at the location
+                    add(new Enemy(), location.getCol(), location.getRow());
 
-                    //remove the option from the list
-                    options.remove(index);
+                    //increase the count
+                    count++;
                 }
 
-                //clear the list
-                options.clear();
+                //remove the option from the list
+                options.remove(index);
             }
-        }
 
-        options.clear();
-        options = null;
+            //clear the list
+            options.clear();
+            options = null;
+        }
     }
 }

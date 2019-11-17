@@ -1,13 +1,12 @@
 package com.gamesbykevin.havoc.obstacles;
 
+import com.gamesbykevin.havoc.dungeon.Leaf;
+import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.level.Level;
-import com.gamesbykevin.havoc.maze.Maze;
-import com.gamesbykevin.havoc.maze.Room;
 
-import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE;
-import static com.gamesbykevin.havoc.level.RoomHelper.ROOM_SIZE_SMALL;
+import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.obstacles.ObstacleHelper.*;
 
 public final class Obstacles extends Entities {
@@ -41,334 +40,231 @@ public final class Obstacles extends Entities {
     @Override
     public void spawn() {
 
-        for (int col = 0; col < getLevel().getMaze().getCols(); col++) {
-            for (int row = 0; row < getLevel().getMaze().getRows(); row++) {
+        for (int i = 0; i < getLevel().getDungeon().getLeafs().size(); i++) {
 
-                //skip the starting room
-                if (col == getLevel().getMaze().getStartCol() && row == getLevel().getMaze().getStartRow())
-                    continue;
+            Leaf leaf = getLevel().getDungeon().getLeafs().get(i);
 
-                Room room = getLevel().getMaze().getRoom(col, row);
+            //only want leafs containing rooms
+            if (leaf.getRoom() == null)
+                continue;
 
-                //where we are starting for the current location
-                int startCol = (col * ROOM_SIZE);
-                int startRow = (row * ROOM_SIZE);
+            //add pillars
+            if (getRandom().nextBoolean())
+                addPillars(leaf.getRoom());
 
-                //add pillars
-                if (Maze.getRandom().nextBoolean())
-                    addPillars(startCol, startRow, room);
+            //add lights
+            addLights(leaf.getRoom());
 
-                //add lights
-                addLights(startCol, startRow);
+            //add items on the 4 corners
+            addCorners(leaf.getRoom());
 
-                //add items on the 4 corners
-                addCorners(startCol, startRow);
-
-                //assign random type next to the walls
-                if (Maze.getRandom().nextBoolean())
-                    addNextToWalls(startCol, startRow, room);
-            }
+            //assign random type next to the walls
+            if (getRandom().nextBoolean())
+                addNextToWalls(leaf.getRoom());
         }
 
         recycle();
     }
 
-    private void addCorners(int startCol, int startRow) {
-
-        //assign random obstacle type
-        assignRandomType();
-
-        for (int offset = ROOM_SIZE_SMALL - 1; offset >= 1; offset--) {
-
-            if (!hasEntityLocationCorner(startCol + offset, startRow + offset) &&
-                    !hasEntityLocationCorner(startCol + offset, startRow + ROOM_SIZE - (offset + 1)) &&
-                    !hasEntityLocationCorner(startCol + ROOM_SIZE - (offset + 1), startRow + ROOM_SIZE - (offset + 1)) &&
-                    !hasEntityLocationCorner(startCol + ROOM_SIZE - (offset + 1), startRow + offset)
-            ) {
-                add(new Obstacle(), startCol + offset, startRow + offset);
-                add(new Obstacle(), startCol + offset, startRow + ROOM_SIZE - (offset + 1));
-                add(new Obstacle(), startCol + ROOM_SIZE - (offset + 1), startRow + ROOM_SIZE - (offset + 1));
-                add(new Obstacle(), startCol + ROOM_SIZE - (offset + 1), startRow + offset);
-                break;
-            }
-        }
-    }
-
-    private void addNextToWalls(int startCol, int startRow, Room room) {
+    private void addNextToWalls(Room room) {
 
         //assign random obstacle type
         assignRandomType();
 
         //how frequent do we add an obstacle
-        int offset = Maze.getRandom().nextInt(4) + 1;
+        int offset = getRandom().nextInt(4) + 1;
 
-        if (room.hasWest()) {
-            for (int row = startRow; row < startRow + ROOM_SIZE; row++) {
+        boolean doorWest = room.hasWestDoor(getLevel().getDungeon());
+        boolean doorEast = room.hasEastDoor(getLevel().getDungeon());
+        boolean doorNorth = room.hasNorthDoor(getLevel().getDungeon());
+        boolean doorSouth = room.hasSouthDoor(getLevel().getDungeon());
 
-                if (row % offset != 0)
-                    continue;
-
-                if (hasEntityLocation(startCol + 1, row))
-                    continue;
-
-                add(new Obstacle(), startCol + 1, row);
-            }
+        for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
+            if (row % offset != 0)
+                continue;
+            if (!doorWest)
+                add(room.getX() + 1, row);
+            if (!doorEast)
+                add(room.getX() + room.getW() - 2, row);
         }
 
-        if (room.hasEast()) {
-            for (int row = startRow; row < startRow + ROOM_SIZE; row++) {
-
-                if (row % offset != 0)
-                    continue;
-
-                if (hasEntityLocation(startCol + ROOM_SIZE - 2, row))
-                    continue;
-
-                add(new Obstacle(), startCol + ROOM_SIZE - 2, row);
-            }
-        }
-
-        if (room.hasNorth()) {
-            for (int col = startCol; col < startCol + ROOM_SIZE; col++) {
-
-                if (col % offset != 0)
-                    continue;
-
-                if (hasEntityLocation(col, startRow + ROOM_SIZE - 2))
-                    continue;
-
-                add(new Obstacle(), col, startRow + ROOM_SIZE - 2);
-            }
-        }
-
-        if (room.hasSouth()) {
-            for (int col = startCol; col < startCol + ROOM_SIZE; col++) {
-
-                if (col % offset != 0)
-                    continue;
-
-                if (hasEntityLocation(col, startRow + 1))
-                    continue;
-
-                add(new Obstacle(), col, startRow + 1);
-            }
+        for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
+            if (col % offset != 0)
+                continue;
+            if (!doorNorth)
+                add(col, room.getY() + room.getH() - 2);
+            if (!doorSouth)
+                add(col, room.getY() + 1);
         }
     }
 
-    private void addPillars(int startCol, int startRow, Room room) {
+    private void addCorners(Room room) {
 
-        Obstacle.TYPE = getRandomPillar();
+        //assign random obstacle type
+        assignRandomType();
 
-        if (room.hasWest() && room.hasEast()) {
+        int size = (room.getW() > room.getH()) ? (room.getW() / 2) : (room.getH() / 2);
 
-            //row we will place obstacles at
-            int tmpRow = startRow + (ROOM_SIZE / 2);
+        for (int offset = 0; offset <= size; offset++) {
 
-            //add pillars horizontally
-            addPillarHorizontal(startCol, tmpRow);
+            if (hasEntityLocation(room.getX() + offset, room.getY() + offset))
+                continue;
+            if (hasEntityLocation(room.getX() + offset, room.getY() + room.getH() - offset))
+                continue;
+            if (hasEntityLocation(room.getX() + room.getW() - offset, room.getY() + offset))
+                continue;
+            if (hasEntityLocation(room.getX() + room.getW() - offset, room.getY() + room.getH() - offset))
+                continue;
 
-        } else if (room.hasNorth() && room.hasSouth()) {
-
-            //column we will place obstacles at
-            int tmpCol = startCol + (ROOM_SIZE / 2);
-
-            //add pillar vertically
-            addPillarVertical(startRow, tmpCol);
-
-        } else {
-
-            if (Maze.getRandom().nextBoolean()) {
-
-                //row we will place obstacles at
-                int tmpRow = startRow + (ROOM_SIZE / 2);
-
-                //add pillars horizontally
-                addPillarHorizontal(startCol, tmpRow + 1);
-                addPillarHorizontal(startCol, tmpRow - 1);
-
-            } else {
-
-                //column we will place obstacles at
-                int tmpCol = startCol + (ROOM_SIZE / 2);
-
-                //add pillar vertically
-                addPillarVertical(startRow, tmpCol + 1);
-                addPillarVertical(startRow, tmpCol - 1);
-            }
+            add(room.getX() + offset, room.getY() + offset);
+            add(room.getX() + offset, room.getY() + room.getH() - offset);
+            add(room.getX() + room.getW() - offset, room.getY() + offset);
+            add(room.getX() + room.getW() - offset, room.getY() + room.getH() - offset);
+            return;
         }
     }
 
-    private void addLights(int startCol, int startRow) {
+    private void addLights(Room room) {
 
         //frequency of lights
-        int frequency = Maze.getRandom().nextInt(4) + 2;
+        int frequency = getRandom().nextInt(4) + 2;
 
         Obstacle.TYPE = getRandomLight();
 
-        switch (Maze.getRandom().nextInt(5)) {
+        int middleCol = room.getX() + (room.getW() / 2);
+        int middleRow = room.getY() + (room.getH() / 2);
+
+        switch (getRandom().nextInt(5)) {
 
             case 0:
-                for (int tmpCol = startCol; tmpCol < startCol + ROOM_SIZE; tmpCol++) {
+                for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
 
-                    if (tmpCol % frequency == 0)
+                    if (col % frequency == 0)
                         continue;
 
-                    if (!hasEntityLocation(tmpCol, startRow + (ROOM_SIZE / 2)))
-                        add(new Obstacle(), tmpCol, startRow + (ROOM_SIZE / 2));
+                    if (!hasEntityLocation(col, middleRow))
+                        add(new Obstacle(), col, middleRow);
                 }
                 break;
 
             case 1:
-                for (int tmpRow = startRow; tmpRow < startRow + ROOM_SIZE; tmpRow++) {
+                for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
 
-                    if (tmpRow % frequency == 0)
+                    if (row % frequency == 0)
                         continue;
 
-                    if (!hasEntityLocation(startCol + (ROOM_SIZE / 2), tmpRow))
-                        add(new Obstacle(), startCol + (ROOM_SIZE / 2), tmpRow);
+                    if (!hasEntityLocation(middleCol, row))
+                        add(new Obstacle(), middleCol, row);
                 }
                 break;
 
             case 2:
-                for (int tmpCol = startCol; tmpCol < startCol + ROOM_SIZE; tmpCol++) {
+                for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
+                    for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
 
-                    for (int tmpRow = startRow; tmpRow < startRow + ROOM_SIZE; tmpRow++) {
-
-                        if (tmpCol % frequency != 0 || tmpRow % frequency != 0)
+                        if (col % frequency != 0 || row % frequency != 0)
                             continue;
 
-                        if (!hasEntityLocation(tmpCol, tmpRow))
-                            add(new Obstacle(), tmpCol, tmpRow);
+                        if (!hasEntityLocation(col, row))
+                            add(new Obstacle(), col, row);
                     }
                 }
                 break;
 
             case 3:
+                for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
 
-                for (int tmpCol = startCol; tmpCol < startCol + ROOM_SIZE; tmpCol++) {
-
-                    if (tmpCol % frequency == 0)
+                    if (col % frequency == 0)
                         continue;
 
-                    if (!hasEntityLocation(tmpCol, startRow + (ROOM_SIZE / 2)))
-                        add(new Obstacle(), tmpCol, startRow + (ROOM_SIZE / 2));
+                    if (!hasEntityLocation(col, middleRow))
+                        add(new Obstacle(), col, middleRow);
                 }
 
-                for (int tmpRow = startRow; tmpRow < startRow + ROOM_SIZE; tmpRow++) {
+                for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
 
-                    if (tmpRow % frequency == 0)
+                    if (row % frequency == 0)
                         continue;
 
-                    if (!hasEntityLocation(startCol + (ROOM_SIZE / 2), tmpRow))
-                        add(new Obstacle(), startCol + (ROOM_SIZE / 2), tmpRow);
+                    if (!hasEntityLocation(middleCol, row))
+                        add(new Obstacle(), middleCol, row);
                 }
                 break;
 
             case 4:
-                int offset = (ROOM_SIZE_SMALL / 2);
-                if (!hasEntityLocation(startCol + offset, startRow + offset))
-                    add(new Obstacle(), startCol + offset, startRow + offset);
-                if (!hasEntityLocation(startCol + ROOM_SIZE - offset, startRow + ROOM_SIZE - offset))
-                    add(new Obstacle(), startCol + ROOM_SIZE - offset, startRow + ROOM_SIZE - offset);
-                if (!hasEntityLocation(startCol + ROOM_SIZE - offset, startRow + offset))
-                    add(new Obstacle(), startCol + ROOM_SIZE - offset, startRow + offset);
-                if (!hasEntityLocation(startCol + offset, startRow + ROOM_SIZE - offset))
-                    add(new Obstacle(), startCol + offset, startRow + ROOM_SIZE - offset);
+                int offset = 4;
+                if (!hasEntityLocation(room.getX() + offset, room.getY() + offset))
+                    add(new Obstacle(), room.getX() + offset, room.getY() + offset);
+                if (!hasEntityLocation(room.getX() + (room.getW() - 1) - offset, room.getY() + (room.getH() - 1) - offset))
+                    add(new Obstacle(), room.getX() + (room.getW() - 1) - offset, room.getY() + (room.getH() - 1) - offset);
+                if (!hasEntityLocation(room.getX() + (room.getW() - 1) - offset, room.getY() + offset))
+                    add(new Obstacle(), room.getX() + (room.getW() - 1) - offset, room.getY() + offset);
+                if (!hasEntityLocation(room.getX() + offset, room.getY() + (room.getH() - 1) - offset))
+                    add(new Obstacle(), room.getX() + offset, room.getY() + (room.getH() - 1) - offset);
                 break;
         }
     }
 
-    private boolean hasEntityLocationCorner(int col, int row) {
+    private void addPillars(Room room) {
 
+        Obstacle.TYPE = getRandomPillar();
+
+        if (!room.hasWestDoor(getLevel().getDungeon()) && !room.hasEastDoor(getLevel().getDungeon())) {
+            addPillarVertical(room, room.getX() + 1);
+            addPillarVertical(room, room.getX() + room.getW() - 2);
+        } else if (!room.hasSouthDoor(getLevel().getDungeon()) && !room.hasNorthDoor(getLevel().getDungeon())) {
+            addPillarHorizontal(room, room.getY() + 1);
+            addPillarHorizontal(room, room.getY() + room.getH() - 2);
+        } else {
+            if (getRandom().nextBoolean()) {
+                addPillarHorizontal(room, room.getY() + (room.getH() / 2) + 1);
+                addPillarHorizontal(room, room.getY() + (room.getH() / 2) - 1);
+            } else {
+                addPillarVertical(room, room.getX() + (room.getW() / 2) + 1);
+                addPillarVertical(room, room.getX() + (room.getW() / 2) - 1);
+            }
+        }
+    }
+
+    private void addPillarVertical(Room room, int col) {
+        for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
+            if (row % 2 != 0)
+                continue;
+            add(col, row);
+        }
+    }
+
+    private void addPillarHorizontal(Room room, int row) {
+        for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
+            if (col % 2 != 0)
+                continue;
+            add(col, row);
+        }
+    }
+
+    private void add(int col, int row) {
         if (hasEntityLocation(col, row))
-            return true;
+            return;
+        if (nearInteract(col, row))
+            return;
+        add(new Obstacle(), col, row);
+    }
 
-        //don't place next to a door
-        if (getLevel().hasDoor(col + 1, row))
-            return true;
-        if (getLevel().hasDoor(col - 1, row))
-            return true;
-        if (getLevel().hasDoor(col, row + 1))
-            return true;
-        if (getLevel().hasDoor(col, row - 1))
-            return true;
+    private boolean nearInteract(int col, int row) {
+
+        //can't place it next to a door
+        for (int x = -2; x <= 2; x++) {
+            for (int y = -2; y <= 2; y++) {
+
+                if (x != 0 && y != 0)
+                    continue;
+
+                if (getLevel().getDungeon().hasInteract(col + x, row + y))
+                    return true;
+            }
+        }
 
         return false;
-    }
-
-    private void addPillarVertical(int startRow, int tmpCol) {
-
-        for (int tmpRow = startRow; tmpRow < startRow + ROOM_SIZE; tmpRow++) {
-
-            if (tmpRow % 2 == 0)
-                continue;
-
-            if (hasEntityLocation(tmpCol, tmpRow))
-                continue;
-
-            //can't place it next to a door
-            if (getLevel().hasDoor(tmpCol + 1, tmpRow))
-                continue;
-            if (getLevel().hasDoor(tmpCol - 1, tmpRow))
-                continue;
-            if (getLevel().hasDoor(tmpCol, tmpRow + 1))
-                continue;
-            if (getLevel().hasDoor(tmpCol, tmpRow - 1))
-                continue;
-
-            //we won't place on the corner where there is no free space
-            if (!getLevel().hasFree(tmpCol - 1, tmpRow - 1))
-                continue;
-            if (!getLevel().hasFree(tmpCol + 1, tmpRow + 1))
-                continue;
-            if (!getLevel().hasFree(tmpCol + 1, tmpRow - 1))
-                continue;
-            if (!getLevel().hasFree(tmpCol - 1, tmpRow + 1))
-                continue;
-
-            //placing we should have open space on the sides
-            if (!getLevel().hasFree(tmpCol - 1, tmpRow) || !getLevel().hasFree(tmpCol + 1, tmpRow))
-                continue;
-
-            add(new Obstacle(), tmpCol, tmpRow);
-        }
-    }
-
-    private void addPillarHorizontal(int startCol, int tmpRow) {
-
-        for (int tmpCol = startCol; tmpCol < startCol + ROOM_SIZE; tmpCol++) {
-
-            if (tmpCol % 2 == 0)
-                continue;
-
-            if (hasEntityLocation(tmpCol, tmpRow))
-                continue;
-
-            if (getLevel().hasDoor(tmpCol + 1, tmpRow))
-                continue;
-            if (getLevel().hasDoor(tmpCol - 1, tmpRow))
-                continue;
-            if (getLevel().hasDoor(tmpCol, tmpRow + 1))
-                continue;
-            if (getLevel().hasDoor(tmpCol, tmpRow - 1))
-                continue;
-
-            //we won't place on the corner where there is no free space
-            if (!getLevel().hasFree(tmpCol - 1, tmpRow - 1))
-                continue;
-            if (!getLevel().hasFree(tmpCol + 1, tmpRow + 1))
-                continue;
-            if (!getLevel().hasFree(tmpCol + 1, tmpRow - 1))
-                continue;
-            if (!getLevel().hasFree(tmpCol - 1, tmpRow + 1))
-                continue;
-
-            //placing we should have open space on the sides
-            if (!getLevel().hasFree(tmpCol, tmpRow - 1) || !getLevel().hasFree(tmpCol, tmpRow + 1))
-                continue;
-
-            add(new Obstacle(), tmpCol, tmpRow);
-        }
     }
 
     @Override

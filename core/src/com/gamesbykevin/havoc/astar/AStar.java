@@ -98,6 +98,10 @@ public class AStar {
 
         //create the solution path
         calculatePath();
+
+        //clear the lists
+        getOpen().clear();
+        getClosed().clear();
     }
 
     private void checkSuccessor(Node lowest, int col, int row, int endCol, int endRow) {
@@ -211,7 +215,7 @@ public class AStar {
                 Node tmp = getClosed().get(i);
 
                 //we found the parent
-                if (tmp.getId() == child.getParent()) {
+                if (tmp.hasId(child.getParent())) {
                     parent = tmp;
                     break;
                 }
@@ -227,10 +231,6 @@ public class AStar {
             //add the child to the list
             getPath().add(0, child);
         }
-
-        //clear the lists
-        getOpen().clear();
-        getClosed().clear();
     }
 
     private List<Node> getOpen() {

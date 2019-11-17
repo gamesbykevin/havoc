@@ -1,15 +1,17 @@
 package com.gamesbykevin.havoc.astar;
 
+import com.gamesbykevin.havoc.guid.GUID;
+
 public class Node {
 
     //location
     private final int col, row;
 
     //unique id of this node
-    private final long id;
+    private final String id;
 
     //what is the parent of this node
-    private long parent = -1;
+    private String parent;
 
     //cost from start to this node
     private float distance = 0;
@@ -20,7 +22,7 @@ public class Node {
     public Node(int col, int row) {
 
         //pick a random id for this node
-        this.id = System.nanoTime();
+        this.id = GUID.generate();
 
         //store the location
         this.col = col;
@@ -63,16 +65,19 @@ public class Node {
         setParent(node.getId());
     }
 
-    public void setParent(long parent) {
+    public void setParent(String parent) {
         this.parent = parent;
     }
 
-    public long getParent() {
+    public String getParent() {
         return this.parent;
     }
 
-    public long getId() {
+    private String getId() {
         return this.id;
     }
 
+    public boolean hasId(String id) {
+        return getId().equals(id);
+    }
 }

@@ -3,14 +3,17 @@ package com.gamesbykevin.havoc.decals;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 
-import static com.gamesbykevin.havoc.level.LevelHelper.DOOR_DEPTH;
-import static com.gamesbykevin.havoc.level.LevelHelper.SECRET_DEPTH;
-
 public abstract class DecalCustom {
 
     //size of a block
     public static final float TEXTURE_WIDTH = 1.0f;
     public static final float TEXTURE_HEIGHT = 1.0f;
+
+    //how deep is the door placed
+    public static final float DOOR_DEPTH = .5f;
+
+    //how deep is the secret placed
+    public static final float SECRET_DEPTH = .075f;
 
     //the location of this decal as it relates to the level
     private int col, row;

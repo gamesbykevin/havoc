@@ -5,42 +5,27 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector3;
-import com.gamesbykevin.havoc.astar.AStar;
 import com.gamesbykevin.havoc.collectables.Collectibles;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
+import com.gamesbykevin.havoc.dungeon.Dungeon;
+import com.gamesbykevin.havoc.dungeon.Leaf;
+import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.enemies.Enemies;
 import com.gamesbykevin.havoc.entities.Entities;
-import com.gamesbykevin.havoc.maze.Maze;
-import com.gamesbykevin.havoc.maze.Room;
-import com.gamesbykevin.havoc.maze.algorithm.*;
 import com.gamesbykevin.havoc.obstacles.Obstacles;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gamesbykevin.havoc.level.LevelHelper.*;
-import static com.gamesbykevin.havoc.level.RoomHelper.*;
-import static com.gamesbykevin.havoc.maze.MazeHelper.calculateCost;
-import static com.gamesbykevin.havoc.maze.MazeHelper.locateGoal;
+import static com.gamesbykevin.havoc.dungeon.DungeonHelper.DUNGEON_SIZE;
+import static com.gamesbykevin.havoc.dungeon.LeafHelper.LEAF_DIMENSION_MIN;
+import static com.gamesbykevin.havoc.texture.TextureHelper.addTextures;
 
 public class Level {
 
-    //how big is our maze
-    public static final int MAZE_COLS = 3;
-    public static final int MAZE_ROWS = 3;
-
-    //different maze generation algorithms
-    public static final int ALGORITHM_BINARY = 0;
-    public static final int ALGORITHM_ELLERS = 1;
-    public static final int ALGORITHM_HUNT = 2;
-    public static final int ALGORITHM_KRUSKAL = 3;
-    public static final int ALGORITHM_RECURSIVE = 4;
-    public static final int ALGORITHM_SIDEWINDER = 5;
-    public static final int ALGORITHM_ALDOUS = 6;
-
-    //our randomly created maze
-    private Maze maze;
+    //our randomly created dungeon
+    private Dungeon dungeon;
 
     //our 3d camera
     private PerspectiveCamera camera3d;
@@ -54,12 +39,6 @@ public class Level {
     //contain the floor / ceiling
     private List<DecalCustom> backgrounds;
 
-    //for collision detection
-    private boolean[][] walls;
-    private boolean[][] doors;
-    private boolean[][] free;
-    private boolean[][] locked;
-
     //contains our doors
     private Door[][] doorDecals;
 
@@ -72,30 +51,36 @@ public class Level {
     //items for pickup
     private Entities collectibles;
 
-    //the start of the maze
-    public static final int START_COL = 0;
-    public static final int START_ROW = 0;
-
-    //calculate path to a specified goal
-    private AStar aStar;
+    //how far away can we render?
+    public static final int RENDER_RANGE = LEAF_DIMENSION_MIN;
 
     public Level() {
 
-        //create our enemies container
-        getEnemies();
+        //create and generate the dungeon
+        this.dungeon = new Dungeon(DUNGEON_SIZE, DUNGEON_SIZE);
+        this.dungeon.generate();
+
+        //place some obstacles
+        getObstacles().spawn();
+
+        //and we add collectibles
+        getCollectibles().spawn();
+
+        //add enemies
+        getEnemies().spawn();
+
+        //add textures
+        addTextures(this);
 
         //set the start location
         resetPosition();
 
         //create the batch
         getDecalBatch();
-
-        //create aStar object
-        this.aStar = new AStar();
     }
 
-    public AStar getAStar() {
-        return this.aStar;
+    public Dungeon getDungeon() {
+        return this.dungeon;
     }
 
     public Entities getCollectibles() {
@@ -124,10 +109,6 @@ public class Level {
 
     public void resetPosition() {
         getCamera3d(true);
-    }
-
-    public Maze getMaze() {
-        return this.maze;
     }
 
     private DecalBatch getDecalBatch() {
@@ -171,94 +152,9 @@ public class Level {
     private Door[][] getDoorDecals() {
 
         if (this.doorDecals == null)
-            this.doorDecals = new Door[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
+            this.doorDecals = new Door[getDungeon().getRows()][getDungeon().getCols()];
 
         return doorDecals;
-    }
-
-    public void setWall(int col, int row, boolean value) {
-        getWalls()[row][col] = value;
-    }
-
-    public boolean hasWall(int col, int row) {
-        return hasValue(getWalls(), col, row);
-    }
-
-    private boolean[][] getWalls() {
-        return this.walls;
-    }
-
-
-    protected void setLocked(int col, int row, boolean value) {
-
-        if (row < 0 || row >= getLocked().length)
-            return;
-        if (col < 0 || col >= getLocked()[0].length)
-            return;
-
-        getLocked()[row][col] = value;
-    }
-
-    public boolean hasLocked(int col, int row) {
-        return hasValue(getLocked(), col, row);
-    }
-
-    private boolean[][] getLocked() {
-        return this.locked;
-    }
-
-    protected void setFree(int col, int row, boolean value) {
-
-        if (row < 0 || row >= getFree().length)
-            return;
-        if (col < 0 || col >= getFree()[0].length)
-            return;
-
-        getFree()[row][col] = value;
-    }
-
-    public boolean hasFree(int col, int row) {
-        return hasValue(getFree(), col, row);
-    }
-
-    private boolean[][] getFree() {
-        return this.free;
-    }
-
-    public void calculate() {
-
-        //make sure our map is set
-        getAStar().setMap(getFree());
-
-        int startCol = (getMaze().getStartCol() * ROOM_SIZE) + (ROOM_SIZE / 2);
-        int startRow = (getMaze().getStartRow() * ROOM_SIZE) + (ROOM_SIZE / 2);
-
-        int endCol = (getMaze().getGoalCol() * ROOM_SIZE) + (ROOM_SIZE / 2);
-        int endRow = (getMaze().getGoalRow() * ROOM_SIZE) + (ROOM_SIZE / 2) - 1;
-
-        getAStar().calculate(startCol, startRow, endCol, endRow);
-    }
-
-    public void setDoor(int col, int row, boolean value) {
-        getDoors()[row][col] = value;
-    }
-
-    public boolean hasDoor(int col, int row) {
-        return hasValue(getDoors(), col, row);
-    }
-
-    private boolean[][] getDoors() {
-        return this.doors;
-    }
-
-    private boolean hasValue(boolean[][] array, int col, int row) {
-
-        if (row < 0 || row >= array.length)
-            return false;
-        if (col < 0 || col >= array[0].length)
-            return false;
-
-        return array[row][col];
     }
 
     public PerspectiveCamera getCamera3d() {
@@ -281,99 +177,19 @@ public class Level {
             this.camera3d.update();
 
             //start where we marked start in our maze
-            float x = (START_COL * ROOM_SIZE) + (ROOM_SIZE / 2) + .5f;
-            float y = (START_ROW * ROOM_SIZE) + (ROOM_SIZE / 2) + .5f;
+            float x = getDungeon().getStartCol();
+            float y = getDungeon().getStartRow();
 
             //this.camera3d.position.set((ROOM_SIZE / 2) + .5f, (ROOM_SIZE / 2) + .5f,0);
             this.camera3d.position.set(x, y,0);
-            //this.camera3d.position.z = 1.50f;
+            this.camera3d.position.z = 1.50f;
             this.camera3d.rotate(Vector3.X, 90);
         }
 
         return this.camera3d;
     }
 
-    /**
-     * create a new maze
-     */
-    public void generateMaze() {
-
-        switch ((int)(Math.random() * 7)) {
-
-            case ALGORITHM_BINARY:
-                this.maze = new BinaryTree(MAZE_COLS, MAZE_ROWS);
-                break;
-
-            case ALGORITHM_ELLERS:
-                this.maze = new Ellers(MAZE_COLS, MAZE_ROWS);
-                break;
-
-            case ALGORITHM_HUNT:
-                this.maze = new HuntKill(MAZE_COLS, MAZE_ROWS);
-                break;
-
-            case ALGORITHM_KRUSKAL:
-                this.maze = new Kruskal(MAZE_COLS, MAZE_ROWS);
-                break;
-
-            case ALGORITHM_RECURSIVE:
-                this.maze = new Recursive(MAZE_COLS, MAZE_ROWS);
-                break;
-
-            case ALGORITHM_SIDEWINDER:
-                this.maze = new Sidewinder(MAZE_COLS, MAZE_ROWS);
-                break;
-
-            case ALGORITHM_ALDOUS:
-                this.maze = new AldousBroder(MAZE_COLS, MAZE_ROWS);
-                break;
-        }
-
-        //generate the maze
-        getMaze().generate();
-
-        //set the starting point
-        getMaze().setStartCol(START_COL);
-        getMaze().setStartRow(START_ROW);
-
-        //calculate cost
-        calculateCost(getMaze());
-
-        //locate the goal
-        locateGoal(getMaze());
-
-        //create the arrays for our collision detection etc...
-        this.walls = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
-        this.doors = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
-        this.free = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
-        this.locked = new boolean[(getMaze().getRows() * ROOM_SIZE) + 1][(getMaze().getCols() * ROOM_SIZE) + 1];
-
-        //default to false
-        for (int row = 0 ; row < getWalls().length; row++) {
-            for (int col = 0; col < getWalls()[0].length; col++) {
-                getWalls()[row][col] = false;
-                getDoors()[row][col] = false;
-                getFree()[row][col] = false;
-                getLocked()[row][col] = false;
-            }
-        }
-
-        //add the boundaries for our maze
-        setupBoundaries(this);
-
-        //add everything else
-        setupLevel(this);
-    }
-
-    private boolean hasRange(DecalCustom decal, float minCol, float maxCol, float minRow, float maxRow, float minColRoom, float maxColRoom, float minRowRoom, float maxRowRoom) {
-
-        //nw & sw
-        if (decal.getCol() < minColRoom && (decal.getRow() > maxRowRoom || decal.getRow() < minRowRoom))
-            return false;
-
-        //ne & se
-        if (decal.getCol() > maxColRoom && (decal.getRow() > maxRowRoom || decal.getRow() < minRowRoom))
-            return false;
+    private boolean hasRange(DecalCustom decal, float minCol, float maxCol, float minRow, float maxRow) {
 
         //west & east
         if (decal.getCol() < minCol || decal.getCol() > maxCol)
@@ -388,54 +204,43 @@ public class Level {
 
     private void drawDecals() {
 
-        //figure out which room we are in
-        int roomCol = (int)(getCamera3d().position.x / ROOM_SIZE);
-        int roomRow = (int)(getCamera3d().position.y / ROOM_SIZE);
-
-        //get the current room
-        Room room = getMaze().getRoom(roomCol, roomRow);
-
-        //get the bounds of the current room
-        int minColRoom = roomCol * ROOM_SIZE;
-        int maxColRoom = minColRoom + ROOM_SIZE;
-        int minRowRoom = roomRow * ROOM_SIZE;
-        int maxRowRoom = minRowRoom + ROOM_SIZE;
-
         //adjust the render range based on
-        float minCol = (room.hasWest()) ? minColRoom : (getCamera3d().position.x - RENDER_RANGE);
-        float maxCol = (room.hasEast()) ? maxColRoom : (getCamera3d().position.x + RENDER_RANGE);
-        float minRow = (room.hasSouth()) ? minRowRoom : (getCamera3d().position.y - RENDER_RANGE);
-        float maxRow = (room.hasNorth()) ? maxRowRoom : (getCamera3d().position.y + RENDER_RANGE);
-
-        //if the door is closed we don't need to render
-        if (!room.hasWest() && hasDoor(minColRoom, minRowRoom + (ROOM_SIZE / 2))) {
-            if (getDoorDecal(minColRoom, minRowRoom + (ROOM_SIZE / 2)).isClosed())
-                minCol = minColRoom;
-        }
-
-        if (!room.hasEast() && hasDoor(maxColRoom - 1, minRowRoom + (ROOM_SIZE / 2))) {
-            if (getDoorDecal(maxColRoom - 1,minRowRoom + (ROOM_SIZE / 2)).isClosed())
-                maxCol = maxColRoom;
-        }
-
-        if (!room.hasSouth() && hasDoor(minColRoom + (ROOM_SIZE / 2), minRowRoom)) {
-            if (getDoorDecal(minColRoom + (ROOM_SIZE / 2), minRowRoom).isClosed())
-                minRow = minRowRoom;
-        }
-
-        if (!room.hasNorth() && hasDoor(minColRoom + (ROOM_SIZE / 2), maxRowRoom - 1)) {
-            if (getDoorDecal(minColRoom + (ROOM_SIZE / 2), maxRowRoom - 1).isClosed())
-                maxRow = maxRowRoom;
-        }
+        float minCol = (getCamera3d().position.x - RENDER_RANGE);
+        float maxCol = (getCamera3d().position.x + RENDER_RANGE);
+        float minRow = (getCamera3d().position.y - RENDER_RANGE);
+        float maxRow = (getCamera3d().position.y + RENDER_RANGE);
 
         int count = 0;
+
+        for (int i = 0; i < getDungeon().getLeafs().size(); i++) {
+
+            Leaf leaf = getDungeon().getLeafs().get(i);
+
+            //skip if no room exists
+            if (leaf.getRoom() == null)
+                continue;
+
+            Room room = leaf.getRoom();
+
+            if (!room.contains((int)getCamera3d().position.x, (int)getCamera3d().position.y))
+                continue;
+
+            if (!room.hasNorthDoor(getDungeon()))
+                maxRow = room.getY() + room.getH();
+            if (!room.hasSouthDoor(getDungeon()))
+                minRow = room.getY();
+            if (!room.hasWestDoor(getDungeon()))
+                minCol = room.getX();
+            if (!room.hasEastDoor(getDungeon()))
+                maxCol = room.getX() + room.getW();
+        }
 
         for (int i = 0; i < getDecals().size(); i++) {
 
             DecalCustom decal = getDecals().get(i);
 
             //only render if in range
-            if (!hasRange(decal, minCol, maxCol, minRow, maxRow, minColRoom, maxColRoom, minRowRoom, maxRowRoom))
+            if (!hasRange(decal, minCol, maxCol, minRow, maxRow))
                 continue;
 
             if (decal.isBillboard())
@@ -449,9 +254,8 @@ public class Level {
         for (int i = 0; i < getBackgrounds().size(); i++) {
             DecalCustom decal = getBackgrounds().get(i);
 
-            if (decal.getCol() < getCamera3d().position.x - RENDER_RANGE || decal.getCol() > getCamera3d().position.x + RENDER_RANGE)
-                continue;
-            if (decal.getRow() < getCamera3d().position.y - RENDER_RANGE || decal.getRow() > getCamera3d().position.y + RENDER_RANGE)
+            //only render if in range
+            if (!hasRange(decal, minCol - RENDER_RANGE, maxCol + RENDER_RANGE, minRow - RENDER_RANGE, maxRow + RENDER_RANGE))
                 continue;
 
             count++;
@@ -467,7 +271,7 @@ public class Level {
                     continue;
 
                 //only render if in range
-                if (!hasRange(decal, minCol, maxCol, minRow, maxRow, minColRoom, maxColRoom, minRowRoom, maxRowRoom))
+                if (!hasRange(decal, minCol, maxCol, minRow, maxRow))
                     continue;
 
                 if (decal.isBillboard())
@@ -487,7 +291,7 @@ public class Level {
         //render the collectibles
         count += getCollectibles().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
 
-        //System.out.println("decal count: " + count);
+        System.out.println("decal count: " + count);
 
         //call flush at the end to draw
         getDecalBatch().flush();

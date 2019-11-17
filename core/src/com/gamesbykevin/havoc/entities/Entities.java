@@ -3,13 +3,15 @@ package com.gamesbykevin.havoc.entities;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.gamesbykevin.havoc.dungeon.Cell;
+import com.gamesbykevin.havoc.dungeon.Leaf;
+import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.level.Level;
-import com.gamesbykevin.havoc.maze.Location;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gamesbykevin.havoc.level.LevelHelper.RENDER_RANGE;
+import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
 
 public abstract class Entities {
 
@@ -63,31 +65,44 @@ public abstract class Entities {
         getEntityList().add(entity);
     }
 
-    //add to the list at the specified location
-    protected void add(Entity entity, Location location) {
-        add(entity, location.col, location.row);
+    protected List<Cell> getLocationOptions(Room room) {
+
+        List<Cell> options = new ArrayList<>();
+
+        //check the cells in the room
+        for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
+            for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
+
+                if (hasEntityLocation(col, row))
+                    continue;
+
+                //add to the list of options
+                options.add(getLevel().getDungeon().getCells()[row][col]);
+            }
+        }
+
+        //return our list of options
+        return options;
     }
 
     //do we have collision with any of the objects
     public abstract boolean hasCollision(float x, float y);
 
-    protected boolean hasEntityLocation(Location location) {
-        return hasEntityLocation(location.col, location.row);
-    }
-
     //check if we have collision with any of our entity lists
     protected boolean hasEntityLocation(float col, float row) {
 
-        if (getLevel().getCollectibles().hasCollision(col, row))
-            return true;
-        if (getLevel().getEnemies().hasCollision(col, row))
-            return true;
         if (getLevel().getObstacles().hasCollision(col, row))
             return true;
-        if (getLevel().hasDoor((int)col, (int)row))
+        if (!getLevel().getDungeon().hasMap((int)col, (int)row))
             return true;
-        if (!getLevel().hasFree((int)col, (int)row))
+        if (getLevel().getDungeon().hasInteract((int)col, (int)row))
             return true;
+        if (getLevel().getCollectibles().hasCollision(col, row))
+            return true;
+        /*
+        if (getLevel().getEnemies().hasCollision(col, row))
+            return true;
+        */
 
         //this location is not used
         return false;
@@ -116,7 +131,7 @@ public abstract class Entities {
                 continue;
 
             //if entity is not close enough we won't render
-            if (getDistance(entity, camera3d.position) >= (RENDER_RANGE / 2))
+            if (getDistance(entity, camera3d.position) > RENDER_RANGE)
                 continue;
 
             //render like a billboard

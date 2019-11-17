@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Background extends DecalCustom {
 
-    public static final float TEXTURE_WIDTH = 32;
-    public static final float TEXTURE_HEIGHT = 32;
+    public static final float TEXTURE_WIDTH = 16;
+    public static final float TEXTURE_HEIGHT = 16;
 
     public Background(TextureRegion texture, Side side) {
         super(texture, Type.Background, side, TEXTURE_WIDTH, TEXTURE_HEIGHT);
@@ -20,7 +20,7 @@ public class Background extends DecalCustom {
         Background decal = new Background(texture, null);
         decal.setCol((int)col);
         decal.setRow((int)row);
-        decal.getDecal().setPosition(col, row, (floor) ? -.5f : .5f);
+        decal.getDecal().setPosition(col + .5f, row + .5f, (floor) ? -.5f : .5f);
         return decal;
     }
 }
