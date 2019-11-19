@@ -74,7 +74,7 @@ public final class Collectibles extends Entities {
         collectibles.add(Type.shotgun);
 
         int countAmmo = 0;
-        int countAmmCrate = 0;
+        int countAmmoCrate = 0;
         int countHealthSmall = 0;
         int countHealthLarge = 0;
 
@@ -94,6 +94,12 @@ public final class Collectibles extends Entities {
             List<Cell> options = getLocationOptions(leaf.getRoom());
 
             int count = 0;
+
+            //only allow once per room
+            int countRoomAmmo = 0;
+            int countRoomAmmoCrate = 0;
+            int countRoomHealthSmall = 0;
+            int countRoomHealthLarge = 0;
 
             //pick random number of enemies
             int limit = getRandom().nextInt(COLLECTIBLES_PER_ROOM_MAX) + 1;
@@ -133,31 +139,46 @@ public final class Collectibles extends Entities {
                             break;
 
                         case ammo:
-                            countAmmo++;
+                            countRoomAmmo++;
 
-                            if (countAmmo >= MAX_AMMO)
-                                collectibles.remove(collectibleIndex);
+                            if (countRoomAmmo <= 1) {
+                                countAmmo++;
+                                if (countAmmo >= MAX_AMMO)
+                                    collectibles.remove(collectibleIndex);
+                            }
                             break;
 
                         case ammo_crate:
-                            countAmmCrate++;
+                            countRoomAmmoCrate++;
 
-                            if (countAmmCrate >= MAX_AMMO_CRATE)
-                                collectibles.remove(collectibleIndex);
+                            if (countRoomAmmoCrate <= 1) {
+                                countAmmoCrate++;
+
+                                if (countAmmoCrate >= MAX_AMMO_CRATE)
+                                    collectibles.remove(collectibleIndex);
+                            }
                             break;
 
                         case health_small:
-                            countHealthSmall++;
+                            countRoomHealthSmall++;
 
-                            if (countHealthSmall >= MAX_HEALTH_SMALL)
-                                collectibles.remove(collectibleIndex);
+                            if (countRoomHealthSmall <= 1) {
+                                countHealthSmall++;
+
+                                if (countHealthSmall >= MAX_HEALTH_SMALL)
+                                    collectibles.remove(collectibleIndex);
+                            }
                             break;
 
                         case health_large:
-                            countHealthLarge++;
+                            countRoomHealthLarge++;
 
-                            if (countHealthLarge >= MAX_HEALTH_LARGE)
-                                collectibles.remove(collectibleIndex);
+                            if (countRoomHealthLarge <= 1) {
+                                countHealthLarge++;
+
+                                if (countHealthLarge >= MAX_HEALTH_LARGE)
+                                    collectibles.remove(collectibleIndex);
+                            }
                             break;
                     }
 
@@ -213,7 +234,7 @@ public final class Collectibles extends Entities {
             Entity entity = getEntityList().get(i);
 
             //update the entity
-            entity.update(camera3d);
+            entity.update(getLevel());
 
             //don't render if not solid
             if (!entity.isSolid())

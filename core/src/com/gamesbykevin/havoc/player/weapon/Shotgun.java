@@ -11,7 +11,7 @@ public class Shotgun extends Weapon {
     private static final String FILE_NAME = "shotgun_f";
     private static final String EXTENSION = ".png";
 
-    private static final float DEFAULT_DAMAGE = 51f;
+    private static final float DEFAULT_DAMAGE = 75f;
 
     private static final float DEFAULT_RANGE = 8f;
 

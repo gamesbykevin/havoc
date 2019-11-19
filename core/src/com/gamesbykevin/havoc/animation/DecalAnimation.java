@@ -28,7 +28,7 @@ public class DecalAnimation extends Animation {
 
         //load the textures
         for (int i = 0; i < getDecals().length; i++) {
-            Texture texture = new Texture(Gdx.files.internal(path + filename + (startIndex + (i+1)) + extension));
+            Texture texture = new Texture(Gdx.files.internal(path + filename + (startIndex + i) + extension));
             getDecals()[i] = Decal.newDecal(DEFAULT_WIDTH, DEFAULT_HEIGHT, new TextureRegion(texture), true);
         }
     }

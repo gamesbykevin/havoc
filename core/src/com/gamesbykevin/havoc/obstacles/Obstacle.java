@@ -1,8 +1,8 @@
 package com.gamesbykevin.havoc.obstacles;
 
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
 import com.gamesbykevin.havoc.entities.Entity;
+import com.gamesbykevin.havoc.level.Level;
 
 public final class Obstacle extends Entity {
 
@@ -44,7 +44,7 @@ public final class Obstacle extends Entity {
     }
 
     @Override
-    public void update(PerspectiveCamera camera3d) {
+    public void update(Level level) {
         //do we need to do anything here
     }
 

@@ -56,7 +56,7 @@ public final class Obstacles extends Entities {
             addLights(leaf.getRoom());
 
             //add items on the 4 corners
-            addCorners(leaf.getRoom());
+            //addCorners(leaf.getRoom());
 
             //assign random type next to the walls
             if (getRandom().nextBoolean())
@@ -105,16 +105,7 @@ public final class Obstacles extends Entities {
 
         int size = (room.getW() > room.getH()) ? (room.getW() / 2) : (room.getH() / 2);
 
-        for (int offset = 0; offset <= size; offset++) {
-
-            if (hasEntityLocation(room.getX() + offset, room.getY() + offset))
-                continue;
-            if (hasEntityLocation(room.getX() + offset, room.getY() + room.getH() - offset))
-                continue;
-            if (hasEntityLocation(room.getX() + room.getW() - offset, room.getY() + offset))
-                continue;
-            if (hasEntityLocation(room.getX() + room.getW() - offset, room.getY() + room.getH() - offset))
-                continue;
+        for (int offset = 2; offset <= size; offset++) {
 
             add(room.getX() + offset, room.getY() + offset);
             add(room.getX() + offset, room.getY() + room.getH() - offset);
@@ -142,8 +133,7 @@ public final class Obstacles extends Entities {
                     if (col % frequency == 0)
                         continue;
 
-                    if (!hasEntityLocation(col, middleRow))
-                        add(new Obstacle(), col, middleRow);
+                    add(col, middleRow);
                 }
                 break;
 
@@ -153,8 +143,7 @@ public final class Obstacles extends Entities {
                     if (row % frequency == 0)
                         continue;
 
-                    if (!hasEntityLocation(middleCol, row))
-                        add(new Obstacle(), middleCol, row);
+                    add(middleCol, row);
                 }
                 break;
 
@@ -165,8 +154,7 @@ public final class Obstacles extends Entities {
                         if (col % frequency != 0 || row % frequency != 0)
                             continue;
 
-                        if (!hasEntityLocation(col, row))
-                            add(new Obstacle(), col, row);
+                        add(col, row);
                     }
                 }
                 break;
@@ -177,8 +165,7 @@ public final class Obstacles extends Entities {
                     if (col % frequency == 0)
                         continue;
 
-                    if (!hasEntityLocation(col, middleRow))
-                        add(new Obstacle(), col, middleRow);
+                    add(col, middleRow);
                 }
 
                 for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
@@ -186,21 +173,16 @@ public final class Obstacles extends Entities {
                     if (row % frequency == 0)
                         continue;
 
-                    if (!hasEntityLocation(middleCol, row))
-                        add(new Obstacle(), middleCol, row);
+                    add(middleCol, row);
                 }
                 break;
 
             case 4:
                 int offset = 4;
-                if (!hasEntityLocation(room.getX() + offset, room.getY() + offset))
-                    add(new Obstacle(), room.getX() + offset, room.getY() + offset);
-                if (!hasEntityLocation(room.getX() + (room.getW() - 1) - offset, room.getY() + (room.getH() - 1) - offset))
-                    add(new Obstacle(), room.getX() + (room.getW() - 1) - offset, room.getY() + (room.getH() - 1) - offset);
-                if (!hasEntityLocation(room.getX() + (room.getW() - 1) - offset, room.getY() + offset))
-                    add(new Obstacle(), room.getX() + (room.getW() - 1) - offset, room.getY() + offset);
-                if (!hasEntityLocation(room.getX() + offset, room.getY() + (room.getH() - 1) - offset))
-                    add(new Obstacle(), room.getX() + offset, room.getY() + (room.getH() - 1) - offset);
+                add(room.getX() + offset, room.getY() + offset);
+                add(room.getX() + (room.getW() - 1) - offset, room.getY() + (room.getH() - 1) - offset);
+                add(room.getX() + (room.getW() - 1) - offset, room.getY() + offset);
+                add(room.getX() + offset, room.getY() + (room.getH() - 1) - offset);
                 break;
         }
     }
@@ -247,6 +229,7 @@ public final class Obstacles extends Entities {
             return;
         if (nearInteract(col, row))
             return;
+
         add(new Obstacle(), col, row);
     }
 

@@ -2,10 +2,12 @@ package com.gamesbykevin.havoc.enemies;
 
 import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.dungeon.Leaf;
+import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.level.Level;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
@@ -14,7 +16,7 @@ import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
 public final class Enemies extends Entities {
 
     //how many enemies in each room
-    public static final int ENEMIES_PER_ROOM_MAX = 4;
+    public static final int ENEMIES_PER_ROOM_MAX = 3;
 
     public Enemies(Level level) {
         super(level);
@@ -46,6 +48,10 @@ public final class Enemies extends Entities {
         //list of valid leaves for spawning
         List<Leaf> leaves = getLeafRooms(getLevel().getDungeon());
 
+        //make sure map is updated and we won't allow diagonal movement
+        getLevel().getDungeon().updateMap();
+        getLevel().getDungeon().getAStar().setDiagonal(false);
+
         while (!leaves.isEmpty()) {
 
             int randomIndex = getRandom().nextInt(leaves.size());
@@ -56,7 +62,10 @@ public final class Enemies extends Entities {
             //remove from the list
             leaves.remove(randomIndex);
 
-            List<Cell> options = getLocationOptions(leaf.getRoom());
+            List<Cell> options = getLocationOptions(leaf.getRoom(), null);
+
+            int middleCol = leaf.getRoom().getX() + (leaf.getRoom().getW() / 2);
+            int middleRow = leaf.getRoom().getY() + (leaf.getRoom().getH() / 2);
 
             int count = 0;
 
@@ -69,18 +78,66 @@ public final class Enemies extends Entities {
                 //pick random index
                 int index = getRandom().nextInt(options.size());
 
-                //get the location
+                //get the random location
                 Cell location = options.get(index);
 
-                //check if there are any other items
-                if (!hasEntityLocation(location.getCol(), location.getRow())) {
+                //what type of enemy are we creating
+                Enemy.TYPE = Enemy.Type.values()[getRandom().nextInt(Enemy.Type.values().length)];
 
-                    //add enemy at the location
-                    add(new Enemy(), location.getCol(), location.getRow());
+                //create our enemy
+                Enemy enemy = new Enemy(location.getCol(), location.getRow());
 
-                    //increase the count
-                    count++;
+                //start the enemy out as idle
+                enemy.setIndex(Enemy.INDEX_IDLE_E);
+
+                //change the facing direction
+                if (location.getCol() < middleCol) {
+                    enemy.setDirection(Enemy.DIRECTION_E);
+                } else if (location.getCol() > middleCol) {
+                    enemy.setDirection(Enemy.DIRECTION_W);
+                } else {
+                    if (location.getRow() < middleRow) {
+                        enemy.setDirection(Enemy.DIRECTION_N);
+                    } else {
+                        enemy.setDirection(Enemy.DIRECTION_S);
+                    }
                 }
+
+                //determine at random if the enemy will patrol the room
+                if (getRandom().nextBoolean()) {
+
+                    int size = 0;
+
+                    //pick random location in the room for the enemy to walk to
+                    List<Cell> tmpList = getLocationOptions(leaf.getRoom(), location);
+
+                    Cell winner = null;
+
+                    //pick the location furthest away
+                    for (int i = 0; i < tmpList.size(); i++) {
+
+                        Cell tmp = tmpList.get(i);
+                        getLevel().getDungeon().getAStar().calculate(location.getCol(), location.getRow(), tmp.getCol(), tmp.getRow());
+
+                        if (getLevel().getDungeon().getAStar().getPath().size() > size) {
+                            size = getLevel().getDungeon().getAStar().getPath().size();
+                            winner = tmp;
+                        }
+                    }
+
+                    tmpList.clear();
+                    tmpList = null;
+
+                    //set the path to the target
+                    getLevel().getDungeon().getAStar().calculate(location.getCol(), location.getRow(), winner.getCol(), winner.getRow());
+                    enemy.setPathTarget(getLevel().getDungeon().getAStar().getPath());
+                }
+
+                //add enemy at the location
+                add(enemy, enemy.getStartCol(), enemy.getStartRow());
+
+                //increase the count
+                count++;
 
                 //remove the option from the list
                 options.remove(index);
@@ -90,5 +147,51 @@ public final class Enemies extends Entities {
             options.clear();
             options = null;
         }
+    }
+
+    protected List<Cell> getLocationOptions(Room room, Cell target) {
+
+        List<Cell> options = new ArrayList<>();
+
+        //all 4 sides
+        for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
+            add(options, getLevel().getDungeon().getCells()[room.getY() + 1][col], target);
+            add(options, getLevel().getDungeon().getCells()[room.getY() + room.getH() - 2][col], target);
+        }
+
+        for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
+            add(options, getLevel().getDungeon().getCells()[row][room.getX() + 1], target);
+            add(options, getLevel().getDungeon().getCells()[row][room.getX() + room.getW() - 2], target);
+        }
+
+
+        //north south east west
+        add(options, getLevel().getDungeon().getCells()[room.getY() + (room.getH() / 2)][room.getX() + 2], target);
+        add(options, getLevel().getDungeon().getCells()[room.getY() + (room.getH() / 2)][room.getX() + room.getW() - 3], target);
+        add(options, getLevel().getDungeon().getCells()[room.getY() + 2][room.getX() + (room.getW() / 2)], target);
+        add(options, getLevel().getDungeon().getCells()[room.getY() + room.getH() - 3][room.getX() + (room.getW() / 2)], target);
+
+        //4 corners inner
+        for (int i = 2; i < (room.getW() / 2); i++) {
+            add(options, getLevel().getDungeon().getCells()[room.getY() + i][room.getX() + i], target);
+            add(options, getLevel().getDungeon().getCells()[room.getY() + room.getH() - i - 1][room.getX() + i], target);
+            add(options, getLevel().getDungeon().getCells()[room.getY() + i][room.getX() + room.getW() - i - 1], target);
+            add(options, getLevel().getDungeon().getCells()[room.getY() + room.getH() - i - 1][room.getX() + room.getW() - i - 1], target);
+        }
+
+        //center
+        add(options, getLevel().getDungeon().getCells()[room.getY() + (room.getH() / 2)][room.getX() + (room.getW() / 2)], target);
+
+        //return our options
+        return options;
+    }
+
+    private void add(List<Cell> options, Cell option, Cell target) {
+
+        if (target != null && (option.getCol() == target.getCol() && option.getRow() == target.getRow()))
+            return;
+
+        if (!hasEntityLocation(option.getCol(), option.getRow()))
+            options.add(option);
     }
 }

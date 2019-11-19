@@ -11,7 +11,7 @@ public class Glock extends Weapon {
     private static final String FILE_NAME = "glock_handgun_f";
     private static final String EXTENSION = ".png";
 
-    private static final float DEFAULT_DAMAGE = 10f;
+    private static final float DEFAULT_DAMAGE = 33f;
 
     private static final float DEFAULT_RANGE = 30f;
 

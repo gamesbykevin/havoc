@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.dungeon.Cell;
-import com.gamesbykevin.havoc.dungeon.Leaf;
 import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.level.Level;
 
@@ -21,8 +20,8 @@ public abstract class Entities {
     //store reference to the level
     private final Level level;
 
-    //we offset the position
-    public static final float OFFSET = .5f;
+    //offset the texture to render correctly
+    public static final float OFFSET = 0.5f;
 
     public Entities(Level level) {
         this.level = level;
@@ -59,9 +58,9 @@ public abstract class Entities {
     public abstract void spawn();
 
     protected void add(Entity entity, float col, float row) {
-        entity.setCol(col + OFFSET);
-        entity.setRow(row + OFFSET);
-        entity.getAnimation().setPosition(entity.getCol(), entity.getRow(), 0);
+        entity.setCol(col);
+        entity.setRow(row);
+        entity.getAnimation().setPosition(entity.getCol() + OFFSET, entity.getRow() + OFFSET, 0);
         getEntityList().add(entity);
     }
 
@@ -99,10 +98,8 @@ public abstract class Entities {
             return true;
         if (getLevel().getCollectibles().hasCollision(col, row))
             return true;
-        /*
         if (getLevel().getEnemies().hasCollision(col, row))
             return true;
-        */
 
         //this location is not used
         return false;
@@ -119,7 +116,7 @@ public abstract class Entities {
             Entity entity = getEntityList().get(i);
 
             //update the entity
-            entity.update(camera3d);
+            entity.update(getLevel());
 
             //get the position of the entity
             Vector3 position = entity.getAnimation().getDecal().getPosition();

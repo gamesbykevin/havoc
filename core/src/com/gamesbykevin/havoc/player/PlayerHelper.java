@@ -141,6 +141,9 @@ public class PlayerHelper {
 
     protected static void checkCollision(MyController controller) {
 
+        if (1==1)
+            return;
+
         //reset position if there is a collision
         if (checkCollision(controller, controller.getPreviousPosition().x, controller.getCamera3d().position.y))
             controller.getCamera3d().position.y = controller.getPreviousPosition().y;

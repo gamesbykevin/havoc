@@ -57,11 +57,14 @@ public class Level {
     public Level() {
 
         //create and generate the dungeon
-        this.dungeon = new Dungeon(DUNGEON_SIZE, DUNGEON_SIZE);
-        this.dungeon.generate();
+        this.dungeon = new Dungeon(this, DUNGEON_SIZE, DUNGEON_SIZE);
+        getDungeon().generate();
 
         //place some obstacles
         getObstacles().spawn();
+
+        //update the map again based on the obstacles we just spawned
+        getDungeon().updateMap();
 
         //and we add collectibles
         getCollectibles().spawn();
@@ -291,7 +294,7 @@ public class Level {
         //render the collectibles
         count += getCollectibles().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
 
-        System.out.println("decal count: " + count);
+        //System.out.println("decal count: " + count);
 
         //call flush at the end to draw
         getDecalBatch().flush();

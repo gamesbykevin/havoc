@@ -1,8 +1,8 @@
 package com.gamesbykevin.havoc.collectables;
 
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
 import com.gamesbykevin.havoc.entities.Entity;
+import com.gamesbykevin.havoc.level.Level;
 
 public final class Collectible extends Entity {
 
@@ -38,7 +38,7 @@ public final class Collectible extends Entity {
     }
 
     @Override
-    public void update(PerspectiveCamera camera3d) {
+    public void update(Level level) {
         //don't do anything here
     }
 

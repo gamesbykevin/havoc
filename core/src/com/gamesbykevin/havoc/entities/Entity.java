@@ -3,6 +3,7 @@ package com.gamesbykevin.havoc.entities;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
+import com.gamesbykevin.havoc.level.Level;
 
 import static com.gamesbykevin.havoc.entities.Entities.getDistance;
 
@@ -76,7 +77,7 @@ public abstract class Entity {
     public abstract void reset();
 
     //logic to update the entity
-    public abstract void update(PerspectiveCamera camera3d);
+    public abstract void update(Level level);
 
     //create the animations for the entity
     public abstract void createAnimations();

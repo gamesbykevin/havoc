@@ -11,7 +11,7 @@ public class Magnum extends Weapon {
     private static final String FILE_NAME = "magnum_f";
     private static final String EXTENSION = ".png";
 
-    private static final float DEFAULT_DAMAGE = 20f;
+    private static final float DEFAULT_DAMAGE = 50f;
 
     private static final float DEFAULT_RANGE = 30f;
 

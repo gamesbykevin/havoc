@@ -152,6 +152,10 @@ public class WeaponHelper {
                     //get our enemy
                     Enemy enemy = (Enemy)entity;
 
+                    //the enemy is hurting
+                    enemy.setIndex(Enemy.INDEX_PAIN);
+                    enemy.getAnimation().reset();
+
                     //deduct the enemies health
                     enemy.setHealth(enemy.getHealth() - weapon.getDamage());
                     return;

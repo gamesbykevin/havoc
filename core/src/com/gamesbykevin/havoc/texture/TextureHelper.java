@@ -162,7 +162,7 @@ public class TextureHelper {
                     case Wall:
                         TextureRegion texture = (goal) ? getWallGoal() : textures.get(current.getId());
 
-                        if (col > 0 && dungeon.hasMap(col - 1, row)) {
+                        if (col > 0 && (dungeon.hasMap(col - 1, row) || dungeon.getLevel().getObstacles().hasCollision(col - 1, row))) {
                             Cell west = dungeon.getCells()[row][col - 1];
                             if (west.getType() == Cell.Type.Door) {
                                 level.getDecals().add(DecalCustom.createDecalWall(col, row, getTextureSide(), Side.West));
@@ -175,7 +175,7 @@ public class TextureHelper {
                             }
                         }
 
-                        if (col < dungeon.getCols() - 1 && dungeon.hasMap(col + 1, row)) {
+                        if (col < dungeon.getCols() - 1 && (dungeon.hasMap(col + 1, row) || dungeon.getLevel().getObstacles().hasCollision(col + 1, row))) {
                             Cell east = dungeon.getCells()[row][col + 1];
                             if (east.getType() == Cell.Type.Door) {
                                 level.getDecals().add(DecalCustom.createDecalWall(col, row, getTextureSide(), Side.East));
@@ -188,7 +188,7 @@ public class TextureHelper {
                             }
                         }
 
-                        if (row > 0 && dungeon.hasMap(col, row - 1)) {
+                        if (row > 0 && (dungeon.hasMap(col, row - 1) || dungeon.getLevel().getObstacles().hasCollision(col, row - 1))) {
                             Cell south = dungeon.getCells()[row - 1][col];
                             if (south.getType() == Cell.Type.Door) {
                                 level.getDecals().add(DecalCustom.createDecalWall(col, row, getTextureSide(), Side.South));
@@ -201,7 +201,7 @@ public class TextureHelper {
                             }
                         }
 
-                        if (row < dungeon.getRows() - 1 && dungeon.hasMap(col, row + 1)) {
+                        if (row < dungeon.getRows() - 1 && (dungeon.hasMap(col, row + 1) || dungeon.getLevel().getObstacles().hasCollision(col, row + 1))) {
                             Cell north = dungeon.getCells()[row + 1][col];
                             if (north.getType() == Cell.Type.Door) {
                                 level.getDecals().add(DecalCustom.createDecalWall(col, row, getTextureSide(), Side.North));

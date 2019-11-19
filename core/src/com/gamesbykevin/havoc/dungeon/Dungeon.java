@@ -2,13 +2,13 @@ package com.gamesbykevin.havoc.dungeon;
 
 import com.gamesbykevin.havoc.astar.AStar;
 import com.gamesbykevin.havoc.dungeon.Cell.Type;
+import com.gamesbykevin.havoc.level.Level;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import static com.gamesbykevin.havoc.dungeon.DungeonHelper.*;
-import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MIN;
 
 public class Dungeon {
 
@@ -39,7 +39,13 @@ public class Dungeon {
     //which leaf is the goal contained within
     private int goalLeafIndex = -1;
 
-    public Dungeon(int cols, int rows) {
+    //reference to our level
+    private final Level level;
+
+    public Dungeon(Level level, int cols, int rows) {
+
+        //store the reference to our level
+        this.level = level;
 
         //object used for path finding
         this.aStar = new AStar();
@@ -180,7 +186,7 @@ public class Dungeon {
     }
 
     //mark where the player can go and where the obstacles are
-    protected void updateMap() {
+    public void updateMap() {
 
         for (int row = 0; row < getRows(); row++) {
             for (int col = 0; col < getCols(); col++) {
@@ -209,6 +215,10 @@ public class Dungeon {
                         getInteract()[row][col] = false;
                         break;
                 }
+
+                //if obstacles exist
+                if (getLevel().getObstacles() != null && getLevel().getObstacles().hasCollision(col, row))
+                    getMap()[row][col] = false;
             }
         }
 
@@ -402,5 +412,9 @@ public class Dungeon {
             //System.out.println(line);
             System.out.println();
         }
+    }
+
+    public Level getLevel() {
+        return this.level;
     }
 }

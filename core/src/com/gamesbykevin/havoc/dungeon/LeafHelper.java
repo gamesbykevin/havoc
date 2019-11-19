@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
+import static com.gamesbykevin.havoc.entities.Entities.getDistance;
 
 public class LeafHelper {
 
@@ -147,10 +148,6 @@ public class LeafHelper {
 
     protected static double getDistanceHorizontal(Room west, Room east) {
         return getDistance(west.getX(), west.getY() + (west.getH() / 2), east.getX() + east.getW() - 1, east.getY() + (east.getH() / 2));
-    }
-
-    protected static double getDistance(int x1, int y1, int x2, int y2) {
-        return Math.sqrt(((y2 - y1) * (y2 - y1)) + ((x2 - x1) * (x2 - x1)));
     }
 
     public static List<Leaf> getLeafRooms(Dungeon dungeon) {
