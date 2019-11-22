@@ -2,7 +2,11 @@ package com.gamesbykevin.havoc.dungeon;
 
 import com.gamesbykevin.havoc.dungeon.Cell.Type;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
+import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
 
 public class RoomHelper {
 
@@ -397,6 +401,95 @@ public class RoomHelper {
                 dungeon.getCells()[row][col].setType(Type.Wall);
             col++;
         }
+    }
+
+    protected static void createSecrets(Dungeon dungeon) {
+
+        //get a list of leaves
+        List<Leaf> leaves = getLeafRooms(dungeon);
+
+        for (int i = 0; i < leaves.size(); i++) {
+
+            Leaf leaf = leaves.get(i);
+
+            List<Cell> doors = getDoors(dungeon, leaf.getRoom());
+
+            //we will only make a room a secret if it has only 1 door
+            if (doors.size() > 1)
+                continue;
+
+            //room only has 1 door so let's get it
+            Cell door = doors.get(0);
+
+            Room room = null;
+
+            //find the connected room
+            for (int x = 0; x < leaves.size(); x++) {
+
+                if (i == x)
+                    continue;
+
+                //get the room
+                Room tmp = leaves.get(x).getRoom();
+
+                if (dungeon.getCells()[tmp.getY()][tmp.getX()].hasId(door.getLink().getId())) {
+                    room = tmp;
+                    break;
+                }
+            }
+
+            if (room != null) {
+                //check the room we are linked to, in order to get the linked door
+                Cell linkedDoor = getLinkedDoor(dungeon, room, door);
+
+                //mark this door as a secret
+                if (linkedDoor != null)
+                    linkedDoor.setType(Type.Secret);
+            }
+        }
+    }
+
+    protected static Cell getLinkedDoor(Dungeon dungeon, Room room, Cell door) {
+
+        for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
+            for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
+
+                //only check the edges for doors
+                if (col != room.getX() && col != room.getX() + room.getW() - 1 && row != room.getY() && row != room.getY() + room.getH() - 1)
+                    continue;
+
+                Cell cell = dungeon.getCells()[row][col];
+
+                //any of these are doors
+                if (cell.isDoor()) {
+                    if (cell.hasId(door.getLink().getId()) && door.hasId(cell.getLink().getId()))
+                        return cell;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static List<Cell> getDoors(Dungeon dungeon, Room room) {
+
+        List<Cell> doors = new ArrayList<>();
+
+        for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
+            for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
+
+                //only check the edges for doors
+                if (col != room.getX() && col != room.getX() + room.getW() - 1 && row != room.getY() && row != room.getY() + room.getH() - 1)
+                    continue;
+
+                Cell cell = dungeon.getCells()[row][col];
+
+                if (cell.isDoor())
+                    doors.add(cell);
+            }
+        }
+
+        return doors;
     }
 
     private static int getRowN(Room room) {

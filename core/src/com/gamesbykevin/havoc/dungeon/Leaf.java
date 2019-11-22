@@ -115,10 +115,6 @@ public class Leaf {
         this.parentId = parentId;
     }
 
-    public void setParentId(Leaf leaf) {
-        setParentId(leaf.getId());
-    }
-
     public boolean hasId(Leaf leaf) {
         return hasId(leaf.getId());
     }

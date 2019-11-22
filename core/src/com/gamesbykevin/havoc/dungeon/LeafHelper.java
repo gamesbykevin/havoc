@@ -88,7 +88,7 @@ public class LeafHelper {
     //here we check our neighbors to determine if a door can be placed here
     protected static boolean isDoorValid(Dungeon dungeon, Cell cell) {
 
-        if (cell.getType() != Cell.Type.Wall)
+        if (!cell.isWall())
             return false;
 
         if (cell.getCol() <= 0 || cell.getCol() >= dungeon.getCols() - 1)
@@ -98,9 +98,9 @@ public class LeafHelper {
 
         boolean valid = false;
 
-        if (dungeon.getCells()[cell.getRow()][cell.getCol() - 1].getType() == Cell.Type.Wall && dungeon.getCells()[cell.getRow()][cell.getCol() + 1].getType() == Cell.Type.Wall)
+        if (dungeon.getCells()[cell.getRow()][cell.getCol() - 1].isWall() && dungeon.getCells()[cell.getRow()][cell.getCol() + 1].isWall())
             valid = true;
-        if (dungeon.getCells()[cell.getRow() - 1][cell.getCol()].getType() == Cell.Type.Wall && dungeon.getCells()[cell.getRow() + 1][cell.getCol()].getType() == Cell.Type.Wall)
+        if (dungeon.getCells()[cell.getRow() - 1][cell.getCol()].isWall() && dungeon.getCells()[cell.getRow() + 1][cell.getCol()].isWall())
             valid = true;
 
         if (!valid)
@@ -122,15 +122,10 @@ public class LeafHelper {
                     continue;
 
                 //count the open and wall #
-                switch (tmp.getType()) {
-
-                    case Open:
-                        countOpen++;
-                        break;
-
-                    case Wall:
-                        countWall++;
-                        break;
+                if (tmp.isOpen()) {
+                    countOpen++;
+                } else if (tmp.isWall()) {
+                    countWall++;
                 }
             }
         }
@@ -160,7 +155,7 @@ public class LeafHelper {
             Leaf leaf = dungeon.getLeafs().get(i);
 
             //only want leafs containing rooms
-            if (leaf.getRoom() == null)
+            if (leaf.hasChildren() || leaf.getRoom() == null)
                 continue;
 
             //skip the starting room
@@ -177,5 +172,19 @@ public class LeafHelper {
 
         //return our list
         return leaves;
+    }
+
+    protected static Leaf getLeaf(Dungeon dungeon, String id) {
+
+        for (int i = 0; i < dungeon.getLeafs().size(); i++) {
+
+            Leaf leaf = dungeon.getLeafs().get(i);
+
+            if (leaf.hasId(id))
+                return leaf;
+        }
+
+        //leaf not found
+        return null;
     }
 }

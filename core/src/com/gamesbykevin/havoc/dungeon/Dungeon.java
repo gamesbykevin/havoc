@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 import static com.gamesbykevin.havoc.dungeon.DungeonHelper.*;
+import static com.gamesbykevin.havoc.dungeon.RoomHelper.createSecrets;
 
 public class Dungeon {
 
@@ -100,6 +101,9 @@ public class Dungeon {
         //update the map
         updateMap();
 
+        //now let's see if we can create a secret room
+        createSecrets(this);
+
         //print the dungeon so we can see it
         print();
     }
@@ -122,9 +126,17 @@ public class Dungeon {
                     if (x != 0 && y != 0 || x == 0 && y == 0)
                         continue;
 
-                    if (getMap()[cell.getRow() + y][cell.getCol() + x] && getCells()[cell.getRow() + y][cell.getCol() + x].getCost() < 0) {
-                        getCells()[cell.getRow() + y][cell.getCol() + x].setCost(cell.getCost() + 1);
-                        cells.add(getCells()[cell.getRow() + y][cell.getCol() + x]);
+                    int row = cell.getRow() + y;
+                    int col = cell.getCol() + x;
+
+                    if (col < 0 || col >= getCols())
+                        continue;
+                    if (row < 0 || row >= getRows())
+                        continue;
+
+                    if (getMap()[row][col] && getCells()[row][col].getCost() < 0) {
+                        getCells()[row][col].setCost(cell.getCost() + 1);
+                        cells.add(getCells()[row][col]);
                     }
                 }
             }
@@ -190,30 +202,21 @@ public class Dungeon {
 
         for (int row = 0; row < getRows(); row++) {
             for (int col = 0; col < getCols(); col++) {
-                switch (getCells()[row][col].getType()) {
-                    case DoorLocked:
-                    case Door:
-                    case Secret:
-                        getMap()[row][col] = true;
-                        getInteract()[row][col] = true;
-                        break;
 
-                    case Open:
-                    case Unvisited:
-                        getMap()[row][col] = true;
-                        getInteract()[row][col] = false;
-                        break;
+                Cell cell = getCells()[row][col];
 
-                    case Goal:
-                        getMap()[row][col] = false;
-                        getInteract()[row][col] = true;
-                        break;
-
-                    case Wall:
-                    default:
-                        getMap()[row][col] = false;
-                        getInteract()[row][col] = false;
-                        break;
+                if (cell.isDoor()) {
+                    getMap()[row][col] = true;
+                    getInteract()[row][col] = true;
+                } else if (cell.isOpen() || cell.isUnvisited()) {
+                    getMap()[row][col] = true;
+                    getInteract()[row][col] = false;
+                } else if (cell.isGoal()) {
+                    getMap()[row][col] = false;
+                    getInteract()[row][col] = true;
+                } else if (cell.isWall()) {
+                    getMap()[row][col] = false;
+                    getInteract()[row][col] = false;
                 }
 
                 //if obstacles exist
@@ -245,12 +248,8 @@ public class Dungeon {
 
             for (int col = 0; col < getCols(); col++) {
 
-                switch (getCells()[row][col].getType()) {
-
-                    case Unvisited:
-                        getCells()[row][col].setType(type);
-                        break;
-                }
+                if (getCells()[row][col].isUnvisited())
+                    getCells()[row][col].setType(type);
             }
         }
     }
@@ -264,6 +263,12 @@ public class Dungeon {
     }
 
     public boolean hasMap(int col, int row) {
+
+        if (col < 0 || row < 0)
+            return false;
+        if (col >= getCols() || row >= getRows())
+            return false;
+
         return getMap()[row][col];
     }
 
@@ -358,58 +363,10 @@ public class Dungeon {
     }
 
     private void print() {
-
         for (int row = 0; row < getRows(); row++) {
-
-            String line = "";
             for (int col = 0; col < getCols(); col++) {
-
-                /*
-                int cost = getCells()[row][col].getCost();
-
-                if (cost < 0) {
-                    line += "    ";
-                } else if (cost < 10) {
-                    line += "000" + cost;
-                } else if (cost < 100) {
-                    line += "00" + cost;
-                } else if (cost < 1000) {
-                    line += "0" + cost;
-                } else {
-                    line += cost;
-                }
-                line += ",";
-                */
-
-                switch (getCells()[row][col].getType()) {
-
-                    case Secret:
-                        System.out.print("r");
-                        break;
-
-                    case Door:
-                    case DoorLocked:
-                        System.out.print("Z");
-                        break;
-
-                    case Goal:
-                        System.out.print("g");
-                        break;
-
-                    case Wall:
-                        System.out.print(" ");
-                        break;
-
-                    case Open:
-                        System.out.print("o");
-                        break;
-
-                    case Unvisited:
-                        System.out.print("_");
-                        break;
-                }
+                getCells()[row][col].print();
             }
-            //System.out.println(line);
             System.out.println();
         }
     }

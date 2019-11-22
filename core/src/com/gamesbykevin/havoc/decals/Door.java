@@ -78,7 +78,7 @@ public class Door extends DecalCustom {
         this.start = start;
     }
 
-    public float getLapsed() {
+    private float getLapsed() {
         return this.lapsed;
     }
 
@@ -169,11 +169,23 @@ public class Door extends DecalCustom {
         }
     }
 
+    //open the door
+    public void open() {
+
+        //we can only open if the door is closed
+        if (!isClosed())
+            return;
+
+        setClosed(false);
+        setOpening(true);
+        setLapsed(0);
+    }
+
     public boolean isOpen() {
         return this.open;
     }
 
-    public void setOpen(boolean open) {
+    private void setOpen(boolean open) {
         this.open = open;
     }
 
@@ -181,7 +193,7 @@ public class Door extends DecalCustom {
         return this.closed;
     }
 
-    public void setClosed(boolean closed) {
+    private void setClosed(boolean closed) {
         this.closed = closed;
     }
 
@@ -189,7 +201,7 @@ public class Door extends DecalCustom {
         return this.opening;
     }
 
-    public void setOpening(boolean opening) {
+    private void setOpening(boolean opening) {
         this.opening = opening;
     }
 
@@ -197,7 +209,7 @@ public class Door extends DecalCustom {
         return this.closing;
     }
 
-    public void setClosing(boolean closing) {
+    private void setClosing(boolean closing) {
         this.closing = closing;
     }
 }

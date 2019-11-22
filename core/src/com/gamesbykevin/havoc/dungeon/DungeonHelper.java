@@ -13,7 +13,7 @@ import static com.gamesbykevin.havoc.dungeon.RoomHelper.*;
 public class DungeonHelper {
 
     //how big is the dungeon
-    public static final int DUNGEON_SIZE = 90;
+    public static final int DUNGEON_SIZE = 100;
 
     public static int getCount(Dungeon dungeon, String id) {
 
@@ -218,7 +218,7 @@ public class DungeonHelper {
             children.add(child);
         }
 
-        //start connecting the children
+        //start connecting the children together
         connect(dungeon, children);
     }
 
@@ -380,7 +380,7 @@ public class DungeonHelper {
                     //if the doors are valid let's check the distance
                     if (isDoorValid(dungeon, cell1) && isDoorValid(dungeon, cell2)) {
 
-                        //make a door (for now)
+                        //make a door for now so we can calculate the path
                         cell1.setType(Type.Door);
                         cell2.setType(Type.Door);
 
@@ -474,7 +474,9 @@ public class DungeonHelper {
 
         //now let's connect the start and goal together
         start.setType(Type.Door);
+        start.setLink(goal);
         goal.setType(Type.Door);
+        goal.setLink(start);
 
         //calculate the shortest path
         dungeon.updateMap();

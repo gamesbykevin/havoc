@@ -12,9 +12,6 @@ public class EnemyHelper {
 
     protected static void updateIdle(Vector3 position, Enemy enemy) {
 
-        float xDiff = Math.abs(position.x - enemy.getCol());
-        float yDiff = Math.abs(position.y - enemy.getRow());
-
         //where is the player in relation to this enemy
         boolean n = ((int)position.y > (int)enemy.getRow());
         boolean s = ((int)position.y < (int)enemy.getRow());
@@ -27,47 +24,79 @@ public class EnemyHelper {
         switch (enemy.getDirection()) {
 
             case DIRECTION_S:
-                if (n && yDiff > xDiff)
-                    index = INDEX_IDLE_N;
-                if (s && yDiff > xDiff)
+                if (n)
                     index = INDEX_IDLE_S;
-                if (w && xDiff > yDiff)
+                if (w)
                     index = INDEX_IDLE_E;
-                if (e && xDiff > yDiff)
+                if (e)
                     index = INDEX_IDLE_W;
+                if (s)
+                    index = INDEX_IDLE_S;
+                if (n && w)
+                    index = INDEX_IDLE_NE;
+                if (n && e)
+                    index = INDEX_IDLE_NW;
+                if (s && w)
+                    index = INDEX_IDLE_SE;
+                if (s && e)
+                    index = INDEX_IDLE_SW;
                 break;
 
             case DIRECTION_N:
-                if (n && yDiff > xDiff)
+                if (n)
                     index = INDEX_IDLE_S;
-                if (s && yDiff > xDiff)
+                if (s)
                     index = INDEX_IDLE_N;
-                if (w)
-                    index = INDEX_IDLE_W;
                 if (e)
                     index = INDEX_IDLE_E;
+                if (w)
+                    index = INDEX_IDLE_W;
+                if (n && w)
+                    index = INDEX_IDLE_SW;
+                if (n && e)
+                    index = INDEX_IDLE_SE;
+                if (s && w)
+                    index = INDEX_IDLE_NW;
+                if (s && e)
+                    index = INDEX_IDLE_NE;
                 break;
 
             case DIRECTION_W:
-                if (n && yDiff > xDiff)
+                if (n)
                     index = INDEX_IDLE_E;
-                if (s && yDiff > xDiff)
+                if (s)
                     index = INDEX_IDLE_W;
-                if (w)
-                    index = INDEX_IDLE_S;
                 if (e)
                     index = INDEX_IDLE_N;
+                if (w)
+                    index = INDEX_IDLE_S;
+                if (n && w)
+                    index = INDEX_IDLE_SE;
+                if (n && e)
+                    index = INDEX_IDLE_NE;
+                if (s && w)
+                    index = INDEX_IDLE_SW;
+                if (s && e)
+                    index = INDEX_IDLE_NW;
                 break;
 
             case DIRECTION_E:
-                if (n && yDiff > xDiff)
+                if (n)
                     index = INDEX_IDLE_W;
-                if (s && yDiff > xDiff)
+                if (s)
                     index = INDEX_IDLE_E;
-                if (w)
-                    index = INDEX_IDLE_N;
                 if (e)
                     index = INDEX_IDLE_S;
+                if (w)
+                    index = INDEX_IDLE_N;
+                if (n && w)
+                    index = INDEX_IDLE_NW;
+                if (n && e)
+                    index = INDEX_IDLE_SW;
+                if (s && w)
+                    index = INDEX_IDLE_NE;
+                if (s && e)
+                    index = INDEX_IDLE_SE;
                 break;
         }
 
@@ -77,9 +106,6 @@ public class EnemyHelper {
 
     protected static void updateWalk(Vector3 position, Enemy enemy) {
 
-        float xDiff = Math.abs(position.x - enemy.getCol());
-        float yDiff = Math.abs(position.y - enemy.getRow());
-
         //where is the player in relation to this enemy
         boolean n = ((int)position.y > (int)enemy.getRow());
         boolean s = ((int)position.y < (int)enemy.getRow());
@@ -92,47 +118,79 @@ public class EnemyHelper {
         switch (enemy.getDirection()) {
 
             case DIRECTION_S:
-                if (n && yDiff > xDiff)
-                    index = INDEX_WALK_N;
-                if (s && yDiff > xDiff)
+                if (n)
                     index = INDEX_WALK_S;
-                if (w && xDiff > yDiff)
+                if (w)
                     index = INDEX_WALK_E;
-                if (e && xDiff > yDiff)
+                if (e)
                     index = INDEX_WALK_W;
+                if (s)
+                    index = INDEX_WALK_S;
+                if (n && w)
+                    index = INDEX_WALK_NE;
+                if (n && e)
+                    index = INDEX_WALK_NW;
+                if (s && w)
+                    index = INDEX_WALK_SE;
+                if (s && e)
+                    index = INDEX_WALK_SW;
                 break;
 
             case DIRECTION_N:
-                if (n && yDiff > xDiff)
+                if (n)
                     index = INDEX_WALK_S;
-                if (s && yDiff > xDiff)
+                if (s)
                     index = INDEX_WALK_N;
-                if (w && xDiff > yDiff)
-                    index = INDEX_WALK_W;
-                if (e && xDiff > yDiff)
+                if (e)
                     index = INDEX_WALK_E;
+                if (w)
+                    index = INDEX_WALK_W;
+                if (n && w)
+                    index = INDEX_WALK_SW;
+                if (n && e)
+                    index = INDEX_WALK_SE;
+                if (s && w)
+                    index = INDEX_WALK_NW;
+                if (s && e)
+                    index = INDEX_WALK_NE;
                 break;
 
             case DIRECTION_W:
-                if (n && yDiff > xDiff)
+                if (n)
                     index = INDEX_WALK_E;
-                if (s && yDiff > xDiff)
+                if (s)
                     index = INDEX_WALK_W;
-                if (w && xDiff > yDiff)
-                    index = INDEX_WALK_S;
-                if (e && xDiff > yDiff)
+                if (e)
                     index = INDEX_WALK_N;
+                if (w)
+                    index = INDEX_WALK_S;
+                if (n && w)
+                    index = INDEX_WALK_SE;
+                if (n && e)
+                    index = INDEX_WALK_NE;
+                if (s && w)
+                    index = INDEX_WALK_SW;
+                if (s && e)
+                    index = INDEX_WALK_NW;
                 break;
 
             case DIRECTION_E:
-                if (n && yDiff > xDiff)
+                if (n)
                     index = INDEX_WALK_W;
-                if (s && yDiff > xDiff)
+                if (s)
                     index = INDEX_WALK_E;
-                if (w && xDiff > yDiff)
-                    index = INDEX_WALK_N;
-                if (e && xDiff > yDiff)
+                if (e)
                     index = INDEX_WALK_S;
+                if (w)
+                    index = INDEX_WALK_N;
+                if (n && w)
+                    index = INDEX_WALK_NW;
+                if (n && e)
+                    index = INDEX_WALK_SW;
+                if (s && w)
+                    index = INDEX_WALK_NE;
+                if (s && e)
+                    index = INDEX_WALK_SE;
                 break;
         }
 
@@ -275,11 +333,8 @@ public class EnemyHelper {
 
             if (door != null) {
 
-                if (door.isClosed()) {
-                    door.setClosed(false);
-                    door.setOpening(true);
-                    door.setLapsed(0);
-                }
+                //open the door (if possible)
+                door.open();
 
                 //enemy will remain idle until the door is open
                 if (!door.isOpen()) {
@@ -313,7 +368,7 @@ public class EnemyHelper {
             }
 
             if (enemy.getPathIndex() >= enemy.getPathTarget().size()) {
-                enemy.setPathIndex(enemy.getPathTarget().size() - 2);
+                enemy.setPathIndex(enemy.getPathTarget().size() - 1);
                 enemy.setAscending(!enemy.isAscending());
 
                 //we reached the end, so keep the enemy idle for a short time

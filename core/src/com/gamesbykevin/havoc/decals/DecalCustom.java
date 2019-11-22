@@ -12,7 +12,7 @@ public abstract class DecalCustom {
     //how deep is the door placed
     public static final float DOOR_DEPTH = .5f;
 
-    //how deep is the secret placed
+    //the depth will be close to the walls
     public static final float SECRET_DEPTH = .075f;
 
     //the location of this decal as it relates to the level
@@ -105,17 +105,18 @@ public abstract class DecalCustom {
                 door.setDestination(row - (TEXTURE_HEIGHT / 2));
                 break;
 
-            case South:
             case North:
+            case South:
                 door.setStart(col + (TEXTURE_WIDTH / 2));
                 door.setDestination(col - (TEXTURE_WIDTH / 2));
                 break;
         }
 
+        //setup the door
         decalSetup(door.getDecal(), col, row, side);
 
-        //secret doors will have a different depth and be harder to spot
-        final float depth = (secret) ? SECRET_DEPTH : DOOR_DEPTH;
+        //depth of the door will be different for a secret door
+        float depth = (secret) ? SECRET_DEPTH : DOOR_DEPTH;
 
         //increase the depth of the door so it is noticeable
         switch (door.getSide()) {

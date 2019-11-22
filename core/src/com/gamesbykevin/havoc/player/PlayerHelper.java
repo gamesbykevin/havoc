@@ -3,6 +3,7 @@ package com.gamesbykevin.havoc.player;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.collectables.Collectible;
 import com.gamesbykevin.havoc.decals.Door;
+import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
@@ -140,9 +141,6 @@ public class PlayerHelper {
     }
 
     protected static void checkCollision(MyController controller) {
-
-        if (1==1)
-            return;
 
         //reset position if there is a collision
         if (checkCollision(controller, controller.getPreviousPosition().x, controller.getCamera3d().position.y))
@@ -322,29 +320,30 @@ public class PlayerHelper {
                     if (!level.getDungeon().hasInteract(col, row))
                         continue;
 
-                    switch (level.getDungeon().getCells()[row][col].getType()) {
-                        case Door:
-                        case DoorLocked:
-                        case Secret:
-                            Door door = level.getDoorDecal(col, row);
+                    Cell cell = level.getDungeon().getCells()[row][col];
 
-                            //we can only open the door if it exists and it's closed
-                            if (door != null && door.isClosed()) {
+                    if (cell.isDoor()) {
+                        Door door = level.getDoorDecal(col, row);
 
-                                //also make sure if it's locked that we have a key
-                                if (!door.isLocked() || (door.isLocked() && player.hasKey())) {
-                                    door.setClosed(false);
-                                    door.setOpening(true);
-                                    door.setLapsed(0);
-                                }
+                        //we can only open the door if it exists and it's closed
+                        if (door != null && door.isClosed()) {
+
+                            //also make sure if it's locked that we have a key
+                            if (!door.isLocked() || (door.isLocked() && player.hasKey())) {
+
+                                //open the door
+                                door.open();
+
+                                //if there is a linked door, open it
+                                if (cell != null && cell.getLink() != null)
+                                    level.getDoorDecal(cell.getLink().getCol(), cell.getLink().getRow()).open();
                             }
-                            break;
+                        }
 
-                        case Goal:
-                            player.getController().setRotation(0);
-                            level.resetPosition();
-                            level.getEnemies().reset();
-                            break;
+                    } else if (level.getDungeon().getCells()[row][col].isGoal()) {
+                        player.getController().setRotation(0);
+                        level.resetPosition();
+                        level.getEnemies().reset();
                     }
                 }
             }

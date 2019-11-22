@@ -1,7 +1,5 @@
 package com.gamesbykevin.havoc.dungeon;
 
-import com.gamesbykevin.havoc.dungeon.Cell.Type;
-
 public class Room {
 
     //location of room
@@ -89,7 +87,7 @@ public class Room {
                 continue;
             if (col >= dungeon.getCells()[0].length || row >= dungeon.getCells().length)
                 continue;
-            if (dungeon.getCells()[row][col].getType() == Type.Door)
+            if (dungeon.getCells()[row][col].isDoor())
                 return true;
         }
         return false;
@@ -101,7 +99,7 @@ public class Room {
                 continue;
             if (col >= dungeon.getCells()[0].length || row >= dungeon.getCells().length)
                 continue;
-            if (dungeon.getCells()[row][col].getType() == Type.Door)
+            if (dungeon.getCells()[row][col].isDoor())
                 return true;
         }
         return false;
