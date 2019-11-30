@@ -1,61 +1,84 @@
 package com.gamesbykevin.havoc.player.weapon;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.gamesbykevin.havoc.animation.SpriteAnimation;
+import com.gamesbykevin.havoc.entities.Entity2d;
 import com.gamesbykevin.havoc.input.MyController;
+import com.gamesbykevin.havoc.level.Level;
+import com.gamesbykevin.havoc.util.Disposable;
 
 import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.*;
 
-public abstract class Weapon {
+public class Weapon extends Entity2d implements Disposable {
 
     //velocity to move weapon
     private float velocityX = DEFAULT_VELOCITY_X, velocityY = DEFAULT_VELOCITY_Y;
 
-    //where to render our weapon
-    private float weaponX = DEFAULT_WEAPON_X, weaponY = DEFAULT_WEAPON_Y;
-
     //what are we doing with the weapon
-    private boolean isResting = true, isStarting = false, isAttacking = false, isStopping = false, isSwitchingOn = false, isSwitchingOff = false;
+    private boolean isSwitchingOn = false, isSwitchingOff = false;
 
     //how many bullets do we have
     private int bullets;
 
-    //maximum amount of bullets we can carry
-    private final int bulletsMax;
-
-    //how much damage does each bullet inflict
-    private float damage;
-
-    //how close do we need to be in order to attack?
-    private float range;
-
-    //different types of weapons
-    public enum Type {
-        Buzz, Glock, Impact, Magnum, Shotgun, Smg, Lance
-    }
-
     //which weapon is this?
     private final Type type;
 
-    //render sprite when doing nothing
-    protected SpriteAnimation resting;
+    //the gun has 4 animations
+    public static final int ANIMATIONS = 4;
 
-    //render animation when about to attack
-    protected SpriteAnimation starting;
+    //different animations for the weapon
+    public static final int INDEX_RESTING   = 0;
+    public static final int INDEX_STARTING  = 1;
+    public static final int INDEX_ATTACKING = 2;
+    public static final int INDEX_STOPPING  = 3;
 
-    //render animation when attacking
-    protected SpriteAnimation attacking;
+    //how many bullets to add by default
+    public static final float BULLETS_DEFAULT_RATIO = .25f;
 
-    //render animation when we stop attacking
-    protected SpriteAnimation stopping;
+    public Weapon(Type type) {
 
-    public Weapon(Type type, int bulletsMax) {
+        //call parent
+        super(ANIMATIONS);
+
+        //save the type of weapon
         this.type = type;
-        this.bulletsMax = bulletsMax;
+
+        //setup the weapons animations
+        getAnimations()[INDEX_RESTING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), EXTENSION, getType().getRestIndexStart(), getType().getRestIndexCount(), FRAME_DURATION);
+        getAnimations()[INDEX_STARTING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), EXTENSION, getType().getStartIndexStart(), getType().getStartIndexCount(), FRAME_DURATION);
+        getAnimations()[INDEX_ATTACKING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), EXTENSION, getType().getAttackIndexStart(), getType().getAttackIndexCount(), FRAME_DURATION);
+        getAnimations()[INDEX_STOPPING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), EXTENSION, getType().getStopIndexStart(), getType().getStopIndexCount(), FRAME_DURATION);
+
+        //reset
+        reset();
+
+        //reset bullet count
+        resetBullets();
     }
 
-    public int getBulletsMax() {
-        return this.bulletsMax;
+    public void resetBullets() {
+
+        //start with the default bullets
+        setBullets((int)(getType().getBulletsMax() * BULLETS_DEFAULT_RATIO));
+    }
+
+    @Override
+    public void reset() {
+
+        //flag that we want to switch on the weapon
+        setSwitchingOff(false);
+        setSwitchingOn(true);
+
+        //position off the screen
+        setCol(DEFAULT_WEAPON_X);
+        setRow(DEFAULT_WEAPON_Y - WEAPON_HEIGHT);
+
+        //set default animation
+        setIndex(INDEX_RESTING);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
     }
 
     public Type getType() {
@@ -63,30 +86,30 @@ public abstract class Weapon {
     }
 
     public float getRange() {
-        return this.range;
-    }
-
-    public void setRange(float range) {
-        this.range = range;
+        return getType().getRange();
     }
 
     public int getBullets() {
         return this.bullets;
     }
 
+    public void addAmmoLarge() {
+        setBullets(getBullets() + (int)(getType().getBulletsMax() * AMMO_LARGE_RATIO));
+    }
+
+    public void addAmmoSmall() {
+        setBullets(getBullets() + (int)(getType().getBulletsMax() * AMMO_SMALL_RATIO));
+    }
+
     public void setBullets(int bullets) {
         this.bullets = bullets;
 
-        if (this.bullets > getBulletsMax())
-            this.bullets = getBulletsMax();
+        if (this.bullets > getType().getBulletsMax())
+            this.bullets = getType().getBulletsMax();
     }
 
     public float getDamage() {
-        return this.damage;
-    }
-
-    public void setDamage(float damage) {
-        this.damage = damage;
+        return getType().getDamage();
     }
 
     public boolean isSwitchingOn() {
@@ -106,67 +129,19 @@ public abstract class Weapon {
     }
 
     public boolean isResting() {
-        return this.isResting;
-    }
-
-    public void setResting(boolean resting) {
-        this.isResting = resting;
+        return (getIndex() == INDEX_RESTING);
     }
 
     public boolean isStarting() {
-        return this.isStarting;
-    }
-
-    public void setStarting(boolean starting) {
-        this.isStarting = starting;
+        return (getIndex() == INDEX_STARTING);
     }
 
     public boolean isAttacking() {
-        return this.isAttacking;
-    }
-
-    public void setAttacking(boolean attacking) {
-        this.isAttacking = attacking;
+        return (getIndex() == INDEX_ATTACKING);
     }
 
     public boolean isStopping() {
-        return this.isStopping;
-    }
-
-    public void setStopping(boolean stopping) {
-        this.isStopping = stopping;
-    }
-
-    public SpriteAnimation getResting() {
-        return this.resting;
-    }
-
-    public SpriteAnimation getStarting() {
-        return this.starting;
-    }
-
-    public SpriteAnimation getAttacking() {
-        return this.attacking;
-    }
-
-    public SpriteAnimation getStopping() {
-        return this.stopping;
-    }
-
-    public float getWeaponX() {
-        return this.weaponX;
-    }
-
-    public void setWeaponX(float weaponX) {
-        this.weaponX = weaponX;
-    }
-
-    public float getWeaponY() {
-        return this.weaponY;
-    }
-
-    public void setWeaponY(float weaponY) {
-        this.weaponY = weaponY;
+        return (getIndex() == INDEX_STOPPING);
     }
 
     public float getVelocityX() {
@@ -185,7 +160,11 @@ public abstract class Weapon {
         this.velocityY = velocityY;
     }
 
-    public void update(MyController controller) {
+    @Override
+    public void update(Level level) {
+
+        //get the controller
+        MyController controller = level.getPlayer().getController();
 
         //if we are walking, move weapon as if we are carrying it
         if (controller.isMoveForward() || controller.isMoveBackward()) {
@@ -195,123 +174,87 @@ public abstract class Weapon {
         }
 
         //if we are resting and the player wants to shoot
-        if (isResting() && controller.isShooting() && getBullets() != 0) {
+        if (isResting() && controller.isShooting() && getBullets() != 0)
+            setIndex(INDEX_STARTING);
 
-            //stop resting
-            setResting(false);
-            getResting().reset();
+        //if the current animation is finished
+        if (getAnimation().isFinish()) {
 
-            //start next animation
-            setStarting(true);
-            getStarting().reset();
+            if (isStarting()) {
 
-        } else if (isStarting() && getStarting().isFinish()) {
-
-            //we finished starting our attack
-            setStarting(false);
-            getStarting().reset();
-
-            //start attacking
-            setAttacking(true);
-            getAttacking().reset();
-
-            //take a bullet away
-            setBullets(getBullets() - 1);
-
-            //check if attack hit enemy
-            checkAttack(controller, this);
-
-        } else if (isAttacking() && getAttacking().isFinish()) {
-
-            //if the player no longer wishes to shoot, or we ran out of bullets we will stop
-            if (!controller.isShooting() || getBullets() == 0) {
-
-                //stop the attack animation
-                setAttacking(false);
-                getAttacking().reset();
-
-                //start the "stop attack" animation
-                setStopping(true);
-                getStopping().reset();
-
-            } else {
-
-                //continue to attack
-                getAttacking().reset();
+                setIndex(INDEX_ATTACKING);
 
                 //take a bullet away
                 setBullets(getBullets() - 1);
 
                 //check if attack hit enemy
-                checkAttack(controller, this);
+                checkAttack(level, this);
+
+            } else if (isAttacking()) {
+
+                //if the player no longer wishes to shoot, or we ran out of bullets we will stop
+                if (!controller.isShooting() || getBullets() == 0) {
+
+                    setIndex(INDEX_STOPPING);
+
+                } else {
+
+                    //continue to attack
+                    getAnimation().reset();
+
+                    //take a bullet away
+                    setBullets(getBullets() - 1);
+
+                    //check if attack hit enemy
+                    checkAttack(level, this);
+                }
+
+            } else if (isStopping()) {
+                setIndex(INDEX_RESTING);
             }
-
-        } else if (isStopping() && getStopping().isFinish()) {
-
-            //stop the animation
-            setStopping(false);
-            getStopping().reset();
-
-            //go back to resting
-            setResting(true);
-            getResting().reset();
         }
 
-        if (isResting()) {
-            getResting().update();
-        } else if (isStarting()) {
-            getStarting().update();
-        } else if (isAttacking()) {
-            getAttacking().update();
-        } else if (isStopping()) {
-            getStopping().update();
-        }
+        //update the animation
+        getAnimation().update();
     }
 
     private void holdWeapon() {
 
         //reset back to the default
-        if (getWeaponX() != DEFAULT_WEAPON_X || getWeaponY() != DEFAULT_WEAPON_Y) {
+        if (getCol() != DEFAULT_WEAPON_X || getRow() != DEFAULT_WEAPON_Y) {
 
             //move weapon position back to the default
-            if (getWeaponX() < DEFAULT_WEAPON_X)
-                setWeaponX(getWeaponX() + DEFAULT_VELOCITY_X);
-            if (getWeaponX() > DEFAULT_WEAPON_X)
-                setWeaponX(getWeaponX() - DEFAULT_VELOCITY_X);
-            if (getWeaponY() < DEFAULT_WEAPON_Y)
-                setWeaponY(getWeaponY() + DEFAULT_VELOCITY_Y);
-            if (getWeaponY() > DEFAULT_WEAPON_Y)
-                setWeaponY(getWeaponY() - DEFAULT_VELOCITY_Y);
-            if (Math.abs(getWeaponX() - DEFAULT_WEAPON_X) <= DEFAULT_VELOCITY_X)
-                setWeaponX(DEFAULT_WEAPON_X);
-            if (Math.abs(getWeaponY() - DEFAULT_VELOCITY_Y) <= DEFAULT_VELOCITY_Y)
-                setWeaponY(DEFAULT_WEAPON_Y);
+            if (getCol() < DEFAULT_WEAPON_X)
+                setCol(getCol() + DEFAULT_VELOCITY_X);
+            if (getCol() > DEFAULT_WEAPON_X)
+                setCol(getCol() - DEFAULT_VELOCITY_X);
+            if (getRow() < DEFAULT_WEAPON_Y)
+                setRow(getRow() + DEFAULT_VELOCITY_Y);
+            if (getRow() > DEFAULT_WEAPON_Y)
+                setRow(getRow() - DEFAULT_VELOCITY_Y);
+            if (Math.abs(getCol() - DEFAULT_WEAPON_X) <= DEFAULT_VELOCITY_X)
+                setCol(DEFAULT_WEAPON_X);
+            if (Math.abs(getRow() - DEFAULT_VELOCITY_Y) <= DEFAULT_VELOCITY_Y)
+                setRow(DEFAULT_WEAPON_Y);
         }
     }
 
     private void carryWeapon() {
 
         //move the weapon
-        setWeaponX(getWeaponX() + getVelocityX());
-        setWeaponY(getWeaponY() + getVelocityY());
+        setCol(getCol() + getVelocityX());
+        setRow(getRow() + getVelocityY());
 
         //use the correct velocity
-        if (getWeaponX() >= WEAPON_X_MAX || getWeaponX() <= WEAPON_X_MIN)
+        if (getCol() >= WEAPON_X_MAX || getCol() <= WEAPON_X_MIN)
             setVelocityX(-getVelocityX());
-        if (getWeaponY() >= WEAPON_Y_MAX || getWeaponY() <= WEAPON_Y_MIN)
+        if (getRow() >= WEAPON_Y_MAX || getRow() <= WEAPON_Y_MIN)
             setVelocityY(-getVelocityY());
     }
 
-    public void render(Batch batch) {
-
-        if (isResting()) {
-            batch.draw(getResting().getImage(), getWeaponX(), getWeaponY());
-        } else if (isStarting()) {
-            batch.draw(getStarting().getImage(), getWeaponX(), getWeaponY());
-        } else if (isAttacking()) {
-            batch.draw(getAttacking().getImage(), getWeaponX(), getWeaponY());
-        } else if (isStopping()) {
-            batch.draw(getStopping().getImage(), getWeaponX(), getWeaponY());
-        }
+    @Override
+    public void setIndex(int index) {
+        super.setIndex(index);
+        getAnimation().reset();
     }
 }

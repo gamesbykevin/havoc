@@ -201,10 +201,10 @@ public class TextureHelper {
             ceiling = getBackgroundRandomDark();
         }
 
-        for (int row = 0; row < dungeon.getRows(); row += Background.TEXTURE_HEIGHT) {
-            for (int col = 0; col < dungeon.getCols(); col += Background.TEXTURE_WIDTH) {
+        for (int row = (int)-Background.TEXTURE_HEIGHT; row <= dungeon.getRows() + Background.TEXTURE_HEIGHT; row += Background.TEXTURE_HEIGHT) {
+            for (int col = (int)-Background.TEXTURE_WIDTH; col <= dungeon.getCols() + Background.TEXTURE_WIDTH; col += Background.TEXTURE_WIDTH) {
                 level.getBackgrounds().add(createDecalBackground(col, row, floor, true));
-                level.getBackgrounds().add(createDecalBackground(col, row, ceiling, false));
+                //level.getBackgrounds().add(createDecalBackground(col, row, ceiling, false));
             }
         }
 

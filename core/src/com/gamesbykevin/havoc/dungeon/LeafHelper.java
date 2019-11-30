@@ -4,34 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
-import static com.gamesbykevin.havoc.entities.Entities.getDistance;
+import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public class LeafHelper {
 
     //what is the smallest allowed size of a leaf, before we spawn a room inside
     public static final int LEAF_DIMENSION_MIN = ROOM_DIMENSION_MAX + 1;
 
-    //find the room furthest north
-    protected static List<Room> getRoomsNorth(List<Leaf> leafs, Leaf parent) {
-        return getRooms(leafs, parent, 2);
-    }
-
-    //find the room furthest south
-    protected static List<Room> getRoomsSouth(List<Leaf> leafs, Leaf parent) {
-        return getRooms(leafs, parent, 3);
-    }
-
-    //find the room furthest west
-    protected static List<Room> getRoomsWest(List<Leaf> leafs, Leaf parent) {
-        return getRooms(leafs, parent, 1);
-    }
-
-    //find the room furthest east
-    protected static List<Room> getRoomsEast(List<Leaf> leafs, Leaf parent) {
-        return getRooms(leafs, parent, 0);
-    }
-
-    private static List<Room> getRooms(List<Leaf> leafs, Leaf parent, int direction) {
+    protected static List<Room> getRooms(List<Leaf> leafs, Leaf parent) {
 
         List<Room> rooms = new ArrayList<>();
 
@@ -88,9 +68,11 @@ public class LeafHelper {
     //here we check our neighbors to determine if a door can be placed here
     protected static boolean isDoorValid(Dungeon dungeon, Cell cell) {
 
+        //we want to turn a wall into a door
         if (!cell.isWall())
             return false;
 
+        //door can't be on the edge
         if (cell.getCol() <= 0 || cell.getCol() >= dungeon.getCols() - 1)
             return false;
         if (cell.getRow() <= 0 || cell.getRow() >= dungeon.getRows() - 1)
@@ -98,6 +80,7 @@ public class LeafHelper {
 
         boolean valid = false;
 
+        //there has to be walls on opposite sides
         if (dungeon.getCells()[cell.getRow()][cell.getCol() - 1].isWall() && dungeon.getCells()[cell.getRow()][cell.getCol() + 1].isWall())
             valid = true;
         if (dungeon.getCells()[cell.getRow() - 1][cell.getCol()].isWall() && dungeon.getCells()[cell.getRow() + 1][cell.getCol()].isWall())
@@ -107,7 +90,6 @@ public class LeafHelper {
             return false;
 
         int countOpen = 0;
-        int countWall = 0;
 
         for (int col = -1; col <= 1; col++) {
             for (int row = -1; row <= 1; row++) {
@@ -122,16 +104,13 @@ public class LeafHelper {
                     continue;
 
                 //count the open and wall #
-                if (tmp.isOpen()) {
+                if (tmp.isOpen())
                     countOpen++;
-                } else if (tmp.isWall()) {
-                    countWall++;
-                }
             }
         }
 
-        //wall should have 1 open space next to it and at least 2 walls
-        if (countOpen == 1 && countWall == 2)
+        //wall should have 1 open space
+        if (countOpen == 1)
             return true;
 
         return false;
@@ -186,5 +165,26 @@ public class LeafHelper {
 
         //leaf not found
         return null;
+    }
+
+    protected static boolean isRoom(List<Leaf> leaves, Cell cell) {
+        return isRoom(leaves, cell.getCol(), cell.getRow());
+    }
+
+    protected static boolean isRoom(List<Leaf> leaves, float x, float y) {
+
+        for (int i = 0; i < leaves.size(); i++) {
+
+            Leaf leaf = leaves.get(i);
+
+            //we only want to check the rooms
+            if (leaf.hasChildren() || leaf.getRoom() == null)
+                continue;
+
+            if (leaf.getRoom().contains(x, y))
+                return true;
+        }
+
+        return false;
     }
 }

@@ -1,8 +1,9 @@
 package com.gamesbykevin.havoc.dungeon;
 
 import com.gamesbykevin.havoc.guid.GUID;
+import com.gamesbykevin.havoc.util.Disposable;
 
-public class Leaf {
+public class Leaf implements Disposable {
 
     //location of leaf
     private int x, y;
@@ -121,5 +122,15 @@ public class Leaf {
 
     public boolean hasId(String id) {
         return getId().equals(id);
+    }
+
+    @Override
+    public void dispose() {
+
+        if (this.room != null)
+            this.room.dispose();
+
+        this.parentId = null;
+        this.room = null;
     }
 }

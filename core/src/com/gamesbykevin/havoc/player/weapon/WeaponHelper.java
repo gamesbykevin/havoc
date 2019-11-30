@@ -1,26 +1,15 @@
 package com.gamesbykevin.havoc.player.weapon;
 
-import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.decals.Door;
-import com.gamesbykevin.havoc.enemies.Enemies;
 import com.gamesbykevin.havoc.enemies.Enemy;
 import com.gamesbykevin.havoc.entities.Entity;
-import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
-import com.gamesbykevin.havoc.player.Player;
 
-import static com.gamesbykevin.havoc.entities.Entities.getDistance;
+import static com.gamesbykevin.havoc.enemies.EnemyHelper.INDEX_PAIN;
+import static com.gamesbykevin.havoc.input.MyController.SPEED_WALK;
+import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public class WeaponHelper {
-
-    //where our guns are located
-    public static final int INDEX_LANCE = 0;
-    public static final int INDEX_GLOCK = 1;
-    public static final int INDEX_SMG = 2;
-    public static final int INDEX_IMPACT = 3;
-    public static final int INDEX_MAGNUM = 4;
-    public static final int INDEX_SHOTGUN = 5;
-    public static final int INDEX_BUZZ = 6;
 
     //how many bullets can we hold per weapon
     public static final int BULLETS_MAX_BUZZ = 500;
@@ -58,65 +47,130 @@ public class WeaponHelper {
     //where our weapon images are located
     protected static final String WEAPONS_DIR = "weapons/";
 
+    //file extension
+    protected static final String EXTENSION = ".png";
+
     //how many times do we check for collision
     private static final int ATTEMPT_LIMIT = 200;
 
     //how close does the bullet need to be for collision detection
     private static final double BULLET_DISTANCE = 1.25d;
 
-    public static final int AMMO_SMALL = 25;
-    public static final int AMMO_LARGE = 75;
+    //how much ammo to add when we collect a collectible
+    public static final float AMMO_SMALL_RATIO = .10f;
+    public static final float AMMO_LARGE_RATIO = .33f;
 
-    public static void reset(Weapon weapon) {
+    //different types of weapons
+    public enum Type {
+        Buzz(35f, 30f, BULLETS_MAX_BUZZ, "buzzsaw_cannon_f", WEAPONS_DIR + "buzzsaw_cannon/", 0, 1, 0, 3, 3, 2, 15, 5),
+        Glock(33f, 30f, BULLETS_MAX_GLOCK, "glock_handgun_f", WEAPONS_DIR + "glock_handgun/", 0, 1, 0, 3, 2, 8, 9, 1),
+        Impact(30f, 20f, BULLETS_MAX_IMPACT, "impact_cannon_f", WEAPONS_DIR + "impact_cannon/", 0, 1, 0, 2, 2, 2, 8, 6),
+        Magnum(50f, 30f, BULLETS_MAX_MAGNUM, "magnum_f", WEAPONS_DIR + "magnum/", 0, 1, 0, 4, 4, 11, 14, 1),
+        Shotgun(75f, 8f, BULLETS_MAX_SHOTGUN, "shotgun_f", WEAPONS_DIR + "shotgun/", 0, 1, 0, 1, 1, 16, 17, 2),
+        Smg(20f, 30f, BULLETS_MAX_SMG, "smg_f", WEAPONS_DIR + "smg/", 0, 1, 0, 1, 1, 3, 9, 2),
+        Lance(3f, 1f, BULLETS_MAX_LANCE, "thermic_lance_f", WEAPONS_DIR + "thermic_lance/", 0, 1, 1, 3, 4, 2, 16, 4);
 
-        if (weapon == null)
-            return;
+            private final float damage;
+            private final float range;
+            private final int bulletsMax;
+            private final String fileName;
+            private final String dir;
+            private final int restIndexStart;
+            private final int restIndexCount;
+            private final int startIndexStart;
+            private final int startIndexCount;
+            private final int attackIndexStart;
+            private final int attackIndexCount;
+            private final int stopIndexStart;
+            private final int stopIndexCount;
 
-        //flag that we want to switch on the weapon
-        weapon.setSwitchingOff(false);
-        weapon.setSwitchingOn(true);
+            Type(float damage, float range, int bulletsMax, String fileName, String dir,
+            int restIndexStart, int restIndexCount, int startIndexStart, int startIndexCount,
+            int attackIndexStart, int attackIndexCount, int stopIndexStart, int stopIndexCount) {
+                this.damage = damage;
+                this.range = range;
+                this.bulletsMax = bulletsMax;
+                this.fileName = fileName;
+                this.dir = dir;
+                this.restIndexStart = restIndexStart;
+                this.restIndexCount = restIndexCount;
+                this.startIndexStart = startIndexStart;
+                this.startIndexCount = startIndexCount;
+                this.attackIndexStart = attackIndexStart;
+                this.attackIndexCount = attackIndexCount;
+                this.stopIndexStart = stopIndexStart;
+                this.stopIndexCount = stopIndexCount;
+            }
 
-        //position off the screen
-        weapon.setWeaponY(DEFAULT_WEAPON_Y - WEAPON_HEIGHT);
+            public float getDamage() {
+                return this.damage;
+            }
 
-        weapon.setResting(true);
-        weapon.getResting().reset();
-        weapon.getResting().setLoop(false);
-        weapon.getResting().setFrameDuration(FRAME_DURATION);
+            public float getRange() {
+                return this.range;
+            }
 
-        weapon.setStarting(false);
-        weapon.getStarting().reset();
-        weapon.getStarting().setLoop(false);
-        weapon.getStarting().setFrameDuration(FRAME_DURATION);
+            public int getBulletsMax() {
+                return this.bulletsMax;
+            }
 
-        weapon.setAttacking(false);
-        weapon.getAttacking().reset();
-        weapon.getAttacking().setLoop(false);
-        weapon.getAttacking().setFrameDuration(FRAME_DURATION);
+            public String getDir() {
+                return this.dir;
+            }
 
-        weapon.setStopping(false);
-        weapon.getStopping().reset();
-        weapon.getStopping().setLoop(false);
-        weapon.getStopping().setFrameDuration(FRAME_DURATION);
-    }
+            public String getFileName() {
+                return this.fileName;
+            }
 
-    public static void checkAttack(MyController controller, Weapon weapon) {
+            public int getRestIndexStart() {
+                return this.restIndexStart;
+            }
 
-        //level instance
-        Level level = controller.getLevel();
+            public int getRestIndexCount() {
+                return this.restIndexCount;
+            }
+
+            public int getStartIndexStart() {
+                return this.startIndexStart;
+            }
+
+            public int getStartIndexCount() {
+                return this.startIndexCount;
+            }
+
+            public int getAttackIndexStart() {
+                return this.attackIndexStart;
+            }
+
+            public int getAttackIndexCount() {
+                return this.attackIndexCount;
+            }
+
+            public int getStopIndexStart() {
+                return this.stopIndexStart;
+            }
+
+            public int getStopIndexCount() {
+                return this.stopIndexCount;
+            }
+        }
+
+    public static void checkAttack(Level level, Weapon weapon) {
+
+        final double rotation = level.getPlayer().getController().getRotation();
 
         //what direction are we facing
-        double angle = Math.toRadians(controller.getRotation());
+        double angle = Math.toRadians(rotation);
 
         //start position of attack
-        float col = controller.getCamera3d().position.x;
-        float row = controller.getCamera3d().position.y;
+        float col = level.getPlayer().getCamera3d().position.x;
+        float row = level.getPlayer().getCamera3d().position.y;
 
         //calculate the distance moved
         float xa = (float)((0 * Math.cos(angle)) - (1 * Math.sin(angle)));
         float ya = (float)((1 * Math.cos(angle)) + (0 * Math.sin(angle)));
-        xa *= controller.getSpeed();
-        ya *= controller.getSpeed();
+        xa *= SPEED_WALK;
+        ya *= SPEED_WALK;
 
         int attempts = 0;
 
@@ -134,7 +188,7 @@ public class WeaponHelper {
                     continue;
 
                 //how far are we from the enemy
-                double playerDistance = getDistance(entity, controller.getCamera3d().position);
+                double playerDistance = getDistance(entity, level.getPlayer().getCamera3d().position);
 
                 //if too far away to attack skip this enemy
                 if (playerDistance >= weapon.getRange())
@@ -153,8 +207,7 @@ public class WeaponHelper {
                     Enemy enemy = (Enemy)entity;
 
                     //the enemy is hurting
-                    enemy.setIndex(Enemy.INDEX_PAIN);
-                    enemy.getAnimation().reset();
+                    enemy.setIndex(INDEX_PAIN);
 
                     //deduct the enemies health
                     enemy.setHealth(enemy.getHealth() - weapon.getDamage());
@@ -197,74 +250,22 @@ public class WeaponHelper {
         }
     }
 
-    public static void updateWeapon(Player player) {
+    protected static void switchWeaponOn(Weapon weapon) {
 
-        //get our current weapon
-        Weapon weapon = player.getWeapon();
-
-        //if we want to switch weapons we can't be doing anything else
-        if (player.getController().isChange()) {
-
-            //we have to be resting to switch weapons
-            if (!weapon.isResting())
-                player.getController().setChange(false);
-            if (weapon.isSwitchingOff() || weapon.isSwitchingOn())
-                player.getController().setChange(false);
-        }
-
-        if (weapon.isSwitchingOff()) {
-
-            //update the weapon
-            switchWeaponOff(weapon);
-
-            //if we are no longer switching off
-            if (!weapon.isSwitchingOff()) {
-
-                //reset the current weapon
-                reset(weapon);
-
-                //move to the next weapon
-                player.setWeaponIndex(player.getWeaponIndex() + 1);
-
-                //flag switching on
-                reset(player.getWeapon());
-            }
-
-        } else if (weapon.isSwitchingOn()) {
-
-            //update the weapon
-            switchWeaponOn(weapon);
-
-            //if we are done switching on
-            if (!weapon.isSwitchingOn())
-                player.getController().setChange(false);
-
+        if (weapon.getRow() < DEFAULT_WEAPON_Y) {
+            weapon.setRow(weapon.getRow() + DEFAULT_VELOCITY_SWITCH_Y);
         } else {
-
-            if (player.getController().isChange())
-                weapon.setSwitchingOff(true);
-
-            //update the current weapon if we aren't switching
-            weapon.update(player.getController());
-        }
-    }
-
-    private static void switchWeaponOn(Weapon weapon) {
-
-        if (weapon.getWeaponY() < DEFAULT_WEAPON_Y) {
-            weapon.setWeaponY(weapon.getWeaponY() + DEFAULT_VELOCITY_SWITCH_Y);
-        } else {
-            weapon.setWeaponY(DEFAULT_WEAPON_Y);
+            weapon.setRow(DEFAULT_WEAPON_Y);
             weapon.setSwitchingOn(false);
         }
     }
 
-    private static void switchWeaponOff(Weapon weapon) {
+    protected static void switchWeaponOff(Weapon weapon) {
 
-        if (weapon.getWeaponY() > DEFAULT_WEAPON_Y - WEAPON_HEIGHT) {
-            weapon.setWeaponY(weapon.getWeaponY() - DEFAULT_VELOCITY_SWITCH_Y);
+        if (weapon.getRow() > DEFAULT_WEAPON_Y - WEAPON_HEIGHT) {
+            weapon.setRow(weapon.getRow() - DEFAULT_VELOCITY_SWITCH_Y);
         } else {
-            weapon.setWeaponY(DEFAULT_WEAPON_Y - WEAPON_HEIGHT);
+            weapon.setRow(DEFAULT_WEAPON_Y - WEAPON_HEIGHT);
             weapon.setSwitchingOff(false);
         }
     }

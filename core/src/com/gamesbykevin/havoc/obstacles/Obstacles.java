@@ -1,13 +1,21 @@
 package com.gamesbykevin.havoc.obstacles;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gamesbykevin.havoc.dungeon.Leaf;
 import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.level.Level;
 
+import java.util.HashMap;
+
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
+import static com.gamesbykevin.havoc.obstacles.Obstacle.ASSET_DIR;
+import static com.gamesbykevin.havoc.obstacles.Obstacle.ASSET_EXT;
 import static com.gamesbykevin.havoc.obstacles.ObstacleHelper.*;
+import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public final class Obstacles extends Entities {
 
@@ -31,7 +39,10 @@ public final class Obstacles extends Entities {
     }
 
     //how close can we get to the obstacle
-    private static final float OBSTACLE_COLLISION = .35f;
+    private static final float OBSTACLE_COLLISION = .33f;
+
+    //list of textures so we don't have to load the same texture repeatedly
+    private static HashMap<Type, TextureRegion> TEXTURES;
 
     public Obstacles(Level level) {
         super(level);
@@ -49,27 +60,41 @@ public final class Obstacles extends Entities {
                 continue;
 
             //add pillars
-            if (getRandom().nextBoolean())
-                addPillars(leaf.getRoom());
+            //if (getRandom().nextBoolean())
+            //    addPillars(leaf.getRoom());
 
             //add lights
             addLights(leaf.getRoom());
-
-            //add items on the 4 corners
-            //addCorners(leaf.getRoom());
 
             //assign random type next to the walls
             if (getRandom().nextBoolean())
                 addNextToWalls(leaf.getRoom());
         }
 
+        //clean up lists
         recycle();
+
+        //update the map
+        getLevel().getDungeon().updateMap();
+    }
+
+    public static HashMap<Type, TextureRegion> getTextures() {
+
+        if (TEXTURES == null) {
+            TEXTURES = new HashMap<>();
+            for (Type type : Type.values()) {
+                TEXTURES.put(type, new TextureRegion(new Texture(Gdx.files.internal(ASSET_DIR + type.toString() + ASSET_EXT))));
+            }
+        }
+
+        //return our list of textures
+        return TEXTURES;
     }
 
     private void addNextToWalls(Room room) {
 
         //assign random obstacle type
-        assignRandomType();
+        Obstacles.Type type = assignRandomType();
 
         //how frequent do we add an obstacle
         int offset = getRandom().nextInt(4) + 1;
@@ -83,35 +108,18 @@ public final class Obstacles extends Entities {
             if (row % offset != 0)
                 continue;
             if (!doorWest)
-                add(room.getX() + 1, row);
+                add(type, room.getX() + 1, row);
             if (!doorEast)
-                add(room.getX() + room.getW() - 2, row);
+                add(type, room.getX() + room.getW() - 2, row);
         }
 
         for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
             if (col % offset != 0)
                 continue;
             if (!doorNorth)
-                add(col, room.getY() + room.getH() - 2);
+                add(type, col, room.getY() + room.getH() - 2);
             if (!doorSouth)
-                add(col, room.getY() + 1);
-        }
-    }
-
-    private void addCorners(Room room) {
-
-        //assign random obstacle type
-        assignRandomType();
-
-        int size = (room.getW() > room.getH()) ? (room.getW() / 2) : (room.getH() / 2);
-
-        for (int offset = 2; offset <= size; offset++) {
-
-            add(room.getX() + offset, room.getY() + offset);
-            add(room.getX() + offset, room.getY() + room.getH() - offset);
-            add(room.getX() + room.getW() - offset, room.getY() + offset);
-            add(room.getX() + room.getW() - offset, room.getY() + room.getH() - offset);
-            return;
+                add(type, col, room.getY() + 1);
         }
     }
 
@@ -120,7 +128,7 @@ public final class Obstacles extends Entities {
         //frequency of lights
         int frequency = getRandom().nextInt(4) + 2;
 
-        Obstacle.TYPE = getRandomLight();
+        Obstacles.Type type = getRandomLight();
 
         int middleCol = room.getX() + (room.getW() / 2);
         int middleRow = room.getY() + (room.getH() / 2);
@@ -133,7 +141,7 @@ public final class Obstacles extends Entities {
                     if (col % frequency == 0)
                         continue;
 
-                    add(col, middleRow);
+                    add(type, col, middleRow);
                 }
                 break;
 
@@ -143,7 +151,7 @@ public final class Obstacles extends Entities {
                     if (row % frequency == 0)
                         continue;
 
-                    add(middleCol, row);
+                    add(type, middleCol, row);
                 }
                 break;
 
@@ -154,7 +162,7 @@ public final class Obstacles extends Entities {
                         if (col % frequency != 0 || row % frequency != 0)
                             continue;
 
-                        add(col, row);
+                        add(type, col, row);
                     }
                 }
                 break;
@@ -165,7 +173,7 @@ public final class Obstacles extends Entities {
                     if (col % frequency == 0)
                         continue;
 
-                    add(col, middleRow);
+                    add(type, col, middleRow);
                 }
 
                 for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
@@ -173,64 +181,64 @@ public final class Obstacles extends Entities {
                     if (row % frequency == 0)
                         continue;
 
-                    add(middleCol, row);
+                    add(type, middleCol, row);
                 }
                 break;
 
             case 4:
                 int offset = 4;
-                add(room.getX() + offset, room.getY() + offset);
-                add(room.getX() + (room.getW() - 1) - offset, room.getY() + (room.getH() - 1) - offset);
-                add(room.getX() + (room.getW() - 1) - offset, room.getY() + offset);
-                add(room.getX() + offset, room.getY() + (room.getH() - 1) - offset);
+                add(type, room.getX() + offset, room.getY() + offset);
+                add(type, room.getX() + (room.getW() - 1) - offset, room.getY() + (room.getH() - 1) - offset);
+                add(type, room.getX() + (room.getW() - 1) - offset, room.getY() + offset);
+                add(type, room.getX() + offset, room.getY() + (room.getH() - 1) - offset);
                 break;
         }
     }
 
     private void addPillars(Room room) {
 
-        Obstacle.TYPE = getRandomPillar();
+        Obstacles.Type type = getRandomPillar();
 
         if (!room.hasWestDoor(getLevel().getDungeon()) && !room.hasEastDoor(getLevel().getDungeon())) {
-            addPillarVertical(room, room.getX() + 1);
-            addPillarVertical(room, room.getX() + room.getW() - 2);
+            addPillarVertical(type, room, room.getX() + 1);
+            addPillarVertical(type, room, room.getX() + room.getW() - 2);
         } else if (!room.hasSouthDoor(getLevel().getDungeon()) && !room.hasNorthDoor(getLevel().getDungeon())) {
-            addPillarHorizontal(room, room.getY() + 1);
-            addPillarHorizontal(room, room.getY() + room.getH() - 2);
+            addPillarHorizontal(type, room, room.getY() + 1);
+            addPillarHorizontal(type, room, room.getY() + room.getH() - 2);
         } else {
             if (getRandom().nextBoolean()) {
-                addPillarHorizontal(room, room.getY() + (room.getH() / 2) + 1);
-                addPillarHorizontal(room, room.getY() + (room.getH() / 2) - 1);
+                addPillarHorizontal(type, room, room.getY() + (room.getH() / 2) + 1);
+                addPillarHorizontal(type, room, room.getY() + (room.getH() / 2) - 1);
             } else {
-                addPillarVertical(room, room.getX() + (room.getW() / 2) + 1);
-                addPillarVertical(room, room.getX() + (room.getW() / 2) - 1);
+                addPillarVertical(type, room, room.getX() + (room.getW() / 2) + 1);
+                addPillarVertical(type, room, room.getX() + (room.getW() / 2) - 1);
             }
         }
     }
 
-    private void addPillarVertical(Room room, int col) {
+    private void addPillarVertical(Obstacles.Type type, Room room, int col) {
         for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
             if (row % 2 != 0)
                 continue;
-            add(col, row);
+            add(type, col, row);
         }
     }
 
-    private void addPillarHorizontal(Room room, int row) {
+    private void addPillarHorizontal(Obstacles.Type type, Room room, int row) {
         for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
             if (col % 2 != 0)
                 continue;
-            add(col, row);
+            add(type, col, row);
         }
     }
 
-    private void add(int col, int row) {
+    private void add(Obstacles.Type type, int col, int row) {
         if (hasEntityLocation(col, row))
             return;
         if (nearInteract(col, row))
             return;
 
-        add(new Obstacle(), col, row);
+        add(new Obstacle(type), col, row);
     }
 
     private boolean nearInteract(int col, int row) {
@@ -266,5 +274,30 @@ public final class Obstacles extends Entities {
         }
 
         return false;
+    }
+
+    @Override
+    public void update() {
+        //do we need to update any of the obstacles?
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        if (TEXTURES != null) {
+
+            for (Type type : Type.values()) {
+
+                if (TEXTURES.get(type) != null) {
+                    TEXTURES.get(type).getTexture().dispose();
+                    TEXTURES.put(type, null);
+                }
+            }
+
+            TEXTURES.clear();
+        }
+
+        TEXTURES = null;
     }
 }

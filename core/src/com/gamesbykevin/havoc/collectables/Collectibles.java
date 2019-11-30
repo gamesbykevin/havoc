@@ -1,21 +1,24 @@
 package com.gamesbykevin.havoc.collectables;
 
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.dungeon.Leaf;
 import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.entities.Entity;
+import com.gamesbykevin.havoc.entities.Entity3d;
 import com.gamesbykevin.havoc.level.Level;
 
+import java.lang.reflect.GenericArrayType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-import static com.gamesbykevin.havoc.collectables.Collectible.TYPE;
+import static com.gamesbykevin.havoc.collectables.Collectible.ASSET_DIR;
+import static com.gamesbykevin.havoc.collectables.Collectible.ASSET_EXT;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
-import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
 
 public final class Collectibles extends Entities {
 
@@ -34,29 +37,49 @@ public final class Collectibles extends Entities {
         key,
     }
 
-    //how many of these types can we spawn?
-    public static final int MAX_HEALTH_SMALL = 10;
-    public static final int MAX_HEALTH_LARGE = 3;
-    public static final int MAX_AMMO = 10;
-    public static final int MAX_AMMO_CRATE = 5;
+    //the total number of allowed will depend on the number of rooms
+    public static final float MAX_RATIO_HEALTH_SMALL    = .2f;
+    public static final float MAX_RATIO_HEALTH_LARGE    = .1f;
+    public static final float MAX_RATIO_AMMO            = .4f;
+    public static final float MAX_RATIO_AMMO_CRATE      = .25f;
 
     //how many collectibles per room
     public static final int COLLECTIBLES_PER_ROOM_MAX = 2;
 
+    //spawn ammo here for enemies
+    private static final int SPAWN_AMMO_COL = -1;
+    private static final int SPAWN_AMMO_ROW = -1;
+
+    //list of textures to be re-used
+    private static HashMap<Type, TextureRegion> TEXTURES;
+
     public Collectibles(Level level) {
         super(level);
+
+        //load the collectible textures
+        getTextures();
     }
 
-    public void addKey(float col, float row) {
+    public static HashMap<Type, TextureRegion> getTextures() {
 
-        Collectible.TYPE = Type.key;
-        Collectible collectible = new Collectible(TYPE);
-        collectible.setSolid(true);
-        add(collectible, col, row);
+        if (TEXTURES == null) {
+            TEXTURES = new HashMap<>();
+            for (Type type : Type.values()) {
+                TEXTURES.put(type, new TextureRegion(new Texture(Gdx.files.internal(ASSET_DIR + type.toString() + ASSET_EXT))));
+            }
+        }
+
+        //return our instance
+        return TEXTURES;
     }
 
     @Override
     public void spawn() {
+
+        //spawn
+        for (int i = 0; i < getLevel().getEnemies().getEntityList().size(); i++) {
+            spawnAmmo();
+        }
 
         //create a new list of collectibles
         List<Type> collectibles = new ArrayList<>();
@@ -66,131 +89,155 @@ public final class Collectibles extends Entities {
         collectibles.add(Type.health_large);
 
         //player spawns with this by default
-        //collectibles.add(Type.glock);
-        collectibles.add(Type.smg);
-        collectibles.add(Type.impact);
-        collectibles.add(Type.magnum);
-        collectibles.add(Type.buzzsaw);
-        collectibles.add(Type.shotgun);
+        List<Type> weapons = new ArrayList<>();
+        //weapons.add(Type.glock);
+        weapons.add(Type.smg);
+        weapons.add(Type.impact);
+        weapons.add(Type.magnum);
+        weapons.add(Type.buzzsaw);
+        weapons.add(Type.shotgun);
 
         int countAmmo = 0;
         int countAmmoCrate = 0;
         int countHealthSmall = 0;
         int countHealthLarge = 0;
 
-        //list of valid leaves for spawning
+        //list of valid leaves containing rooms for spawning
         List<Leaf> leaves = getLeafRooms(getLevel().getDungeon());
+
+        //the max number allowed will depend on the number of rooms
+        int maxHealthSmall = (int)(MAX_RATIO_HEALTH_SMALL * leaves.size());
+        int maxHealthLarge = (int)(MAX_RATIO_HEALTH_LARGE * leaves.size());
+        int maxAmmo = (int)(MAX_RATIO_AMMO * leaves.size());
+        int maxAmmoCrate = (int)(MAX_RATIO_AMMO_CRATE * leaves.size());
+
+        //list of options where the collectibles can be placed
+        List<Cell> options = null;
 
         while (!leaves.isEmpty()) {
 
-            int randomIndex = getRandom().nextInt(leaves.size());
+            //choose random leaf
+            final int randomIndex = getRandom().nextInt(leaves.size());
 
             //get random leaf
             Leaf leaf = leaves.get(randomIndex);
 
-            //remove from the list
+            //remove it from the list
             leaves.remove(randomIndex);
 
-            List<Cell> options = getLocationOptions(leaf.getRoom());
+            //get a list of options to place the collectibles
+            options = getLocationOptions(leaf.getRoom());
 
             int count = 0;
 
-            //only allow once per room
-            int countRoomAmmo = 0;
-            int countRoomAmmoCrate = 0;
-            int countRoomHealthSmall = 0;
-            int countRoomHealthLarge = 0;
+            //keep track of what we spawn in the room
+            boolean roomAmmo = false;
+            boolean roomAmmoCrate = false;
+            boolean roomHealthSmall = false;
+            boolean roomHealthLarge = false;
 
-            //pick random number of enemies
-            int limit = getRandom().nextInt(COLLECTIBLES_PER_ROOM_MAX) + 1;
+            //pick random number of collectibles for the current room
+            final int limit = getRandom().nextInt(COLLECTIBLES_PER_ROOM_MAX) + 1;
 
-            //continue until we reach limit or no move options
+            //continue until we reach limit or there are no more options
             while (!options.isEmpty() && count < limit) {
 
-                if (collectibles.isEmpty())
+                //if there is nothing left
+                if (collectibles.isEmpty() && weapons.isEmpty())
                     break;
 
                 //pick random index
-                int index = getRandom().nextInt(options.size());
+                final int index = getRandom().nextInt(options.size());
 
                 //get the location
                 Cell cell = options.get(index);
 
-                //check if there are any other items
-                if (!hasEntityLocation(cell.getCol(), cell.getRow())) {
+                //can't place if there is something already here
+                if (hasEntityLocation(cell.getCol(), cell.getRow())) {
 
-                    //pick a random collectible
-                    int collectibleIndex = getRandom().nextInt(collectibles.size());
+                    //remove from the list of options
+                    options.remove(index);
 
-                    //get the collectible
-                    TYPE = collectibles.get(collectibleIndex);
+                    //skip to the next location
+                    continue;
+                }
 
-                    //some collectibles should only exist once
-                    switch (collectibles.get(collectibleIndex)) {
+                //type of collectible
+                Type type = null;
 
-                        //these can only be added once
-                        case glock:
-                        case impact:
-                        case buzzsaw:
-                        case magnum:
-                        case smg:
-                        case shotgun:
-                            collectibles.remove(collectibleIndex);
-                            break;
+                //secret rooms have weapons placed in them
+                if (leaf.getRoom().isSecret() && !weapons.isEmpty()) {
+
+                    //pick a random index
+                    int tmpIndex = getRandom().nextInt(weapons.size());
+
+                    //get the type
+                    type = weapons.get(tmpIndex);
+
+                    //remove from the list
+                    weapons.remove(tmpIndex);
+
+                    //make this the limit so we place only 1 weapon per secret room
+                    count = limit;
+
+                } else if (!collectibles.isEmpty()) {
+
+                    //pick a random index
+                    int tmpIndex = getRandom().nextInt(collectibles.size());
+
+                    //get the type
+                    type = collectibles.get(tmpIndex);
+
+                    switch (type) {
 
                         case ammo:
-                            countRoomAmmo++;
-
-                            if (countRoomAmmo <= 1) {
+                            if (!roomAmmo && !roomAmmoCrate) {
+                                roomAmmo = true;
                                 countAmmo++;
-                                if (countAmmo >= MAX_AMMO)
-                                    collectibles.remove(collectibleIndex);
+
+                                if (countAmmo >= maxAmmo)
+                                    collectibles.remove(tmpIndex);
                             }
                             break;
 
                         case ammo_crate:
-                            countRoomAmmoCrate++;
-
-                            if (countRoomAmmoCrate <= 1) {
+                            if (!roomAmmo && !roomAmmoCrate) {
+                                roomAmmoCrate = true;
                                 countAmmoCrate++;
 
-                                if (countAmmoCrate >= MAX_AMMO_CRATE)
-                                    collectibles.remove(collectibleIndex);
+                                if (countAmmoCrate >= maxAmmoCrate)
+                                    collectibles.remove(tmpIndex);
                             }
                             break;
 
                         case health_small:
-                            countRoomHealthSmall++;
-
-                            if (countRoomHealthSmall <= 1) {
+                            if (!roomHealthSmall && !roomHealthLarge) {
+                                roomHealthSmall = true;
                                 countHealthSmall++;
 
-                                if (countHealthSmall >= MAX_HEALTH_SMALL)
-                                    collectibles.remove(collectibleIndex);
+                                if (countHealthSmall >= maxHealthSmall)
+                                    collectibles.remove(tmpIndex);
                             }
                             break;
 
                         case health_large:
-                            countRoomHealthLarge++;
-
-                            if (countRoomHealthLarge <= 1) {
+                            if (!roomHealthSmall && !roomHealthLarge) {
+                                roomHealthLarge = true;
                                 countHealthLarge++;
 
-                                if (countHealthLarge >= MAX_HEALTH_LARGE)
-                                    collectibles.remove(collectibleIndex);
+                                if (countHealthLarge >= maxHealthLarge)
+                                    collectibles.remove(tmpIndex);
                             }
                             break;
                     }
-
-                    Collectible collectible = new Collectible(TYPE);
-                    collectible.setSolid(true);
-
-                    //add at the location
-                    add(collectible, cell.getCol(), cell.getRow());
-
-                    //increase the count
-                    count++;
                 }
+
+                //if we have a type we will create the collectible
+                if (type != null)
+                    add(type, cell);
+
+                //increase the count
+                count++;
 
                 //remove the option from the list
                 options.remove(index);
@@ -199,6 +246,79 @@ public final class Collectibles extends Entities {
             //clear the list
             options.clear();
         }
+
+        if (options != null)
+            options.clear();
+
+        if (collectibles != null)
+            collectibles.clear();
+
+        if (weapons != null)
+            weapons.clear();
+
+        options = null;
+        collectibles = null;
+        weapons = null;
+
+        //update the map
+        getLevel().getDungeon().updateMap();
+    }
+
+    public void spawnAmmo() {
+        //render off screen for now
+        add(Type.ammo, SPAWN_AMMO_COL, SPAWN_AMMO_ROW);
+    }
+
+    public void displayAmmo(Entity entity) {
+
+        //look for a collectible to display in the game
+        for (int i = 0; i < getEntityList().size(); i++) {
+
+            if (getEntityList().get(i).getCol() != SPAWN_AMMO_COL && getEntityList().get(i).getRow() != SPAWN_AMMO_ROW)
+                continue;
+
+            Entity3d tmp = (Entity3d)getEntityList().get(i);
+
+            //search for a nearby spot to place the ammo
+            for (float x = 0; x <= OFFSET * 3; x += OFFSET) {
+                for (float y = 0; y <= OFFSET * 3; y += OFFSET) {
+
+                    //avoid this location
+                    if (x == OFFSET || y == OFFSET)
+                        continue;
+
+                    if (hasEntityLocation((int)(entity.getCol() + x), (int)(entity.getRow() + y)) || hasEntityLocation(entity.getCol() + x, entity.getRow() + y))
+                        continue;
+
+                    tmp.setCol(entity.getCol() + x);
+                    tmp.setRow(entity.getRow() + y);
+                    tmp.getAnimation().reset();
+                    tmp.getAnimation().setPosition(entity.getCol() + x, entity.getRow() + y, 0);
+                    return;
+                }
+            }
+        }
+    }
+
+    public void add(Type type, Cell cell) {
+        this.add(type, cell.getCol(), cell.getRow());
+    }
+
+    public void add(Type type, int col, int row) {
+
+        //create the collectible and make it solid so we can collect it
+        Collectible collectible = new Collectible(type);
+
+        //reset the animation
+        collectible.getAnimation().reset();
+
+        //add at the location
+        super.add(collectible, col, row);
+    }
+
+    @Override
+    public void update() {
+        //update anything here
     }
 
     @Override
@@ -222,48 +342,21 @@ public final class Collectibles extends Entities {
         return false;
     }
 
-    //logic to render the entities
     @Override
-    public int render(DecalBatch decalBatch, PerspectiveCamera camera3d, float minCol, float maxCol, float minRow, float maxRow) {
+    public void dispose() {
+        super.dispose();
 
-        int count = 0;
+        if (TEXTURES != null) {
+            for (Type type : Type.values()) {
 
-        for (int i = 0; i < getEntityList().size(); i++) {
-
-            //get the current entity
-            Entity entity = getEntityList().get(i);
-
-            //update the entity
-            entity.update(getLevel());
-
-            //don't render if not solid
-            if (!entity.isSolid())
-                continue;
-
-            //get the position of the entity
-            Vector3 position = entity.getAnimation().getDecal().getPosition();
-
-            //if too far away there is no reason to render
-            if (position.x < minCol || position.x > maxCol)
-                continue;
-            if (position.y < minRow || position.y > maxRow)
-                continue;
-
-            //if entity is not close enough we won't render
-            if (getDistance(entity, camera3d.position) >= RENDER_RANGE)
-                continue;
-
-            //render like a billboard
-            entity.getAnimation().getDecal().lookAt(camera3d.position, camera3d.up);
-
-            //add to the batch to be rendered
-            entity.render(decalBatch);
-
-            //keep track of total rendered
-            count++;
+                if (TEXTURES.get(type) != null) {
+                    TEXTURES.get(type).getTexture().dispose();
+                    TEXTURES.put(type, null);
+                }
+            }
+            TEXTURES.clear();
         }
 
-        //return total number of items rendered
-        return count;
+        TEXTURES = null;
     }
 }

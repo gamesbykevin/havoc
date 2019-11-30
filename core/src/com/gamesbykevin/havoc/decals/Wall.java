@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Wall extends DecalCustom {
 
-    public Wall(TextureRegion texture, Side side) {
+    protected Wall(TextureRegion texture, Side side) {
         super(texture, Type.Wall, side, TEXTURE_WIDTH, TEXTURE_HEIGHT);
     }
 

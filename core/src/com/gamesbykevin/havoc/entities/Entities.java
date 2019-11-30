@@ -1,18 +1,18 @@
 package com.gamesbykevin.havoc.entities;
 
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.level.Level;
+import com.gamesbykevin.havoc.util.Disposable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
+import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
-public abstract class Entities {
+public abstract class Entities implements Disposable {
 
     //list of entities in the game
     private List<Entity> entityList;
@@ -20,7 +20,7 @@ public abstract class Entities {
     //store reference to the level
     private final Level level;
 
-    //offset the texture to render correctly
+    //offset the animation so it doesn't get stuck in the walls
     public static final float OFFSET = 0.5f;
 
     public Entities(Level level) {
@@ -42,27 +42,11 @@ public abstract class Entities {
         return this.entityList;
     }
 
-    public static double getDistance(Entity entity, Vector3 position) {
-        return getDistance(entity.getCol(), entity.getRow(), position.x, position.y);
-    }
-
-    public static double getDistance(Entity entity, float x2, float y2) {
-        return getDistance(entity.getCol(), entity.getRow(), x2, y2);
-    }
-
-    public static double getDistance(float x1, float y1, float x2, float y2) {
-        return Math.sqrt(Math.pow(x2 - x1, 2) + (Math.pow(y2 - y1, 2)));
-    }
+    //how to update the entities
+    public abstract void update();
 
     //how do we spawn items
     public abstract void spawn();
-
-    protected void add(Entity entity, float col, float row) {
-        entity.setCol(col);
-        entity.setRow(row);
-        entity.getAnimation().setPosition(entity.getCol() + OFFSET, entity.getRow() + OFFSET, 0);
-        getEntityList().add(entity);
-    }
 
     protected List<Cell> getLocationOptions(Room room) {
 
@@ -82,6 +66,17 @@ public abstract class Entities {
 
         //return our list of options
         return options;
+    }
+
+    public void add(Entity3d entity, float col, float row) {
+        entity.getAnimation().setPosition(col + OFFSET, row + OFFSET, 0);
+        entity.setCol(col);
+        entity.setRow(row);
+        getEntityList().add(entity);
+    }
+
+    public void add(Entity2d entity) {
+        getEntityList().add(entity);
     }
 
     //do we have collision with any of the objects
@@ -105,8 +100,35 @@ public abstract class Entities {
         return false;
     }
 
+    @Override
+    public void dispose() {
+        if (this.entityList != null) {
+            for (int i = 0; i < this.entityList.size(); i++) {
+                if (this.entityList.get(i) != null) {
+                    this.entityList.get(i).dispose();
+                    this.entityList.set(i, null);
+                }
+            }
+
+            this.entityList.clear();
+        }
+
+        this.entityList = null;
+    }
+
+    public int render() {
+        return render(false, RENDER_RANGE);
+    }
+
+    public int render(boolean hide) {
+        return render(hide, RENDER_RANGE);
+    }
+
     //logic to render the entities
-    public int render(DecalBatch decalBatch, PerspectiveCamera camera3d, float minCol, float maxCol, float minRow, float maxRow) {
+    public int render(boolean hide, int range) {
+
+        //update the entities accordingly
+        update();
 
         int count = 0;
 
@@ -115,32 +137,22 @@ public abstract class Entities {
             //get the current entity
             Entity entity = getEntityList().get(i);
 
-            //update the entity
-            entity.update(getLevel());
-
-            //get the position of the entity
-            Vector3 position = entity.getAnimation().getDecal().getPosition();
-
-            //if too far away there is no reason to render
-            if (position.x < minCol || position.x > maxCol)
-                continue;
-            if (position.y < minRow || position.y > maxRow)
+            //if we want to hide entities that are not solid
+            if (hide && !entity.isSolid())
                 continue;
 
-            //if entity is not close enough we won't render
-            if (getDistance(entity, camera3d.position) > RENDER_RANGE)
+            //don't render if too far away
+            if (range > 0 && getDistance(entity, getLevel().getPlayer().getCamera3d().position) > range)
                 continue;
 
-            //render like a billboard
-            entity.getAnimation().getDecal().lookAt(camera3d.position, camera3d.up);
+            //render the entity
+            entity.render(getLevel().getPlayer().getCamera3d(), getLevel().getDecalBatch(), getLevel().getPlayer().getController().getStage().getBatch());
 
-            //add to the batch to be rendered
-            entity.render(decalBatch);
-
+            //keep track of how many items we rendered
             count++;
         }
 
-        //return the number of entities rendered
+        //return the count
         return count;
     }
 }

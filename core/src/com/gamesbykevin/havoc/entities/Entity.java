@@ -1,15 +1,16 @@
 package com.gamesbykevin.havoc.entities;
 
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
-import com.gamesbykevin.havoc.animation.DecalAnimation;
 import com.gamesbykevin.havoc.level.Level;
+import com.gamesbykevin.havoc.util.Disposable;
 
-import static com.gamesbykevin.havoc.entities.Entities.getDistance;
+import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
-public abstract class Entity {
+public abstract class Entity implements Disposable {
 
-    //is the entity solid? for collision detection
+    //is the entity solid? for collision detection and rendering etc...
     private boolean solid;
 
     //location of the entity
@@ -18,27 +19,11 @@ public abstract class Entity {
     //the index of the current animation
     private int index = 0;
 
-    //array of animations for our entity
-    private DecalAnimation[] animations;
-
     //how close can the player get to an object
-    public static final double PLAYER_COLLISION = 0.75d;
+    public static final double PLAYER_COLLISION = 0.70d;
 
-    public Entity(int count) {
-
-        //create array of animations
-        this.animations = new DecalAnimation[count];
-
-        //now create and load the animations accordingly
-        createAnimations();
-    }
-
-    protected DecalAnimation[] getAnimations() {
-        return this.animations;
-    }
-
-    public DecalAnimation getAnimation() {
-        return getAnimations()[getIndex()];
+    protected Entity() {
+        //default constructor
     }
 
     public int getIndex() {
@@ -79,9 +64,6 @@ public abstract class Entity {
     //logic to update the entity
     public abstract void update(Level level);
 
-    //create the animations for the entity
-    public abstract void createAnimations();
-
     public boolean hasCollision(float x, float y) {
 
         //skip if not solid
@@ -96,7 +78,6 @@ public abstract class Entity {
         return false;
     }
 
-    public void render(DecalBatch decalBatch) {
-        decalBatch.add(getAnimation().getDecal());
-    }
+    //implement logic to render an entity
+    public abstract void render(PerspectiveCamera camera, DecalBatch decalBatch, Batch batch);
 }

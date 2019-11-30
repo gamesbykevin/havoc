@@ -220,7 +220,7 @@ public class ObstacleHelper {
             OPTIONS_PLANT = new ArrayList<>();
 
         if (OPTIONS_PLANT.isEmpty()) {
-            OPTIONS_PLANT.add(Obstacles.Type.BluePotEmpty);
+            //OPTIONS_PLANT.add(Obstacles.Type.BluePotEmpty);
             OPTIONS_PLANT.add(Obstacles.Type.BluePotLargeEmpty);
             OPTIONS_PLANT.add(Obstacles.Type.BluePotPlant1);
             OPTIONS_PLANT.add(Obstacles.Type.BluePotPlant2);
@@ -246,7 +246,7 @@ public class ObstacleHelper {
             OPTIONS_OTHER.add(Obstacles.Type.random4);
             OPTIONS_OTHER.add(Obstacles.Type.FloorLamp1);
             OPTIONS_OTHER.add(Obstacles.Type.FloorLamp2);
-            OPTIONS_OTHER.add(Obstacles.Type.DogFood);
+            //OPTIONS_OTHER.add(Obstacles.Type.DogFood);
             OPTIONS_OTHER.add(Obstacles.Type.pots1);
             OPTIONS_OTHER.add(Obstacles.Type.pots2);
         }
@@ -261,59 +261,70 @@ public class ObstacleHelper {
         return type;
     }
 
-    protected static void assignRandomType() {
+    protected static Obstacles.Type assignRandomType() {
 
         if (OPTIONS_RANDOM_TYPE == null)
             OPTIONS_RANDOM_TYPE = new ArrayList<>();
 
         if (OPTIONS_RANDOM_TYPE.isEmpty()) {
-            for (int i = 0; i < 9; i++) {
+            for (int i = 0; i < 8; i++) {
                 OPTIONS_RANDOM_TYPE.add(i);
             }
         }
 
         int index = getRandom().nextInt(OPTIONS_RANDOM_TYPE.size());
 
+        Obstacles.Type type = null;
+
         switch (OPTIONS_RANDOM_TYPE.get(index)) {
 
             case 0:
-                Obstacle.TYPE = getRandomStatue();
+                type = getRandomStatue();
                 break;
 
             case 1:
-                Obstacle.TYPE = getRandomFlag();
+                type = getRandomFlag();
                 break;
 
             case 2:
-                Obstacle.TYPE = getRandomCage();
+                type = getRandomCage();
                 break;
 
             case 3:
-                Obstacle.TYPE = getRandomBarrel();
+                type = getRandomBarrel();
                 break;
 
+            case 4:
+                type = getRandomPillar();
+                break;
+
+            case 5:
+                type = getRandomPlant();
+                break;
+
+            case 6:
+                type = getRandomOther();
+                break;
+
+            case 7:
+                type = getRandomGrass();
+                break;
+
+            /*
             case 4:
                 Obstacle.TYPE = getRandomWell();
                 break;
 
             case 5:
-                Obstacle.TYPE = getRandomSpecimen();
+                type = getRandomSpecimen();
                 break;
-
-            case 6:
-                Obstacle.TYPE = getRandomPlant();
-                break;
-
-            case 7:
-                Obstacle.TYPE = getRandomOther();
-                break;
-
-            case 8:
-                Obstacle.TYPE = getRandomGrass();
-                break;
+            */
         }
 
         //remove from the list
         OPTIONS_RANDOM_TYPE.remove(index);
+
+        //return the random type selected
+        return type;
     }
 }

@@ -3,39 +3,24 @@ package com.gamesbykevin.havoc.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
-import com.gamesbykevin.havoc.level.Level;
 
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
 import static com.gamesbykevin.havoc.input.MyControllerHelper.*;
 
-public class MyController implements InputProcessor {
+public class MyController implements InputProcessor, Disposable {
 
     //how fast can we move
     public static final float SPEED_WALK = .1f;
-    public static final float SPEED_RUN = .25f;
-
-    //how fast can the player move
-    private float speed = SPEED_WALK;
 
     //how fast can the player turn by default
     public static final float DEFAULT_SPEED_ROTATE = 3f;
 
-    //track how fast the player can turn
-    private float speedRotate = DEFAULT_SPEED_ROTATE;
-
     //our rotation and rotation angle
     private float rotation = 0;
-
-    //track our previous position
-    private Vector3 previousPosition;
-
-    //our 3d camera reference containing our game location
-    private final Level level;
 
     //our input listener
     private Stage stage;
@@ -52,7 +37,6 @@ public class MyController implements InputProcessor {
     private boolean strafeRight = false;
     private boolean turnRight = false;
     private boolean turnLeft = false;
-    private boolean running = false;
     private boolean shooting = false;
     private boolean action = false;
     private boolean change = false;
@@ -63,15 +47,7 @@ public class MyController implements InputProcessor {
     //track the joystick position
     private float knobPercentX = 0, knobPercentY = 0;
 
-    public MyController(Level level) {
-
-        //reference our level for collision detection
-        this.level = level;
-
-        //track previous position in maze
-        this.previousPosition = new Vector3();
-        getPreviousPosition().x = getCamera3d().position.x;
-        getPreviousPosition().y = getCamera3d().position.y;
+    public MyController() {
 
         //setup our controller ui
         setupController(this);
@@ -79,11 +55,18 @@ public class MyController implements InputProcessor {
         //make sure we are capturing input correct
         setInput();
 
-        //how fast can we turn?
-        setSpeedRotate(DEFAULT_SPEED_ROTATE);
-
         //create our camera
         getCamera2d();
+    }
+
+    @Override
+    public void dispose() {
+
+        if (this.stage != null)
+            this.stage.dispose();
+
+        this.stage = null;
+        this.camera2d = null;
     }
 
     public void setKnobPercentX(float knobPercentX) {
@@ -100,10 +83,6 @@ public class MyController implements InputProcessor {
 
     public float getKnobPercentY() {
         return this.knobPercentY;
-    }
-
-    public Level getLevel() {
-        return this.level;
     }
 
     public OrthographicCamera getCamera2d() {
@@ -129,9 +108,6 @@ public class MyController implements InputProcessor {
                 break;
 
             case Desktop:
-                Gdx.input.setInputProcessor(this);
-                break;
-
             default:
                 Gdx.input.setInputProcessor(this);
                 break;
@@ -144,22 +120,6 @@ public class MyController implements InputProcessor {
 
     public void setRotation(float rotation) {
         this.rotation = rotation;
-    }
-
-    public float getSpeedRotate() {
-        return this.speedRotate;
-    }
-
-    public void setSpeedRotate(float speedRotate) {
-        this.speedRotate = speedRotate;
-    }
-
-    public float getSpeed() {
-        return this.speed;
-    }
-
-    public void setSpeed(float speed) {
-        this.speed = speed;
     }
 
     @Override
@@ -204,14 +164,6 @@ public class MyController implements InputProcessor {
         return false;
     }
 
-    public PerspectiveCamera getCamera3d() {
-        return this.level.getCamera3d();
-    }
-
-    public Vector3 getPreviousPosition() {
-        return this.previousPosition;
-    }
-
     public boolean isStrafeLeft() {
         return this.strafeLeft;
     }
@@ -250,14 +202,6 @@ public class MyController implements InputProcessor {
 
     public void setStrafeRight(boolean strafeRight) {
         this.strafeRight = strafeRight;
-    }
-
-    public boolean isRunning() {
-        return this.running;
-    }
-
-    public void setRunning(boolean running) {
-        this.running = running;
     }
 
     public void setTurnRight(boolean turnRight) {

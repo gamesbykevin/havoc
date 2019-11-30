@@ -2,9 +2,13 @@ package com.gamesbykevin.havoc;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
+import com.gamesbykevin.havoc.collectables.CollectibleHelper;
+import com.gamesbykevin.havoc.collectables.Collectibles;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.player.Player;
+import com.gamesbykevin.havoc.player.weapon.Weapons;
+import com.gamesbykevin.havoc.texture.TextureHelper;
 
 public class MyGdxGame extends ApplicationAdapter {
 
@@ -20,67 +24,63 @@ public class MyGdxGame extends ApplicationAdapter {
 	 */
 	public static final float FRAME_MS = (1000f / FPS);
 
-	//how we will control the game
-	private MyController controller;
-
 	//our game level
 	private Level level;
 
 	//our hero
 	private Player player;
 
+	//our weapon inventory
+	private Weapons weapons;
+
 	@Override
 	public void create () {
 
-		//create our level
+		//create objects etc...
 		getLevel();
-
-		//create the controller
-		getController();
+		getWeapons();
 	}
 
-    public Player getPlayer() {
-
-	    if (this.player == null)
-	        this.player = new Player(getController());
-
-        return this.player;
-    }
-
-    public Level getLevel() {
+	public Level getLevel() {
 
 		if (this.level == null)
-			this.level = new Level();
+			this.level = new Level(getPlayer());
 
 		return this.level;
 	}
 
-	public MyController getController() {
+	public Player getPlayer() {
 
-		if (this.controller == null)
-			this.controller = new MyController(getLevel());
+	    if (this.player == null)
+	        this.player = new Player();
 
-		return this.controller;
+        return this.player;
+    }
+
+	public Weapons getWeapons() {
+
+		if (this.weapons == null)
+			this.weapons = new Weapons(getLevel());
+
+		return this.weapons;
 	}
 
 	@Override
 	public void render () {
+
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
 		final long time = System.currentTimeMillis();
 
-        //update the player
-        getPlayer().update();
+		//check if any collectibles have been collected
+		CollectibleHelper.check(getLevel(), getWeapons());
 
         //render the level
         getLevel().render();
 
-        //render the controls
-        getController().render();
-
-        //render the player
-        getPlayer().render();
+		//render player etc...
+		getPlayer().render(getWeapons());
 
         final long elapsed = System.currentTimeMillis() - time;
 
@@ -99,5 +99,16 @@ public class MyGdxGame extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 
+		if (this.player != null)
+			this.player.dispose();
+		if (this.level != null)
+			this.level.dispose();
+		if (this.weapons != null)
+			this.weapons.dispose();
+
+		this.player = null;
+		this.level = null;
+		this.weapons = null;
+		TextureHelper.recycle();
 	}
 }

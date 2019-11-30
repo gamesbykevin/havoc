@@ -410,9 +410,8 @@ public class RoomHelper {
 
         for (int i = 0; i < leaves.size(); i++) {
 
-            Leaf leaf = leaves.get(i);
-
-            List<Cell> doors = getDoors(dungeon, leaf.getRoom());
+            //let's see how many doors are in the room
+            List<Cell> doors = getDoors(dungeon, leaves.get(i).getRoom());
 
             //we will only make a room a secret if it has only 1 door
             if (doors.size() > 1)
@@ -439,12 +438,18 @@ public class RoomHelper {
             }
 
             if (room != null) {
+
                 //check the room we are linked to, in order to get the linked door
                 Cell linkedDoor = getLinkedDoor(dungeon, room, door);
 
-                //mark this door as a secret
-                if (linkedDoor != null)
+                if (linkedDoor != null) {
+
+                    //mark this door as a secret
                     linkedDoor.setType(Type.Secret);
+
+                    //mark the room as a secret as well
+                    leaves.get(i).getRoom().setSecret(true);
+                }
             }
         }
     }
@@ -478,13 +483,14 @@ public class RoomHelper {
         for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
             for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
 
-                //only check the edges for doors
-                if (col != room.getX() && col != room.getX() + room.getW() - 1 && row != room.getY() && row != room.getY() + room.getH() - 1)
-                    continue;
-
                 Cell cell = dungeon.getCells()[row][col];
 
-                if (cell.isDoor())
+                //we are looking for doors
+                if (!cell.isDoor())
+                    continue;
+
+                //also make sure it's linked to another door in another room
+                if (cell.getLink() != null)
                     doors.add(cell);
             }
         }

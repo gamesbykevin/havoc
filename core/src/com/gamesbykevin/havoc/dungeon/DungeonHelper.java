@@ -1,6 +1,7 @@
 package com.gamesbykevin.havoc.dungeon;
 
 import com.gamesbykevin.havoc.astar.Node;
+import com.gamesbykevin.havoc.collectables.Collectibles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ import static com.gamesbykevin.havoc.dungeon.RoomHelper.*;
 public class DungeonHelper {
 
     //how big is the dungeon
-    public static final int DUNGEON_SIZE = 100;
+    public static final int DUNGEON_SIZE = ROOM_DIMENSION_MAX * 3;
 
     public static int getCount(Dungeon dungeon, String id) {
 
@@ -330,170 +331,242 @@ public class DungeonHelper {
         sibling1.setMerged(true);
         sibling2.setMerged(true);
 
-        //the start and goal
+        //we need to figure out which rooms we are going to connect together
+        Room room1 = null, room2 = null;
+        List<Room> rooms1, rooms2;
+
+        //the start and end door of those rooms to be connected
         Cell start = null, goal = null;
 
-        //where do we connect
-        if (sibling1.getX() != sibling2.getX()) {
+        boolean horizontal = (sibling1.getX() != sibling2.getX());
 
-            //two rooms
-            Room west = null, east = null;
+        if (horizontal) {
+            rooms1 = getRooms(dungeon.getLeafs(), (sibling1.getX() > sibling2.getX()) ? sibling1 : sibling2);
+            rooms2 = getRooms(dungeon.getLeafs(), (sibling1.getX() > sibling2.getX()) ? sibling2 : sibling1);
+        } else {
+            rooms1 = getRooms(dungeon.getLeafs(), (sibling1.getY() > sibling2.getY()) ? sibling1 : sibling2);
+            rooms2 = getRooms(dungeon.getLeafs(), (sibling1.getY() > sibling2.getY()) ? sibling2 : sibling1);
+        }
 
-            List<Room> roomsWest;
-            List<Room> roomsEast;
+        //the distance to beat
+        double distance = -1;
 
-            if (sibling1.getX() > sibling2.getX()) {
-                roomsWest = getRoomsWest(dungeon.getLeafs(), sibling1);
-                roomsEast = getRoomsEast(dungeon.getLeafs(), sibling2);
-            } else {
-                roomsWest = getRoomsWest(dungeon.getLeafs(), sibling2);
-                roomsEast = getRoomsEast(dungeon.getLeafs(), sibling1);
-            }
+        //compare rooms to find which 2 are closest together
+        for (int i = 0; i < rooms1.size(); i++) {
+            for (int j = 0; j < rooms2.size(); j++) {
 
-            //the distance to beat
-            double distance = -1;
+                Room tmp1 = rooms1.get(i);
+                Room tmp2 = rooms2.get(j);
 
-            //compare rooms to find which 2 are closest together
-            for (int i = 0; i < roomsWest.size(); i++) {
-                for (int j = 0; j < roomsEast.size(); j++) {
+                //calculate the distance
+                double dist = (horizontal) ? getDistanceHorizontal(tmp1, tmp2) : getDistanceVertical(tmp1, tmp2);
 
-                    Room roomWest = roomsWest.get(i);
-                    Room roomEast = roomsEast.get(j);
-
-                    //if these 2 rooms are closest we have a winner
-                    if (distance < 0 || getDistanceHorizontal(roomWest, roomEast) < distance) {
-                        west = roomWest;
-                        east = roomEast;
-                        distance = getDistanceHorizontal(roomWest, roomEast);
-                    }
+                //if these 2 rooms are closest we have a winner
+                if (distance < 0 || dist < distance) {
+                    room1 = tmp1;
+                    room2 = tmp2;
+                    distance = dist;
                 }
             }
+        }
 
-            int size = -1;
+        int diff = -1;
 
-            for (int rowWest = west.getY(); rowWest < west.getY() + west.getH(); rowWest++) {
-                for (int rowEast = east.getY(); rowEast < east.getY() + east.getH(); rowEast++) {
+        int offset = 3;
 
-                    Cell cell1 = dungeon.getCells()[rowWest][west.getX()];
-                    Cell cell2 = dungeon.getCells()[rowEast][east.getX() + east.getW() - 1];
+        //where do we connect
+        if (horizontal) {
 
-                    //if the doors are valid let's check the distance
-                    if (isDoorValid(dungeon, cell1) && isDoorValid(dungeon, cell2)) {
+            Room roomW = (room1.getX() < room2.getX()) ? room1 : room2;
+            Room roomE = (room1.getX() < room2.getX()) ? room2 : room1;
 
-                        //make a door for now so we can calculate the path
-                        cell1.setType(Type.Door);
-                        cell2.setType(Type.Door);
+            //we prefer to connect rooms at the center
+            int middleW = roomW.getY() + (roomW.getH() / 2);
+            int middleE = roomW.getY() + (roomE.getH() / 2);
 
-                        //calculate path from start to finish
-                        dungeon.updateMap();
-                        dungeon.getAStar().setDiagonal(false);
-                        dungeon.getAStar().calculate(cell1.getCol(), cell1.getRow(), cell2.getCol(), cell2.getRow());
+            for (int rowW = roomW.getY() + offset; rowW < roomW.getY() + roomW.getH() - offset; rowW++) {
+                for (int rowE = roomE.getY() + offset; rowE < roomE.getY() + roomE.getH() - offset; rowE++) {
 
-                        //if the path is shorter, we'll use this one then
-                        if (size < 0 || dungeon.getAStar().getPath().size() < size) {
-                            size = dungeon.getAStar().getPath().size();
-                            start = cell1;
-                            goal = cell2;
-                        }
+                    Cell cell1 = dungeon.getCells()[rowW][roomW.getX() + roomW.getW() - 1];
+                    Cell cell2 = dungeon.getCells()[rowE][roomE.getX()];
 
-                        //set back to wall
-                        cell1.setType(Type.Wall);
-                        cell2.setType(Type.Wall);
+                    if (!isDoorValid(dungeon, cell1) || !isDoorValid(dungeon, cell2))
+                        continue;
+
+                    //calculate the difference
+                    int difference = Math.abs(rowW - rowE);
+
+                    //penalize for being away from the center
+                    //difference += Math.abs(rowE - middleE);
+                    //difference += Math.abs(rowW - middleW);
+
+                    if (diff < 0 || difference < diff) {
+                        start = cell1;
+                        goal = cell2;
+                        diff = difference;
                     }
                 }
             }
 
         } else if (sibling1.getY() != sibling2.getY()) {
 
-            //two rooms
-            Room north = null, south = null;
+            Room roomN = (room1.getY() < room2.getY()) ? room2 : room1;
+            Room roomS = (room1.getY() < room2.getY()) ? room1 : room2;
 
-            List<Room> roomsNorth;
-            List<Room> roomsSouth;
+            //we prefer to connect rooms at the center
+            int middleN = roomN.getX() + (roomN.getW() / 2);
+            int middleS = roomS.getX() + (roomS.getW() / 2);
 
-            if (sibling1.getY() > sibling2.getY()) {
-                roomsSouth = getRoomsSouth(dungeon.getLeafs(), sibling1);
-                roomsNorth = getRoomsNorth(dungeon.getLeafs(), sibling2);
-            } else {
-                roomsSouth = getRoomsSouth(dungeon.getLeafs(), sibling2);
-                roomsNorth = getRoomsNorth(dungeon.getLeafs(), sibling1);
-            }
+            for (int colN = roomN.getX() + offset; colN < roomN.getX() + roomN.getW() - offset; colN++) {
+                for (int colS = roomS.getX() + offset; colS < roomS.getX() + roomS.getW() - offset; colS++) {
 
-            double distance = -1;
+                    Cell cell1 = dungeon.getCells()[roomN.getY()][colN];
+                    Cell cell2 = dungeon.getCells()[roomS.getY() + roomS.getH() - 1][colS];
 
-            //determine which 2 rooms to combine
-            for (int i = 0; i < roomsNorth.size(); i++) {
-                for (int j = 0; j < roomsSouth.size(); j++) {
+                    if (!isDoorValid(dungeon, cell1) || !isDoorValid(dungeon, cell2))
+                        continue;
 
-                    Room roomNorth = roomsNorth.get(i);
-                    Room roomSouth = roomsSouth.get(j);
+                    //calculate the difference
+                    int difference = Math.abs(colN - colS);
 
-                    //if these 2 rooms are closest we have a winner
-                    if (distance < 0 || getDistanceVertical(roomNorth, roomSouth) < distance) {
-                        north = roomNorth;
-                        south = roomSouth;
-                        distance = getDistanceVertical(roomNorth, roomSouth);
-                    }
-                }
-            }
+                    //penalize for being away from the center
+                    //difference += Math.abs(colN - middleN);
+                    //difference += Math.abs(colS - middleS);
 
-            int size = -1;
-
-            for (int colNorth = north.getX(); colNorth < north.getX() + north.getW(); colNorth++) {
-                for (int colSouth = south.getX(); colSouth < south.getX() + south.getW(); colSouth++) {
-
-                    Cell cell1 = dungeon.getCells()[north.getY() + north.getH() - 1][colNorth];
-                    Cell cell2 = dungeon.getCells()[south.getY()][colSouth];
-
-                    //if the doors are valid let's check the distance
-                    if (isDoorValid(dungeon, cell1) && isDoorValid(dungeon, cell2)) {
-
-                        //make a door (for now)
-                        cell1.setType(Type.Door);
-                        cell2.setType(Type.Door);
-
-                        //calculate path from start to finish
-                        dungeon.updateMap();
-                        dungeon.getAStar().setDiagonal(false);
-                        dungeon.getAStar().calculate(cell1.getCol(), cell1.getRow(), cell2.getCol(), cell2.getRow());
-
-                        //if the path is shorter, we'll use this one then
-                        if (size < 0 || dungeon.getAStar().getPath().size() < size) {
-                            size = dungeon.getAStar().getPath().size();
-                            start = cell1;
-                            goal = cell2;
-                        }
-
-                        //set back to wall
-                        cell1.setType(Type.Wall);
-                        cell2.setType(Type.Wall);
+                    if (diff < 0 || difference < diff) {
+                        start = cell1;
+                        goal = cell2;
+                        diff = difference;
                     }
                 }
             }
         }
 
-        //now let's connect the start and goal together
+        //let's link the start and goal together
         start.setType(Type.Door);
         start.setLink(goal);
         goal.setType(Type.Door);
         goal.setLink(start);
 
-        //calculate the shortest path
+        //calculate path from start to finish
         dungeon.updateMap();
         dungeon.getAStar().setDiagonal(false);
         dungeon.getAStar().calculate(start.getCol(), start.getRow(), goal.getCol(), goal.getRow());
 
-        //update the dungeon
-        for (int i = 0; i < dungeon.getAStar().getPath().size(); i++) {
+        //update the dungeon marking the open spaces
+        for (int i = 1; i < dungeon.getAStar().getPath().size() - 1; i++) {
             Node node = dungeon.getAStar().getPath().get(i);
-
-            if (node.getCol() == start.getCol() && node.getRow() == start.getRow())
-                continue;
-            if (node.getCol() == goal.getCol() && node.getRow() == goal.getRow())
-                continue;
-
-            //flag as open on the path
             dungeon.getCells()[node.getRow()][node.getCol()].setType(Type.Open);
         }
+    }
+
+    protected static void lockDoor(Dungeon dungeon) {
+
+        List<Cell> options = new ArrayList<>();
+
+        //mark goal open so we can calculate path to it
+        dungeon.getCells()[dungeon.getGoalRow()][dungeon.getGoalCol()].setType(Type.Open);
+        dungeon.updateMap();
+        dungeon.getAStar().setDiagonal(false);
+
+        //calculate shortest path to goal
+        dungeon.getAStar().calculate(dungeon.getStartCol(), dungeon.getStartRow(), dungeon.getGoalCol(), dungeon.getGoalRow());
+
+        //now that we made our calculation we can set it back to the goal
+        dungeon.getCells()[dungeon.getGoalRow()][dungeon.getGoalCol()].setType(Type.Goal);
+        dungeon.updateMap();
+
+        //create a list of doors we can possibly lock
+        for (int i = 0; i < dungeon.getAStar().getPath().size(); i++) {
+
+            Node node = dungeon.getAStar().getPath().get(i);
+            Cell cell = dungeon.getCells()[node.getRow()][node.getCol()];
+
+            if (!cell.isDoor())
+                continue;
+            if (cell.isSecret() || cell.isGoal())
+                continue;
+
+            options.add(cell);
+        }
+
+        //if there are no options we can't lock the door
+        if (options.isEmpty())
+            return;
+
+        //pick random index to lock a door
+        int index;
+
+        //minimum cost to place a key
+        int costMin;
+
+        //we don't want to place a key/lock at the start
+        int offsetStart = 2;
+
+        //if the level is large enough we can avoid locking a door right at the start of the level
+        if ((options.size() / 2) > offsetStart)
+            offsetStart = (options.size() / 2);
+
+        if (options.size() >= offsetStart) {
+
+            //adjust the minimum cost so we don't place a key at the beginning
+            costMin = options.get(offsetStart).getCost();
+
+            //which door do we lock?
+            index = getRandom().nextInt(options.size() - (offsetStart + 1));
+            index += (offsetStart + 1);
+
+        } else {
+
+            //lock any random door since the level is too small
+            index = getRandom().nextInt(options.size());
+
+            //any cost above -1 is valid to place the key
+            costMin = -1;
+        }
+
+        //pick a random door to be locked
+        Cell choice = options.get(index);
+
+        //make a locked door
+        choice.setType(Type.DoorLocked);
+
+        //clear previous list
+        options.clear();
+
+        //look for open cells that meet the  cost requirement so we can spawn a key
+        for (int row = 0; row < dungeon.getRows(); row++) {
+            for (int col = 0; col < dungeon.getCols(); col++) {
+
+                Cell tmp = dungeon.getCells()[row][col];
+
+                //only place key on an open cell
+                if (!tmp.isOpen())
+                    continue;
+
+                //only spawn keys in rooms, not hallways
+                if (!isRoom(dungeon.getLeafs(), tmp))
+                    continue;
+
+                //keep away from the start location
+                if (tmp.getCol() == dungeon.getStartCol() || tmp.getRow() == dungeon.getStartRow())
+                    continue;
+
+                //the cost has to be lower than the locked door and meet our cost requirement
+                if (tmp.getCost() < choice.getCost() && tmp.getCost() > costMin)
+                    options.add(tmp);
+            }
+        }
+
+        //pick a random place for the key
+        index = getRandom().nextInt(options.size());
+        choice = options.get(index);
+
+        //and now place the key there
+        ((Collectibles)dungeon.getLevel().getCollectibles()).add(Collectibles.Type.key, choice.getCol(), choice.getRow());
+
+        //we no longer need the list
+        options.clear();
+        options = null;
     }
 }

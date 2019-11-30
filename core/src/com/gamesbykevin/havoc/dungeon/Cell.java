@@ -1,8 +1,9 @@
 package com.gamesbykevin.havoc.dungeon;
 
 import com.gamesbykevin.havoc.guid.GUID;
+import com.gamesbykevin.havoc.util.Disposable;
 
-public class Cell {
+public class Cell implements Disposable {
 
     //location of cell
     private int col, row;
@@ -197,5 +198,12 @@ public class Cell {
                 System.out.print("_");
                 break;
         }
+    }
+
+    @Override
+    public void dispose() {
+        this.id = null;
+        this.type = null;
+        this.link = null;
     }
 }

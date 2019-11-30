@@ -1,9 +1,11 @@
 package com.gamesbykevin.havoc.astar;
 
+import com.gamesbykevin.havoc.util.Disposable;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class AStar {
+public class AStar implements Disposable {
 
     private List<Node> open, closed;
     private List<Node> path;
@@ -251,5 +253,50 @@ public class AStar {
 
     public void setMap(boolean[][] map) {
         this.map = map;
+    }
+
+    @Override
+    public void dispose() {
+
+        if (this.open != null) {
+
+            for (int i = 0; i < this.open.size(); i++) {
+                if (this.open.get(i) != null) {
+                    this.open.get(i).dispose();
+                    this.open.set(i, null);
+                }
+            }
+
+            this.open.clear();
+        }
+
+        if (this.closed != null) {
+
+            for (int i = 0; i < this.closed.size(); i++) {
+                if (this.closed.get(i) != null) {
+                    this.closed.get(i).dispose();
+                    this.closed.set(i, null);
+                }
+            }
+
+            this.closed.clear();
+        }
+
+        if (this.path != null) {
+
+            for (int i = 0; i < this.path.size(); i++) {
+                if (this.path.get(i) != null) {
+                    this.path.get(i).dispose();
+                    this.path.set(i, null);
+                }
+            }
+
+            this.path.clear();
+        }
+
+        this.map = null;
+        this.open = null;
+        this.closed = null;
+        this.path = null;
     }
 }

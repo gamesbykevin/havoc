@@ -1,8 +1,9 @@
 package com.gamesbykevin.havoc.astar;
 
 import com.gamesbykevin.havoc.guid.GUID;
+import com.gamesbykevin.havoc.util.Disposable;
 
-public class Node {
+public class Node implements Disposable {
 
     //location
     private final int col, row;
@@ -79,5 +80,10 @@ public class Node {
 
     public boolean hasId(String id) {
         return getId().equals(id);
+    }
+
+    @Override
+    public void dispose() {
+        //dispose anything here?
     }
 }

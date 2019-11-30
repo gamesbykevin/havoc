@@ -18,7 +18,6 @@ public class MyControllerHelper {
     //different control inputs
     public static final int KEY_MOVE_FORWARD = Input.Keys.W;
     public static final int KEY_MOVE_BACKWARD = Input.Keys.S;
-    public static final int KEY_MOVE_RUNNING = Input.Keys.SHIFT_LEFT;
     public static final int KEY_STRAFE_LEFT = Input.Keys.A;
     public static final int KEY_STRAFE_RIGHT = Input.Keys.D;
     public static final int KEY_TURN_LEFT = Input.Keys.LEFT;
@@ -33,15 +32,15 @@ public class MyControllerHelper {
     private static final String CONTROL_PATH_CHANGE = "controls/change.png";
 
     //how to setup our touch pad
-    private static final float TOUCHPAD_X = 10;
-    private static final float TOUCHPAD_Y = 10;
-    private static final float TOUCHPAD_SIZE = 200;
-    private static final float TOUCHPAD_KNOB_RATIO = 0.40f;
-    private static final float TOUCHPAD_DEADZONE_RATIO = 0.03f;
-    private static final String TOUCHPAD_PATH_BACKGROUND = "controls/joystick.png";
-    private static final String TOUCHPAD_PATH_KNOB = "controls/knob.png";
-    private static final String TOUCHPAD_NAME_BACKGROUND = "touchBackground";
-    private static final String TOUCHPAD_NAME_KNOB = "touchKnob";
+    private static final float TOUCH_PAD_X = 10;
+    private static final float TOUCH_PAD_Y = 10;
+    private static final float TOUCH_PAD_SIZE = 200;
+    private static final float TOUCH_PAD_KNOB_RATIO = 0.40f;
+    private static final float TOUCH_PAD_DEAD_ZONE_RATIO = 0.03f;
+    private static final String TOUCH_PAD_PATH_BACKGROUND = "controls/joystick.png";
+    private static final String TOUCH_PAD_PATH_KNOB = "controls/knob.png";
+    private static final String TOUCH_PAD_NAME_BACKGROUND = "touchBackground";
+    private static final String TOUCH_PAD_NAME_KNOB = "touchKnob";
 
     //size of each button
     public static final int BUTTON_SIZE = 80;
@@ -52,18 +51,18 @@ public class MyControllerHelper {
     protected static void setupController(final MyController controller) {
 
         Skin skin = new Skin();
-        skin.add(TOUCHPAD_NAME_BACKGROUND, new Texture(TOUCHPAD_PATH_BACKGROUND));
-        skin.add(TOUCHPAD_NAME_KNOB, new Texture(TOUCHPAD_PATH_KNOB));
+        skin.add(TOUCH_PAD_NAME_BACKGROUND, new Texture(TOUCH_PAD_PATH_BACKGROUND));
+        skin.add(TOUCH_PAD_NAME_KNOB, new Texture(TOUCH_PAD_PATH_KNOB));
         Touchpad.TouchpadStyle style = new Touchpad.TouchpadStyle();
-        Drawable knob = skin.getDrawable(TOUCHPAD_NAME_KNOB);
-        knob.setMinHeight(TOUCHPAD_SIZE * TOUCHPAD_KNOB_RATIO);
-        knob.setMinWidth(TOUCHPAD_SIZE * TOUCHPAD_KNOB_RATIO);
+        Drawable knob = skin.getDrawable(TOUCH_PAD_NAME_KNOB);
+        knob.setMinHeight(TOUCH_PAD_SIZE * TOUCH_PAD_KNOB_RATIO);
+        knob.setMinWidth(TOUCH_PAD_SIZE * TOUCH_PAD_KNOB_RATIO);
 
-        style.background = skin.getDrawable(TOUCHPAD_NAME_BACKGROUND);
+        style.background = skin.getDrawable(TOUCH_PAD_NAME_BACKGROUND);
         style.knob = knob;
 
-        Touchpad touchpad = new Touchpad(TOUCHPAD_SIZE * TOUCHPAD_DEADZONE_RATIO, style);
-        touchpad.setBounds(TOUCHPAD_X, TOUCHPAD_Y, TOUCHPAD_SIZE, TOUCHPAD_SIZE);
+        Touchpad touchpad = new Touchpad(TOUCH_PAD_SIZE * TOUCH_PAD_DEAD_ZONE_RATIO, style);
+        touchpad.setBounds(TOUCH_PAD_X, TOUCH_PAD_Y, TOUCH_PAD_SIZE, TOUCH_PAD_SIZE);
 
         touchpad.addListener(new ChangeListener() {
             @Override
@@ -158,10 +157,6 @@ public class MyControllerHelper {
 
             case KEY_MOVE_FORWARD:
                 controller.setMoveForward(flag);
-                break;
-
-            case KEY_MOVE_RUNNING:
-                controller.setRunning(flag);
                 break;
 
             case KEY_STRAFE_LEFT:

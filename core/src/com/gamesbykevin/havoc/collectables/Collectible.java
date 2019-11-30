@@ -1,18 +1,15 @@
 package com.gamesbykevin.havoc.collectables;
 
 import com.gamesbykevin.havoc.animation.DecalAnimation;
-import com.gamesbykevin.havoc.entities.Entity;
+import com.gamesbykevin.havoc.entities.Entity3d;
 import com.gamesbykevin.havoc.level.Level;
 
-public final class Collectible extends Entity {
+public final class Collectible extends Entity3d {
 
     //where the sprite image is located
     public static final String ASSET_DIR = "collect/";
 
     public static final String ASSET_EXT = ".bmp";
-
-    //the type of obstacle
-    public static Collectibles.Type TYPE;
 
     private final Collectibles.Type type;
 
@@ -24,8 +21,14 @@ public final class Collectible extends Entity {
         //call parent
         super(SPRITES);
 
+        //default solid to true
+        setSolid(true);
+
         //store the type of collectible
         this.type = type;
+
+        //animations are a single frame
+        getAnimations()[0] = new DecalAnimation(Collectibles.getTextures().get(type));
     }
 
     public Collectibles.Type getType() {
@@ -35,17 +38,11 @@ public final class Collectible extends Entity {
     @Override
     public void reset() {
         setSolid(true);
+        getAnimation().reset();
     }
 
     @Override
     public void update(Level level) {
-        //don't do anything here
-    }
-
-    @Override
-    public void createAnimations() {
-
-        //animations are a single frame
-        getAnimations()[0] = new DecalAnimation(ASSET_DIR + TYPE.toString() + ASSET_EXT);
+        //don't do anything here?
     }
 }

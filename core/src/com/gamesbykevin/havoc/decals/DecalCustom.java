@@ -2,8 +2,9 @@ package com.gamesbykevin.havoc.decals;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
+import com.gamesbykevin.havoc.util.Disposable;
 
-public abstract class DecalCustom {
+public abstract class DecalCustom implements Disposable {
 
     //size of a block
     public static final float TEXTURE_WIDTH = 1.0f;
@@ -38,9 +39,9 @@ public abstract class DecalCustom {
     //billboard will always be facing the camera
     private boolean billboard = false;
 
-    private final Decal decal;
+    private Decal decal;
 
-    public DecalCustom(TextureRegion textureRegion, Type type, Side side, float textureWidth, float textureHeight) {
+    protected DecalCustom(TextureRegion textureRegion, Type type, Side side, float textureWidth, float textureHeight) {
         this.decal = Decal.newDecal(textureWidth, textureHeight, textureRegion);
         this.type = type;
         this.side = side;
@@ -101,14 +102,14 @@ public abstract class DecalCustom {
         switch (door.getSide()) {
             case West:
             case East:
-                door.setStart(row + (TEXTURE_HEIGHT / 2));
-                door.setDestination(row - (TEXTURE_HEIGHT / 2));
+                door.setStart(row + (TEXTURE_HEIGHT/2));
+                door.setDestination(row - (TEXTURE_HEIGHT/2));
                 break;
 
             case North:
             case South:
-                door.setStart(col + (TEXTURE_WIDTH / 2));
-                door.setDestination(col - (TEXTURE_WIDTH / 2));
+                door.setStart(col + (TEXTURE_WIDTH/2));
+                door.setDestination(col - (TEXTURE_WIDTH/2));
                 break;
         }
 
@@ -172,5 +173,12 @@ public abstract class DecalCustom {
                 decal.rotateY(90);
                 break;
         }
+
+        decal.setPosition(decal.getPosition().x, decal.getPosition().y, decal.getPosition().z);
+    }
+
+    @Override
+    public void dispose() {
+        this.decal = null;
     }
 }

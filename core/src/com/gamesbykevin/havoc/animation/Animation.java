@@ -1,8 +1,9 @@
 package com.gamesbykevin.havoc.animation;
 
 import com.badlogic.gdx.Gdx;
+import com.gamesbykevin.havoc.util.Disposable;
 
-public abstract class Animation {
+public abstract class Animation implements Disposable {
 
     //current animation
     private int index;
@@ -92,6 +93,10 @@ public abstract class Animation {
     }
 
     public void update() {
+
+        //no need to update if finished
+        if (isFinish())
+            return;
 
         //track the amount of time elapsed
         setElapsed(getElapsed() + (Gdx.graphics.getDeltaTime() * MILLISECONDS_PER_SECOND));

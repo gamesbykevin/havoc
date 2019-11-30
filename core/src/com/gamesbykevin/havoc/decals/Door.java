@@ -29,29 +29,18 @@ public class Door extends DecalCustom {
     private float lapsed;
 
     //how long does the door stay open
-    private static final float DOOR_OPEN_TIME = 2500f;
+    private static final float DOOR_OPEN_TIME = 3500f;
 
     //is this door a secret
     private boolean secret;
 
-    //is the door locked?
-    private boolean locked = false;
-
-    public Door(TextureRegion texture, Side side, boolean secret) {
+    protected Door(TextureRegion texture, Side side, boolean secret) {
         super(texture, Type.Door, side, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         setOpen(false);
         setOpening(false);
         setClosing(false);
         setClosed(true);
         setSecret(secret);
-    }
-
-    public boolean isLocked() {
-        return this.locked;
-    }
-
-    public void setLocked(boolean locked) {
-        this.locked = locked;
     }
 
     public boolean isSecret() {

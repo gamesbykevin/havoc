@@ -1,6 +1,8 @@
 package com.gamesbykevin.havoc.dungeon;
 
-public class Room {
+import com.gamesbykevin.havoc.util.Disposable;
+
+public class Room implements Disposable {
 
     //location of room
     private int x, y;
@@ -23,7 +25,7 @@ public class Room {
         setSecret(false);
     }
 
-    public boolean contains(int x, int y) {
+    public boolean contains(float x, float y) {
 
         if (x < getX() || y < getY())
             return false;
@@ -103,5 +105,10 @@ public class Room {
                 return true;
         }
         return false;
+    }
+
+    @Override
+    public void dispose() {
+        //dispose anything here?
     }
 }

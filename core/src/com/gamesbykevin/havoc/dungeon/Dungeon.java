@@ -3,6 +3,7 @@ package com.gamesbykevin.havoc.dungeon;
 import com.gamesbykevin.havoc.astar.AStar;
 import com.gamesbykevin.havoc.dungeon.Cell.Type;
 import com.gamesbykevin.havoc.level.Level;
+import com.gamesbykevin.havoc.util.Disposable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Random;
 import static com.gamesbykevin.havoc.dungeon.DungeonHelper.*;
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.createSecrets;
 
-public class Dungeon {
+public class Dungeon implements Disposable {
 
     //the map of the dungeon
     private boolean[][] map;
@@ -103,6 +104,9 @@ public class Dungeon {
 
         //now let's see if we can create a secret room
         createSecrets(this);
+
+        //lock a random door and place a key
+        lockDoor(this);
 
         //print the dungeon so we can see it
         print();
@@ -219,9 +223,11 @@ public class Dungeon {
                     getInteract()[row][col] = false;
                 }
 
-                //if obstacles exist
-                if (getLevel().getObstacles() != null && getLevel().getObstacles().hasCollision(col, row))
+                //if we are including obstacles
+                if (getLevel().getObstacles() != null && getLevel().getObstacles().hasCollision(col, row)) {
                     getMap()[row][col] = false;
+                    getInteract()[row][col] = false;
+                }
             }
         }
 
@@ -373,5 +379,42 @@ public class Dungeon {
 
     public Level getLevel() {
         return this.level;
+    }
+
+    @Override
+    public void dispose() {
+
+        if (this.cells != null) {
+            for (int row = 0; row < this.cells.length; row++) {
+                for (int col = 0; col < this.cells[0].length; col++) {
+
+                    if (this.cells[row][col] != null)
+                        this.cells[row][col].dispose();
+
+                    this.cells[row][col] = null;
+                }
+            }
+        }
+
+        if (this.leafs != null) {
+            for (int i = 0; i < this.leafs.size(); i++) {
+                if (this.leafs.get(i) != null) {
+                    this.leafs.get(i).dispose();
+                    this.leafs.set(i, null);
+                }
+            }
+
+            this.leafs.clear();
+        }
+
+        if (this.aStar != null)
+            this.aStar.dispose();
+
+        this.aStar = null;
+        this.leafs = null;
+        this.cells = null;
+        this.map = null;
+        this.interact = null;
+        RANDOM = null;
     }
 }

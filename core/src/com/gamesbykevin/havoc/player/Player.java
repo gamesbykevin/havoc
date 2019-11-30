@@ -1,33 +1,26 @@
 package com.gamesbykevin.havoc.player;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.input.MyController;
-import com.gamesbykevin.havoc.player.weapon.*;
+import com.gamesbykevin.havoc.player.weapon.Weapon;
+import com.gamesbykevin.havoc.player.weapon.Weapons;
+import com.gamesbykevin.havoc.util.Disposable;
+import com.gamesbykevin.havoc.util.Hud;
 
-import static com.gamesbykevin.havoc.player.PlayerHelper.*;
-import static com.gamesbykevin.havoc.player.weapon.WeaponHelper.*;
+import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
+import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
+import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
+import static com.gamesbykevin.havoc.util.Hud.*;
 
-public final class Player {
+public final class Player implements Disposable {
 
-    //our weapons
-    private Weapon[] weapons;
-
-    //used to render images fast
-    private SpriteBatch spriteBatch;
-
-    //current selected weapon
-    private int weaponIndex = 0;
-
-    //controller reference
-    private final MyController controller;
-
-    //array of numbers
-    private Texture[] numbers;
-
-    private static final int HEALTH_MAX = 100;
-    private static final int HEALTH_MIN = 0;
+    //health range
+    public static final int HEALTH_MAX = 100;
+    public static final int HEALTH_MIN = 0;
 
     //what is our health
     private int health = 0;
@@ -35,41 +28,97 @@ public final class Player {
     //do we have the key
     private boolean key = false;
 
-    public Player(MyController controller) {
+    //the previous location of the player
+    private Vector3 previous;
 
-        //store reference to controller
-        this.controller = controller;
+    //is the player hurt?
+    private boolean hurt = false;
 
-        //create our array of number images
-        this.numbers = new Texture[13];
+    //texture to represent the player is hurt
+    private Texture hurtImage;
 
-        //load our textures
-        for (int i = 0; i < this.numbers.length; i++) {
+    //our 3d camera
+    private PerspectiveCamera camera3d;
 
-            if (i < 10) {
-                this.numbers[i] = new Texture(Gdx.files.internal("hud/" + i + ".png"));
-            } else if (i == 10) {
-                this.numbers[i] = new Texture(Gdx.files.internal("hud/key_1_small.png"));
-            } else if (i == 11) {
-                this.numbers[i] = new Texture(Gdx.files.internal("hud/key_2_small.png"));
-            } else if (i == 12) {
-                this.numbers[i] = new Texture(Gdx.files.internal("hud/percent.png"));
-            }
-        }
+    //start location
+    private int startCol, startRow;
 
-        //add weapon to our list
-        getWeapons()[INDEX_LANCE] = new Lance();
-        getWeapons()[INDEX_GLOCK] = new Glock();
+    //the game controller
+    private MyController controller;
 
-        for (int i = 0; i < getWeapons().length; i++) {
-            reset(getWeapons()[i]);
-        }
-
-        //start with glock
-        setWeaponIndex(1);
+    public Player() {
 
         //start out with the max health
         setHealth(HEALTH_MAX);
+
+        //we don't have the key (yet)
+        setKey(false);
+
+        //player isn't hurt (just yet)
+        setHurt(false);
+
+        //store reference to the hurt image
+        this.hurtImage = new Texture(Gdx.files.internal("hud/hurt.png"));
+    }
+
+    public MyController getController() {
+
+        if (this.controller == null)
+            this.controller = new MyController();
+
+        return controller;
+    }
+
+    public PerspectiveCamera getCamera3d() {
+        return getCamera3d(false);
+    }
+
+    public PerspectiveCamera getCamera3d(boolean reset) {
+
+        //create if null
+        if (this.camera3d == null) {
+            float w = Gdx.graphics.getWidth();
+            float h = Gdx.graphics.getHeight();
+            this.camera3d = new PerspectiveCamera(67, 1, h/w);
+            this.camera3d.near = .05f;
+            this.camera3d.far = RENDER_RANGE;
+        }
+
+        if (reset) {
+
+            this.camera3d.direction.set(0, 0, -1);
+            this.camera3d.up.set(0, 1, 0);
+            this.camera3d.update();
+
+            //begin at the start
+            float x = getStartCol();
+            float y = getStartRow();
+
+            //this.camera3d.position.set((ROOM_SIZE / 2) + .5f, (ROOM_SIZE / 2) + .5f,0);
+            this.camera3d.position.set(x, y,0);
+            this.camera3d.position.z = 1.50f;
+            this.camera3d.rotate(Vector3.X, 90);
+
+            //assign the previous position
+            updatePrevious(this.camera3d.position);
+        }
+
+        //return our instance
+        return this.camera3d;
+    }
+
+    public float getStartCol() {
+        return this.startCol;
+    }
+
+    public void setStart(int col, int row) {
+        this.startCol = col;
+        this.startRow = row;
+        getCamera3d(true);
+    }
+
+    public float getStartRow() {
+        return this.startRow;
     }
 
     public int getHealth() {
@@ -85,118 +134,6 @@ public final class Player {
             this.health = HEALTH_MAX;
     }
 
-    public MyController getController() {
-        return this.controller;
-    }
-
-    public Weapon getWeapon() {
-        return getWeapons()[getWeaponIndex()];
-    }
-
-    public void addWeapon(Weapon.Type type) {
-
-        int index = -1;
-
-        switch (type) {
-            case Smg:
-                index = INDEX_SMG;
-                break;
-            case Shotgun:
-                index = INDEX_SHOTGUN;
-                break;
-            case Magnum:
-                index = INDEX_MAGNUM;
-                break;
-            case Impact:
-                index = INDEX_IMPACT;
-                break;
-            case Glock:
-                index = INDEX_GLOCK;
-                break;
-            case Buzz:
-                index = INDEX_BUZZ;
-                break;
-        }
-
-        //if we don't have the weapon we will create and add to the list
-        if (getWeapons()[index] == null) {
-            switch (type) {
-                case Buzz:
-                    getWeapons()[index] = new Buzzsaw();
-                    break;
-                case Glock:
-                    getWeapons()[index] = new Glock();
-                    break;
-                case Impact:
-                    getWeapons()[index] = new Impact();
-                    break;
-                case Magnum:
-                    getWeapons()[index] = new Magnum();
-                    break;
-                case Shotgun:
-                    getWeapons()[index] = new Shotgun();
-                    break;
-                case Smg:
-                    getWeapons()[index] = new Smg();
-                    break;
-            }
-
-            setWeaponIndex(index);
-            reset(getWeapon());
-            getController().setChange(true);
-
-        } else {
-
-            //if weapon exists we will add the bullets
-            getWeapons()[index].setBullets(getWeapons()[index].getBullets() + AMMO_LARGE);
-        }
-    }
-
-    public void update() {
-
-        //update the weapon
-        updateWeapon(this);
-
-        //update the players location
-        updateLocation(getController());
-
-        //check for collision
-        checkCollision(getController());
-
-        //check if we picked up a collectible
-        checkCollectible(getController(), this);
-
-        //update the level
-        updateLevel(this);
-    }
-
-    public void setWeaponIndex(int weaponIndex) {
-        this.weaponIndex = weaponIndex;
-
-        if (getWeaponIndex() >= getWeapons().length || getWeaponIndex() < 0)
-            this.weaponIndex = 0;
-
-        //make sure we pick an index with an existing weapon
-        while (getWeapons()[this.weaponIndex] == null) {
-            this.weaponIndex++;
-
-            if (this.weaponIndex >= getWeapons().length)
-                this.weaponIndex = 0;
-        }
-    }
-
-    public int getWeaponIndex() {
-        return this.weaponIndex;
-    }
-
-    protected Weapon[] getWeapons() {
-
-        if (this.weapons == null)
-            this.weapons = new Weapon[Weapon.Type.values().length];
-
-        return this.weapons;
-    }
-
     public boolean hasKey() {
         return this.key;
     }
@@ -205,69 +142,85 @@ public final class Player {
         this.key = key;
     }
 
-    public SpriteBatch getSpriteBatch() {
+    public Vector3 getPrevious() {
 
-        if (this.spriteBatch == null)
-            this.spriteBatch = new SpriteBatch();
+        if (this.previous == null)
+            this.previous = new Vector3();
 
-        return this.spriteBatch;
+        return this.previous;
     }
 
-    public void render() {
+    public void updatePrevious(Vector3 previous) {
+        getPrevious().x = previous.x;
+        getPrevious().y = previous.y;
+        getPrevious().z = previous.z;
+    }
 
-        getSpriteBatch().setProjectionMatrix(getController().getCamera2d().combined);
+    public boolean isHurt() {
+        return this.hurt;
+    }
 
-        //start rendering
-        getController().getStage().getBatch().begin();
+    public void setHurt(boolean hurt) {
+        this.hurt = hurt;
+    }
 
-        //render weapon animation
-        getWeapons()[getWeaponIndex()].render(getController().getStage().getBatch());
+    public Texture getHurtImage() {
+        return this.hurtImage;
+    }
 
-        //render ammo
-        renderNumber(getWeapon().getBullets(), HUD_BULLET_X, HUD_BULLET_Y, HUD_NUMBER_WIDTH, HUD_NUMBER_HEIGHT, HUD_NUMBER_PAD);
+    //update the player
+    public void update() {
+        //do we need to do anything here
+    }
+
+    public void render(Weapons weapons) {
+
+        //render the controller first
+        getController().render();
+
+        //used to render 2d items etc...
+        Batch batch = getController().getStage().getBatch();
+
+        //start
+        batch.begin();
+
+        //if hurt render the screen graphic
+        if (isHurt()) {
+            batch.draw(getHurtImage(), 0, 0, SIZE_WIDTH, SIZE_HEIGHT);
+            setHurt(false);
+        }
 
         //render health
-        renderNumber(getHealth(), HUD_HEALTH_X, HUD_HEALTH_Y, HUD_NUMBER_WIDTH, HUD_NUMBER_HEIGHT, HUD_NUMBER_PAD);
+        Hud.renderNumber(
+            batch,
+            getHealth(),
+            HUD_HEALTH_X, HUD_HEALTH_Y,
+            HUD_NUMBER_WIDTH, HUD_NUMBER_HEIGHT,
+            HUD_NUMBER_PAD
+        );
 
         //render key?
         if (hasKey())
-            getController().getStage().getBatch().draw(this.numbers[10], HUD_HEALTH_X, HUD_HEALTH_Y - (HUD_KEY_HEIGHT * 1), HUD_KEY_WIDTH, HUD_KEY_HEIGHT);
+            renderKey(batch);
 
-        //done rendering
-        getController().getStage().getBatch().end();
+        //render the weapons
+        weapons.render();
+
+        //we are done
+        batch.end();
     }
 
-    private final void renderNumber(final int number, int renderX, int renderY, int width, int height, int padding) {
+    @Override
+    public void dispose() {
 
-        float x = renderX;
+        if (this.hurtImage != null)
+            this.hurtImage.dispose();
+        if (this.controller != null)
+            this.controller.dispose();
 
-        for (int i = 0; i < 4; i++) {
-
-            int index = 12;
-
-            switch (i) {
-                case 0:
-                    index = (number / 100);
-                    break;
-
-                case 1:
-                    index = (number % 100) / 10;
-                    break;
-
-                case 2:
-                    index = (number % 10);
-                    break;
-            }
-
-            //if less than 0 we display as 999
-            if (number < 0)
-                index = 9;
-
-            //render the number
-            getController().getStage().getBatch().draw(this.numbers[index], x, renderY, width, height);
-
-            //move to the next coordinate
-            x += width + padding;
-        }
+        this.hurtImage = null;
+        this.previous = null;
+        this.controller = null;
+        this.camera3d = null;
     }
 }

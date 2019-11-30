@@ -12,6 +12,9 @@ import java.util.List;
 
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
+import static com.gamesbykevin.havoc.enemies.Enemy.RANGE_NOTICE;
+import static com.gamesbykevin.havoc.enemies.EnemyHelper.*;
+import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public final class Enemies extends Entities {
 
@@ -49,7 +52,6 @@ public final class Enemies extends Entities {
         List<Leaf> leaves = getLeafRooms(getLevel().getDungeon());
 
         //make sure map is updated and we won't allow diagonal movement
-        getLevel().getDungeon().updateMap();
         getLevel().getDungeon().getAStar().setDiagonal(false);
 
         while (!leaves.isEmpty()) {
@@ -81,46 +83,48 @@ public final class Enemies extends Entities {
                 //get the random location
                 Cell location = options.get(index);
 
-                //what type of enemy are we creating
-                Enemy.TYPE = Enemy.Type.values()[getRandom().nextInt(Enemy.Type.values().length)];
-
                 //create our enemy
-                Enemy enemy = new Enemy(location.getCol(), location.getRow());
+                //Enemy enemy = new Enemy(Type.values()[getRandom().nextInt(Type.values().length)], location.getCol(), location.getRow());
+                Enemy enemy = new Enemy(Type.SsApprentice, location.getCol(), location.getRow());
 
                 //start the enemy out as idle
-                enemy.setIndex(Enemy.INDEX_IDLE_E);
+                enemy.setIndex(INDEX_IDLE_E);
 
                 //change the facing direction
                 if (location.getCol() < middleCol) {
-                    enemy.setDirection(Enemy.DIRECTION_E);
+                    enemy.setDirection(DIRECTION_E);
                 } else if (location.getCol() > middleCol) {
-                    enemy.setDirection(Enemy.DIRECTION_W);
+                    enemy.setDirection(DIRECTION_W);
                 } else {
                     if (location.getRow() < middleRow) {
-                        enemy.setDirection(Enemy.DIRECTION_N);
+                        enemy.setDirection(DIRECTION_N);
                     } else {
-                        enemy.setDirection(Enemy.DIRECTION_S);
+                        enemy.setDirection(DIRECTION_S);
                     }
                 }
 
                 //determine at random if the enemy will patrol the room
                 if (getRandom().nextBoolean()) {
 
-                    int size = 0;
+                    //shortest distance
+                    double distance = -1;
 
                     //pick random location in the room for the enemy to walk to
                     List<Cell> tmpList = getLocationOptions(leaf.getRoom(), location);
 
                     Cell winner = null;
 
-                    //pick the location furthest away
+                    //pick the location furthest away so the enemy can patrol the room
                     for (int i = 0; i < tmpList.size(); i++) {
 
                         Cell tmp = tmpList.get(i);
-                        getLevel().getDungeon().getAStar().calculate(location.getCol(), location.getRow(), tmp.getCol(), tmp.getRow());
 
-                        if (getLevel().getDungeon().getAStar().getPath().size() > size) {
-                            size = getLevel().getDungeon().getAStar().getPath().size();
+                        //calculate distance from enemy spawn point
+                        double dist = getDistance(location, tmp);
+
+                        //if the distance is longer this is the distance to beat
+                        if (distance < 0 || dist > distance) {
+                            distance = dist;
                             winner = tmp;
                         }
                     }
@@ -130,7 +134,7 @@ public final class Enemies extends Entities {
 
                     //set the path to the target
                     getLevel().getDungeon().getAStar().calculate(location.getCol(), location.getRow(), winner.getCol(), winner.getRow());
-                    enemy.setPathTarget(getLevel().getDungeon().getAStar().getPath());
+                    enemy.setPathPatrol(getLevel().getDungeon().getAStar().getPath());
                 }
 
                 //add enemy at the location
@@ -147,6 +151,9 @@ public final class Enemies extends Entities {
             options.clear();
             options = null;
         }
+
+        //update the map
+        getLevel().getDungeon().updateMap();
     }
 
     protected List<Cell> getLocationOptions(Room room, Cell target) {
@@ -155,15 +162,14 @@ public final class Enemies extends Entities {
 
         //all 4 sides
         for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
-            add(options, getLevel().getDungeon().getCells()[room.getY() + 1][col], target);
-            add(options, getLevel().getDungeon().getCells()[room.getY() + room.getH() - 2][col], target);
+            add(options, getLevel().getDungeon().getCells()[room.getY() + 2][col], target);
+            add(options, getLevel().getDungeon().getCells()[room.getY() + room.getH() - 3][col], target);
         }
 
         for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
-            add(options, getLevel().getDungeon().getCells()[row][room.getX() + 1], target);
-            add(options, getLevel().getDungeon().getCells()[row][room.getX() + room.getW() - 2], target);
+            add(options, getLevel().getDungeon().getCells()[row][room.getX() + 2], target);
+            add(options, getLevel().getDungeon().getCells()[row][room.getX() + room.getW() - 3], target);
         }
-
 
         //north south east west
         add(options, getLevel().getDungeon().getCells()[room.getY() + (room.getH() / 2)][room.getX() + 2], target);
@@ -193,5 +199,57 @@ public final class Enemies extends Entities {
 
         if (!hasEntityLocation(option.getCol(), option.getRow()))
             options.add(option);
+    }
+
+    @Override
+    public void update() {
+
+        //update the enemies
+        for (int i = 0; i < getEntityList().size(); i++) {
+
+            //get the current entity
+            Entity enemy = getEntityList().get(i);
+
+            //update the entity
+            enemy.update(getLevel());
+
+            //if alert or attacking or hurt, notify nearby enemies
+            if (isShooting(enemy.getIndex()) || isAlert(enemy.getIndex()) || isHurt(enemy.getIndex()))
+                notifyNeighbors(enemy, i);
+        }
+    }
+
+    private void notifyNeighbors(Entity enemy, int indexIgnore) {
+
+        //update the enemies
+        for (int i = 0; i < getEntityList().size(); i++) {
+
+            //ignore self
+            if (indexIgnore == i)
+                continue;
+
+            Entity entity = getEntityList().get(i);
+
+            //ignore dead enemies
+            if (isDead(entity.getIndex()))
+                continue;
+
+            //we are only considering entities that are close enough
+            if (getDistance(enemy, entity) < RANGE_NOTICE) {
+
+                //if the enemy isn't obstructed
+                if (!isObstructed(getLevel(), getLevel().getPlayer().getCamera3d().position, entity)) {
+
+                    //and if we aren't already attacking, they will start now
+                    if (!isAlert(entity.getIndex()) && !isShooting(entity.getIndex()) && !isHurt(entity.getIndex()))
+                        entity.setIndex(INDEX_SHOOT);
+
+                } else {
+
+                    //if enemy is obstructed and in the same room, let's find the player
+
+                }
+            }
+        }
     }
 }

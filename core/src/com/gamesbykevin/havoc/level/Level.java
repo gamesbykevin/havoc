@@ -1,34 +1,32 @@
 package com.gamesbykevin.havoc.level;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
-import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.collectables.Collectibles;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.dungeon.Dungeon;
-import com.gamesbykevin.havoc.dungeon.Leaf;
-import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.enemies.Enemies;
 import com.gamesbykevin.havoc.entities.Entities;
+import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.obstacles.Obstacles;
+import com.gamesbykevin.havoc.player.Player;
+import com.gamesbykevin.havoc.util.Disposable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.gamesbykevin.havoc.dungeon.DungeonHelper.DUNGEON_SIZE;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.LEAF_DIMENSION_MIN;
+import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
+import static com.gamesbykevin.havoc.level.LevelHelper.*;
+import static com.gamesbykevin.havoc.player.PlayerHelper.checkCollision;
 import static com.gamesbykevin.havoc.texture.TextureHelper.addTextures;
 
-public class Level {
+public class Level implements Disposable {
 
     //our randomly created dungeon
     private Dungeon dungeon;
-
-    //our 3d camera
-    private PerspectiveCamera camera3d;
 
     //needed to render multiple decals
     private DecalBatch decalBatch;
@@ -51,35 +49,49 @@ public class Level {
     //items for pickup
     private Entities collectibles;
 
+    //reference to the player
+    private final Player player;
+
     //how far away can we render?
     public static final int RENDER_RANGE = LEAF_DIMENSION_MIN;
 
-    public Level() {
+    public Level(Player player) {
+
+        //store our player reference
+        this.player = player;
+
+        //how big should the dungeon be?
+        int size = DUNGEON_SIZE;
+
+        //dungeon must meet a minimum size
+        if (size < ROOM_DIMENSION_MAX * 3)
+            size = ROOM_DIMENSION_MAX * 3;
 
         //create and generate the dungeon
-        this.dungeon = new Dungeon(this, DUNGEON_SIZE, DUNGEON_SIZE);
+        this.dungeon = new Dungeon(this, size, size);
         getDungeon().generate();
 
-        //place some obstacles
+        //flag the players start location
+        getPlayer().setStart(getDungeon().getStartCol(), getDungeon().getStartRow());
+
+        //create the obstacles
         getObstacles().spawn();
 
-        //update the map again based on the obstacles we just spawned
-        getDungeon().updateMap();
-
-        //and we add collectibles
-        getCollectibles().spawn();
-
-        //add enemies
+        //create the enemies
         getEnemies().spawn();
+
+        //create the collectibles
+        getCollectibles().spawn();
 
         //add textures
         addTextures(this);
 
-        //set the start location
-        resetPosition();
-
         //create the batch
         getDecalBatch();
+    }
+
+    public Player getPlayer() {
+        return this.player;
     }
 
     public Dungeon getDungeon() {
@@ -110,14 +122,10 @@ public class Level {
         return this.enemies;
     }
 
-    public void resetPosition() {
-        getCamera3d(true);
-    }
-
-    private DecalBatch getDecalBatch() {
+    public DecalBatch getDecalBatch() {
 
         if (this.decalBatch == null)
-            this.decalBatch = new DecalBatch(new CameraGroupStrategy(getCamera3d()));
+            this.decalBatch = new DecalBatch(new CameraGroupStrategy(getPlayer().getCamera3d()));
 
         return this.decalBatch;
     }
@@ -152,7 +160,7 @@ public class Level {
         return getDoorDecals()[row][col];
     }
 
-    private Door[][] getDoorDecals() {
+    protected Door[][] getDoorDecals() {
 
         if (this.doorDecals == null)
             this.doorDecals = new Door[getDungeon().getRows()][getDungeon().getCols()];
@@ -160,171 +168,111 @@ public class Level {
         return doorDecals;
     }
 
-    public PerspectiveCamera getCamera3d() {
-        return getCamera3d(false);
-    }
+    private void update() {
 
-    public PerspectiveCamera getCamera3d(boolean reset) {
+        //update the players location
+        updateLocation(getPlayer());
 
-        if (this.camera3d == null) {
-            float w = Gdx.graphics.getWidth();
-            float h = Gdx.graphics.getHeight();
-            this.camera3d = new PerspectiveCamera(67, 1, h/w);
-            this.camera3d.near = .05f;
-            this.camera3d.far = RENDER_RANGE;
-        }
+        //check for collision
+        checkCollision(this);
 
-        if (reset) {
-            this.camera3d.direction.set(0, 0, -1);
-            this.camera3d.up.set(0, 1, 0);
-            this.camera3d.update();
+        //update the level
+        updateLevel(this);
 
-            //start where we marked start in our maze
-            float x = getDungeon().getStartCol();
-            float y = getDungeon().getStartRow();
-
-            //this.camera3d.position.set((ROOM_SIZE / 2) + .5f, (ROOM_SIZE / 2) + .5f,0);
-            this.camera3d.position.set(x, y,0);
-            //this.camera3d.position.z = 1.50f;
-            this.camera3d.rotate(Vector3.X, 90);
-        }
-
-        return this.camera3d;
-    }
-
-    private boolean hasRange(DecalCustom decal, float minCol, float maxCol, float minRow, float maxRow) {
-
-        //west & east
-        if (decal.getCol() < minCol || decal.getCol() > maxCol)
-            return false;
-
-        //north & south
-        if (decal.getRow() < minRow || decal.getRow() > maxRow)
-            return false;
-
-        return true;
-    }
-
-    private void drawDecals() {
-
-        //adjust the render range based on
-        float minCol = (getCamera3d().position.x - RENDER_RANGE);
-        float maxCol = (getCamera3d().position.x + RENDER_RANGE);
-        float minRow = (getCamera3d().position.y - RENDER_RANGE);
-        float maxRow = (getCamera3d().position.y + RENDER_RANGE);
-
-        int count = 0;
-
-        for (int i = 0; i < getDungeon().getLeafs().size(); i++) {
-
-            Leaf leaf = getDungeon().getLeafs().get(i);
-
-            //skip if no room exists
-            if (leaf.getRoom() == null)
-                continue;
-
-            Room room = leaf.getRoom();
-
-            if (!room.contains((int)getCamera3d().position.x, (int)getCamera3d().position.y))
-                continue;
-
-            if (!room.hasNorthDoor(getDungeon()))
-                maxRow = room.getY() + room.getH();
-            if (!room.hasSouthDoor(getDungeon()))
-                minRow = room.getY();
-            if (!room.hasWestDoor(getDungeon()))
-                minCol = room.getX();
-            if (!room.hasEastDoor(getDungeon()))
-                maxCol = room.getX() + room.getW();
-        }
-
-        for (int i = 0; i < getDecals().size(); i++) {
-
-            DecalCustom decal = getDecals().get(i);
-
-            //only render if in range
-            if (!hasRange(decal, minCol, maxCol, minRow, maxRow))
-                continue;
-
-            if (decal.isBillboard())
-                decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
-
-            count++;
-            getDecalBatch().add(decal.getDecal());
-        }
-
-        //render the backgrounds
-        for (int i = 0; i < getBackgrounds().size(); i++) {
-            DecalCustom decal = getBackgrounds().get(i);
-
-            //only render if in range
-            if (!hasRange(decal, minCol - RENDER_RANGE, maxCol + RENDER_RANGE, minRow - RENDER_RANGE, maxRow + RENDER_RANGE))
-                continue;
-
-            count++;
-            getDecalBatch().add(decal.getDecal());
-        }
-
-        for (int col = 0; col < getDoorDecals()[0].length; col++) {
-            for (int row = 0; row < getDoorDecals().length; row++) {
-
-                DecalCustom decal = getDoorDecal(col, row);
-
-                if (decal == null)
-                    continue;
-
-                //only render if in range
-                if (!hasRange(decal, minCol, maxCol, minRow, maxRow))
-                    continue;
-
-                if (decal.isBillboard())
-                    decal.getDecal().lookAt(getCamera3d().position, getCamera3d().up);
-
-                count++;
-                getDecalBatch().add(decal.getDecal());
-            }
-        }
-
-        //render the enemies
-        count += getEnemies().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
-
-        //render the obstacles
-        count += getObstacles().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
-
-        //render the collectibles
-        count += getCollectibles().render(getDecalBatch(), getCamera3d(), minCol, maxCol, minRow, maxRow);
-
-        //System.out.println("decal count: " + count);
-
-        //call flush at the end to draw
-        getDecalBatch().flush();
-    }
-
-    private void updateDecals() {
-
-        for (int col = 0; col < getDoorDecals()[0].length; col++) {
-            for (int row = 0; row < getDoorDecals().length; row++) {
-
-                Door door = getDoorDecals()[row][col];
-
-                if (door == null)
-                    continue;
-
-                //update the door
-                door.update();
-            }
-        }
+        //update the player
+        getPlayer().update();
     }
 
     public void render() {
 
         //update the camera
-        getCamera3d().update();
+        getPlayer().getCamera3d().update();
 
-        //update our decals
-        updateDecals();
+        //update our decals, etc...
+        update();
 
-        //draw our 3d walls
-        drawDecals();
+        int count = 0;
+
+        //draw the walls
+        count += renderWalls(getDecals(), getDecalBatch(), getPlayer().getCamera3d());
+
+        //render the backgrounds
+        count += renderBackground(getBackgrounds(), getPlayer().getCamera3d().position, getDecalBatch());
+
+        //render the doors
+        count += renderDoorDecals(getDoorDecals(), getDecalBatch(), getPlayer().getCamera3d());
+
+        //render the enemies
+        count += getEnemies().render(false);
+
+        //render the obstacles
+        count += getObstacles().render(false);
+
+        //render the collectibles
+        count += getCollectibles().render(true);
+
+        if (count > 400)
+            System.out.println("Rendered: " + count);
+
+        //call flush at the end to draw
+        getDecalBatch().flush();
+    }
+
+    @Override
+    public void dispose() {
+
+        if (this.dungeon != null)
+            this.dungeon.dispose();
+        if (this.decalBatch != null)
+            this.decalBatch.dispose();
+        if (this.decals != null) {
+            for (int i = 0; i < this.decals.size(); i++) {
+                if (this.decals.get(i) != null) {
+                    this.decals.get(i).dispose();
+                    this.decals.set(i, null);
+                }
+            }
+
+            this.decals.clear();
+        }
+
+        if (this.backgrounds != null) {
+            for (int i = 0; i < this.backgrounds.size(); i++) {
+                if (this.backgrounds.get(i) != null) {
+                    this.backgrounds.get(i).dispose();
+                    this.backgrounds.set(i, null);
+                }
+            }
+
+            this.backgrounds.clear();
+        }
+
+        if (this.enemies != null)
+            this.enemies.dispose();
+        if (this.obstacles != null)
+            this.obstacles.dispose();
+        if (this.collectibles != null)
+            this.collectibles.dispose();
+
+        if (this.doorDecals != null) {
+            for (int row = 0; row < this.doorDecals.length; row++) {
+                for (int col = 0; col < this.doorDecals[0].length; col++) {
+
+                    if (this.doorDecals[row][col] != null)
+                        this.doorDecals[row][col].dispose();
+
+                    this.doorDecals[row][col] = null;
+                }
+            }
+        }
+
+        this.dungeon = null;
+        this.decalBatch = null;
+        this.decals = null;
+        this.backgrounds = null;
+        this.enemies = null;
+        this.obstacles = null;
+        this.collectibles = null;
+        this.doorDecals = null;
     }
 }

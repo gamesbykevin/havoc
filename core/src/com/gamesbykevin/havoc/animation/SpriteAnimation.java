@@ -20,8 +20,8 @@ public class SpriteAnimation extends Animation {
         this.images = new Texture[count];
 
         //load all the images
-        for (int i = 0; i < this.images.length; i++) {
-            this.images[i] = new Texture(Gdx.files.internal(path + filename + (startIndex + (i+1)) + extension));
+        for (int i = 0; i < getImages().length; i++) {
+            getImages()[i] = new Texture(Gdx.files.internal(path + filename + (startIndex + (i+1)) + extension));
         }
 
     }
@@ -34,4 +34,18 @@ public class SpriteAnimation extends Animation {
         return getImages()[getIndex()];
     }
 
+    @Override
+    public void dispose() {
+
+        if (this.images != null) {
+            for (int i = 0; i < this.images.length; i++) {
+                if (this.images[i] != null) {
+                    this.images[i].dispose();
+                    this.images[i] = null;
+                }
+            }
+        }
+
+        this.images = null;
+    }
 }

@@ -12,11 +12,10 @@ public class DecalAnimation extends Animation {
     private static final float DEFAULT_WIDTH = 1.0f;
     private static final float DEFAULT_HEIGHT = 1.0f;
 
-    public DecalAnimation(String path) {
+    public DecalAnimation(TextureRegion textureRegion) {
         super(1, 0);
         this.decals = new Decal[1];
-        Texture texture = new Texture(Gdx.files.internal(path));
-        this.decals[0] = Decal.newDecal(DEFAULT_WIDTH, DEFAULT_HEIGHT, new TextureRegion(texture), true);
+        this.decals[0] = Decal.newDecal(DEFAULT_WIDTH, DEFAULT_HEIGHT, textureRegion, true);
     }
 
     public DecalAnimation(String path, String filename, String extension, int startIndex, int count, float duration) {
@@ -46,5 +45,18 @@ public class DecalAnimation extends Animation {
 
     public Decal getDecal() {
         return getDecals()[getIndex()];
+    }
+
+    @Override
+    public void dispose() {
+
+        if (this.decals != null) {
+            for (int i = 0; i < this.decals.length; i++) {
+                if (this.decals[i] != null)
+                    this.decals[i] = null;
+            }
+        }
+
+        this.decals = null;
     }
 }
