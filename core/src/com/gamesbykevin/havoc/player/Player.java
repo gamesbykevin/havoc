@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.input.MyController;
-import com.gamesbykevin.havoc.player.weapon.Weapon;
 import com.gamesbykevin.havoc.player.weapon.Weapons;
 import com.gamesbykevin.havoc.util.Disposable;
 import com.gamesbykevin.havoc.util.Hud;
@@ -32,10 +31,10 @@ public final class Player implements Disposable {
     private Vector3 previous;
 
     //is the player hurt?
-    private boolean hurt = false;
+    private boolean hurt = false, collect = false;
 
-    //texture to represent the player is hurt
-    private Texture hurtImage;
+    //texture to represent the player is hurt and collects an item
+    private Texture imageHurt, imageCollect;
 
     //our 3d camera
     private PerspectiveCamera camera3d;
@@ -57,8 +56,9 @@ public final class Player implements Disposable {
         //player isn't hurt (just yet)
         setHurt(false);
 
-        //store reference to the hurt image
-        this.hurtImage = new Texture(Gdx.files.internal("hud/hurt.png"));
+        //store reference to the images
+        this.imageHurt = new Texture(Gdx.files.internal("hud/hurt.png"));
+        this.imageCollect = new Texture(Gdx.files.internal("hud/collect.png"));
     }
 
     public MyController getController() {
@@ -94,9 +94,8 @@ public final class Player implements Disposable {
             float x = getStartCol();
             float y = getStartRow();
 
-            //this.camera3d.position.set((ROOM_SIZE / 2) + .5f, (ROOM_SIZE / 2) + .5f,0);
             this.camera3d.position.set(x, y,0);
-            this.camera3d.position.z = 1.50f;
+            //this.camera3d.position.z = 1.50f;
             this.camera3d.rotate(Vector3.X, 90);
 
             //assign the previous position
@@ -164,8 +163,20 @@ public final class Player implements Disposable {
         this.hurt = hurt;
     }
 
-    public Texture getHurtImage() {
-        return this.hurtImage;
+    public Texture getImageHurt() {
+        return this.imageHurt;
+    }
+
+    public void setCollect(boolean collect) {
+        this.collect = collect;
+    }
+
+    public boolean isCollect() {
+        return this.collect;
+    }
+
+    public Texture getImageCollect() {
+        return this.imageCollect;
     }
 
     //update the player
@@ -186,8 +197,11 @@ public final class Player implements Disposable {
 
         //if hurt render the screen graphic
         if (isHurt()) {
-            batch.draw(getHurtImage(), 0, 0, SIZE_WIDTH, SIZE_HEIGHT);
+            batch.draw(getImageHurt(), 0, 0, SIZE_WIDTH, SIZE_HEIGHT);
             setHurt(false);
+        } else if (isCollect()) {
+            batch.draw(getImageCollect(), 0, 0, SIZE_WIDTH, SIZE_HEIGHT);
+            setCollect(false);
         }
 
         //render health
@@ -213,12 +227,15 @@ public final class Player implements Disposable {
     @Override
     public void dispose() {
 
-        if (this.hurtImage != null)
-            this.hurtImage.dispose();
+        if (this.imageHurt != null)
+            this.imageHurt.dispose();
+        if (this.imageCollect != null)
+            this.imageCollect.dispose();
         if (this.controller != null)
             this.controller.dispose();
 
-        this.hurtImage = null;
+        this.imageHurt = null;
+        this.imageCollect = null;
         this.previous = null;
         this.controller = null;
         this.camera3d = null;

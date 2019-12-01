@@ -126,8 +126,10 @@ public class CollectibleHelper {
             }
 
             //flag false so we can't collect again
-            if (collected)
+            if (collected) {
                 entity.setSolid(false);
+                player.setCollect(true);
+            }
 
             //flag we are switching weapons
             if (add)

@@ -35,9 +35,6 @@ public final class Enemy extends Entity3d {
     //what is the health
     private float health = 100f;
 
-    //how many animations are there?
-    public static final int ANIMATION_COUNT = 20;
-
     //where does the enemy start
     private final float startCol, startRow;
 
@@ -63,30 +60,31 @@ public final class Enemy extends Entity3d {
         //set the allowed damage
         setDamage(type.damage);
 
-        getAnimations()[INDEX_DIE] = new DecalAnimation(type.path, type.filename + "_die", ".bmp", 1, 4, DURATION_DIE);
+        getAnimations()[INDEX_DIE] = new DecalAnimation(type.path, "die", ".bmp", 1, 4, DURATION_DIE);
 
-        getAnimations()[INDEX_PAIN] = new DecalAnimation(type.path, type.filename + "_pain", ".bmp", 1, 2, DURATION_PAIN);
+        getAnimations()[INDEX_PAIN] = new DecalAnimation(type.path, "pain", ".bmp", 1, 2, DURATION_PAIN);
 
-        getAnimations()[INDEX_IDLE_S] = new DecalAnimation(type.path, type.filename + "_s_", ".bmp", 1, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_SW] = new DecalAnimation(type.path, type.filename + "_s_", ".bmp", 2, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_W] = new DecalAnimation(type.path, type.filename + "_s_", ".bmp", 3, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_NW] = new DecalAnimation(type.path, type.filename + "_s_", ".bmp", 4, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_N] = new DecalAnimation(type.path, type.filename + "_s_", ".bmp", 5, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_NE] = new DecalAnimation(type.path, type.filename + "_s_", ".bmp", 6, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_E] = new DecalAnimation(type.path, type.filename + "_s_", ".bmp", 7, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_SE] = new DecalAnimation(type.path, type.filename + "_s_", ".bmp", 8, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_S] = new DecalAnimation(type.path, "s_", ".bmp", 1, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_SW] = new DecalAnimation(type.path, "s_", ".bmp", 2, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_W] = new DecalAnimation(type.path, "s_", ".bmp", 3, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_NW] = new DecalAnimation(type.path, "s_", ".bmp", 4, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_N] = new DecalAnimation(type.path, "s_", ".bmp", 5, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_NE] = new DecalAnimation(type.path, "s_", ".bmp", 6, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_E] = new DecalAnimation(type.path, "s_", ".bmp", 7, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_SE] = new DecalAnimation(type.path, "s_", ".bmp", 8, 1, DURATION_IDLE);
 
-        getAnimations()[INDEX_SHOOT] = new DecalAnimation(type.path, type.filename + "_shoot", ".bmp", 1, 3, DURATION_SHOOT);
-        getAnimations()[INDEX_ALERT] = new DecalAnimation(type.path, type.filename + "_shoot", ".bmp", 2, 2, DURATION_ALERT);
+        getAnimations()[INDEX_SHOOT] = new DecalAnimation(type.path, "shoot", ".bmp", 1, 3, DURATION_SHOOT);
+        getAnimations()[INDEX_ALERT] = new DecalAnimation(type.path, "shoot", ".bmp", 2, 2, DURATION_ALERT);
+        getAnimations()[INDEX_PAUSE] = new DecalAnimation(type.path, "shoot", ".bmp", 2, 1, DURATION_PAUSE);
 
-        getAnimations()[INDEX_WALK_S] = new DecalAnimation(type.path, type.filename + "_w", "_1.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_SW] = new DecalAnimation(type.path, type.filename + "_w", "_2.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_W] = new DecalAnimation(type.path, type.filename + "_w", "_3.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_NW] = new DecalAnimation(type.path, type.filename + "_w", "_4.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_N] = new DecalAnimation(type.path, type.filename + "_w", "_5.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_NE] = new DecalAnimation(type.path, type.filename + "_w", "_6.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_E] = new DecalAnimation(type.path, type.filename + "_w", "_7.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_SE] = new DecalAnimation(type.path, type.filename + "_w", "_8.bmp", 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_S] = new DecalAnimation(type.path, "w", "_1.bmp", 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_SW] = new DecalAnimation(type.path, "w", "_2.bmp", 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_W] = new DecalAnimation(type.path, "w", "_3.bmp", 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_NW] = new DecalAnimation(type.path, "w", "_4.bmp", 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_N] = new DecalAnimation(type.path, "w", "_5.bmp", 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_NE] = new DecalAnimation(type.path, "w", "_6.bmp", 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_E] = new DecalAnimation(type.path, "w", "_7.bmp", 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_SE] = new DecalAnimation(type.path, "w", "_8.bmp", 1, 4, DURATION_WALK);
 
         //reset the enemy
         reset();
@@ -138,7 +136,7 @@ public final class Enemy extends Entity3d {
 
                         //if we are close and the player is shooting and nothing is in our way
                         if (level.getPlayer().getController().isShooting() && !isObstructed(level, position, this))
-                            setIndex(INDEX_ALERT);
+                            setIndex(INDEX_SHOOT);
                     }
                 }
 
@@ -158,7 +156,7 @@ public final class Enemy extends Entity3d {
 
                         //are we close enough to check if we can attack?
                         if (!isObstructed(level, position, this)) {
-                            setIndex(INDEX_ALERT);
+                            setIndex(INDEX_SHOOT);
                         } else {
                             updateIdle(position, this);
                         }
@@ -170,11 +168,17 @@ public final class Enemy extends Entity3d {
                         level.getPlayer().setHealth(level.getPlayer().getHealth() - getDamage());
 
                         //if close enough the enemy will remain alert
-                        if (dist < RANGE_NOTICE && !isObstructed(level, position, this)) {
-                            setIndex(INDEX_ALERT);
+                        if (canShoot(dist, level, position)) {
+                            setIndex(INDEX_PAUSE);
                         } else {
                             updateIdle(position, this);
                         }
+
+                    } else if (isPaused(this)) {
+
+                        //if close enough and our view isn't blocked
+                        if (canShoot(dist, level, position))
+                            setIndex(INDEX_ALERT);
 
                     } else if (isAlert(this)) {
 
@@ -183,8 +187,8 @@ public final class Enemy extends Entity3d {
                         level.getPlayer().setHealth(level.getPlayer().getHealth() - getDamage());
 
                         //are we close enough to check if we can attack?
-                        if (dist < RANGE_NOTICE && !isObstructed(level, position, this)) {
-                            setIndex(INDEX_ALERT);
+                        if (canShoot(dist, level, position)) {
+                            setIndex(INDEX_PAUSE);
                         } else {
                             updateIdle(position, this);
                         }
@@ -224,6 +228,10 @@ public final class Enemy extends Entity3d {
 
         //update the animation
         getAnimation().update();
+    }
+
+    private boolean canShoot(double distance, Level level, Vector3 position) {
+        return (distance < RANGE_NOTICE && !isObstructed(level, position, this));
     }
 
     @Override

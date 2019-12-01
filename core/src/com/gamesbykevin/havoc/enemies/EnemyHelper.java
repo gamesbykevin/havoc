@@ -12,33 +12,51 @@ import static com.gamesbykevin.havoc.level.LevelHelper.isDoorOpen;
 
 public class EnemyHelper {
 
+    public static final int DAMAGE_DOCTOR = 2;
+    public static final int DAMAGE_GUARD = 3;
+    public static final int DAMAGE_SERGEANT = 4;
+    public static final int DAMAGE_LIEUTENANT = 5;
+    public static final int DAMAGE_OFFICER = 6;
+    public static final int DAMAGE_MAJOR = 7;
+
     public enum Type {
-        BrownMguard("enemies/brown/mguard/", "mguard", 5),
-        BrownMnco("enemies/brown/mNCO/", "mNCO", 3),
-        BrownMofficer("enemies/brown/mofficer/", "mofficer", 5),
-        BrownPguard("enemies/brown/pguard/", "pguard", 3),
-        BrownPnco("enemies/brown/pNCO/", "pNCO", 5),
-        BrownPofficer("enemies/brown/pofficer/", "pofficer", 3),
-        BrownRguard("enemies/brown/rguard/", "rguard", 5),
+        doctor_1("enemies/doctor_1/", DAMAGE_DOCTOR),
+        doctor_2("enemies/doctor_2/", DAMAGE_DOCTOR),
+        guard_1("enemies/guard_1/", DAMAGE_GUARD),
+        guard_2("enemies/guard_2/", DAMAGE_GUARD),
+        guard_3("enemies/guard_3/", DAMAGE_GUARD),
+        guard_4("enemies/guard_4/", DAMAGE_GUARD),
+        guard_5("enemies/guard_5/", DAMAGE_GUARD),
+        guard_6("enemies/guard_6/", DAMAGE_GUARD),
+        guard_7("enemies/guard_7/", DAMAGE_GUARD),
+        guard_8("enemies/guard_8/", DAMAGE_GUARD),
+        guard_9("enemies/guard_9/", DAMAGE_GUARD),
+        guard_10("enemies/guard_10/", DAMAGE_GUARD),
+        lieutenant_1("enemies/lieutenant_1/", DAMAGE_LIEUTENANT),
+        lieutenant_2("enemies/lieutenant_2/", DAMAGE_LIEUTENANT),
+        lieutenant_3("enemies/lieutenant_3/", DAMAGE_LIEUTENANT),
+        lieutenant_4("enemies/lieutenant_4/", DAMAGE_LIEUTENANT),
+        lieutenant_5("enemies/lieutenant_5/", DAMAGE_LIEUTENANT),
+        major_1("enemies/major_1/", DAMAGE_MAJOR),
+        major_2("enemies/major_2/", DAMAGE_MAJOR),
+        officer_1("enemies/officer_1/", DAMAGE_OFFICER),
+        officer_2("enemies/officer_2/", DAMAGE_OFFICER),
+        officer_3("enemies/officer_3/", DAMAGE_OFFICER),
+        officer_4("enemies/officer_4/", DAMAGE_OFFICER),
+        officer_5("enemies/officer_5/", DAMAGE_OFFICER),
+        sergeant_1("enemies/sergeant_1/", DAMAGE_SERGEANT),
+        sergeant_2("enemies/sergeant_2/", DAMAGE_SERGEANT),
+        sergeant_3("enemies/sergeant_3/", DAMAGE_SERGEANT),
+        sergeant_4("enemies/sergeant_4/", DAMAGE_SERGEANT),
+        sergeant_5("enemies/sergeant_5/", DAMAGE_SERGEANT);
 
-        OtherMguard("enemies/other/mguard/", "mguard", 3),
-        OtherMnco("enemies/other/mNCO/", "mNCO", 5),
-        OtherMofficer("enemies/other/mofficer/", "mofficer", 3),
-        OtherPguard("enemies/other/pguard/", "pguard", 5),
-        OtherPnco("enemies/other/pNCO/", "pNCO", 3),
-        OtherPofficer("enemies/other/pofficer/", "pofficer", 5),
-        OtherRguard("enemies/other/rguard/", "rguard", 3),
-
-        SsApprentice("enemies/ss_apprentice/", "", 3);
-
-        public final String path, filename;
+        public final String path;
 
         //how much damage can the enemy do?
         public final int damage;
 
-        Type(String path, String filename, int damage) {
+        Type(String path, int damage) {
             this.path = path;
-            this.filename = filename;
             this.damage = damage;
         }
     }
@@ -55,7 +73,8 @@ public class EnemyHelper {
     protected static final float DURATION_WALK = 300f;
     protected static final float DURATION_DIE = 200f;
     protected static final float DURATION_SHOOT = 450f;
-    protected static final float DURATION_ALERT = 600f;
+    protected static final float DURATION_ALERT = 275f;
+    protected static final float DURATION_PAUSE = 1750f;
 
     //different animations
     public static final int INDEX_DIE = 0;
@@ -78,6 +97,10 @@ public class EnemyHelper {
     public static final int INDEX_WALK_E = 17;
     public static final int INDEX_WALK_SE = 18;
     public static final int INDEX_ALERT = 19;
+    public static final int INDEX_PAUSE = 20;
+
+    //how many animations are there?
+    public static final int ANIMATION_COUNT = 21;
 
     protected static void updateIdle(Vector3 position, Enemy enemy) {
 
@@ -262,8 +285,8 @@ public class EnemyHelper {
         return false;
     }
 
-    public static boolean isIdle(Enemy enemy) {
-        return isIdle(enemy.getIndex());
+    public static boolean isIdle(Entity entity) {
+        return isIdle(entity.getIndex());
     }
 
     public static boolean isIdle(int index) {
@@ -284,8 +307,8 @@ public class EnemyHelper {
         }
     }
 
-    public static boolean isHurt(Enemy enemy) {
-        return isHurt(enemy.getIndex());
+    public static boolean isHurt(Entity entity) {
+        return isHurt(entity.getIndex());
     }
 
     public static boolean isHurt(int index) {
@@ -299,8 +322,8 @@ public class EnemyHelper {
         }
     }
 
-    public static boolean isDead(Enemy enemy) {
-        return isDead(enemy.getIndex());
+    public static boolean isDead(Entity entity) {
+        return isDead(entity.getIndex());
     }
 
     public static boolean isDead(int index) {
@@ -314,8 +337,8 @@ public class EnemyHelper {
         }
     }
 
-    public static boolean isShooting(Enemy enemy) {
-        return isShooting(enemy.getIndex());
+    public static boolean isShooting(Entity entity) {
+        return isShooting(entity.getIndex());
     }
 
     public static boolean isShooting(int index) {
@@ -329,8 +352,8 @@ public class EnemyHelper {
         }
     }
 
-    public static boolean isAlert(Enemy enemy) {
-        return isAlert(enemy.getIndex());
+    public static boolean isAlert(Entity entity) {
+        return isAlert(entity.getIndex());
     }
 
     public static boolean isAlert(int index) {
@@ -344,8 +367,23 @@ public class EnemyHelper {
         }
     }
 
-    public static boolean isWalking(Enemy enemy) {
-        return isWalking(enemy.getIndex());
+    public static boolean isPaused(Entity entity) {
+        return isPaused(entity.getIndex());
+    }
+
+    public static boolean isPaused(int index) {
+
+        switch (index) {
+            case INDEX_PAUSE:
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    public static boolean isWalking(Entity entity) {
+        return isWalking(entity.getIndex());
     }
 
     public static boolean isWalking(int index) {

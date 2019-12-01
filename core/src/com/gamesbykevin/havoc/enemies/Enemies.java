@@ -84,8 +84,7 @@ public final class Enemies extends Entities {
                 Cell location = options.get(index);
 
                 //create our enemy
-                //Enemy enemy = new Enemy(Type.values()[getRandom().nextInt(Type.values().length)], location.getCol(), location.getRow());
-                Enemy enemy = new Enemy(Type.SsApprentice, location.getCol(), location.getRow());
+                Enemy enemy = new Enemy(Type.values()[getRandom().nextInt(Type.values().length)], location.getCol(), location.getRow());
 
                 //start the enemy out as idle
                 enemy.setIndex(INDEX_IDLE_E);
@@ -214,7 +213,7 @@ public final class Enemies extends Entities {
             enemy.update(getLevel());
 
             //if alert or attacking or hurt, notify nearby enemies
-            if (isShooting(enemy.getIndex()) || isAlert(enemy.getIndex()) || isHurt(enemy.getIndex()))
+            if (isShooting(enemy) || isAlert(enemy) || isHurt(enemy) || isPaused(enemy))
                 notifyNeighbors(enemy, i);
         }
     }
@@ -230,25 +229,23 @@ public final class Enemies extends Entities {
 
             Entity entity = getEntityList().get(i);
 
-            //ignore dead enemies
-            if (isDead(entity.getIndex()))
+            //must be idle or walking to notify
+            if (!isIdle(entity) && !isWalking(entity))
                 continue;
 
-            //we are only considering entities that are close enough
-            if (getDistance(enemy, entity) < RANGE_NOTICE) {
+            //if enemy is too far away we will skip
+            if (getDistance(enemy, entity) > RANGE_NOTICE)
+                continue;
 
-                //if the enemy isn't obstructed
-                if (!isObstructed(getLevel(), getLevel().getPlayer().getCamera3d().position, entity)) {
+            if (!isObstructed(getLevel(), getLevel().getPlayer().getCamera3d().position, entity)) {
 
-                    //and if we aren't already attacking, they will start now
-                    if (!isAlert(entity.getIndex()) && !isShooting(entity.getIndex()) && !isHurt(entity.getIndex()))
-                        entity.setIndex(INDEX_SHOOT);
+                //if the enemy isn't obstructed we can begin shooting
+                entity.setIndex(INDEX_SHOOT);
 
-                } else {
+            } else {
 
-                    //if enemy is obstructed and in the same room, let's find the player
+                //if enemy is obstructed and in the same room, let's move so we can see the player and start shooting
 
-                }
             }
         }
     }
