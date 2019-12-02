@@ -22,7 +22,7 @@ public final class Soldier extends Enemy {
     //animation delay
     protected static final float DURATION_IDLE =  1000f;
     protected static final float DURATION_PAIN =  150f;
-    protected static final float DURATION_WALK =  300f;
+    protected static final float DURATION_WALK =  200f;
     protected static final float DURATION_DIE =   150f;
     protected static final float DURATION_SHOOT = 250f;
     protected static final float DURATION_ALERT = 175f;
@@ -165,7 +165,7 @@ public final class Soldier extends Enemy {
         }
 
         //if index is different we will assign it
-        if (index != getIndex())
+        if (index >= 0 && index != getIndex())
             setIndex(index);
     }
 

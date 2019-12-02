@@ -90,9 +90,9 @@ public final class Enemies extends Entities {
                 boolean patrol = getRandom().nextBoolean();
 
                 //create our enemy
-                if (getRandom().nextBoolean()) {
+                if (getRandom().nextBoolean() && limit == 1) {
 
-                    //create the boss
+                    //create the boss if by chance this room is limited to 1 enemy
                     enemy = new Boss(Boss.Type.values()[getRandom().nextInt(Boss.Type.values().length)]);
 
                     //boss will never patrol

@@ -53,7 +53,7 @@ public final class Player implements Disposable, Restart {
     private Weapons weapons;
 
     //height the camera will be at
-    private static final float HEIGHT_START = .075f;
+    private static final float HEIGHT_START = .05f;
 
     public Player() {
 

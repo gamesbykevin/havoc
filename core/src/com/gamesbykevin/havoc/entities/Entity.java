@@ -24,7 +24,7 @@ public abstract class Entity implements Disposable, Restart {
     private int index = 0;
 
     //how close can the player get to an object
-    public static final double PLAYER_COLLISION = 0.70d;
+    public static final double PLAYER_COLLISION = 0.8d;
 
     protected Entity() {
         //default constructor
