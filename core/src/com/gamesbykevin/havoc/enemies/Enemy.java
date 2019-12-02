@@ -14,6 +14,7 @@ import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.*;
 import static com.gamesbykevin.havoc.entities.Entities.OFFSET;
 import static com.gamesbykevin.havoc.level.LevelHelper.isDoorOpen;
+import static com.gamesbykevin.havoc.player.Player.HEALTH_MAX;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public abstract class Enemy extends Entity3d {
@@ -25,7 +26,13 @@ public abstract class Enemy extends Entity3d {
     private int damage;
 
     //how fast can the enemy move
-    public static final float VELOCITY_SPEED = .01f;
+    public static final float SPEED_DEFAULT = 0.01f;
+
+    //how fast does the enemy move when chasing
+    public static final float SPEED_CHASE = 0.03f;
+
+    //how fast can the enemy move?
+    private float speed;
 
     //how close to notice the player
     public static final float RANGE_NOTICE = 6f;
@@ -60,11 +67,12 @@ public abstract class Enemy extends Entity3d {
     @Override
     public void reset() {
         setIndex(0);
+        setSpeed(SPEED_DEFAULT);
         setDirection(DIRECTION_E);
         setPathIndex(0);
         setCol(getStartCol());
         setRow(getStartRow());
-        setHealth(100f);
+        setHealth(HEALTH_MAX);
         setSolid(true);
         setAscending(true);
         setStatus(Status.Idle);
@@ -98,7 +106,7 @@ public abstract class Enemy extends Entity3d {
                 if (distance > RANGE_UPDATE)
                     return;
 
-                //if there is a patrol path, the enemy will patrol
+                //if there is a path, the enemy will patrol
                 if (getPathPatrol() != null && getPathPatrol().size() > 0)
                     patrol(this, level);
 
@@ -132,7 +140,15 @@ public abstract class Enemy extends Entity3d {
         getAnimation().setPosition(getCol(), getRow(), 0);
     }
 
-    protected int getPathIndex() {
+    public float getSpeed() {
+        return this.speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
+    public int getPathIndex() {
         return this.pathIndex;
     }
 
@@ -145,6 +161,8 @@ public abstract class Enemy extends Entity3d {
     }
 
     public void setPathPatrol(List<Node> pathPatrol) {
+        setPathIndex(0);
+        setAscending(true);
         this.pathPatrol = new ArrayList<>(pathPatrol);
     }
 

@@ -32,7 +32,7 @@ public class Weapon extends Entity2d implements Disposable {
     public static final int INDEX_STOPPING  = 3;
 
     //how many bullets to add by default
-    public static final float BULLETS_DEFAULT_RATIO = .25f;
+    public static final float BULLETS_DEFAULT_RATIO = .33f;
 
     public Weapon(Type type) {
 

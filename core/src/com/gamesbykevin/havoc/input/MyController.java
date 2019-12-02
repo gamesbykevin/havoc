@@ -18,10 +18,14 @@ public class MyController implements InputProcessor, Disposable, Restart {
     public static final float SPEED_WALK = .1f;
 
     //how fast can the player turn by default
-    public static final float DEFAULT_SPEED_ROTATE = 3f;
+    public static final float DEFAULT_SPEED_ROTATE = 2.5f;
 
     //our rotation and rotation angle
     private float rotation = 0;
+
+    //the least/most we can turn
+    public static final float ROTATION_ANGLE_MIN = 0.0f;
+    public static final float ROTATION_ANGLE_MAX = 360.0f;
 
     //our input listener
     private Stage stage;
@@ -125,8 +129,6 @@ public class MyController implements InputProcessor, Disposable, Restart {
     }
 
     public void setInput() {
-
-        //Gdx.input.setInputProcessor(getStage());
 
         switch (Gdx.app.getType()) {
 

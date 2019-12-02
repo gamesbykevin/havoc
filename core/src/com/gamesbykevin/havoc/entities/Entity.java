@@ -20,6 +20,9 @@ public abstract class Entity implements Disposable, Restart {
     //location where the entity starts
     private float startCol, startRow;
 
+    //location where the entity ends
+    private float finishCol, finishRow;
+
     //the index of the current animation
     private int index = 0;
 
@@ -76,6 +79,22 @@ public abstract class Entity implements Disposable, Restart {
 
     public void setStartRow(float startRow) {
         this.startRow = startRow;
+    }
+
+    public float getFinishCol() {
+        return this.finishCol;
+    }
+
+    public void setFinishCol(float finishCol) {
+        this.finishCol = finishCol;
+    }
+
+    public float getFinishRow() {
+        return this.finishRow;
+    }
+
+    public void setFinishRow(float finishRow) {
+        this.finishRow = finishRow;
     }
 
     //logic to reset the entity

@@ -82,6 +82,8 @@ public abstract class Entities implements Disposable, Restart {
         //assign the starting location
         entity.setStartCol(col);
         entity.setStartRow(row);
+        entity.setFinishCol(col);
+        entity.setFinishRow(row);
 
         //add to the list of entities
         getEntityList().add(entity);

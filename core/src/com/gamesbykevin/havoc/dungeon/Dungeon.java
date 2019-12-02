@@ -268,6 +268,10 @@ public class Dungeon implements Disposable {
         return this.map;
     }
 
+    public boolean hasMap(float col, float row) {
+        return hasMap((int)col, (int)row);
+    }
+
     public boolean hasMap(int col, int row) {
 
         if (col < 0 || row < 0)

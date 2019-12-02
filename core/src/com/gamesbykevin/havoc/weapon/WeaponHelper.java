@@ -6,6 +6,7 @@ import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.level.Level;
 
 import static com.gamesbykevin.havoc.enemies.Enemy.RANGE_NOTICE;
+import static com.gamesbykevin.havoc.enemies.EnemyHelper.chase;
 import static com.gamesbykevin.havoc.input.MyController.SPEED_WALK;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
@@ -183,6 +184,7 @@ public class WeaponHelper {
         //enemy that we hit
         Enemy enemy = null;
 
+        //check for bullet impact only so many times
         while (attempts < ATTEMPT_LIMIT) {
 
             for (int i = 0; i < level.getEnemies().getEntityList().size(); i++) {
@@ -206,7 +208,7 @@ public class WeaponHelper {
                 //calculate distance
                 double distance = getDistance(entity, col, row);
 
-                //if close enough to cause damage
+                //if close enough to cause damage to a single enemy
                 if (distance <= BULLET_DISTANCE && enemy == null) {
 
                     //we can only hit 1 enemy
@@ -218,19 +220,38 @@ public class WeaponHelper {
                     //deduct the enemies health
                     enemy.setHealth(enemy.getHealth() - weapon.getDamage());
 
+                    //setup the chase
+                    chase(level, enemy);
+
                 } else if (distance <= RANGE_NOTICE) {
 
                     //if the bullet is close enough to the enemy they should be alerted
-                    Enemy tmp = (Enemy)entity;
+                    Enemy tmp = (Enemy) entity;
 
-                    //if the enemy has a clear view of the player they can shoot
-                    if (!tmp.isObstructed(level))
+                    //don't do anything if hurt
+                    if (tmp.isHurt())
+                        continue;
+
+                    if (!tmp.isObstructed(level) && !tmp.isShoot()) {
+
+                        //if the enemy has a clear view of the player they can shoot
                         tmp.setStatus(Enemy.Status.Shoot);
+                        chase(level, tmp);
+
+                    } else if (tmp.getPathIndex() > 0 || tmp.isIdle()) {
+
+                        //if we didn't calculate yet or the enemy is idle
+                        chase(level, tmp);
+                    }
                 }
             }
 
             //if we don't have range with any enemies skip this
             if (!range)
+                break;
+
+            //if we struck an enemy
+            if (enemy != null)
                 break;
 
             //move to the next position

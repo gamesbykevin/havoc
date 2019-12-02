@@ -53,7 +53,7 @@ public final class Player implements Disposable, Restart {
     private Weapons weapons;
 
     //height the camera will be at
-    private static final float HEIGHT_START = .05f;
+    private static final float HEIGHT_START = 0.075f;
 
     public Player() {
 
@@ -93,7 +93,7 @@ public final class Player implements Disposable, Restart {
             float h = Gdx.graphics.getHeight();
             this.camera3d = new PerspectiveCamera(67, 1, h/w);
             this.camera3d.near = .05f;
-            this.camera3d.far = RENDER_RANGE;
+            this.camera3d.far = (RENDER_RANGE * 2);
         }
 
         if (reset) {
@@ -121,14 +121,14 @@ public final class Player implements Disposable, Restart {
         return this.startCol;
     }
 
+    public float getStartRow() {
+        return this.startRow;
+    }
+
     public void setStart(int col, int row) {
         this.startCol = col;
         this.startRow = row;
         getCamera3d(true);
-    }
-
-    public float getStartRow() {
-        return this.startRow;
     }
 
     public int getHealth() {
@@ -222,9 +222,45 @@ public final class Player implements Disposable, Restart {
         }
     }
 
+    @Override
+    public void dispose() {
+
+        if (this.imageHurt != null)
+            this.imageHurt.dispose();
+        if (this.imageCollect != null)
+            this.imageCollect.dispose();
+        if (this.controller != null)
+            this.controller.dispose();
+        if (this.weapons != null)
+            this.weapons.dispose();
+
+        this.imageHurt = null;
+        this.imageCollect = null;
+        this.previous = null;
+        this.controller = null;
+        this.camera3d = null;
+        this.weapons = null;
+    }
+
+    @Override
+    public void reset() {
+
+        //start out with the max health
+        setHealth(HEALTH_MAX);
+
+        //we don't have the key (yet)
+        setKey(false);
+
+        //player isn't hurt (just yet)
+        setHurt(false);
+
+        //reset the camera position
+        getCamera3d(true);
+    }
+
     public void render() {
 
-        //render the controller first
+        //render the controller first if not dead
         if (!isDead())
             getController().render();
 
@@ -262,41 +298,5 @@ public final class Player implements Disposable, Restart {
 
         //we are done
         batch.end();
-    }
-
-    @Override
-    public void dispose() {
-
-        if (this.imageHurt != null)
-            this.imageHurt.dispose();
-        if (this.imageCollect != null)
-            this.imageCollect.dispose();
-        if (this.controller != null)
-            this.controller.dispose();
-        if (this.weapons != null)
-            this.weapons.dispose();
-
-        this.imageHurt = null;
-        this.imageCollect = null;
-        this.previous = null;
-        this.controller = null;
-        this.camera3d = null;
-        this.weapons = null;
-    }
-
-    @Override
-    public void reset() {
-
-        //start out with the max health
-        setHealth(HEALTH_MAX);
-
-        //we don't have the key (yet)
-        setKey(false);
-
-        //player isn't hurt (just yet)
-        setHurt(false);
-
-        //reset the camera position
-        getCamera3d(true);
     }
 }

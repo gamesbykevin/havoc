@@ -20,8 +20,8 @@ public final class Soldier extends Enemy {
     public static final int DAMAGE_MAJOR = 5;
 
     //animation delay
-    protected static final float DURATION_IDLE =  1000f;
-    protected static final float DURATION_PAIN =  150f;
+    protected static final float DURATION_IDLE =  100f;
+    protected static final float DURATION_PAIN =  250f;
     protected static final float DURATION_WALK =  200f;
     protected static final float DURATION_DIE =   150f;
     protected static final float DURATION_SHOOT = 250f;
@@ -128,9 +128,6 @@ public final class Soldier extends Enemy {
         getAnimations()[INDEX_WALK_NE] = new DecalAnimation(type.path, "w", "_6.bmp", 1, 4, DURATION_WALK);
         getAnimations()[INDEX_WALK_E] = new DecalAnimation(type.path, "w", "_7.bmp", 1, 4, DURATION_WALK);
         getAnimations()[INDEX_WALK_SE] = new DecalAnimation(type.path, "w", "_8.bmp", 1, 4, DURATION_WALK);
-
-        //reset the enemy
-        reset();
     }
 
     @Override
@@ -148,20 +145,35 @@ public final class Soldier extends Enemy {
 
         int index = -1;
 
-        if (isIdle()) {
-            index = getAnimationIndex(this, position, true);
-        } else if (isWalk()) {
-            index = getAnimationIndex(this, position, false);
-        } else if (isHurt()) {
-            index = INDEX_PAIN;
-        } else if (isDie()) {
-            index = INDEX_DIE;
-        } else if (isAlert()) {
-            index = INDEX_ALERT;
-        } else if (isShoot()) {
-            index = INDEX_SHOOT;
-        } else if (isPause()) {
-            index = INDEX_PAUSE;
+        switch (getStatus()) {
+
+            case Idle:
+                index = getAnimationIndex(this, position, true);
+                break;
+
+            case Hurt:
+                index = INDEX_PAIN;
+                break;
+
+            case Die:
+                index = INDEX_DIE;
+                break;
+
+            case Alert:
+                index = INDEX_ALERT;
+                break;
+
+            case Shoot:
+                index = INDEX_SHOOT;
+                break;
+
+            case Walk:
+                index = getAnimationIndex(this, position, false);
+                break;
+
+            case Pause:
+                index = INDEX_PAUSE;
+                break;
         }
 
         //if index is different we will assign it

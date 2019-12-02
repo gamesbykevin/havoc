@@ -14,7 +14,7 @@ import static com.gamesbykevin.havoc.dungeon.RoomHelper.*;
 public class DungeonHelper {
 
     //how big is the dungeon
-    public static final int DUNGEON_SIZE = ROOM_DIMENSION_MAX * 3;
+    public static final int DUNGEON_SIZE = ROOM_DIMENSION_MAX * 5;
 
     public static int getCount(Dungeon dungeon, String id) {
 
@@ -495,7 +495,7 @@ public class DungeonHelper {
             return;
 
         //pick random index to lock a door
-        int index;
+        int index = -1;
 
         //minimum cost to place a key
         int costMin;
@@ -513,7 +513,12 @@ public class DungeonHelper {
             costMin = options.get(offsetStart).getCost();
 
             //which door do we lock?
-            index = getRandom().nextInt(options.size() - (offsetStart + 1));
+            if (options.size() > offsetStart) {
+                index = getRandom().nextInt(options.size() - (offsetStart + 1));
+            } else {
+                index = 0;
+            }
+
             index += (offsetStart + 1);
 
         } else {

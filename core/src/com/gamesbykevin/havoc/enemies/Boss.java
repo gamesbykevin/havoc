@@ -3,11 +3,15 @@ package com.gamesbykevin.havoc.enemies;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
 
-public final class Boss extends Enemy {
+import static com.gamesbykevin.havoc.player.Player.HEALTH_MAX;
 
+public final class Boss extends Enemy {
 
     //how much damage
     public static final int DAMAGE_BOSS = 10;
+
+    //how much health does the boss have compared to the soldier
+    public static final float HEALTH_MAX_RATIO = 2.0f;
 
     //different animations
     public static final int INDEX_IDLE = 0;
@@ -21,7 +25,7 @@ public final class Boss extends Enemy {
     public static final int ANIMATION_COUNT = 6;
 
     //animation delay
-    protected static final float DURATION_IDLE = 1000f;
+    protected static final float DURATION_IDLE = 100f;
     protected static final float DURATION_WALK = 250f;
     protected static final float DURATION_SHOOT = 300f;
     protected static final float DURATION_ALERT = 200f;
@@ -71,9 +75,6 @@ public final class Boss extends Enemy {
         getAnimations()[INDEX_ALERT] = new DecalAnimation(type.path, "shoot", ".bmp", 1, 3, DURATION_ALERT);
         getAnimations()[INDEX_DIE] = new DecalAnimation(type.path, "dead", ".bmp", 1, 4, DURATION_DIE);
         getAnimations()[INDEX_PAUSE] = new DecalAnimation(type.path, "shoot", ".bmp", 1, 1, DURATION_PAUSE);
-
-        //reset the enemy
-        reset();
     }
 
     @Override
@@ -81,6 +82,9 @@ public final class Boss extends Enemy {
 
         //call parent
         super.reset();
+
+        //set the max health differently for bosses
+        setHealth(HEALTH_MAX * HEALTH_MAX_RATIO);
 
         //set default index
         setIndex(INDEX_IDLE);

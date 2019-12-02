@@ -12,7 +12,6 @@ import java.util.List;
 
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
-import static com.gamesbykevin.havoc.enemies.Enemy.RANGE_NOTICE;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.*;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
@@ -121,6 +120,9 @@ public final class Enemies extends Entities {
                     }
                 }
 
+                //for patrol
+                Cell winner = null;
+
                 //determine at random if the enemy will patrol the room
                 if (patrol) {
 
@@ -129,8 +131,6 @@ public final class Enemies extends Entities {
 
                     //pick random location in the room for the enemy to walk to
                     List<Cell> tmpList = getLocationOptions(leaf.getRoom(), location);
-
-                    Cell winner = null;
 
                     //pick the location furthest away so the enemy can patrol the room
                     for (int i = 0; i < tmpList.size(); i++) {
@@ -149,14 +149,16 @@ public final class Enemies extends Entities {
 
                     tmpList.clear();
                     tmpList = null;
-
-                    //set the path to the target
-                    getLevel().getDungeon().getAStar().calculate(location.getCol(), location.getRow(), winner.getCol(), winner.getRow());
-                    enemy.setPathPatrol(getLevel().getDungeon().getAStar().getPath());
                 }
 
                 //add enemy at the location
                 add(enemy, location.getCol(), location.getRow());
+
+                //set the destination if we have one
+                if (winner != null) {
+                    enemy.setFinishCol(winner.getCol());
+                    enemy.setFinishRow(winner.getRow());
+                }
 
                 //increase the count
                 count++;
@@ -172,6 +174,9 @@ public final class Enemies extends Entities {
 
         //update the map
         getLevel().getDungeon().updateMap();
+
+        //reset the enemies
+        reset();
     }
 
     protected List<Cell> getLocationOptions(Room room, Cell target) {
@@ -220,52 +225,38 @@ public final class Enemies extends Entities {
     }
 
     @Override
+    public void reset() {
+
+        //call parent
+        super.reset();
+
+        //reset the enemies
+        for (int i = 0; i < getEntityList().size(); i++) {
+
+            //get the current enemy
+            Enemy enemy = (Enemy)getEntityList().get(i);
+
+            //remove the path (if exists)
+            if (enemy.getPathPatrol() != null)
+                enemy.getPathPatrol().clear();
+
+            //update the patrol path only if the start and finish are different
+            if (enemy.getStartCol() == enemy.getFinishCol() && enemy.getStartRow() == enemy.getFinishRow())
+                continue;
+
+            //calculate the patrol path
+            calculatePath(getLevel(), enemy, enemy.getStartCol(), enemy.getStartRow(), enemy.getFinishCol(), enemy.getFinishRow());
+        }
+    }
+
+    @Override
     public void update() {
 
         //update the enemies
         for (int i = 0; i < getEntityList().size(); i++) {
 
-            //get the current entity
-            Enemy enemy = (Enemy)getEntityList().get(i);
-
-            //update the entity
-            enemy.update(getLevel());
-
-            //if alert or attacking or hurt, notify nearby enemies
-            if (enemy.isShoot() || enemy.isAlert() || enemy.isHurt() || enemy.isPause())
-                notifyNeighbors(enemy, i);
-        }
-    }
-
-    private void notifyNeighbors(Entity enemy, int indexIgnore) {
-
-        //update the enemies
-        for (int i = 0; i < getEntityList().size(); i++) {
-
-            //ignore self
-            if (indexIgnore == i)
-                continue;
-
-            Enemy entity = (Enemy)getEntityList().get(i);
-
-            //must be idle or walking to notify
-            if (!entity.isIdle() && !entity.isWalk())
-                continue;
-
-            //if enemy is too far away we will skip
-            if (getDistance(enemy, entity) > RANGE_NOTICE)
-                continue;
-
-            if (!entity.isObstructed(getLevel())) {
-
-                //if the enemy isn't obstructed we can begin shooting
-                entity.setStatus(Enemy.Status.Shoot);
-
-            } else {
-
-                //if enemy is obstructed and in the same room, let's move so we can see the player and start shooting
-
-            }
+            //update the current entity
+            getEntityList().get(i).update(getLevel());
         }
     }
 }

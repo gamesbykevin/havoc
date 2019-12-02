@@ -11,8 +11,7 @@ import com.gamesbykevin.havoc.player.Player;
 
 import java.util.List;
 
-import static com.gamesbykevin.havoc.input.MyController.DEFAULT_SPEED_ROTATE;
-import static com.gamesbykevin.havoc.input.MyController.SPEED_WALK;
+import static com.gamesbykevin.havoc.input.MyController.*;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
 import static com.gamesbykevin.havoc.player.PlayerHelper.DEAD_ZONE_IGNORE;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
@@ -165,9 +164,6 @@ public class LevelHelper {
         double xMove = 0;
         double yMove = 0;
 
-        //which way are we turning?
-        float rotationA = 0;
-
         //which direction are we moving
         if (controller.isMoveForward())
             yMove++;
@@ -179,10 +175,12 @@ public class LevelHelper {
         if (controller.isStrafeRight())
             xMove++;
 
+        float rotationA = 0f;
+
         if (controller.isTurnLeft()) {
-            rotationA = DEFAULT_SPEED_ROTATE;
+            rotationA += DEFAULT_SPEED_ROTATE;
         } else if (controller.isTurnRight()) {
-            rotationA = -DEFAULT_SPEED_ROTATE;
+            rotationA -= DEFAULT_SPEED_ROTATE;
         }
 
         //if we aren't moving let's check the joystick
@@ -197,9 +195,9 @@ public class LevelHelper {
 
             //make sure we are moving enough
             if (controller.getKnobPercentX() < -DEAD_ZONE_IGNORE) {
-                rotationA = DEFAULT_SPEED_ROTATE * (-controller.getKnobPercentX() - DEAD_ZONE_IGNORE);
+                rotationA = (DEFAULT_SPEED_ROTATE * (-controller.getKnobPercentX() - DEAD_ZONE_IGNORE));
             } else if (controller.getKnobPercentX() > DEAD_ZONE_IGNORE) {
-                rotationA = DEFAULT_SPEED_ROTATE * (-controller.getKnobPercentX() + DEAD_ZONE_IGNORE);
+                rotationA = (DEFAULT_SPEED_ROTATE * (-controller.getKnobPercentX() + DEAD_ZONE_IGNORE));
             }
         }
 
@@ -221,17 +219,14 @@ public class LevelHelper {
         camera.position.y += ya;
         camera.rotate(Vector3.Z, rotationA);
 
-        if (rotationA != 0) {
+        //add rotation angle to overall rotation
+        controller.setRotation(controller.getRotation() + rotationA);
 
-            //add rotation angle to overall rotation
-            controller.setRotation(controller.getRotation() + rotationA);
-
-            //keep radian value from getting to large/small
-            if (controller.getRotation() > 360)
-                controller.setRotation(0);
-            if (controller.getRotation() < 0)
-                controller.setRotation(360);
-        }
+        //keep radian value from getting to large/small
+        if (controller.getRotation() > ROTATION_ANGLE_MAX)
+            controller.setRotation(controller.getRotation() - ROTATION_ANGLE_MAX);
+        if (controller.getRotation() < ROTATION_ANGLE_MIN)
+            controller.setRotation(controller.getRotation() + ROTATION_ANGLE_MAX);
     }
 
     protected static void updateLevel(Level level) {
