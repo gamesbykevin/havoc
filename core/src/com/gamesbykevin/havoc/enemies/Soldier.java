@@ -20,7 +20,7 @@ public final class Soldier extends Enemy {
     public static final int DAMAGE_MAJOR = 5;
 
     //animation delay
-    protected static final float DURATION_IDLE =  100f;
+    protected static final float DURATION_IDLE =  1000f;
     protected static final float DURATION_PAIN =  250f;
     protected static final float DURATION_WALK =  200f;
     protected static final float DURATION_DIE =   150f;

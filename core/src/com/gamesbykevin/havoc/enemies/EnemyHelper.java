@@ -48,6 +48,10 @@ public class EnemyHelper {
             }
         }
 
+        //if the player is in the way, the enemy will stand idle
+        if (enemy.hasCollision(level.getPlayer().getCamera3d().position.x, level.getPlayer().getCamera3d().position.y))
+            enemy.setStatus(Status.Idle);
+
         //how far are we from our next node
         float colDiff = Math.abs(node.getCol() - enemy.getCol());
         float rowDiff = Math.abs(node.getRow() - enemy.getRow());
@@ -71,6 +75,9 @@ public class EnemyHelper {
             if (enemy.getPathIndex() >= enemy.getPathPatrol().size()) {
                 enemy.setPathIndex(enemy.getPathPatrol().size() - 1);
                 enemy.setAscending(!enemy.isAscending());
+
+                //we reached the end, so keep the enemy idle for a short time
+                enemy.setStatus(Status.Idle);
             }
 
             node = enemy.getPathPatrol().get(enemy.getPathIndex());

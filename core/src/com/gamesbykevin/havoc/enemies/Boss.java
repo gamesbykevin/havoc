@@ -25,7 +25,7 @@ public final class Boss extends Enemy {
     public static final int ANIMATION_COUNT = 6;
 
     //animation delay
-    protected static final float DURATION_IDLE = 100f;
+    protected static final float DURATION_IDLE = 1000f;
     protected static final float DURATION_WALK = 250f;
     protected static final float DURATION_SHOOT = 300f;
     protected static final float DURATION_ALERT = 200f;
