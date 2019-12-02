@@ -10,7 +10,6 @@ import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.entities.Entity3d;
 import com.gamesbykevin.havoc.level.Level;
 
-import java.lang.reflect.GenericArrayType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,17 +23,7 @@ public final class Collectibles extends Entities {
 
     //different type of collectibles
     public enum Type {
-        ammo,
-        ammo_crate,
-        buzzsaw,
-        glock,
-        health_large,
-        health_small,
-        impact,
-        magnum,
-        shotgun,
-        smg,
-        key,
+        ammo, ammo_crate, buzzsaw, glock, health_large, health_small, impact, magnum, shotgun, smg, key,
     }
 
     //the total number of allowed will depend on the number of rooms
@@ -88,9 +77,8 @@ public final class Collectibles extends Entities {
         collectibles.add(Type.health_small);
         collectibles.add(Type.health_large);
 
-        //player spawns with this by default
+        //list of weapons the player can collect
         List<Type> weapons = new ArrayList<>();
-        //weapons.add(Type.glock);
         weapons.add(Type.smg);
         weapons.add(Type.impact);
         weapons.add(Type.magnum);

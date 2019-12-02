@@ -5,6 +5,7 @@ import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Disposable;
+import com.gamesbykevin.havoc.util.Restart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
-public abstract class Entities implements Disposable {
+public abstract class Entities implements Disposable, Restart {
 
     //list of entities in the game
     private List<Entity> entityList;
@@ -28,6 +29,7 @@ public abstract class Entities implements Disposable {
         this.entityList = new ArrayList<>();
     }
 
+    @Override
     public void reset() {
         for (int i = 0; i < getEntityList().size(); i++) {
             getEntityList().get(i).reset();
@@ -69,9 +71,19 @@ public abstract class Entities implements Disposable {
     }
 
     public void add(Entity3d entity, float col, float row) {
+
+        //update the location of our animation
         entity.getAnimation().setPosition(col + OFFSET, row + OFFSET, 0);
+
+        //assign the location
         entity.setCol(col);
         entity.setRow(row);
+
+        //assign the starting location
+        entity.setStartCol(col);
+        entity.setStartRow(row);
+
+        //add to the list of entities
         getEntityList().add(entity);
     }
 

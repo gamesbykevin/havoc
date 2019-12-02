@@ -1,9 +1,9 @@
 package com.gamesbykevin.havoc.enemies;
 
 import com.badlogic.gdx.math.Vector3;
-import com.gamesbykevin.havoc.animation.DecalAnimation;
 import com.gamesbykevin.havoc.astar.Node;
 import com.gamesbykevin.havoc.collectables.Collectibles;
+import com.gamesbykevin.havoc.dungeon.Dungeon;
 import com.gamesbykevin.havoc.entities.Entity3d;
 import com.gamesbykevin.havoc.level.Level;
 
@@ -13,9 +13,10 @@ import java.util.List;
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.*;
 import static com.gamesbykevin.havoc.entities.Entities.OFFSET;
+import static com.gamesbykevin.havoc.level.LevelHelper.isDoorOpen;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
-public final class Enemy extends Entity3d {
+public abstract class Enemy extends Entity3d {
 
     //what direction is the enemy facing
     private int direction;
@@ -24,7 +25,7 @@ public final class Enemy extends Entity3d {
     private int damage;
 
     //how fast can the enemy move
-    public static final float VELOCITY_SPEED = .0075f;
+    public static final float VELOCITY_SPEED = .01f;
 
     //how close to notice the player
     public static final float RANGE_NOTICE = 6f;
@@ -35,14 +36,8 @@ public final class Enemy extends Entity3d {
     //what is the health
     private float health = 100f;
 
-    //where does the enemy start
-    private final float startCol, startRow;
-
     //the path the enemy will patrol on
     private List<Node> pathPatrol;
-
-    //path to the player
-    private List<Node> pathPlayer;
 
     //where are we on our path target
     private int pathIndex = 0;
@@ -50,64 +45,41 @@ public final class Enemy extends Entity3d {
     //order for our target path
     private boolean ascending = true;
 
-    public Enemy(Type type, float startCol, float startRow) {
-        super(ANIMATION_COUNT);
+    //what is the enemy doing
+    public enum Status {
+        Die, Hurt, Shoot, Walk, Alert, Pause, Idle
+    }
 
-        //store the starting position
-        this.startCol = startCol;
-        this.startRow = startRow;
+    //status of the player
+    private Status status;
 
-        //set the allowed damage
-        setDamage(type.damage);
-
-        getAnimations()[INDEX_DIE] = new DecalAnimation(type.path, "die", ".bmp", 1, 4, DURATION_DIE);
-
-        getAnimations()[INDEX_PAIN] = new DecalAnimation(type.path, "pain", ".bmp", 1, 2, DURATION_PAIN);
-
-        getAnimations()[INDEX_IDLE_S] = new DecalAnimation(type.path, "s_", ".bmp", 1, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_SW] = new DecalAnimation(type.path, "s_", ".bmp", 2, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_W] = new DecalAnimation(type.path, "s_", ".bmp", 3, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_NW] = new DecalAnimation(type.path, "s_", ".bmp", 4, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_N] = new DecalAnimation(type.path, "s_", ".bmp", 5, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_NE] = new DecalAnimation(type.path, "s_", ".bmp", 6, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_E] = new DecalAnimation(type.path, "s_", ".bmp", 7, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_SE] = new DecalAnimation(type.path, "s_", ".bmp", 8, 1, DURATION_IDLE);
-
-        getAnimations()[INDEX_SHOOT] = new DecalAnimation(type.path, "shoot", ".bmp", 1, 3, DURATION_SHOOT);
-        getAnimations()[INDEX_ALERT] = new DecalAnimation(type.path, "shoot", ".bmp", 2, 2, DURATION_ALERT);
-        getAnimations()[INDEX_PAUSE] = new DecalAnimation(type.path, "shoot", ".bmp", 2, 1, DURATION_PAUSE);
-
-        getAnimations()[INDEX_WALK_S] = new DecalAnimation(type.path, "w", "_1.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_SW] = new DecalAnimation(type.path, "w", "_2.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_W] = new DecalAnimation(type.path, "w", "_3.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_NW] = new DecalAnimation(type.path, "w", "_4.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_N] = new DecalAnimation(type.path, "w", "_5.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_NE] = new DecalAnimation(type.path, "w", "_6.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_E] = new DecalAnimation(type.path, "w", "_7.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_SE] = new DecalAnimation(type.path, "w", "_8.bmp", 1, 4, DURATION_WALK);
-
-        //reset the enemy
-        reset();
+    public Enemy(int count) {
+        super(count);
     }
 
     @Override
     public void reset() {
-        setHealth(100f);
-        setSolid(true);
-        setIndex(INDEX_IDLE_E);
+        setIndex(0);
         setDirection(DIRECTION_E);
-        setAscending(true);
         setPathIndex(0);
         setCol(getStartCol());
         setRow(getStartRow());
+        setHealth(100f);
+        setSolid(true);
+        setAscending(true);
+        setStatus(Status.Idle);
     }
 
     @Override
     public void update(Level level) {
 
+        //if solid, if not the enemy is dead
         if (isSolid()) {
 
-            //if health is gone start death animation
+            //get the current player position
+            Vector3 position = level.getPlayer().getCamera3d().position;
+
+            //check if enemy died
             if (getHealth() <= 0) {
 
                 //enemy just died, now add ammo for player to collect
@@ -115,112 +87,27 @@ public final class Enemy extends Entity3d {
 
                 //start death animation
                 setSolid(false);
-                setIndex(INDEX_DIE);
+                setStatus(Status.Die);
 
             } else {
 
-                //get the current location
-                Vector3 position = level.getPlayer().getCamera3d().position;
-
                 //calculate distance to player from enemy
-                double dist = getDistance(this, position);
+                double distance = getDistance(this, position);
 
                 //don't continue if too far away
-                if (dist > RANGE_UPDATE)
+                if (distance > RANGE_UPDATE)
                     return;
 
-                if (dist < RANGE_NOTICE) {
-
-                    //if the enemy isn't hurt
-                    if (!isHurt(this)) {
-
-                        //if we are close and the player is shooting and nothing is in our way
-                        if (level.getPlayer().getController().isShooting() && !isObstructed(level, position, this))
-                            setIndex(INDEX_SHOOT);
-                    }
-                }
-
-                //update these animations because they can change when the player moves
-                if (isIdle(this))
-                    updateIdle(position, this);
-                if (isWalking(this))
-                    updateWalk(position, this);
-
+                //if there is a patrol path, the enemy will patrol
                 if (getPathPatrol() != null && getPathPatrol().size() > 0)
-                    patrol(this, level, position);
+                    patrol(this, level);
 
-                //if the animation is finished what do we do next?
-                if (getAnimation().isFinish()) {
-
-                    if (isHurt(this)) {
-
-                        //are we close enough to check if we can attack?
-                        if (!isObstructed(level, position, this)) {
-                            setIndex(INDEX_SHOOT);
-                        } else {
-                            updateIdle(position, this);
-                        }
-
-                    } else if (isShooting(this)) {
-
-                        //if the enemy finished shooting flag the player as hurt
-                        level.getPlayer().setHurt(true);
-                        level.getPlayer().setHealth(level.getPlayer().getHealth() - getDamage());
-
-                        //if close enough the enemy will remain alert
-                        if (canShoot(dist, level, position)) {
-                            setIndex(INDEX_PAUSE);
-                        } else {
-                            updateIdle(position, this);
-                        }
-
-                    } else if (isPaused(this)) {
-
-                        //if close enough and our view isn't blocked
-                        if (canShoot(dist, level, position))
-                            setIndex(INDEX_ALERT);
-
-                    } else if (isAlert(this)) {
-
-                        //if the enemy finished shooting flag the player as hurt
-                        level.getPlayer().setHurt(true);
-                        level.getPlayer().setHealth(level.getPlayer().getHealth() - getDamage());
-
-                        //are we close enough to check if we can attack?
-                        if (canShoot(dist, level, position)) {
-                            setIndex(INDEX_PAUSE);
-                        } else {
-                            updateIdle(position, this);
-                        }
-
-                    } else if (isIdle(this) || isWalking(this)) {
-
-                        //are we close enough to check if we can attack?
-                        if (dist < RANGE_NOTICE) {
-
-                            //check to see if the enemy is facing the player
-                            if (isFacing(position, this)) {
-
-                                //if nothing is blocking our view, then the enemy can see the player
-                                if (!isObstructed(level, position, this))
-                                    setIndex(INDEX_SHOOT);
-                            }
-
-                        } else {
-
-                            //if not in range we go back to idle
-                            updateIdle(position, this);
-                        }
-
-                        //if we are idle and we have a path, start walking again
-                        if (isIdle(this) && (getPathPatrol() != null && !getPathPatrol().isEmpty()))
-                            updateWalk(position, this);
-
-                        //reset the animation
-                        getAnimation().reset();
-                    }
-                }
+                //update the enemy accordingly
+                EnemyHelper.update(this, level, distance);
             }
+
+            //ensure correct index is assigned
+            updateIndex(position);
         }
 
         //update the location for the animation
@@ -230,8 +117,12 @@ public final class Enemy extends Entity3d {
         getAnimation().update();
     }
 
-    private boolean canShoot(double distance, Level level, Vector3 position) {
-        return (distance < RANGE_NOTICE && !isObstructed(level, position, this));
+    //is the enemy walking, attacking, etc...
+    public abstract void updateIndex(Vector3 position);
+
+    //is the enemy able to shoot
+    public boolean canShoot(double distance, Level level) {
+        return (distance < RANGE_NOTICE && !isObstructed(level));
     }
 
     @Override
@@ -257,28 +148,12 @@ public final class Enemy extends Entity3d {
         this.pathPatrol = new ArrayList<>(pathPatrol);
     }
 
-    public List<Node> getPathPlayer() {
-        return this.pathPlayer;
-    }
-
-    public void setPathPlayer(List<Node> pathPlayer) {
-        this.pathPlayer = new ArrayList<>(pathPlayer);
-    }
-
     public float getHealth() {
         return this.health;
     }
 
     public void setHealth(float health) {
         this.health = health;
-    }
-
-    public float getStartCol() {
-        return this.startCol;
-    }
-
-    public float getStartRow() {
-        return this.startRow;
     }
 
     protected boolean isAscending() {
@@ -303,5 +178,116 @@ public final class Enemy extends Entity3d {
 
     public void setDamage(int damage) {
         this.damage = damage;
+    }
+
+    public Status getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public boolean isDie() {
+        return getStatus() == Status.Die;
+    }
+
+    public boolean isHurt() {
+        return getStatus() == Status.Hurt;
+    }
+
+    public boolean isShoot() {
+        return getStatus() == Status.Shoot;
+    }
+
+    public boolean isWalk() {
+        return getStatus() == Status.Walk;
+    }
+
+    public boolean isAlert() {
+        return getStatus() == Status.Alert;
+    }
+
+    public boolean isPause() {
+        return getStatus() == Status.Pause;
+    }
+
+    public boolean isIdle() {
+        return getStatus() == Status.Idle;
+    }
+
+    public boolean isObstructed(Level level) {
+
+        int x = (int)getCol();
+        int y = (int)getRow();
+
+        //get the dungeon
+        Dungeon dungeon = level.getDungeon();
+
+        //make sure there is a clear vision to the location
+        if (!dungeon.hasMap(x, y))
+            return true;
+
+        //if door isn't open, we are obstructed
+        if (dungeon.hasInteract(x, y) && !isDoorOpen(level, x, y))
+            return true;
+
+        Vector3 location = level.getPlayer().getCamera3d().position;
+
+        int goalX = (int)location.x;
+        int goalY = (int)location.y;
+
+        //continue until we get to the location
+        while (x != goalX || y != goalY) {
+
+            if (x < goalX)
+                x++;
+            if (x > goalX)
+                x--;
+
+            //if not an open space then it is obstructed
+            if (!dungeon.hasMap(x, y))
+                return true;
+
+            //if door isn't open, we are obstructed
+            if (dungeon.hasInteract(x, y) && !isDoorOpen(level, x, y))
+                return true;
+
+            if (y < goalY)
+                y++;
+            if (y > goalY)
+                y--;
+
+            //if not an open space then it is obstructed
+            if (!dungeon.hasMap(x, y))
+                return true;
+
+            //if door isn't open, we are obstructed
+            if (dungeon.hasInteract(x, y) && !isDoorOpen(level, x, y))
+                return true;
+        }
+
+        //nothing is blocking from viewing the player
+        return false;
+    }
+
+    protected boolean isFacing(Vector3 location) {
+
+        switch (getDirection()) {
+            case DIRECTION_E:
+                return (location.x > getCol());
+
+            case DIRECTION_W:
+                return (location.x < getCol());
+
+            case DIRECTION_N:
+                return (location.y > getRow());
+
+            case DIRECTION_S:
+                return (location.y < getRow());
+
+            default:
+                return false;
+        }
     }
 }

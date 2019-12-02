@@ -83,11 +83,30 @@ public final class Enemies extends Entities {
                 //get the random location
                 Cell location = options.get(index);
 
-                //create our enemy
-                Enemy enemy = new Enemy(Type.values()[getRandom().nextInt(Type.values().length)], location.getCol(), location.getRow());
+                //the enemy created
+                Enemy enemy = null;
 
-                //start the enemy out as idle
-                enemy.setIndex(INDEX_IDLE_E);
+                //will the enemy patrol?
+                boolean patrol = getRandom().nextBoolean();
+
+                //create our enemy
+                if (getRandom().nextBoolean()) {
+
+                    //create the boss
+                    enemy = new Boss(Boss.Type.values()[getRandom().nextInt(Boss.Type.values().length)]);
+
+                    //boss will never patrol
+                    patrol = false;
+
+                } else {
+
+                    //create the soldier
+                    enemy = new Soldier(Soldier.Type.values()[getRandom().nextInt(Soldier.Type.values().length)]);
+                }
+
+                //assign location
+                enemy.setCol(location.getCol());
+                enemy.setRow(location.getRow());
 
                 //change the facing direction
                 if (location.getCol() < middleCol) {
@@ -103,7 +122,7 @@ public final class Enemies extends Entities {
                 }
 
                 //determine at random if the enemy will patrol the room
-                if (getRandom().nextBoolean()) {
+                if (patrol) {
 
                     //shortest distance
                     double distance = -1;
@@ -137,7 +156,7 @@ public final class Enemies extends Entities {
                 }
 
                 //add enemy at the location
-                add(enemy, enemy.getStartCol(), enemy.getStartRow());
+                add(enemy, location.getCol(), location.getRow());
 
                 //increase the count
                 count++;
@@ -207,13 +226,13 @@ public final class Enemies extends Entities {
         for (int i = 0; i < getEntityList().size(); i++) {
 
             //get the current entity
-            Entity enemy = getEntityList().get(i);
+            Enemy enemy = (Enemy)getEntityList().get(i);
 
             //update the entity
             enemy.update(getLevel());
 
             //if alert or attacking or hurt, notify nearby enemies
-            if (isShooting(enemy) || isAlert(enemy) || isHurt(enemy) || isPaused(enemy))
+            if (enemy.isShoot() || enemy.isAlert() || enemy.isHurt() || enemy.isPause())
                 notifyNeighbors(enemy, i);
         }
     }
@@ -227,20 +246,20 @@ public final class Enemies extends Entities {
             if (indexIgnore == i)
                 continue;
 
-            Entity entity = getEntityList().get(i);
+            Enemy entity = (Enemy)getEntityList().get(i);
 
             //must be idle or walking to notify
-            if (!isIdle(entity) && !isWalking(entity))
+            if (!entity.isIdle() && !entity.isWalk())
                 continue;
 
             //if enemy is too far away we will skip
             if (getDistance(enemy, entity) > RANGE_NOTICE)
                 continue;
 
-            if (!isObstructed(getLevel(), getLevel().getPlayer().getCamera3d().position, entity)) {
+            if (!entity.isObstructed(getLevel())) {
 
                 //if the enemy isn't obstructed we can begin shooting
-                entity.setIndex(INDEX_SHOOT);
+                entity.setStatus(Enemy.Status.Shoot);
 
             } else {
 

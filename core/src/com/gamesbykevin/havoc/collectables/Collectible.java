@@ -38,6 +38,8 @@ public final class Collectible extends Entity3d {
     @Override
     public void reset() {
         setSolid(true);
+        setCol(getStartCol());
+        setRow(getStartRow());
         getAnimation().reset();
     }
 

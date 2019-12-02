@@ -528,13 +528,10 @@ public class DungeonHelper {
         //pick a random door to be locked
         Cell choice = options.get(index);
 
-        //make a locked door
-        choice.setType(Type.DoorLocked);
-
         //clear previous list
         options.clear();
 
-        //look for open cells that meet the  cost requirement so we can spawn a key
+        //look for open cells that meet the cost requirement so we can spawn a key
         for (int row = 0; row < dungeon.getRows(); row++) {
             for (int col = 0; col < dungeon.getCols(); col++) {
 
@@ -558,14 +555,21 @@ public class DungeonHelper {
             }
         }
 
-        //pick a random place for the key
-        index = getRandom().nextInt(options.size());
-        choice = options.get(index);
+        //we will only lock a door and place a key if options are available
+        if (!options.isEmpty()) {
 
-        //and now place the key there
-        ((Collectibles)dungeon.getLevel().getCollectibles()).add(Collectibles.Type.key, choice.getCol(), choice.getRow());
+            //make ur choice a locked door
+            choice.setType(Type.DoorLocked);
 
-        //we no longer need the list
+            //now we pick a random place for the key
+            index = getRandom().nextInt(options.size());
+            choice = options.get(index);
+
+            //and add the key to the chosen location
+            ((Collectibles)dungeon.getLevel().getCollectibles()).add(Collectibles.Type.key, choice.getCol(), choice.getRow());
+        }
+
+        //cleanup
         options.clear();
         options = null;
     }

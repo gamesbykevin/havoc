@@ -5,16 +5,20 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Disposable;
+import com.gamesbykevin.havoc.util.Restart;
 
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
-public abstract class Entity implements Disposable {
+public abstract class Entity implements Disposable, Restart {
 
     //is the entity solid? for collision detection and rendering etc...
     private boolean solid;
 
     //location of the entity
     private float col, row;
+
+    //location where the entity starts
+    private float startCol, startRow;
 
     //the index of the current animation
     private int index = 0;
@@ -58,7 +62,24 @@ public abstract class Entity implements Disposable {
         this.row = row;
     }
 
+    public float getStartCol() {
+        return this.startCol;
+    }
+
+    public void setStartCol(float startCol) {
+        this.startCol = startCol;
+    }
+
+    public float getStartRow() {
+        return this.startRow;
+    }
+
+    public void setStartRow(float startRow) {
+        this.startRow = startRow;
+    }
+
     //logic to reset the entity
+    @Override
     public abstract void reset();
 
     //logic to update the entity

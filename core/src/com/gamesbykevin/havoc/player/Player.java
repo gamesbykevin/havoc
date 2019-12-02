@@ -6,16 +6,20 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.input.MyController;
-import com.gamesbykevin.havoc.player.weapon.Weapons;
+import com.gamesbykevin.havoc.level.Level;
+import com.gamesbykevin.havoc.util.Restart;
+import com.gamesbykevin.havoc.weapon.Weapons;
 import com.gamesbykevin.havoc.util.Disposable;
 import com.gamesbykevin.havoc.util.Hud;
 
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
+import static com.gamesbykevin.havoc.player.PlayerHelper.HEIGHT_MIN_Z;
+import static com.gamesbykevin.havoc.player.PlayerHelper.VELOCITY_Z;
 import static com.gamesbykevin.havoc.util.Hud.*;
 
-public final class Player implements Disposable {
+public final class Player implements Disposable, Restart {
 
     //health range
     public static final int HEALTH_MAX = 100;
@@ -45,20 +49,28 @@ public final class Player implements Disposable {
     //the game controller
     private MyController controller;
 
+    //weapons the player has
+    private Weapons weapons;
+
+    //height the camera will be at
+    private static final float HEIGHT_START = .075f;
+
     public Player() {
 
-        //start out with the max health
-        setHealth(HEALTH_MAX);
-
-        //we don't have the key (yet)
-        setKey(false);
-
-        //player isn't hurt (just yet)
-        setHurt(false);
+        //reset values
+        reset();
 
         //store reference to the images
         this.imageHurt = new Texture(Gdx.files.internal("hud/hurt.png"));
         this.imageCollect = new Texture(Gdx.files.internal("hud/collect.png"));
+    }
+
+    public void createWeapons(Level level) {
+        this.weapons = new Weapons(level);
+    }
+
+    public Weapons getWeapons() {
+        return this.weapons;
     }
 
     public MyController getController() {
@@ -94,8 +106,7 @@ public final class Player implements Disposable {
             float x = getStartCol();
             float y = getStartRow();
 
-            this.camera3d.position.set(x, y,0);
-            //this.camera3d.position.z = 1.50f;
+            this.camera3d.position.set(x, y, HEIGHT_START);
             this.camera3d.rotate(Vector3.X, 90);
 
             //assign the previous position
@@ -155,6 +166,10 @@ public final class Player implements Disposable {
         getPrevious().z = previous.z;
     }
 
+    public boolean isDead() {
+        return (getHealth() <= HEALTH_MIN);
+    }
+
     public boolean isHurt() {
         return this.hurt;
     }
@@ -180,14 +195,38 @@ public final class Player implements Disposable {
     }
 
     //update the player
-    public void update() {
-        //do we need to do anything here
+    public void update(Level level) {
+
+        if (isDead()) {
+
+            if (getCamera3d().position.z > HEIGHT_MIN_Z) {
+                getCamera3d().position.z -= VELOCITY_Z;
+
+                //don't go below
+                if (getCamera3d().position.z < HEIGHT_MIN_Z)
+                    getCamera3d().position.z = HEIGHT_MIN_Z;
+
+                //reset the controller
+                getController().reset();
+
+            } else {
+
+                //if the controller has been touched we reset
+                if (getController().isTouch()) {
+
+                    //reset everything
+                    level.reset();
+                    getWeapons().reset();
+                }
+            }
+        }
     }
 
-    public void render(Weapons weapons) {
+    public void render() {
 
         //render the controller first
-        getController().render();
+        if (!isDead())
+            getController().render();
 
         //used to render 2d items etc...
         Batch batch = getController().getStage().getBatch();
@@ -196,7 +235,7 @@ public final class Player implements Disposable {
         batch.begin();
 
         //if hurt render the screen graphic
-        if (isHurt()) {
+        if (isHurt() || isDead()) {
             batch.draw(getImageHurt(), 0, 0, SIZE_WIDTH, SIZE_HEIGHT);
             setHurt(false);
         } else if (isCollect()) {
@@ -218,7 +257,8 @@ public final class Player implements Disposable {
             renderKey(batch);
 
         //render the weapons
-        weapons.render();
+        if (!isDead())
+            getWeapons().render();
 
         //we are done
         batch.end();
@@ -233,11 +273,30 @@ public final class Player implements Disposable {
             this.imageCollect.dispose();
         if (this.controller != null)
             this.controller.dispose();
+        if (this.weapons != null)
+            this.weapons.dispose();
 
         this.imageHurt = null;
         this.imageCollect = null;
         this.previous = null;
         this.controller = null;
         this.camera3d = null;
+        this.weapons = null;
+    }
+
+    @Override
+    public void reset() {
+
+        //start out with the max health
+        setHealth(HEALTH_MAX);
+
+        //we don't have the key (yet)
+        setKey(false);
+
+        //player isn't hurt (just yet)
+        setHurt(false);
+
+        //reset the camera position
+        getCamera3d(true);
     }
 }

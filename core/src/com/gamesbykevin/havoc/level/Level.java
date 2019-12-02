@@ -2,16 +2,17 @@ package com.gamesbykevin.havoc.level;
 
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
+import com.gamesbykevin.havoc.collectables.CollectibleHelper;
 import com.gamesbykevin.havoc.collectables.Collectibles;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.dungeon.Dungeon;
 import com.gamesbykevin.havoc.enemies.Enemies;
 import com.gamesbykevin.havoc.entities.Entities;
-import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.obstacles.Obstacles;
 import com.gamesbykevin.havoc.player.Player;
 import com.gamesbykevin.havoc.util.Disposable;
+import com.gamesbykevin.havoc.util.Restart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import static com.gamesbykevin.havoc.level.LevelHelper.*;
 import static com.gamesbykevin.havoc.player.PlayerHelper.checkCollision;
 import static com.gamesbykevin.havoc.texture.TextureHelper.addTextures;
 
-public class Level implements Disposable {
+public class Level implements Disposable, Restart {
 
     //our randomly created dungeon
     private Dungeon dungeon;
@@ -60,6 +61,9 @@ public class Level implements Disposable {
         //store our player reference
         this.player = player;
 
+        //create the weapons collection
+        getPlayer().createWeapons(this);
+
         //how big should the dungeon be?
         int size = DUNGEON_SIZE;
 
@@ -88,6 +92,16 @@ public class Level implements Disposable {
 
         //create the batch
         getDecalBatch();
+    }
+
+    @Override
+    public void reset() {
+        getEnemies().reset();
+        getObstacles().reset();
+        getCollectibles().reset();
+        getPlayer().reset();
+        getPlayer().getController().reset();
+
     }
 
     public Player getPlayer() {
@@ -173,6 +187,9 @@ public class Level implements Disposable {
         //update the players location
         updateLocation(getPlayer());
 
+        //check if any collectibles have been collected
+        CollectibleHelper.check(this);
+
         //check for collision
         checkCollision(this);
 
@@ -180,7 +197,7 @@ public class Level implements Disposable {
         updateLevel(this);
 
         //update the player
-        getPlayer().update();
+        getPlayer().update(this);
     }
 
     public void render() {

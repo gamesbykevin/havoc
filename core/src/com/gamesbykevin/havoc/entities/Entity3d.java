@@ -5,8 +5,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
 
-import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
-
 public abstract class Entity3d extends Entity {
 
     //array of animations for our entity

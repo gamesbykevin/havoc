@@ -2,12 +2,8 @@ package com.gamesbykevin.havoc;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
-import com.gamesbykevin.havoc.collectables.CollectibleHelper;
-import com.gamesbykevin.havoc.collectables.Collectibles;
-import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.player.Player;
-import com.gamesbykevin.havoc.player.weapon.Weapons;
 import com.gamesbykevin.havoc.texture.TextureHelper;
 
 public class MyGdxGame extends ApplicationAdapter {
@@ -30,15 +26,11 @@ public class MyGdxGame extends ApplicationAdapter {
 	//our hero
 	private Player player;
 
-	//our weapon inventory
-	private Weapons weapons;
-
 	@Override
 	public void create () {
 
 		//create objects etc...
 		getLevel();
-		getWeapons();
 	}
 
 	public Level getLevel() {
@@ -57,14 +49,6 @@ public class MyGdxGame extends ApplicationAdapter {
         return this.player;
     }
 
-	public Weapons getWeapons() {
-
-		if (this.weapons == null)
-			this.weapons = new Weapons(getLevel());
-
-		return this.weapons;
-	}
-
 	@Override
 	public void render () {
 
@@ -73,14 +57,11 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		final long time = System.currentTimeMillis();
 
-		//check if any collectibles have been collected
-		CollectibleHelper.check(getLevel(), getWeapons());
-
         //render the level
         getLevel().render();
 
-		//render player etc...
-		getPlayer().render(getWeapons());
+		//render player objects etc...
+		getPlayer().render();
 
         final long elapsed = System.currentTimeMillis() - time;
 
@@ -103,12 +84,9 @@ public class MyGdxGame extends ApplicationAdapter {
 			this.player.dispose();
 		if (this.level != null)
 			this.level.dispose();
-		if (this.weapons != null)
-			this.weapons.dispose();
 
 		this.player = null;
 		this.level = null;
-		this.weapons = null;
 		TextureHelper.recycle();
 	}
 }

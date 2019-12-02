@@ -10,7 +10,7 @@ public class PlayerHelper {
     public static final float WALL_DISTANCE = .25f;
 
     //if we aren't moving the joystick enough we will ignore
-    public static final float DEADZONE_IGNORE = .2f;
+    public static final float DEAD_ZONE_IGNORE = .2f;
 
     //where to render our hud items
     public static final float HUD_RATIO = .5f;
@@ -19,6 +19,12 @@ public class PlayerHelper {
 
     public static final int HEALTH_SMALL = 10;
     public static final int HEALTH_LARGE = 25;
+
+    //how fast do we fall to the ground
+    public static final float VELOCITY_Z = 0.0075f;
+
+    //the lowest the player can fall to the ground
+    public static final float HEIGHT_MIN_Z = -0.25f;
 
     public static void checkCollision(Level level) {
 

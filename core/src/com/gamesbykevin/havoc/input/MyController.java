@@ -6,12 +6,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.gamesbykevin.havoc.util.Restart;
 
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
 import static com.gamesbykevin.havoc.input.MyControllerHelper.*;
 
-public class MyController implements InputProcessor, Disposable {
+public class MyController implements InputProcessor, Disposable, Restart {
 
     //how fast can we move
     public static final float SPEED_WALK = .1f;
@@ -25,11 +26,6 @@ public class MyController implements InputProcessor, Disposable {
     //our input listener
     private Stage stage;
 
-    //move camera up/down while we are walking/running
-    public static final float MIN_Z = 0f;
-    public static final float MAX_Z = .25f;
-    public static float VELOCITY_Z = 0.01f;
-
     //what are we doing?
     private boolean moveForward = false;
     private boolean moveBackward = false;
@@ -41,6 +37,9 @@ public class MyController implements InputProcessor, Disposable {
     private boolean action = false;
     private boolean change = false;
 
+    //was the screen touched?
+    private boolean touch = false;
+
     //camera to render controls
     private OrthographicCamera camera2d;
 
@@ -49,14 +48,43 @@ public class MyController implements InputProcessor, Disposable {
 
     public MyController() {
 
-        //setup our controller ui
-        setupController(this);
+        //setup our controller ui when needed
+        switch (Gdx.app.getType()) {
+
+            case Android:
+            case iOS:
+                setupController(this);
+                break;
+
+            case Desktop:
+            default:
+                break;
+        }
 
         //make sure we are capturing input correct
         setInput();
 
         //create our camera
         getCamera2d();
+    }
+
+    @Override
+    public void reset() {
+
+        //flag everything false
+        setMoveForward(false);
+        setMoveBackward(false);
+        setShooting(false);
+        setAction(false);
+        setChange(false);
+        setTurnLeft(false);
+        setTurnRight(false);
+        setStrafeLeft(false);
+        setStrafeRight(false);
+        setTouch(false);
+        setKnobPercentX(0);
+        setKnobPercentY(0);
+        setRotation(0);
     }
 
     @Override
@@ -104,7 +132,7 @@ public class MyController implements InputProcessor, Disposable {
 
             case Android:
             case iOS:
-                Gdx.input.setInputProcessor(this.stage);
+                Gdx.input.setInputProcessor(getStage());
                 break;
 
             case Desktop:
@@ -136,11 +164,13 @@ public class MyController implements InputProcessor, Disposable {
 
     @Override
     public boolean keyTyped (char character) {
+        setTouch(true);
         return false;
     }
 
     @Override
     public boolean touchDown (int x, int y, int pointer, int button) {
+        setTouch(true);
         return false;
     }
 
@@ -156,6 +186,7 @@ public class MyController implements InputProcessor, Disposable {
 
     @Override
     public boolean mouseMoved (int x, int y) {
+        setTouch(true);
         return false;
     }
 
@@ -234,6 +265,14 @@ public class MyController implements InputProcessor, Disposable {
 
     public void setChange(boolean change) {
         this.change = change;
+    }
+
+    public boolean isTouch() {
+        return this.touch;
+    }
+
+    public void setTouch(boolean touch) {
+        this.touch = touch;
     }
 
     public Stage getStage() {

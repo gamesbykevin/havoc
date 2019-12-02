@@ -150,6 +150,9 @@ public class MyControllerHelper {
 
     protected static void updateFlag(MyController controller, int keycode, boolean flag) {
 
+        //flag input has been touched
+        controller.setTouch(true);
+
         switch (keycode) {
             case KEY_MOVE_BACKWARD:
                 controller.setMoveBackward(flag);

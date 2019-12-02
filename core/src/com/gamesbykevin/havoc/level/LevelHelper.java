@@ -14,7 +14,7 @@ import java.util.List;
 import static com.gamesbykevin.havoc.input.MyController.DEFAULT_SPEED_ROTATE;
 import static com.gamesbykevin.havoc.input.MyController.SPEED_WALK;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
-import static com.gamesbykevin.havoc.player.PlayerHelper.DEADZONE_IGNORE;
+import static com.gamesbykevin.havoc.player.PlayerHelper.DEAD_ZONE_IGNORE;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public class LevelHelper {
@@ -152,8 +152,16 @@ public class LevelHelper {
 
     protected static void updateLocation(Player player) {
 
+        //nothing to update when dead
+        if (player.isDead())
+            return;
+
+        //get our location
         PerspectiveCamera camera = player.getCamera3d();
+
+        //get the controller as well
         MyController controller = player.getController();
+
         double xMove = 0;
         double yMove = 0;
 
@@ -181,17 +189,17 @@ public class LevelHelper {
         if (yMove == 0 && xMove == 0) {
 
             //make sure we are moving enough
-            if (controller.getKnobPercentY() < -DEADZONE_IGNORE) {
-                yMove = controller.getKnobPercentY() + DEADZONE_IGNORE;
-            } else if (controller.getKnobPercentY() > DEADZONE_IGNORE) {
-                yMove = controller.getKnobPercentY() - DEADZONE_IGNORE;
+            if (controller.getKnobPercentY() < -DEAD_ZONE_IGNORE) {
+                yMove = controller.getKnobPercentY() + DEAD_ZONE_IGNORE;
+            } else if (controller.getKnobPercentY() > DEAD_ZONE_IGNORE) {
+                yMove = controller.getKnobPercentY() - DEAD_ZONE_IGNORE;
             }
 
             //make sure we are moving enough
-            if (controller.getKnobPercentX() < -DEADZONE_IGNORE) {
-                rotationA = DEFAULT_SPEED_ROTATE * (-controller.getKnobPercentX() - DEADZONE_IGNORE);
-            } else if (controller.getKnobPercentX() > DEADZONE_IGNORE) {
-                rotationA = DEFAULT_SPEED_ROTATE * (-controller.getKnobPercentX() + DEADZONE_IGNORE);
+            if (controller.getKnobPercentX() < -DEAD_ZONE_IGNORE) {
+                rotationA = DEFAULT_SPEED_ROTATE * (-controller.getKnobPercentX() - DEAD_ZONE_IGNORE);
+            } else if (controller.getKnobPercentX() > DEAD_ZONE_IGNORE) {
+                rotationA = DEFAULT_SPEED_ROTATE * (-controller.getKnobPercentX() + DEAD_ZONE_IGNORE);
             }
         }
 
@@ -212,21 +220,6 @@ public class LevelHelper {
         camera.position.x += xa;
         camera.position.y += ya;
         camera.rotate(Vector3.Z, rotationA);
-
-        /*
-        if (controller.isMoveForward() || controller.isMoveBackward()) {
-
-            camera.position.z += VELOCITY_Z;
-
-            if (camera.position.z <= MIN_Z) {
-                camera.position.z = MIN_Z;
-                VELOCITY_Z = -VELOCITY_Z;
-            } else if (camera.position.z >= MAX_Z) {
-                camera.position.z = MAX_Z;
-                VELOCITY_Z = -VELOCITY_Z;
-            }
-        }
-        */
 
         if (rotationA != 0) {
 

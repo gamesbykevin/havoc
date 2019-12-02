@@ -2,11 +2,10 @@ package com.gamesbykevin.havoc.collectables;
 
 import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.entities.Entity;
-import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.player.Player;
-import com.gamesbykevin.havoc.player.weapon.WeaponHelper;
-import com.gamesbykevin.havoc.player.weapon.Weapons;
+import com.gamesbykevin.havoc.weapon.WeaponHelper;
+import com.gamesbykevin.havoc.weapon.Weapons;
 
 import static com.gamesbykevin.havoc.player.Player.HEALTH_MAX;
 import static com.gamesbykevin.havoc.player.PlayerHelper.HEALTH_LARGE;
@@ -15,11 +14,12 @@ import static com.gamesbykevin.havoc.player.PlayerHelper.HEALTH_SMALL;
 public class CollectibleHelper {
 
     //check if we collected any collectibles
-    public static void check(Level level, Weapons weapons) {
+    public static void check(Level level) {
 
+        //get our objects
         Entities entities = level.getCollectibles();
-
         Player player = level.getPlayer();
+        Weapons weapons = player.getWeapons();
 
         //check the whole list
         for (int i = 0; i < entities.getEntityList().size(); i++) {
