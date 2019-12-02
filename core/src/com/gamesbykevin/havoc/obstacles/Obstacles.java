@@ -26,16 +26,14 @@ public final class Obstacles extends Entities {
         random1, random2, random3, random4,
         cage1, cage2, cage3, cage4,
         statue1, statue2, statue3, statue4, statue5,
-        well1, well2, well3, well4, well5,
-        BluePotEmpty, BluePotLargeEmpty, BluePotPlant1, BluePotPlant2, YellowPotPlant,
+        BluePotLargeEmpty, BluePotPlant1, BluePotPlant2, YellowPotPlant,
         Candle,
         spear1, spear2,
         flag1, flag2,
         barrel1, barrel2,
         pots1, pots2,
-        DogFood, table,
-        FloorLamp1, FloorLamp2,
-        SpecimenPod1, SpecimenPod2
+        table,
+        FloorLamp1, FloorLamp2
     }
 
     //how close can we get to the obstacle
@@ -58,10 +56,6 @@ public final class Obstacles extends Entities {
             //only want leafs containing rooms
             if (leaf.getRoom() == null)
                 continue;
-
-            //add pillars
-            //if (getRandom().nextBoolean())
-            //    addPillars(leaf.getRoom());
 
             //add lights
             addLights(leaf.getRoom());
@@ -192,43 +186,6 @@ public final class Obstacles extends Entities {
                 add(type, room.getX() + (room.getW() - 1) - offset, room.getY() + offset);
                 add(type, room.getX() + offset, room.getY() + (room.getH() - 1) - offset);
                 break;
-        }
-    }
-
-    private void addPillars(Room room) {
-
-        Obstacles.Type type = getRandomPillar();
-
-        if (!room.hasWestDoor(getLevel().getDungeon()) && !room.hasEastDoor(getLevel().getDungeon())) {
-            addPillarVertical(type, room, room.getX() + 1);
-            addPillarVertical(type, room, room.getX() + room.getW() - 2);
-        } else if (!room.hasSouthDoor(getLevel().getDungeon()) && !room.hasNorthDoor(getLevel().getDungeon())) {
-            addPillarHorizontal(type, room, room.getY() + 1);
-            addPillarHorizontal(type, room, room.getY() + room.getH() - 2);
-        } else {
-            if (getRandom().nextBoolean()) {
-                addPillarHorizontal(type, room, room.getY() + (room.getH() / 2) + 1);
-                addPillarHorizontal(type, room, room.getY() + (room.getH() / 2) - 1);
-            } else {
-                addPillarVertical(type, room, room.getX() + (room.getW() / 2) + 1);
-                addPillarVertical(type, room, room.getX() + (room.getW() / 2) - 1);
-            }
-        }
-    }
-
-    private void addPillarVertical(Obstacles.Type type, Room room, int col) {
-        for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
-            if (row % 2 != 0)
-                continue;
-            add(type, col, row);
-        }
-    }
-
-    private void addPillarHorizontal(Obstacles.Type type, Room room, int row) {
-        for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
-            if (col % 2 != 0)
-                continue;
-            add(type, col, row);
         }
     }
 

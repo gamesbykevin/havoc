@@ -11,8 +11,6 @@ public class ObstacleHelper {
 
     private static List<Obstacles.Type> OPTIONS_OTHER;
     private static List<Obstacles.Type> OPTIONS_PLANT;
-    private static List<Obstacles.Type> OPTIONS_SPECIMEN;
-    private static List<Obstacles.Type> OPTIONS_WELL;
     private static List<Obstacles.Type> OPTIONS_CAGE;
     private static List<Obstacles.Type> OPTIONS_BARREL;
     private static List<Obstacles.Type> OPTIONS_FLAG;
@@ -30,14 +28,6 @@ public class ObstacleHelper {
         if (OPTIONS_PLANT != null)
             OPTIONS_PLANT.clear();
         OPTIONS_PLANT = null;
-
-        if (OPTIONS_SPECIMEN != null)
-            OPTIONS_SPECIMEN.clear();
-        OPTIONS_SPECIMEN = null;
-
-        if (OPTIONS_WELL != null)
-            OPTIONS_WELL.clear();
-        OPTIONS_WELL = null;
 
         if (OPTIONS_CAGE != null)
             OPTIONS_CAGE.clear();
@@ -185,42 +175,12 @@ public class ObstacleHelper {
         return getType(OPTIONS_CAGE);
     }
 
-    protected static Obstacles.Type getRandomWell() {
-
-        if (OPTIONS_WELL == null)
-            OPTIONS_WELL = new ArrayList<>();
-
-        if (OPTIONS_WELL.isEmpty()) {
-            OPTIONS_WELL.add(Obstacles.Type.well1);
-            OPTIONS_WELL.add(Obstacles.Type.well2);
-            OPTIONS_WELL.add(Obstacles.Type.well3);
-            OPTIONS_WELL.add(Obstacles.Type.well4);
-            OPTIONS_WELL.add(Obstacles.Type.well5);
-        }
-
-        return getType(OPTIONS_WELL);
-    }
-
-    protected static Obstacles.Type getRandomSpecimen() {
-
-        if (OPTIONS_SPECIMEN == null)
-            OPTIONS_SPECIMEN = new ArrayList<>();
-
-        if (OPTIONS_SPECIMEN.isEmpty()) {
-            OPTIONS_SPECIMEN.add(Obstacles.Type.SpecimenPod1);
-            OPTIONS_SPECIMEN.add(Obstacles.Type.SpecimenPod2);
-        }
-
-        return getType(OPTIONS_SPECIMEN);
-    }
-
     protected static Obstacles.Type getRandomPlant() {
 
         if (OPTIONS_PLANT == null)
             OPTIONS_PLANT = new ArrayList<>();
 
         if (OPTIONS_PLANT.isEmpty()) {
-            //OPTIONS_PLANT.add(Obstacles.Type.BluePotEmpty);
             OPTIONS_PLANT.add(Obstacles.Type.BluePotLargeEmpty);
             OPTIONS_PLANT.add(Obstacles.Type.BluePotPlant1);
             OPTIONS_PLANT.add(Obstacles.Type.BluePotPlant2);
@@ -246,7 +206,6 @@ public class ObstacleHelper {
             OPTIONS_OTHER.add(Obstacles.Type.random4);
             OPTIONS_OTHER.add(Obstacles.Type.FloorLamp1);
             OPTIONS_OTHER.add(Obstacles.Type.FloorLamp2);
-            //OPTIONS_OTHER.add(Obstacles.Type.DogFood);
             OPTIONS_OTHER.add(Obstacles.Type.pots1);
             OPTIONS_OTHER.add(Obstacles.Type.pots2);
         }
@@ -309,16 +268,6 @@ public class ObstacleHelper {
             case 7:
                 type = getRandomGrass();
                 break;
-
-            /*
-            case 4:
-                Obstacle.TYPE = getRandomWell();
-                break;
-
-            case 5:
-                type = getRandomSpecimen();
-                break;
-            */
         }
 
         //remove from the list

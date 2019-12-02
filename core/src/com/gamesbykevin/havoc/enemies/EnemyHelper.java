@@ -43,7 +43,6 @@ public class EnemyHelper {
                 }
 
             } else {
-
                 enemy.setStatus(Status.Walk);
             }
         }
