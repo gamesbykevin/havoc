@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
+import static com.gamesbykevin.havoc.texture.TextureHelper.PARENT_DIR_IMAGES;
+
 public class MyControllerHelper {
 
     //different control inputs
@@ -26,10 +28,12 @@ public class MyControllerHelper {
     public static final int KEY_ACTION = Input.Keys.SPACE;
     public static final int KEY_CHANGE = Input.Keys.NUM_1;
 
+    public static final String DIR = PARENT_DIR_IMAGES + "controls/";
+
     //location of our assets
-    private static final String CONTROL_PATH_SHOOT = "controls/shoot.png";
-    private static final String CONTROL_PATH_ACTION = "controls/action.png";
-    private static final String CONTROL_PATH_CHANGE = "controls/change.png";
+    private static final String CONTROL_PATH_SHOOT = DIR + "shoot.png";
+    private static final String CONTROL_PATH_ACTION = DIR + "action.png";
+    private static final String CONTROL_PATH_CHANGE = DIR + "change.png";
 
     //how to setup our touch pad
     private static final float TOUCH_PAD_X = 10;
@@ -37,8 +41,8 @@ public class MyControllerHelper {
     private static final float TOUCH_PAD_SIZE = 200;
     private static final float TOUCH_PAD_KNOB_RATIO = 0.40f;
     private static final float TOUCH_PAD_DEAD_ZONE_RATIO = 0.03f;
-    private static final String TOUCH_PAD_PATH_BACKGROUND = "controls/joystick.png";
-    private static final String TOUCH_PAD_PATH_KNOB = "controls/knob.png";
+    private static final String TOUCH_PAD_PATH_BACKGROUND = DIR + "joystick.png";
+    private static final String TOUCH_PAD_PATH_KNOB = DIR + "knob.png";
     private static final String TOUCH_PAD_NAME_BACKGROUND = "touchBackground";
     private static final String TOUCH_PAD_NAME_KNOB = "touchKnob";
 
