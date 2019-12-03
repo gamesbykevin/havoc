@@ -23,13 +23,15 @@ public class TextureHelper {
 
     //locations of some of our textures
 
-    public static final String PATH_DOOR = "door/door.bmp";
-    public static final String PATH_DOOR_LOCKED = "door/door_locked_1.bmp";
-    public static final String PATH_SIDE = "door/door_side.bmp";
-    public static final String PATH_DOOR_GOAL = "goal/door.bmp";
-    public static final String PATH_WALL_GOAL = "goal/wall.bmp";
-    public static final String PATH_SWITCH_OFF = "goal/switch_off.bmp";
-    public static final String PATH_SWITCH_ON = "goal/switch_on.bmp";
+    public static final String PARENT_DIR_IMAGES = "images/";
+
+    public static final String PATH_DOOR        = PARENT_DIR_IMAGES + "door/door.bmp";
+    public static final String PATH_DOOR_LOCKED = PARENT_DIR_IMAGES + "door/door_locked_1.bmp";
+    public static final String PATH_SIDE        = PARENT_DIR_IMAGES + "door/door_side.bmp";
+    public static final String PATH_DOOR_GOAL   = PARENT_DIR_IMAGES + "goal/door.bmp";
+    public static final String PATH_WALL_GOAL   = PARENT_DIR_IMAGES + "goal/wall.bmp";
+    public static final String PATH_SWITCH_OFF  = PARENT_DIR_IMAGES + "goal/switch_off.bmp";
+    public static final String PATH_SWITCH_ON   = PARENT_DIR_IMAGES + "goal/switch_on.bmp";
 
     private static TextureRegion TEXTURE_DOOR;
     private static TextureRegion TEXTURE_DOOR_LOCKED;
@@ -51,7 +53,7 @@ public class TextureHelper {
     private static TextureRegion getTextureHallway() {
 
         if (TEXTURE_HALLWAY == null)
-            TEXTURE_HALLWAY = getTextureRegion("door/hallway/hallway(" + getRandom().nextInt(TILES_HALLWAY) + ").bmp");
+            TEXTURE_HALLWAY = getTextureRegion(PARENT_DIR_IMAGES + "door/hallway/hallway(" + getRandom().nextInt(TILES_HALLWAY) + ").bmp");
 
         return TEXTURE_HALLWAY;
     }
@@ -85,7 +87,7 @@ public class TextureHelper {
     }
 
     private static TextureRegion getBackgroundLight(int index) {
-        return getTextureRegion("background/light/tile" + index + ".bmp");
+        return getTextureRegion(PARENT_DIR_IMAGES + "background/light/tile" + index + ".bmp");
     }
 
     private static TextureRegion getBackgroundRandomDark() {
@@ -93,11 +95,11 @@ public class TextureHelper {
     }
 
     private static TextureRegion getBackgroundDark(int index) {
-        return getTextureRegion("background/dark/tile" + index + ".bmp");
+        return getTextureRegion(PARENT_DIR_IMAGES + "background/dark/tile" + index + ".bmp");
     }
 
     private static TextureRegion getWall(int index) {
-        return getTextureRegion("walls/tile (" + index + ").bmp");
+        return getTextureRegion(PARENT_DIR_IMAGES + "walls/tile (" + index + ").bmp");
     }
 
     private static TextureRegion getWallGoal() {

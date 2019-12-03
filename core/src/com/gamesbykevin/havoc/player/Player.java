@@ -17,6 +17,7 @@ import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
 import static com.gamesbykevin.havoc.player.PlayerHelper.HEIGHT_MIN_Z;
 import static com.gamesbykevin.havoc.player.PlayerHelper.VELOCITY_Z;
+import static com.gamesbykevin.havoc.texture.TextureHelper.PARENT_DIR_IMAGES;
 import static com.gamesbykevin.havoc.util.Hud.*;
 
 public final class Player implements Disposable, Restart {
@@ -61,8 +62,8 @@ public final class Player implements Disposable, Restart {
         reset();
 
         //store reference to the images
-        this.imageHurt = new Texture(Gdx.files.internal("hud/hurt.png"));
-        this.imageCollect = new Texture(Gdx.files.internal("hud/collect.png"));
+        this.imageHurt = new Texture(Gdx.files.internal(PARENT_DIR_IMAGES + "hud/hurt.png"));
+        this.imageCollect = new Texture(Gdx.files.internal(PARENT_DIR_IMAGES + "hud/collect.png"));
     }
 
     public void createWeapons(Level level) {

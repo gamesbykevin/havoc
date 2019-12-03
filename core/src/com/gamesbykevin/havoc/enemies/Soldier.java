@@ -5,11 +5,12 @@ import com.gamesbykevin.havoc.animation.DecalAnimation;
 
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.*;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.DIRECTION_E;
+import static com.gamesbykevin.havoc.texture.TextureHelper.PARENT_DIR_IMAGES;
 
 public final class Soldier extends Enemy {
 
     //directory where enemies are
-    public static final String DIR = "enemies/soldier/";
+    public static final String DIR = PARENT_DIR_IMAGES + "enemies/soldier/";
 
     //different amounts of damage for each soldier
     public static final int DAMAGE_DOCTOR = 1;

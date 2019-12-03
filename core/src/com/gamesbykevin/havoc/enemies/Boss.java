@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
 
 import static com.gamesbykevin.havoc.player.Player.HEALTH_MAX;
+import static com.gamesbykevin.havoc.texture.TextureHelper.PARENT_DIR_IMAGES;
 
 public final class Boss extends Enemy {
 
@@ -33,7 +34,7 @@ public final class Boss extends Enemy {
     protected static final float DURATION_PAUSE = 500f;
 
     //directory where enemies are
-    public static final String DIR = "enemies/boss/";
+    public static final String DIR = PARENT_DIR_IMAGES + "enemies/boss/";
 
     public enum Type {
         boss_1(DIR + "boss_1/", DAMAGE_BOSS),

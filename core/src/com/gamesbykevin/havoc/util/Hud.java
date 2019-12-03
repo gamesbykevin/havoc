@@ -8,6 +8,7 @@ import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
 import static com.gamesbykevin.havoc.player.PlayerHelper.*;
 import static com.gamesbykevin.havoc.player.PlayerHelper.HUD_KEY_HEIGHT;
+import static com.gamesbykevin.havoc.texture.TextureHelper.PARENT_DIR_IMAGES;
 
 public class Hud {
 
@@ -19,6 +20,9 @@ public class Hud {
     public static final int HUD_BULLET_Y = SIZE_HEIGHT - (HUD_NUMBER_HEIGHT);
     public static final int HUD_HEALTH_X = (3 * HUD_NUMBER_PAD);
     public static final int HUD_HEALTH_Y = SIZE_HEIGHT - HUD_NUMBER_HEIGHT - (HUD_NUMBER_PAD * 2);
+
+    //directory where hud items are location
+    public static final String HUD_DIR = PARENT_DIR_IMAGES + "hud/";
 
     //array of numbers
     private static Texture[] NUMBERS;
@@ -33,13 +37,13 @@ public class Hud {
         for (int i = 0; i < NUMBERS.length; i++) {
 
             if (i < 10) {
-                NUMBERS[i] = new Texture(Gdx.files.internal("hud/" + i + ".png"));
+                NUMBERS[i] = new Texture(Gdx.files.internal( HUD_DIR + i + ".png"));
             } else if (i == 10) {
-                NUMBERS[i] = new Texture(Gdx.files.internal("hud/key_1_small.png"));
+                NUMBERS[i] = new Texture(Gdx.files.internal(HUD_DIR + "key_1_small.png"));
             } else if (i == 11) {
-                NUMBERS[i] = new Texture(Gdx.files.internal("hud/key_2_small.png"));
+                NUMBERS[i] = new Texture(Gdx.files.internal(HUD_DIR + "key_2_small.png"));
             } else if (i == 12) {
-                NUMBERS[i] = new Texture(Gdx.files.internal("hud/percent.png"));
+                NUMBERS[i] = new Texture(Gdx.files.internal(HUD_DIR + "percent.png"));
             }
         }
     }

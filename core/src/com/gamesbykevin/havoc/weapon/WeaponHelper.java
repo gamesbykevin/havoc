@@ -8,6 +8,7 @@ import com.gamesbykevin.havoc.level.Level;
 import static com.gamesbykevin.havoc.enemies.Enemy.RANGE_NOTICE;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.chase;
 import static com.gamesbykevin.havoc.input.MyController.SPEED_WALK;
+import static com.gamesbykevin.havoc.texture.TextureHelper.PARENT_DIR_IMAGES;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public class WeaponHelper {
@@ -63,13 +64,13 @@ public class WeaponHelper {
 
     //different types of weapons
     public enum Type {
-        Buzz(35f, 30f, BULLETS_MAX_BUZZ, "buzzsaw_cannon_f", WEAPONS_DIR + "buzzsaw_cannon/", 0, 1, 0, 3, 3, 2, 15, 5),
-        Glock(33f, 30f, BULLETS_MAX_GLOCK, "glock_handgun_f", WEAPONS_DIR + "glock_handgun/", 0, 1, 0, 3, 2, 8, 9, 1),
-        Impact(30f, 20f, BULLETS_MAX_IMPACT, "impact_cannon_f", WEAPONS_DIR + "impact_cannon/", 0, 1, 0, 2, 2, 2, 8, 6),
-        Magnum(50f, 30f, BULLETS_MAX_MAGNUM, "magnum_f", WEAPONS_DIR + "magnum/", 0, 1, 0, 4, 4, 11, 14, 1),
-        Shotgun(75f, 8f, BULLETS_MAX_SHOTGUN, "shotgun_f", WEAPONS_DIR + "shotgun/", 0, 1, 0, 1, 1, 16, 17, 2),
-        Smg(20f, 30f, BULLETS_MAX_SMG, "smg_f", WEAPONS_DIR + "smg/", 0, 1, 0, 1, 1, 3, 9, 2),
-        Lance(3f, 1f, BULLETS_MAX_LANCE, "thermic_lance_f", WEAPONS_DIR + "thermic_lance/", 0, 1, 1, 3, 4, 2, 16, 4);
+        Buzz(35f, 30f, BULLETS_MAX_BUZZ, "buzzsaw_cannon_f", "buzzsaw_cannon/", 0, 1, 0, 3, 3, 2, 15, 5),
+        Glock(33f, 30f, BULLETS_MAX_GLOCK, "glock_handgun_f", "glock_handgun/", 0, 1, 0, 3, 2, 8, 9, 1),
+        Impact(30f, 20f, BULLETS_MAX_IMPACT, "impact_cannon_f", "impact_cannon/", 0, 1, 0, 2, 2, 2, 8, 6),
+        Magnum(50f, 30f, BULLETS_MAX_MAGNUM, "magnum_f", "magnum/", 0, 1, 0, 4, 4, 11, 14, 1),
+        Shotgun(75f, 8f, BULLETS_MAX_SHOTGUN, "shotgun_f", "shotgun/", 0, 1, 0, 1, 1, 16, 17, 2),
+        Smg(20f, 30f, BULLETS_MAX_SMG, "smg_f", "smg/", 0, 1, 0, 1, 1, 3, 9, 2),
+        Lance(3f, 1f, BULLETS_MAX_LANCE, "thermic_lance_f", "thermic_lance/", 0, 1, 1, 3, 4, 2, 16, 4);
 
             private final float damage;
             private final float range;
@@ -92,7 +93,7 @@ public class WeaponHelper {
                 this.range = range;
                 this.bulletsMax = bulletsMax;
                 this.fileName = fileName;
-                this.dir = dir;
+                this.dir = PARENT_DIR_IMAGES + WEAPONS_DIR + dir;
                 this.restIndexStart = restIndexStart;
                 this.restIndexCount = restIndexCount;
                 this.startIndexStart = startIndexStart;

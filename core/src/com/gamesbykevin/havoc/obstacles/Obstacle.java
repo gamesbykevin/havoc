@@ -4,10 +4,12 @@ import com.gamesbykevin.havoc.animation.DecalAnimation;
 import com.gamesbykevin.havoc.entities.Entity3d;
 import com.gamesbykevin.havoc.level.Level;
 
+import static com.gamesbykevin.havoc.texture.TextureHelper.PARENT_DIR_IMAGES;
+
 public final class Obstacle extends Entity3d {
 
     //where the sprite image is located
-    public static final String ASSET_DIR = "obstacles/";
+    public static final String ASSET_DIR = PARENT_DIR_IMAGES + "obstacles/";
 
     public static final String ASSET_EXT = ".bmp";
 
