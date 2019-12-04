@@ -109,7 +109,7 @@ public class Dungeon implements Disposable {
         lockDoor(this);
 
         //print the dungeon so we can see it
-        print();
+        //print();
     }
 
     private void calculateCost() {

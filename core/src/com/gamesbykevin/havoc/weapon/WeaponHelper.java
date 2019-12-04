@@ -47,7 +47,7 @@ public class WeaponHelper {
     protected static final float DEFAULT_VELOCITY_SWITCH_Y = 6f;
 
     //where our weapon images are located
-    protected static final String WEAPONS_DIR = "weapons/";
+    protected static final String WEAPONS_DIR = PARENT_DIR_IMAGES + "weapons/";
 
     //file extension
     protected static final String EXTENSION = ".png";
@@ -93,7 +93,7 @@ public class WeaponHelper {
                 this.range = range;
                 this.bulletsMax = bulletsMax;
                 this.fileName = fileName;
-                this.dir = PARENT_DIR_IMAGES + WEAPONS_DIR + dir;
+                this.dir = WEAPONS_DIR + dir;
                 this.restIndexStart = restIndexStart;
                 this.restIndexCount = restIndexCount;
                 this.startIndexStart = startIndexStart;
