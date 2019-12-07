@@ -1,0 +1,395 @@
+package com.gamesbykevin.havoc.assets;
+
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.gamesbykevin.havoc.collectables.Collectibles;
+import com.gamesbykevin.havoc.enemies.Boss;
+import com.gamesbykevin.havoc.enemies.Soldier;
+import com.gamesbykevin.havoc.obstacles.Obstacles;
+import com.gamesbykevin.havoc.weapon.WeaponHelper;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
+
+public class AssetManagerHelper {
+
+    //list of paths to each asset
+    private static List<String> PATHS;
+
+    //how many different textures can we choose from for the floor ceiling?
+    public static final int TILES_BACKGROUND_LIGHT = 34;
+    public static final int TILES_BACKGROUND_DARK = 32;
+
+    //how many different textures can we choose from for the walls
+    private static final int TILES_WALL = 159;
+    private static final int TILES_HALLWAY = 38;
+
+    //how many wall textures will we allow to be loaded
+    private static final int COUNT_WALLS = 15;
+
+    //how many different enemy types will we allow to be loaded
+    private static final int COUNT_BOSS = 2;
+
+    //how many different enemy types will we allow to be loaded
+    private static final int COUNT_SOLDIER = 6;
+
+    //how many different obstacle types will we allow to be loaded
+    private static final int COUNT_OBSTACLE = 6;
+
+    //here we will load multiple textures for the wall
+    private static List<String> PATHS_WALL;
+
+    //we will pick 1 texture for the hallways
+    private static List<String> PATHS_HALLWAY;
+
+    //here we will load 2 random textures for the floor and ceiling
+    private static List<String> PATHS_BACKGROUND;
+
+    //here we will store the types we want to load textures for
+    private static List<Boss.Type> TYPE_BOSS;
+    private static List<Soldier.Type> TYPE_SOLDIER;
+    private static List<Obstacles.Type> TYPE_OBSTACLE;
+
+    //parent directory of our images
+    public static final String PARENT_DIR_IMAGES = "images/";
+
+    //where the sprite image is located
+    public static final String ASSET_DIR_OBSTACLES = PARENT_DIR_IMAGES + "obstacles/";
+    public static final String ASSET_DIR_COLLECTIBLES = PARENT_DIR_IMAGES + "collect/";
+    public static final String ASSET_DIR_WALLS = PARENT_DIR_IMAGES + "walls/";
+    public static final String ASSET_DIR_BACKGROUND = PARENT_DIR_IMAGES + "background/";
+    public static final String ASSET_DIR_BACKGROUND_LIGHT = ASSET_DIR_BACKGROUND + "light/";
+    public static final String ASSET_DIR_BACKGROUND_DARK = ASSET_DIR_BACKGROUND + "dark/";
+    public static final String ASSET_DIR_HUD = PARENT_DIR_IMAGES + "hud/";
+    public static final String ASSET_DIR_DOOR = PARENT_DIR_IMAGES + "door/";
+    public static final String ASSET_DIR_GOAL = PARENT_DIR_IMAGES + "goal/";
+    public static final String ASSET_DIR_CONTROLS = PARENT_DIR_IMAGES + "controls/";
+    public static final String ASSET_DIR_ENEMIES = PARENT_DIR_IMAGES + "enemies/";
+    public static final String ASSET_DIR_BOSS = ASSET_DIR_ENEMIES + "boss/";
+    public static final String ASSET_DIR_SOLDIER = ASSET_DIR_ENEMIES + "soldier/";
+    public static final String ASSET_DIR_WEAPONS = PARENT_DIR_IMAGES + "weapons/";
+    public static final String ASSET_DIR_HALLWAY     = PARENT_DIR_IMAGES + "hallway/";
+
+    public static final String ASSET_EXT_BMP = ".bmp";
+    public static final String ASSET_EXT_PNG = ".png";
+
+    //bulk of file names start with this
+    public static final String FILENAME_WALL = "wall_";
+    public static final String FILENAME_HALLWAY = "hallway_";
+    public static final String FILENAME_BACKGROUND = "background_";
+    public static final String FILENAME_DIE = "die";
+    public static final String FILENAME_PAIN = "pain";
+    public static final String FILENAME_IDLE = "s_";
+    public static final String FILENAME_SHOOT = "shoot";
+    public static final String FILENAME_WALK_1 = "w1_";
+    public static final String FILENAME_WALK_2 = "w2_";
+    public static final String FILENAME_WALK_3 = "w3_";
+    public static final String FILENAME_WALK_4 = "w4_";
+    public static final String FILENAME_WALK = "w";
+
+    //paths to direct files
+    public static final String PATH_DOOR        = ASSET_DIR_DOOR + "door" + ASSET_EXT_BMP;
+    public static final String PATH_DOOR_LOCKED = ASSET_DIR_DOOR + "door_locked_1" + ASSET_EXT_BMP;
+    public static final String PATH_SIDE        = ASSET_DIR_DOOR + "door_side" + ASSET_EXT_BMP;
+    public static final String PATH_DOOR_GOAL   = ASSET_DIR_GOAL + "door" + ASSET_EXT_BMP;
+    public static final String PATH_WALL_GOAL   = ASSET_DIR_GOAL + "wall" + ASSET_EXT_BMP;
+    public static final String PATH_SWITCH_OFF  = ASSET_DIR_GOAL + "switch_off" + ASSET_EXT_BMP;
+    public static final String PATH_SWITCH_ON   = ASSET_DIR_GOAL + "switch_on" + ASSET_EXT_BMP;
+    public static final String PATH_0   = ASSET_DIR_HUD + "0" + ASSET_EXT_PNG;
+    public static final String PATH_1   = ASSET_DIR_HUD + "1" + ASSET_EXT_PNG;
+    public static final String PATH_2   = ASSET_DIR_HUD + "2" + ASSET_EXT_PNG;
+    public static final String PATH_3   = ASSET_DIR_HUD + "3" + ASSET_EXT_PNG;
+    public static final String PATH_4   = ASSET_DIR_HUD + "4" + ASSET_EXT_PNG;
+    public static final String PATH_5   = ASSET_DIR_HUD + "5" + ASSET_EXT_PNG;
+    public static final String PATH_6   = ASSET_DIR_HUD + "6" + ASSET_EXT_PNG;
+    public static final String PATH_7   = ASSET_DIR_HUD + "7" + ASSET_EXT_PNG;
+    public static final String PATH_8   = ASSET_DIR_HUD + "8" + ASSET_EXT_PNG;
+    public static final String PATH_9   = ASSET_DIR_HUD + "9" + ASSET_EXT_PNG;
+    public static final String PATH_KEY_1 = ASSET_DIR_HUD + "key_1_small" + ASSET_EXT_PNG;
+    public static final String PATH_KEY_2 = ASSET_DIR_HUD + "key_2_small" + ASSET_EXT_PNG;
+    public static final String PATH_PERCENT = ASSET_DIR_HUD + "percent" + ASSET_EXT_PNG;
+    public static final String PATH_HURT = ASSET_DIR_HUD + "hurt" + ASSET_EXT_PNG;
+    public static final String PATH_COLLECT = ASSET_DIR_HUD + "collect" + ASSET_EXT_PNG;
+    public static final String PATH_CONTROL_SHOOT = ASSET_DIR_CONTROLS + "shoot" + ASSET_EXT_PNG;
+    public static final String PATH_CONTROL_ACTION = ASSET_DIR_CONTROLS + "action" + ASSET_EXT_PNG;
+    public static final String PATH_CONTROL_CHANGE = ASSET_DIR_CONTROLS + "change" + ASSET_EXT_PNG;
+    public static final String PATH_TOUCH_PAD_BACKGROUND = ASSET_DIR_CONTROLS + "joystick" + ASSET_EXT_PNG;
+    public static final String PATH_TOUCH_PAD_KNOB = ASSET_DIR_CONTROLS + "knob" + ASSET_EXT_PNG;
+
+    public static List<String> getPaths() {
+
+        if (PATHS == null)
+            PATHS = new ArrayList<>();
+
+        return PATHS;
+    }
+
+    public static List<String> getPathsWall() {
+
+        if (PATHS_WALL == null)
+            PATHS_WALL = new ArrayList<>();
+
+        return PATHS_WALL;
+    }
+
+    public static List<String> getPathsHallway() {
+
+        if (PATHS_HALLWAY == null)
+            PATHS_HALLWAY = new ArrayList<>();
+
+        return PATHS_HALLWAY;
+    }
+
+    public static List<String> getPathsBackground() {
+
+        if (PATHS_BACKGROUND == null)
+            PATHS_BACKGROUND = new ArrayList<>();
+
+        return PATHS_BACKGROUND;
+    }
+
+    public static List<Boss.Type> getTypeBoss() {
+
+        if (TYPE_BOSS == null)
+            TYPE_BOSS = new ArrayList<>();
+
+        return TYPE_BOSS;
+    }
+
+    public static List<Soldier.Type> getTypeSoldier() {
+
+        if (TYPE_SOLDIER == null)
+            TYPE_SOLDIER = new ArrayList<>();
+
+        return TYPE_SOLDIER;
+    }
+
+    public static void dispose(AssetManager assetManager) {
+
+        if (PATHS_WALL != null)
+            PATHS_WALL.clear();
+        if (PATHS_HALLWAY != null)
+            PATHS_HALLWAY.clear();
+        if (PATHS_BACKGROUND != null)
+            PATHS_BACKGROUND.clear();
+        if (TYPE_BOSS != null)
+            TYPE_BOSS.clear();
+        if (TYPE_SOLDIER != null)
+            TYPE_SOLDIER.clear();
+
+        PATHS_WALL = null;
+        PATHS_HALLWAY = null;
+        PATHS_BACKGROUND = null;
+        TYPE_BOSS = null;
+        TYPE_SOLDIER = null;
+
+        if (PATHS != null) {
+
+            for (int index = 0; index < PATHS.size(); index++) {
+                try {
+                    assetManager.unload(PATHS.get(index));
+                } catch (Exception e) {
+
+                }
+            }
+
+            PATHS.clear();
+        }
+
+        PATHS = null;
+    }
+
+    private static void load(AssetManager assetManager, String path, Class assetClass) {
+        assetManager.load(path, assetClass);
+        getPaths().add(path);
+    }
+
+    //load all the assets
+    public static void load(AssetManager assetManager) {
+
+        //load every obstacle
+        for (Obstacles.Type type : Obstacles.Type.values()) {
+            load(assetManager, ASSET_DIR_OBSTACLES + type.toString() + ASSET_EXT_BMP, Texture.class);
+        }
+
+        //load every collectible
+        for (Collectibles.Type type : Collectibles.Type.values()) {
+            load(assetManager, ASSET_DIR_COLLECTIBLES + type.toString() + ASSET_EXT_BMP, Texture.class);
+        }
+
+        //load controller images
+        load(assetManager, PATH_CONTROL_SHOOT, Texture.class);
+        load(assetManager, PATH_CONTROL_ACTION, Texture.class);
+        load(assetManager, PATH_CONTROL_CHANGE, Texture.class);
+        load(assetManager, PATH_TOUCH_PAD_BACKGROUND, Texture.class);
+        load(assetManager, PATH_TOUCH_PAD_KNOB, Texture.class);
+
+        //level textures
+        load(assetManager, PATH_DOOR_LOCKED, Texture.class);
+        load(assetManager, PATH_DOOR, Texture.class);
+        load(assetManager, PATH_SIDE, Texture.class);
+        load(assetManager, PATH_WALL_GOAL, Texture.class);
+        load(assetManager, PATH_DOOR_GOAL, Texture.class);
+        load(assetManager, PATH_SWITCH_OFF, Texture.class);
+        load(assetManager, PATH_SWITCH_ON, Texture.class);
+
+        //load hud images
+        load(assetManager, PATH_HURT, Texture.class);
+        load(assetManager, PATH_COLLECT, Texture.class);
+        load(assetManager, PATH_0, Texture.class);
+        load(assetManager, PATH_1, Texture.class);
+        load(assetManager, PATH_2, Texture.class);
+        load(assetManager, PATH_3, Texture.class);
+        load(assetManager, PATH_4, Texture.class);
+        load(assetManager, PATH_5, Texture.class);
+        load(assetManager, PATH_6, Texture.class);
+        load(assetManager, PATH_7, Texture.class);
+        load(assetManager, PATH_8, Texture.class);
+        load(assetManager, PATH_9, Texture.class);
+        load(assetManager, PATH_PERCENT, Texture.class);
+        load(assetManager, PATH_KEY_1, Texture.class);
+        load(assetManager, PATH_KEY_2, Texture.class);
+
+        //load weapon images
+        for (WeaponHelper.Type type : WeaponHelper.Type.values()) {
+            for (int index = 1; index <= type.getStopIndexStart() + type.getStopIndexCount(); index++) {
+                load(assetManager, type.getDir() + type.getFileName() + index + ASSET_EXT_PNG, Texture.class);
+            }
+        }
+
+        //clear the list and add a wall / ceiling
+        getPathsBackground().clear();
+        getPathsBackground().add(ASSET_DIR_BACKGROUND_LIGHT + FILENAME_BACKGROUND + getRandom().nextInt(TILES_BACKGROUND_LIGHT) + ASSET_EXT_BMP);
+        getPathsBackground().add(ASSET_DIR_BACKGROUND_DARK + FILENAME_BACKGROUND + getRandom().nextInt(TILES_BACKGROUND_DARK) + ASSET_EXT_BMP);
+
+        //clear the list and add a hallway
+        getPathsHallway().clear();
+        getPathsHallway().add(ASSET_DIR_HALLWAY + FILENAME_HALLWAY + getRandom().nextInt(TILES_HALLWAY) + ASSET_EXT_BMP);
+
+        //clear the list and add wall paths
+        getPathsWall().clear();
+
+        //create optional list to choose from
+        List<Integer> options = new ArrayList<>();
+        for (int i = 0; i < TILES_WALL; i++) {
+            options.add(i);
+        }
+
+        //continue until we meet the allowed count
+        while (getPathsWall().size() < COUNT_WALLS && !options.isEmpty()) {
+
+            //pick random index from list
+            int index = getRandom().nextInt(options.size());
+
+            //add to list of wall paths
+            getPathsWall().add(ASSET_DIR_WALLS + FILENAME_WALL + options.get(index) + ASSET_EXT_BMP);
+
+            //remove from options list
+            options.remove(index);
+        }
+
+        //clear the list
+        getTypeBoss().clear();
+
+        //list to choose boss from
+        List<Boss.Type> bossType = new ArrayList(Arrays.asList(Boss.Type.values()));
+
+        //continue until we meet the allowed count
+        while (getTypeBoss().size() < COUNT_BOSS && !bossType.isEmpty()) {
+
+            //pick random index from list
+            int index = getRandom().nextInt(bossType.size());
+
+            //add to list
+            getTypeBoss().add(bossType.get(index));
+
+            //remove from options list
+            bossType.remove(index);
+        }
+
+        //clear the list
+        getTypeSoldier().clear();
+
+        //list to choose soldier from
+        List<Soldier.Type> soldierType = new ArrayList(Arrays.asList(Soldier.Type.values()));
+
+        //continue until we meet the allowed count
+        while (getTypeSoldier().size() < COUNT_SOLDIER && !soldierType.isEmpty()) {
+
+            //pick random index from list
+            int index = getRandom().nextInt(soldierType.size());
+
+            //add to list
+            getTypeSoldier().add(soldierType.get(index));
+
+            //remove from options list
+            soldierType.remove(index);
+        }
+
+        //now add lists to the asset manager queue for loading
+        for (int i = 0; i < getPathsBackground().size(); i++) {
+            assetManager.load(getPathsBackground().get(i), Texture.class);
+        }
+
+        for (int i = 0; i < getPathsWall().size(); i++) {
+            assetManager.load(getPathsWall().get(i), Texture.class);
+        }
+
+        for (int i = 0; i < getPathsHallway().size(); i++) {
+            assetManager.load(getPathsHallway().get(i), Texture.class);
+        }
+
+        for (int i = 0; i < getTypeBoss().size(); i++) {
+            loadTexturesBoss(assetManager, getTypeBoss().get(i));
+        }
+
+        for (int i = 0; i < getTypeSoldier().size(); i++) {
+            loadTexturesSoldier(assetManager, getTypeSoldier().get(i));
+        }
+    }
+
+    private static void loadTexturesSoldier(AssetManager assetManager, Soldier.Type type) {
+
+        for (int i = 1; i <= 4; i++) {
+            load(assetManager, type.path + FILENAME_DIE + i + ASSET_EXT_BMP, Texture.class);
+        }
+
+        for (int i = 1; i <= 2; i++) {
+            load(assetManager, type.path + FILENAME_PAIN + i + ASSET_EXT_BMP, Texture.class);
+        }
+
+        for (int i = 1; i <= 8; i++) {
+            load(assetManager, type.path + FILENAME_IDLE + i + ASSET_EXT_BMP, Texture.class);
+        }
+
+        for (int i = 1; i <= 3; i++) {
+            load(assetManager, type.path + FILENAME_SHOOT + i + ASSET_EXT_BMP, Texture.class);
+        }
+
+        for (int i = 1; i <= 8; i++) {
+            load(assetManager, type.path + FILENAME_WALK_1 + i + ASSET_EXT_BMP, Texture.class);
+            load(assetManager, type.path + FILENAME_WALK_2 + i + ASSET_EXT_BMP, Texture.class);
+            load(assetManager, type.path + FILENAME_WALK_3 + i + ASSET_EXT_BMP, Texture.class);
+            load(assetManager, type.path + FILENAME_WALK_4 + i + ASSET_EXT_BMP, Texture.class);
+        }
+    }
+
+    private static void loadTexturesBoss(AssetManager assetManager, Boss.Type type) {
+
+        for (int i = 1; i <= 4; i++) {
+            load(assetManager, type.path + FILENAME_WALK + i + ASSET_EXT_BMP, Texture.class);
+        }
+
+        for (int i = 1; i <= 3; i++) {
+            load(assetManager, type.path + FILENAME_SHOOT + i + ASSET_EXT_BMP, Texture.class);
+        }
+
+        for (int i = 1; i <= 4; i++) {
+            load(assetManager, type.path + FILENAME_DIE + i + ASSET_EXT_BMP, Texture.class);
+        }
+    }
+}

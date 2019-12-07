@@ -2,6 +2,7 @@ package com.gamesbykevin.havoc.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -13,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
-import static com.gamesbykevin.havoc.texture.TextureHelper.PARENT_DIR_IMAGES;
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 
 public class MyControllerHelper {
 
@@ -28,21 +29,12 @@ public class MyControllerHelper {
     public static final int KEY_ACTION = Input.Keys.SPACE;
     public static final int KEY_CHANGE = Input.Keys.NUM_1;
 
-    public static final String DIR = PARENT_DIR_IMAGES + "controls/";
-
-    //location of our assets
-    private static final String CONTROL_PATH_SHOOT = DIR + "shoot.png";
-    private static final String CONTROL_PATH_ACTION = DIR + "action.png";
-    private static final String CONTROL_PATH_CHANGE = DIR + "change.png";
-
     //how to setup our touch pad
     private static final float TOUCH_PAD_X = 10;
     private static final float TOUCH_PAD_Y = 10;
     private static final float TOUCH_PAD_SIZE = 200;
     private static final float TOUCH_PAD_KNOB_RATIO = 0.40f;
     private static final float TOUCH_PAD_DEAD_ZONE_RATIO = 0.03f;
-    private static final String TOUCH_PAD_PATH_BACKGROUND = DIR + "joystick.png";
-    private static final String TOUCH_PAD_PATH_KNOB = DIR + "knob.png";
     private static final String TOUCH_PAD_NAME_BACKGROUND = "touchBackground";
     private static final String TOUCH_PAD_NAME_KNOB = "touchKnob";
 
@@ -52,11 +44,11 @@ public class MyControllerHelper {
     //space between the buttons
     public static final int PADDING = 5;
 
-    protected static void setupController(final MyController controller) {
+    protected static void setupController(AssetManager assetManager, final MyController controller) {
 
         Skin skin = new Skin();
-        skin.add(TOUCH_PAD_NAME_BACKGROUND, new Texture(TOUCH_PAD_PATH_BACKGROUND));
-        skin.add(TOUCH_PAD_NAME_KNOB, new Texture(TOUCH_PAD_PATH_KNOB));
+        skin.add(TOUCH_PAD_NAME_BACKGROUND, assetManager.get(PATH_TOUCH_PAD_BACKGROUND, Texture.class));
+        skin.add(TOUCH_PAD_NAME_KNOB, assetManager.get(PATH_TOUCH_PAD_KNOB, Texture.class));
         Touchpad.TouchpadStyle style = new Touchpad.TouchpadStyle();
         Drawable knob = skin.getDrawable(TOUCH_PAD_NAME_KNOB);
         knob.setMinHeight(TOUCH_PAD_SIZE * TOUCH_PAD_KNOB_RATIO);
@@ -82,7 +74,7 @@ public class MyControllerHelper {
         tableButtons.setFillParent(true);
         tableButtons.right().bottom().pad(PADDING);
 
-        Image tmpChange = new Image(new Texture(Gdx.files.internal(CONTROL_PATH_CHANGE)));
+        Image tmpChange = new Image(assetManager.get(PATH_CONTROL_CHANGE, Texture.class));
         tmpChange.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
@@ -104,7 +96,7 @@ public class MyControllerHelper {
             }
         });
 
-        Image tmpShoot = new Image(new Texture(Gdx.files.internal(CONTROL_PATH_SHOOT)));
+        Image tmpShoot = new Image(assetManager.get(PATH_CONTROL_SHOOT, Texture.class));
         tmpShoot.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -128,7 +120,7 @@ public class MyControllerHelper {
             }
         });
 
-        Image tmpAction = new Image(new Texture(Gdx.files.internal(CONTROL_PATH_ACTION)));
+        Image tmpAction = new Image(assetManager.get(PATH_CONTROL_ACTION, Texture.class));
         tmpAction.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {

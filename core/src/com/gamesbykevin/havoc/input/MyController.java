@@ -2,6 +2,7 @@ package com.gamesbykevin.havoc.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.utils.Disposable;
@@ -53,7 +54,7 @@ public class MyController implements InputProcessor, Disposable, Restart {
     //do we display the controller?
     private final boolean display;
 
-    public MyController() {
+    public MyController(AssetManager assetManager) {
 
         //setup our controller ui when needed
         switch (Gdx.app.getType()) {
@@ -73,7 +74,7 @@ public class MyController implements InputProcessor, Disposable, Restart {
 
 
         if (isDisplay())
-            setupController(this);
+            setupController(assetManager, this);
 
         //make sure we are capturing input correct
         setInput();

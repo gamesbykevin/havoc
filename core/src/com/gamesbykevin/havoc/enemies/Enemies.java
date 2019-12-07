@@ -10,6 +10,8 @@ import com.gamesbykevin.havoc.level.Level;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.getTypeBoss;
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.getTypeSoldier;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.*;
@@ -92,7 +94,7 @@ public final class Enemies extends Entities {
                 if (getRandom().nextBoolean() && limit == 1) {
 
                     //create the boss if by chance this room is limited to 1 enemy
-                    enemy = new Boss(Boss.Type.values()[getRandom().nextInt(Boss.Type.values().length)]);
+                    enemy = new Boss(getLevel().getAssetManager(), getTypeBoss().get(getRandom().nextInt(getTypeBoss().size())));
 
                     //boss will never patrol
                     patrol = false;
@@ -100,7 +102,7 @@ public final class Enemies extends Entities {
                 } else {
 
                     //create the soldier
-                    enemy = new Soldier(Soldier.Type.values()[getRandom().nextInt(Soldier.Type.values().length)]);
+                    enemy = new Soldier(getLevel().getAssetManager(), getTypeSoldier().get(getRandom().nextInt(getTypeSoldier().size())));
                 }
 
                 //assign location
@@ -184,12 +186,12 @@ public final class Enemies extends Entities {
         List<Cell> options = new ArrayList<>();
 
         //all 4 sides
-        for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
+        for (int col = room.getX() + 2; col < room.getX() + room.getW() - 2; col++) {
             add(options, getLevel().getDungeon().getCells()[room.getY() + 2][col], target);
             add(options, getLevel().getDungeon().getCells()[room.getY() + room.getH() - 3][col], target);
         }
 
-        for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
+        for (int row = room.getY() + 2; row < room.getY() + room.getH() - 2; row++) {
             add(options, getLevel().getDungeon().getCells()[row][room.getX() + 2], target);
             add(options, getLevel().getDungeon().getCells()[row][room.getX() + room.getW() - 3], target);
         }

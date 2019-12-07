@@ -6,6 +6,7 @@ import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Disposable;
 
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_EXT_PNG;
 import static com.gamesbykevin.havoc.weapon.WeaponHelper.*;
 
 public class Weapon extends Entity2d implements Disposable {
@@ -43,10 +44,10 @@ public class Weapon extends Entity2d implements Disposable {
         this.type = type;
 
         //setup the weapons animations
-        getAnimations()[INDEX_RESTING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), EXTENSION, getType().getRestIndexStart(), getType().getRestIndexCount(), FRAME_DURATION);
-        getAnimations()[INDEX_STARTING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), EXTENSION, getType().getStartIndexStart(), getType().getStartIndexCount(), FRAME_DURATION);
-        getAnimations()[INDEX_ATTACKING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), EXTENSION, getType().getAttackIndexStart(), getType().getAttackIndexCount(), FRAME_DURATION);
-        getAnimations()[INDEX_STOPPING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), EXTENSION, getType().getStopIndexStart(), getType().getStopIndexCount(), FRAME_DURATION);
+        getAnimations()[INDEX_RESTING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), ASSET_EXT_PNG, getType().getRestIndexStart(), getType().getRestIndexCount(), FRAME_DURATION);
+        getAnimations()[INDEX_STARTING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), ASSET_EXT_PNG, getType().getStartIndexStart(), getType().getStartIndexCount(), FRAME_DURATION);
+        getAnimations()[INDEX_ATTACKING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), ASSET_EXT_PNG, getType().getAttackIndexStart(), getType().getAttackIndexCount(), FRAME_DURATION);
+        getAnimations()[INDEX_STOPPING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), ASSET_EXT_PNG, getType().getStopIndexStart(), getType().getStopIndexCount(), FRAME_DURATION);
 
         //reset
         reset();

@@ -1,8 +1,9 @@
 package com.gamesbykevin.havoc.collectables;
 
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.gamesbykevin.havoc.animation.DecalAnimation;
 import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.dungeon.Leaf;
 import com.gamesbykevin.havoc.entities.Entities;
@@ -14,8 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.gamesbykevin.havoc.collectables.Collectible.ASSET_DIR;
-import static com.gamesbykevin.havoc.collectables.Collectible.ASSET_EXT;
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_DIR_COLLECTIBLES;
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_EXT_BMP;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
 
@@ -46,15 +47,15 @@ public final class Collectibles extends Entities {
         super(level);
 
         //load the collectible textures
-        getTextures();
+        getTextures(level.getAssetManager());
     }
 
-    public static HashMap<Type, TextureRegion> getTextures() {
+    public static HashMap<Type, TextureRegion> getTextures(AssetManager assetManager) {
 
         if (TEXTURES == null) {
             TEXTURES = new HashMap<>();
             for (Type type : Type.values()) {
-                TEXTURES.put(type, new TextureRegion(new Texture(Gdx.files.internal(ASSET_DIR + type.toString() + ASSET_EXT))));
+                TEXTURES.put(type, new TextureRegion(assetManager.get(ASSET_DIR_COLLECTIBLES + type.toString() + ASSET_EXT_BMP, Texture.class)));
             }
         }
 
@@ -296,6 +297,9 @@ public final class Collectibles extends Entities {
 
         //create the collectible and make it solid so we can collect it
         Collectible collectible = new Collectible(type);
+
+        //setup the single animation
+        collectible.getAnimations()[0] = new DecalAnimation(Collectibles.getTextures(getLevel().getAssetManager()).get(type));
 
         //reset the animation
         collectible.getAnimation().reset();

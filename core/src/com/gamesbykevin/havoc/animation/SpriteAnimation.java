@@ -1,51 +1,33 @@
 package com.gamesbykevin.havoc.animation;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-
 public class SpriteAnimation extends Animation {
 
-    //list of images in our animation
-    private Texture[] images;
+    //paths to the textures
+    private String[] texturePaths;
 
-    public SpriteAnimation(final String path, final String filename, final String extension, final int startIndex, final int count) {
-        this(path, filename, extension, startIndex, count, FRAME_DURATION_DEFAULT);
-    }
-
-    public SpriteAnimation(final String path, final String filename, final String extension, final int startIndex, final int count, final float duration) {
+    public SpriteAnimation(String path, String filename, String extension, int startIndex, int count, float duration) {
 
         super(count, duration);
 
-        //create our array of images
-        this.images = new Texture[count];
+        //create our array
+        this.texturePaths = new String[count];
 
         //load all the images
-        for (int i = 0; i < getImages().length; i++) {
-            getImages()[i] = new Texture(Gdx.files.internal(path + filename + (startIndex + (i+1)) + extension));
+        for (int i = 0; i < getTexturePaths().length; i++) {
+            getTexturePaths()[i] = path + filename + (startIndex + (i+1)) + extension;
         }
-
     }
 
-    private Texture[] getImages() {
-        return this.images;
+    public String[] getTexturePaths() {
+        return this.texturePaths;
     }
 
-    public Texture getImage() {
-        return getImages()[getIndex()];
+    public String getTexturePath() {
+        return getTexturePaths()[getIndex()];
     }
 
     @Override
     public void dispose() {
-
-        if (this.images != null) {
-            for (int i = 0; i < this.images.length; i++) {
-                if (this.images[i] != null) {
-                    this.images[i].dispose();
-                    this.images[i] = null;
-                }
-            }
-        }
-
-        this.images = null;
+        this.texturePaths = null;
     }
 }

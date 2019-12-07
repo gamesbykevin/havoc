@@ -1,14 +1,14 @@
 package com.gamesbykevin.havoc.util;
 
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 import static com.gamesbykevin.havoc.player.PlayerHelper.*;
 import static com.gamesbykevin.havoc.player.PlayerHelper.HUD_KEY_HEIGHT;
-import static com.gamesbykevin.havoc.texture.TextureHelper.PARENT_DIR_IMAGES;
 
 public class Hud {
 
@@ -21,43 +21,13 @@ public class Hud {
     public static final int HUD_HEALTH_X = (3 * HUD_NUMBER_PAD);
     public static final int HUD_HEALTH_Y = SIZE_HEIGHT - HUD_NUMBER_HEIGHT - (HUD_NUMBER_PAD * 2);
 
-    //directory where hud items are location
-    public static final String HUD_DIR = PARENT_DIR_IMAGES + "hud/";
-
-    //array of numbers
-    private static Texture[] NUMBERS;
-
-    //load the textures
-    public static void load() {
-
-        //create our array of number images
-        NUMBERS = new Texture[13];
-
-        //load our textures
-        for (int i = 0; i < NUMBERS.length; i++) {
-
-            if (i < 10) {
-                NUMBERS[i] = new Texture(Gdx.files.internal( HUD_DIR + i + ".png"));
-            } else if (i == 10) {
-                NUMBERS[i] = new Texture(Gdx.files.internal(HUD_DIR + "key_1_small.png"));
-            } else if (i == 11) {
-                NUMBERS[i] = new Texture(Gdx.files.internal(HUD_DIR + "key_2_small.png"));
-            } else if (i == 12) {
-                NUMBERS[i] = new Texture(Gdx.files.internal(HUD_DIR + "percent.png"));
-            }
-        }
-    }
-
-    public static final void renderNumber(Batch batch, final int number, int renderX, int renderY, int width, int height, int padding) {
-
-        if (NUMBERS == null)
-            Hud.load();
+    public static final void renderNumber(AssetManager assetManager, Batch batch, final int number, int renderX, int renderY, int width, int height, int padding) {
 
         float x = renderX;
 
         for (int i = 0; i < 4; i++) {
 
-            int index = 12;
+            int index = -1;
 
             switch (i) {
                 case 0:
@@ -78,14 +48,59 @@ public class Hud {
                 index = 9;
 
             //render the number
-            batch.draw(NUMBERS[index], x, renderY, width, height);
+            switch (index) {
+
+                case -1:
+                    batch.draw(assetManager.get(PATH_PERCENT, Texture.class), x, renderY, width, height);
+                    break;
+
+                case 0:
+                    batch.draw(assetManager.get(PATH_0, Texture.class), x, renderY, width, height);
+                    break;
+
+                case 1:
+                    batch.draw(assetManager.get(PATH_1, Texture.class), x, renderY, width, height);
+                    break;
+
+                case 2:
+                    batch.draw(assetManager.get(PATH_2, Texture.class), x, renderY, width, height);
+                    break;
+
+                case 3:
+                    batch.draw(assetManager.get(PATH_3, Texture.class), x, renderY, width, height);
+                    break;
+
+                case 4:
+                    batch.draw(assetManager.get(PATH_4, Texture.class), x, renderY, width, height);
+                    break;
+
+                case 5:
+                    batch.draw(assetManager.get(PATH_5, Texture.class), x, renderY, width, height);
+                    break;
+
+                case 6:
+                    batch.draw(assetManager.get(PATH_6, Texture.class), x, renderY, width, height);
+                    break;
+
+                case 7:
+                    batch.draw(assetManager.get(PATH_7, Texture.class), x, renderY, width, height);
+                    break;
+
+                case 8:
+                    batch.draw(assetManager.get(PATH_8, Texture.class), x, renderY, width, height);
+                    break;
+
+                case 9:
+                    batch.draw(assetManager.get(PATH_9, Texture.class), x, renderY, width, height);
+                    break;
+            }
 
             //move to the next coordinate
             x += width + padding;
         }
     }
 
-    public static void renderKey(Batch batch) {
-        batch.draw(NUMBERS[10], HUD_HEALTH_X, HUD_HEALTH_Y - (HUD_KEY_HEIGHT * 1), HUD_KEY_WIDTH, HUD_KEY_HEIGHT);
+    public static void renderKey(AssetManager assetManager, Batch batch) {
+        batch.draw(assetManager.get(PATH_KEY_1, Texture.class), HUD_HEALTH_X, HUD_HEALTH_Y - (HUD_KEY_HEIGHT * 1), HUD_KEY_WIDTH, HUD_KEY_HEIGHT);
     }
 }

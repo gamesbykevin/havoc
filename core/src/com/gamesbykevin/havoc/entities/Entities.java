@@ -160,7 +160,12 @@ public abstract class Entities implements Disposable, Restart {
                 continue;
 
             //render the entity
-            entity.render(getLevel().getPlayer().getCamera3d(), getLevel().getDecalBatch(), getLevel().getPlayer().getController().getStage().getBatch());
+            entity.render(
+                getLevel().getAssetManager(),
+                getLevel().getPlayer().getCamera3d(),
+                getLevel().getDecalBatch(),
+                getLevel().getPlayer().getController().getStage().getBatch()
+            );
 
             //keep track of how many items we rendered
             count++;

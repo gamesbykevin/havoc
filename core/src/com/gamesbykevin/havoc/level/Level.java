@@ -1,5 +1,6 @@
 package com.gamesbykevin.havoc.level;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.gamesbykevin.havoc.collectables.CollectibleHelper;
@@ -56,13 +57,19 @@ public class Level implements Disposable, Restart {
     //how far away can we render?
     public static final int RENDER_RANGE = LEAF_DIMENSION_MIN;
 
-    public Level(Player player) {
+    //where we hold our assets
+    private final AssetManager assetManager;
+
+    public Level(AssetManager assetManager, Player player) {
+
+        //store reference to our asset manager
+        this.assetManager = assetManager;
 
         //store our player reference
         this.player = player;
 
-        //create the weapons collection
-        getPlayer().createWeapons(this);
+        //create the batch now that we have the player reference
+        getDecalBatch();
 
         //how big should the dungeon be?
         int size = DUNGEON_SIZE;
@@ -73,10 +80,15 @@ public class Level implements Disposable, Restart {
 
         //create and generate the dungeon
         this.dungeon = new Dungeon(this, size, size);
+
+        /*
         getDungeon().generate();
 
         //flag the players start location
         getPlayer().setStart(getDungeon().getStartCol(), getDungeon().getStartRow());
+
+        //create the weapons collection
+        getPlayer().createWeapons(this);
 
         //create the obstacles
         getObstacles().spawn();
@@ -89,9 +101,7 @@ public class Level implements Disposable, Restart {
 
         //add textures
         addTextures(this);
-
-        //create the batch
-        getDecalBatch();
+        */
     }
 
     @Override
@@ -101,7 +111,10 @@ public class Level implements Disposable, Restart {
         getCollectibles().reset();
         getPlayer().reset();
         getPlayer().getController().reset();
+    }
 
+    public AssetManager getAssetManager() {
+        return this.assetManager;
     }
 
     public Player getPlayer() {
@@ -228,6 +241,7 @@ public class Level implements Disposable, Restart {
         //render the collectibles
         count += getCollectibles().render(true);
 
+        //tracking performance
         if (count > 400)
             System.out.println("Rendered: " + count);
 

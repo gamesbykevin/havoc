@@ -1,5 +1,6 @@
 package com.gamesbykevin.havoc.entities;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
@@ -119,5 +120,5 @@ public abstract class Entity implements Disposable, Restart {
     }
 
     //implement logic to render an entity
-    public abstract void render(PerspectiveCamera camera, DecalBatch decalBatch, Batch batch);
+    public abstract void render(AssetManager assetManager, PerspectiveCamera camera, DecalBatch decalBatch, Batch batch);
 }

@@ -1,6 +1,7 @@
 package com.gamesbykevin.havoc.animation;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
@@ -18,7 +19,7 @@ public class DecalAnimation extends Animation {
         this.decals[0] = Decal.newDecal(DEFAULT_WIDTH, DEFAULT_HEIGHT, textureRegion, true);
     }
 
-    public DecalAnimation(String path, String filename, String extension, int startIndex, int count, float duration) {
+    public DecalAnimation(AssetManager assetManager, String path, String filename, String extension, int startIndex, int count, float duration) {
 
         super(count, duration);
 
@@ -27,8 +28,8 @@ public class DecalAnimation extends Animation {
 
         //load the textures
         for (int i = 0; i < getDecals().length; i++) {
-            Texture texture = new Texture(Gdx.files.internal(path + filename + (startIndex + i) + extension));
-            getDecals()[i] = Decal.newDecal(DEFAULT_WIDTH, DEFAULT_HEIGHT, new TextureRegion(texture), true);
+            String filePath = path + filename + (startIndex + i) + extension;
+            getDecals()[i] = Decal.newDecal(DEFAULT_WIDTH, DEFAULT_HEIGHT, new TextureRegion(assetManager.get(filePath, Texture.class)), true);
         }
     }
 

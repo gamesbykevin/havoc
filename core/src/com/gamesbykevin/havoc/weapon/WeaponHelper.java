@@ -5,10 +5,10 @@ import com.gamesbykevin.havoc.enemies.Enemy;
 import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.level.Level;
 
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_DIR_WEAPONS;
 import static com.gamesbykevin.havoc.enemies.Enemy.RANGE_NOTICE;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.chase;
 import static com.gamesbykevin.havoc.input.MyController.SPEED_WALK;
-import static com.gamesbykevin.havoc.texture.TextureHelper.PARENT_DIR_IMAGES;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public class WeaponHelper {
@@ -45,12 +45,6 @@ public class WeaponHelper {
 
     //how fast do we switch our weapon
     protected static final float DEFAULT_VELOCITY_SWITCH_Y = 6f;
-
-    //where our weapon images are located
-    protected static final String WEAPONS_DIR = PARENT_DIR_IMAGES + "weapons/";
-
-    //file extension
-    protected static final String EXTENSION = ".png";
 
     //how many times do we check for collision
     private static final int ATTEMPT_LIMIT = 200;
@@ -93,7 +87,7 @@ public class WeaponHelper {
                 this.range = range;
                 this.bulletsMax = bulletsMax;
                 this.fileName = fileName;
-                this.dir = WEAPONS_DIR + dir;
+                this.dir = ASSET_DIR_WEAPONS + dir;
                 this.restIndexStart = restIndexStart;
                 this.restIndexCount = restIndexCount;
                 this.startIndexStart = startIndexStart;
@@ -155,7 +149,7 @@ public class WeaponHelper {
             public int getStopIndexCount() {
                 return this.stopIndexCount;
             }
-        }
+    }
 
     public static void checkAttack(Level level) {
 

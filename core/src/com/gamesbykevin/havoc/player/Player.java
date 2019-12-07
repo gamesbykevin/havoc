@@ -1,6 +1,7 @@
 package com.gamesbykevin.havoc.player;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -14,6 +15,8 @@ import com.gamesbykevin.havoc.util.Hud;
 
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_COLLECT;
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_HURT;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
 import static com.gamesbykevin.havoc.player.PlayerHelper.HEIGHT_MIN_Z;
 import static com.gamesbykevin.havoc.player.PlayerHelper.VELOCITY_Z;
@@ -37,9 +40,6 @@ public final class Player implements Disposable, Restart {
     //is the player hurt?
     private boolean hurt = false, collect = false;
 
-    //texture to represent the player is hurt and collects an item
-    private Texture imageHurt, imageCollect;
-
     //our 3d camera
     private PerspectiveCamera camera3d;
 
@@ -55,14 +55,20 @@ public final class Player implements Disposable, Restart {
     //height the camera will be at
     private static final float HEIGHT_START = 0.075f;
 
-    public Player() {
+    //reference to our assets
+    private final AssetManager assetManager;
+
+    public Player(AssetManager assetManager) {
+
+        //store reference
+        this.assetManager = assetManager;
 
         //reset values
         reset();
+    }
 
-        //store reference to the images
-        this.imageHurt = new Texture(Gdx.files.internal(HUD_DIR + "hurt.png"));
-        this.imageCollect = new Texture(Gdx.files.internal(HUD_DIR + "collect.png"));
+    public AssetManager getAssetManager() {
+        return this.assetManager;
     }
 
     public void createWeapons(Level level) {
@@ -76,7 +82,7 @@ public final class Player implements Disposable, Restart {
     public MyController getController() {
 
         if (this.controller == null)
-            this.controller = new MyController();
+            this.controller = new MyController(getAssetManager());
 
         return controller;
     }
@@ -178,20 +184,12 @@ public final class Player implements Disposable, Restart {
         this.hurt = hurt;
     }
 
-    public Texture getImageHurt() {
-        return this.imageHurt;
-    }
-
     public void setCollect(boolean collect) {
         this.collect = collect;
     }
 
     public boolean isCollect() {
         return this.collect;
-    }
-
-    public Texture getImageCollect() {
-        return this.imageCollect;
     }
 
     //update the player
@@ -225,17 +223,11 @@ public final class Player implements Disposable, Restart {
     @Override
     public void dispose() {
 
-        if (this.imageHurt != null)
-            this.imageHurt.dispose();
-        if (this.imageCollect != null)
-            this.imageCollect.dispose();
         if (this.controller != null)
             this.controller.dispose();
         if (this.weapons != null)
             this.weapons.dispose();
 
-        this.imageHurt = null;
-        this.imageCollect = null;
         this.previous = null;
         this.controller = null;
         this.camera3d = null;
@@ -272,15 +264,16 @@ public final class Player implements Disposable, Restart {
 
         //if hurt render the screen graphic
         if (isHurt() || isDead()) {
-            batch.draw(getImageHurt(), 0, 0, SIZE_WIDTH, SIZE_HEIGHT);
+            batch.draw(getAssetManager().get(PATH_HURT, Texture.class), 0, 0, SIZE_WIDTH, SIZE_HEIGHT);
             setHurt(false);
         } else if (isCollect()) {
-            batch.draw(getImageCollect(), 0, 0, SIZE_WIDTH, SIZE_HEIGHT);
+            batch.draw(getAssetManager().get(PATH_COLLECT, Texture.class), 0, 0, SIZE_WIDTH, SIZE_HEIGHT);
             setCollect(false);
         }
 
         //render health
         Hud.renderNumber(
+            getAssetManager(),
             batch,
             getHealth(),
             HUD_HEALTH_X, HUD_HEALTH_Y,
@@ -290,7 +283,7 @@ public final class Player implements Disposable, Restart {
 
         //render key?
         if (hasKey())
-            renderKey(batch);
+            renderKey(getAssetManager(), batch);
 
         //render the weapons
         if (!isDead())

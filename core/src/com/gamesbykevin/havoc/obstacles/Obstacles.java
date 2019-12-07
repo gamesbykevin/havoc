@@ -1,8 +1,9 @@
 package com.gamesbykevin.havoc.obstacles;
 
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.gamesbykevin.havoc.animation.DecalAnimation;
 import com.gamesbykevin.havoc.dungeon.Leaf;
 import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.entities.Entities;
@@ -11,9 +12,9 @@ import com.gamesbykevin.havoc.level.Level;
 
 import java.util.HashMap;
 
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_DIR_OBSTACLES;
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_EXT_BMP;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
-import static com.gamesbykevin.havoc.obstacles.Obstacle.ASSET_DIR;
-import static com.gamesbykevin.havoc.obstacles.Obstacle.ASSET_EXT;
 import static com.gamesbykevin.havoc.obstacles.ObstacleHelper.*;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
@@ -72,12 +73,12 @@ public final class Obstacles extends Entities {
         getLevel().getDungeon().updateMap();
     }
 
-    public static HashMap<Type, TextureRegion> getTextures() {
+    public static HashMap<Type, TextureRegion> getTextures(AssetManager assetManager) {
 
         if (TEXTURES == null) {
             TEXTURES = new HashMap<>();
             for (Type type : Type.values()) {
-                TEXTURES.put(type, new TextureRegion(new Texture(Gdx.files.internal(ASSET_DIR + type.toString() + ASSET_EXT))));
+                TEXTURES.put(type, new TextureRegion(assetManager.get(ASSET_DIR_OBSTACLES + type.toString() + ASSET_EXT_BMP, Texture.class)));
             }
         }
 
@@ -195,7 +196,14 @@ public final class Obstacles extends Entities {
         if (nearInteract(col, row))
             return;
 
-        add(new Obstacle(type), col, row);
+        //create our obstacle
+        Obstacle obstacle = new Obstacle(type);
+
+        //animation obstacles are a single frame
+        obstacle.getAnimations()[0] = new DecalAnimation(Obstacles.getTextures(getLevel().getAssetManager()).get(type));
+
+        //then add to entity list
+        add(obstacle, col, row);
     }
 
     private boolean nearInteract(int col, int row) {

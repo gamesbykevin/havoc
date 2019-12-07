@@ -1,16 +1,14 @@
 package com.gamesbykevin.havoc.enemies;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
 
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.*;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.DIRECTION_E;
-import static com.gamesbykevin.havoc.texture.TextureHelper.PARENT_DIR_IMAGES;
 
 public final class Soldier extends Enemy {
-
-    //directory where enemies are
-    public static final String DIR = PARENT_DIR_IMAGES + "enemies/soldier/";
 
     //different amounts of damage for each soldier
     public static final int DAMAGE_DOCTOR = 1;
@@ -56,37 +54,37 @@ public final class Soldier extends Enemy {
     public static final int ANIMATION_COUNT = 21;
 
     public enum Type {
-        doctor_1(DIR +"doctor_1/", DAMAGE_DOCTOR),
-        doctor_2(DIR + "doctor_2/", DAMAGE_DOCTOR),
-        guard_1(DIR + "guard_1/", DAMAGE_GUARD),
-        guard_2(DIR + "guard_2/", DAMAGE_GUARD),
-        guard_3(DIR + "guard_3/", DAMAGE_GUARD),
-        guard_4(DIR + "guard_4/", DAMAGE_GUARD),
-        guard_5(DIR + "guard_5/", DAMAGE_GUARD),
-        guard_6(DIR + "guard_6/", DAMAGE_GUARD),
-        guard_7(DIR + "guard_7/", DAMAGE_GUARD),
-        guard_8(DIR + "guard_8/", DAMAGE_GUARD),
-        guard_9(DIR + "guard_9/", DAMAGE_GUARD),
-        guard_10(DIR + "guard_10/", DAMAGE_GUARD),
-        guard_11(DIR + "guard_11/", DAMAGE_GUARD),
-        guard_12(DIR + "guard_12/", DAMAGE_GUARD),
-        lieutenant_1(DIR + "lieutenant_1/", DAMAGE_LIEUTENANT),
-        lieutenant_2(DIR + "lieutenant_2/", DAMAGE_LIEUTENANT),
-        lieutenant_3(DIR + "lieutenant_3/", DAMAGE_LIEUTENANT),
-        lieutenant_4(DIR + "lieutenant_4/", DAMAGE_LIEUTENANT),
-        lieutenant_5(DIR + "lieutenant_5/", DAMAGE_LIEUTENANT),
-        major_1(DIR + "major_1/", DAMAGE_MAJOR),
-        major_2(DIR + "major_2/", DAMAGE_MAJOR),
-        officer_1(DIR + "officer_1/", DAMAGE_OFFICER),
-        officer_2(DIR + "officer_2/", DAMAGE_OFFICER),
-        officer_3(DIR + "officer_3/", DAMAGE_OFFICER),
-        officer_4(DIR + "officer_4/", DAMAGE_OFFICER),
-        officer_5(DIR + "officer_5/", DAMAGE_OFFICER),
-        sergeant_1(DIR + "sergeant_1/", DAMAGE_SERGEANT),
-        sergeant_2(DIR + "sergeant_2/", DAMAGE_SERGEANT),
-        sergeant_3(DIR + "sergeant_3/", DAMAGE_SERGEANT),
-        sergeant_4(DIR + "sergeant_4/", DAMAGE_SERGEANT),
-        sergeant_5(DIR + "sergeant_5/", DAMAGE_SERGEANT);
+        doctor_1(ASSET_DIR_SOLDIER +"doctor_1/", DAMAGE_DOCTOR),
+        doctor_2(ASSET_DIR_SOLDIER + "doctor_2/", DAMAGE_DOCTOR),
+        guard_1(ASSET_DIR_SOLDIER + "guard_1/", DAMAGE_GUARD),
+        guard_2(ASSET_DIR_SOLDIER + "guard_2/", DAMAGE_GUARD),
+        guard_3(ASSET_DIR_SOLDIER + "guard_3/", DAMAGE_GUARD),
+        guard_4(ASSET_DIR_SOLDIER + "guard_4/", DAMAGE_GUARD),
+        guard_5(ASSET_DIR_SOLDIER + "guard_5/", DAMAGE_GUARD),
+        guard_6(ASSET_DIR_SOLDIER + "guard_6/", DAMAGE_GUARD),
+        guard_7(ASSET_DIR_SOLDIER + "guard_7/", DAMAGE_GUARD),
+        guard_8(ASSET_DIR_SOLDIER + "guard_8/", DAMAGE_GUARD),
+        guard_9(ASSET_DIR_SOLDIER + "guard_9/", DAMAGE_GUARD),
+        guard_10(ASSET_DIR_SOLDIER + "guard_10/", DAMAGE_GUARD),
+        guard_11(ASSET_DIR_SOLDIER + "guard_11/", DAMAGE_GUARD),
+        guard_12(ASSET_DIR_SOLDIER + "guard_12/", DAMAGE_GUARD),
+        lieutenant_1(ASSET_DIR_SOLDIER + "lieutenant_1/", DAMAGE_LIEUTENANT),
+        lieutenant_2(ASSET_DIR_SOLDIER + "lieutenant_2/", DAMAGE_LIEUTENANT),
+        lieutenant_3(ASSET_DIR_SOLDIER + "lieutenant_3/", DAMAGE_LIEUTENANT),
+        lieutenant_4(ASSET_DIR_SOLDIER + "lieutenant_4/", DAMAGE_LIEUTENANT),
+        lieutenant_5(ASSET_DIR_SOLDIER + "lieutenant_5/", DAMAGE_LIEUTENANT),
+        major_1(ASSET_DIR_SOLDIER + "major_1/", DAMAGE_MAJOR),
+        major_2(ASSET_DIR_SOLDIER + "major_2/", DAMAGE_MAJOR),
+        officer_1(ASSET_DIR_SOLDIER + "officer_1/", DAMAGE_OFFICER),
+        officer_2(ASSET_DIR_SOLDIER + "officer_2/", DAMAGE_OFFICER),
+        officer_3(ASSET_DIR_SOLDIER + "officer_3/", DAMAGE_OFFICER),
+        officer_4(ASSET_DIR_SOLDIER + "officer_4/", DAMAGE_OFFICER),
+        officer_5(ASSET_DIR_SOLDIER + "officer_5/", DAMAGE_OFFICER),
+        sergeant_1(ASSET_DIR_SOLDIER + "sergeant_1/", DAMAGE_SERGEANT),
+        sergeant_2(ASSET_DIR_SOLDIER + "sergeant_2/", DAMAGE_SERGEANT),
+        sergeant_3(ASSET_DIR_SOLDIER + "sergeant_3/", DAMAGE_SERGEANT),
+        sergeant_4(ASSET_DIR_SOLDIER + "sergeant_4/", DAMAGE_SERGEANT),
+        sergeant_5(ASSET_DIR_SOLDIER + "sergeant_5/", DAMAGE_SERGEANT);
 
         public final String path;
 
@@ -99,7 +97,7 @@ public final class Soldier extends Enemy {
         }
     }
 
-    public Soldier(Type type) {
+    public Soldier(AssetManager assetManager, Type type) {
 
         //call parent
         super(ANIMATION_COUNT);
@@ -108,27 +106,27 @@ public final class Soldier extends Enemy {
         setDamage(type.damage);
 
         //setup animations
-        getAnimations()[INDEX_DIE] = new DecalAnimation(type.path, "die", ".bmp", 1, 4, DURATION_DIE);
-        getAnimations()[INDEX_PAIN] = new DecalAnimation(type.path, "pain", ".bmp", 1, 2, DURATION_PAIN);
-        getAnimations()[INDEX_IDLE_S] = new DecalAnimation(type.path, "s_", ".bmp", 1, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_SW] = new DecalAnimation(type.path, "s_", ".bmp", 2, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_W] = new DecalAnimation(type.path, "s_", ".bmp", 3, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_NW] = new DecalAnimation(type.path, "s_", ".bmp", 4, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_N] = new DecalAnimation(type.path, "s_", ".bmp", 5, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_NE] = new DecalAnimation(type.path, "s_", ".bmp", 6, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_E] = new DecalAnimation(type.path, "s_", ".bmp", 7, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_SE] = new DecalAnimation(type.path, "s_", ".bmp", 8, 1, DURATION_IDLE);
-        getAnimations()[INDEX_SHOOT] = new DecalAnimation(type.path, "shoot", ".bmp", 1, 3, DURATION_SHOOT);
-        getAnimations()[INDEX_ALERT] = new DecalAnimation(type.path, "shoot", ".bmp", 2, 2, DURATION_ALERT);
-        getAnimations()[INDEX_PAUSE] = new DecalAnimation(type.path, "shoot", ".bmp", 2, 1, DURATION_PAUSE);
-        getAnimations()[INDEX_WALK_S] = new DecalAnimation(type.path, "w", "_1.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_SW] = new DecalAnimation(type.path, "w", "_2.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_W] = new DecalAnimation(type.path, "w", "_3.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_NW] = new DecalAnimation(type.path, "w", "_4.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_N] = new DecalAnimation(type.path, "w", "_5.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_NE] = new DecalAnimation(type.path, "w", "_6.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_E] = new DecalAnimation(type.path, "w", "_7.bmp", 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_SE] = new DecalAnimation(type.path, "w", "_8.bmp", 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_DIE] = new DecalAnimation(assetManager, type.path, FILENAME_DIE, ASSET_EXT_BMP, 1, 4, DURATION_DIE);
+        getAnimations()[INDEX_PAIN] = new DecalAnimation(assetManager, type.path, FILENAME_PAIN, ASSET_EXT_BMP, 1, 2, DURATION_PAIN);
+        getAnimations()[INDEX_IDLE_S] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 1, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_SW] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 2, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_W] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 3, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_NW] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 4, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_N] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 5, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_NE] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 6, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_E] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 7, 1, DURATION_IDLE);
+        getAnimations()[INDEX_IDLE_SE] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 8, 1, DURATION_IDLE);
+        getAnimations()[INDEX_SHOOT] = new DecalAnimation(assetManager, type.path, FILENAME_SHOOT, ASSET_EXT_BMP, 1, 3, DURATION_SHOOT);
+        getAnimations()[INDEX_ALERT] = new DecalAnimation(assetManager, type.path, FILENAME_SHOOT, ASSET_EXT_BMP, 2, 2, DURATION_ALERT);
+        getAnimations()[INDEX_PAUSE] = new DecalAnimation(assetManager, type.path, FILENAME_SHOOT, ASSET_EXT_BMP, 2, 1, DURATION_PAUSE);
+        getAnimations()[INDEX_WALK_S] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_1" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_SW] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_2" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_W] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_3" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_NW] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_4" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_N] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_5" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_NE] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_6" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_E] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_7" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
+        getAnimations()[INDEX_WALK_SE] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_8" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
     }
 
     @Override

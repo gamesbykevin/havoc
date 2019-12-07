@@ -4,14 +4,7 @@ import com.gamesbykevin.havoc.animation.DecalAnimation;
 import com.gamesbykevin.havoc.entities.Entity3d;
 import com.gamesbykevin.havoc.level.Level;
 
-import static com.gamesbykevin.havoc.texture.TextureHelper.PARENT_DIR_IMAGES;
-
 public final class Obstacle extends Entity3d {
-
-    //where the sprite image is located
-    public static final String ASSET_DIR = PARENT_DIR_IMAGES + "obstacles/";
-
-    public static final String ASSET_EXT = ".bmp";
 
     //each obstacle has a single animation sprite
     private static final int SPRITES = 1;
@@ -35,9 +28,6 @@ public final class Obstacle extends Entity3d {
                 setSolid(true);
                 break;
         }
-
-        //animations are a single frame
-        getAnimations()[0] = new DecalAnimation(Obstacles.getTextures().get(type));
     }
 
     @Override

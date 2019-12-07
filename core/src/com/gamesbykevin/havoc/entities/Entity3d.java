@@ -1,5 +1,6 @@
 package com.gamesbykevin.havoc.entities;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
@@ -15,7 +16,7 @@ public abstract class Entity3d extends Entity {
         this.animations = new DecalAnimation[count];
     }
 
-    protected DecalAnimation[] getAnimations() {
+    public DecalAnimation[] getAnimations() {
         return this.animations;
     }
 
@@ -39,7 +40,7 @@ public abstract class Entity3d extends Entity {
     }
 
     @Override
-    public void render(PerspectiveCamera camera, DecalBatch decalBatch, Batch batch) {
+    public void render(AssetManager assetManager, PerspectiveCamera camera, DecalBatch decalBatch, Batch batch) {
 
         //render like a billboard
         getAnimation().getDecal().lookAt(camera.position, camera.up);
