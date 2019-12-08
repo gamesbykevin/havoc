@@ -50,26 +50,6 @@ public abstract class Entities implements Disposable, Restart {
     //how do we spawn items
     public abstract void spawn();
 
-    protected List<Cell> getLocationOptions(Room room) {
-
-        List<Cell> options = new ArrayList<>();
-
-        //check the cells in the room
-        for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
-            for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
-
-                if (hasEntityLocation(col, row))
-                    continue;
-
-                //add to the list of options
-                options.add(getLevel().getDungeon().getCells()[row][col]);
-            }
-        }
-
-        //return our list of options
-        return options;
-    }
-
     public void add(Entity3d entity, float col, float row) {
 
         //update the location of our animation
@@ -87,6 +67,9 @@ public abstract class Entities implements Disposable, Restart {
 
         //add to the list of entities
         getEntityList().add(entity);
+
+        //update the dungeon map at this location
+        getLevel().getDungeon().updateMap((int)col, (int)row);
     }
 
     public void add(Entity2d entity) {

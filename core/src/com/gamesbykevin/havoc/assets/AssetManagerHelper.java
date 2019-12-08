@@ -2,8 +2,7 @@ package com.gamesbykevin.havoc.assets;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.gamesbykevin.havoc.collectables.Collectibles;
+import com.gamesbykevin.havoc.collectibles.Collectibles;
 import com.gamesbykevin.havoc.enemies.Boss;
 import com.gamesbykevin.havoc.enemies.Soldier;
 import com.gamesbykevin.havoc.obstacles.Obstacles;
@@ -32,10 +31,10 @@ public class AssetManagerHelper {
     private static final int COUNT_WALLS = 15;
 
     //how many different enemy types will we allow to be loaded
-    private static final int COUNT_BOSS = 2;
+    private static final int COUNT_BOSS = 3;
 
     //how many different enemy types will we allow to be loaded
-    private static final int COUNT_SOLDIER = 6;
+    private static final int COUNT_SOLDIER = 8;
 
     //how many different obstacle types will we allow to be loaded
     private static final int COUNT_OBSTACLE = 6;
@@ -52,7 +51,6 @@ public class AssetManagerHelper {
     //here we will store the types we want to load textures for
     private static List<Boss.Type> TYPE_BOSS;
     private static List<Soldier.Type> TYPE_SOLDIER;
-    private static List<Obstacles.Type> TYPE_OBSTACLE;
 
     //parent directory of our images
     public static final String PARENT_DIR_IMAGES = "images/";
@@ -74,6 +72,7 @@ public class AssetManagerHelper {
     public static final String ASSET_DIR_WEAPONS = PARENT_DIR_IMAGES + "weapons/";
     public static final String ASSET_DIR_HALLWAY     = PARENT_DIR_IMAGES + "hallway/";
 
+    //different file extensions
     public static final String ASSET_EXT_BMP = ".bmp";
     public static final String ASSET_EXT_PNG = ".png";
 
@@ -211,6 +210,9 @@ public class AssetManagerHelper {
     //load all the assets
     public static void load(AssetManager assetManager) {
 
+        //unload any assets (if they exist)
+        dispose(assetManager);
+
         //load every obstacle
         for (Obstacles.Type type : Obstacles.Type.values()) {
             load(assetManager, ASSET_DIR_OBSTACLES + type.toString() + ASSET_EXT_BMP, Texture.class);
@@ -222,37 +224,13 @@ public class AssetManagerHelper {
         }
 
         //load controller images
-        load(assetManager, PATH_CONTROL_SHOOT, Texture.class);
-        load(assetManager, PATH_CONTROL_ACTION, Texture.class);
-        load(assetManager, PATH_CONTROL_CHANGE, Texture.class);
-        load(assetManager, PATH_TOUCH_PAD_BACKGROUND, Texture.class);
-        load(assetManager, PATH_TOUCH_PAD_KNOB, Texture.class);
+        loadController(assetManager);
 
-        //level textures
-        load(assetManager, PATH_DOOR_LOCKED, Texture.class);
-        load(assetManager, PATH_DOOR, Texture.class);
-        load(assetManager, PATH_SIDE, Texture.class);
-        load(assetManager, PATH_WALL_GOAL, Texture.class);
-        load(assetManager, PATH_DOOR_GOAL, Texture.class);
-        load(assetManager, PATH_SWITCH_OFF, Texture.class);
-        load(assetManager, PATH_SWITCH_ON, Texture.class);
+        //load wall textures
+        loadWallTextures(assetManager);
 
         //load hud images
-        load(assetManager, PATH_HURT, Texture.class);
-        load(assetManager, PATH_COLLECT, Texture.class);
-        load(assetManager, PATH_0, Texture.class);
-        load(assetManager, PATH_1, Texture.class);
-        load(assetManager, PATH_2, Texture.class);
-        load(assetManager, PATH_3, Texture.class);
-        load(assetManager, PATH_4, Texture.class);
-        load(assetManager, PATH_5, Texture.class);
-        load(assetManager, PATH_6, Texture.class);
-        load(assetManager, PATH_7, Texture.class);
-        load(assetManager, PATH_8, Texture.class);
-        load(assetManager, PATH_9, Texture.class);
-        load(assetManager, PATH_PERCENT, Texture.class);
-        load(assetManager, PATH_KEY_1, Texture.class);
-        load(assetManager, PATH_KEY_2, Texture.class);
+        loadHud(assetManager);
 
         //load weapon images
         for (WeaponHelper.Type type : WeaponHelper.Type.values()) {
@@ -261,36 +239,35 @@ public class AssetManagerHelper {
             }
         }
 
+        //load the floor / ceiling images
+        loadBackground(assetManager);
+
+        //load the enemy sprites
+        loadEnemies(assetManager);
+    }
+
+    private static void loadController(AssetManager assetManager) {
+        load(assetManager, PATH_CONTROL_SHOOT, Texture.class);
+        load(assetManager, PATH_CONTROL_ACTION, Texture.class);
+        load(assetManager, PATH_CONTROL_CHANGE, Texture.class);
+        load(assetManager, PATH_TOUCH_PAD_BACKGROUND, Texture.class);
+        load(assetManager, PATH_TOUCH_PAD_KNOB, Texture.class);
+    }
+
+    private static void loadBackground(AssetManager assetManager) {
+
         //clear the list and add a wall / ceiling
         getPathsBackground().clear();
         getPathsBackground().add(ASSET_DIR_BACKGROUND_LIGHT + FILENAME_BACKGROUND + getRandom().nextInt(TILES_BACKGROUND_LIGHT) + ASSET_EXT_BMP);
         getPathsBackground().add(ASSET_DIR_BACKGROUND_DARK + FILENAME_BACKGROUND + getRandom().nextInt(TILES_BACKGROUND_DARK) + ASSET_EXT_BMP);
 
-        //clear the list and add a hallway
-        getPathsHallway().clear();
-        getPathsHallway().add(ASSET_DIR_HALLWAY + FILENAME_HALLWAY + getRandom().nextInt(TILES_HALLWAY) + ASSET_EXT_BMP);
-
-        //clear the list and add wall paths
-        getPathsWall().clear();
-
-        //create optional list to choose from
-        List<Integer> options = new ArrayList<>();
-        for (int i = 0; i < TILES_WALL; i++) {
-            options.add(i);
+        //now add lists to the asset manager queue for loading
+        for (int i = 0; i < getPathsBackground().size(); i++) {
+            assetManager.load(getPathsBackground().get(i), Texture.class);
         }
+    }
 
-        //continue until we meet the allowed count
-        while (getPathsWall().size() < COUNT_WALLS && !options.isEmpty()) {
-
-            //pick random index from list
-            int index = getRandom().nextInt(options.size());
-
-            //add to list of wall paths
-            getPathsWall().add(ASSET_DIR_WALLS + FILENAME_WALL + options.get(index) + ASSET_EXT_BMP);
-
-            //remove from options list
-            options.remove(index);
-        }
+    private static void loadEnemies(AssetManager assetManager) {
 
         //clear the list
         getTypeBoss().clear();
@@ -330,19 +307,6 @@ public class AssetManagerHelper {
             soldierType.remove(index);
         }
 
-        //now add lists to the asset manager queue for loading
-        for (int i = 0; i < getPathsBackground().size(); i++) {
-            assetManager.load(getPathsBackground().get(i), Texture.class);
-        }
-
-        for (int i = 0; i < getPathsWall().size(); i++) {
-            assetManager.load(getPathsWall().get(i), Texture.class);
-        }
-
-        for (int i = 0; i < getPathsHallway().size(); i++) {
-            assetManager.load(getPathsHallway().get(i), Texture.class);
-        }
-
         for (int i = 0; i < getTypeBoss().size(); i++) {
             loadTexturesBoss(assetManager, getTypeBoss().get(i));
         }
@@ -350,6 +314,69 @@ public class AssetManagerHelper {
         for (int i = 0; i < getTypeSoldier().size(); i++) {
             loadTexturesSoldier(assetManager, getTypeSoldier().get(i));
         }
+    }
+
+    private static void loadWallTextures(AssetManager assetManager) {
+
+        load(assetManager, PATH_DOOR_LOCKED, Texture.class);
+        load(assetManager, PATH_DOOR, Texture.class);
+        load(assetManager, PATH_SIDE, Texture.class);
+        load(assetManager, PATH_WALL_GOAL, Texture.class);
+        load(assetManager, PATH_DOOR_GOAL, Texture.class);
+        load(assetManager, PATH_SWITCH_OFF, Texture.class);
+        load(assetManager, PATH_SWITCH_ON, Texture.class);
+
+        //clear the list and add wall paths
+        getPathsWall().clear();
+
+        //create optional list to choose from
+        List<Integer> options = new ArrayList<>();
+        for (int i = 0; i < TILES_WALL; i++) {
+            options.add(i);
+        }
+
+        //continue until we meet the allowed count
+        while (getPathsWall().size() < COUNT_WALLS && !options.isEmpty()) {
+
+            //pick random index from list
+            int index = getRandom().nextInt(options.size());
+
+            //add to list of wall paths
+            getPathsWall().add(ASSET_DIR_WALLS + FILENAME_WALL + options.get(index) + ASSET_EXT_BMP);
+
+            //remove from options list
+            options.remove(index);
+        }
+
+        for (int i = 0; i < getPathsWall().size(); i++) {
+            assetManager.load(getPathsWall().get(i), Texture.class);
+        }
+
+        //clear the list and add a hallway
+        getPathsHallway().clear();
+        getPathsHallway().add(ASSET_DIR_HALLWAY + FILENAME_HALLWAY + getRandom().nextInt(TILES_HALLWAY) + ASSET_EXT_BMP);
+
+        for (int i = 0; i < getPathsHallway().size(); i++) {
+            assetManager.load(getPathsHallway().get(i), Texture.class);
+        }
+    }
+
+    private static void loadHud(AssetManager assetManager) {
+        load(assetManager, PATH_HURT, Texture.class);
+        load(assetManager, PATH_COLLECT, Texture.class);
+        load(assetManager, PATH_0, Texture.class);
+        load(assetManager, PATH_1, Texture.class);
+        load(assetManager, PATH_2, Texture.class);
+        load(assetManager, PATH_3, Texture.class);
+        load(assetManager, PATH_4, Texture.class);
+        load(assetManager, PATH_5, Texture.class);
+        load(assetManager, PATH_6, Texture.class);
+        load(assetManager, PATH_7, Texture.class);
+        load(assetManager, PATH_8, Texture.class);
+        load(assetManager, PATH_9, Texture.class);
+        load(assetManager, PATH_PERCENT, Texture.class);
+        load(assetManager, PATH_KEY_1, Texture.class);
+        load(assetManager, PATH_KEY_2, Texture.class);
     }
 
     private static void loadTexturesSoldier(AssetManager assetManager, Soldier.Type type) {

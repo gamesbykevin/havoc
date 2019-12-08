@@ -3,8 +3,8 @@ package com.gamesbykevin.havoc.level;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
-import com.gamesbykevin.havoc.collectables.CollectibleHelper;
-import com.gamesbykevin.havoc.collectables.Collectibles;
+import com.gamesbykevin.havoc.collectibles.CollectibleHelper;
+import com.gamesbykevin.havoc.collectibles.Collectibles;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.dungeon.Dungeon;
@@ -21,9 +21,9 @@ import java.util.List;
 import static com.gamesbykevin.havoc.dungeon.DungeonHelper.DUNGEON_SIZE;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.LEAF_DIMENSION_MIN;
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
+import static com.gamesbykevin.havoc.input.MyControllerHelper.updateLocation;
 import static com.gamesbykevin.havoc.level.LevelHelper.*;
 import static com.gamesbykevin.havoc.player.PlayerHelper.checkCollision;
-import static com.gamesbykevin.havoc.texture.TextureHelper.addTextures;
 
 public class Level implements Disposable, Restart {
 

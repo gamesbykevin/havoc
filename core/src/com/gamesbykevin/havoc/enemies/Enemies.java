@@ -174,9 +174,6 @@ public final class Enemies extends Entities {
             options = null;
         }
 
-        //update the map
-        getLevel().getDungeon().updateMap();
-
         //reset the enemies
         reset();
     }

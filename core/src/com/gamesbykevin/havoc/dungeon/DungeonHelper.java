@@ -1,7 +1,7 @@
 package com.gamesbykevin.havoc.dungeon;
 
 import com.gamesbykevin.havoc.astar.Node;
-import com.gamesbykevin.havoc.collectables.Collectibles;
+import com.gamesbykevin.havoc.collectibles.Collectibles;
 
 import java.util.ArrayList;
 import java.util.List;

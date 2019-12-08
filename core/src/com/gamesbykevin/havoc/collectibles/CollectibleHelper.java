@@ -1,4 +1,4 @@
-package com.gamesbykevin.havoc.collectables;
+package com.gamesbykevin.havoc.collectibles;
 
 import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.entities.Entity;

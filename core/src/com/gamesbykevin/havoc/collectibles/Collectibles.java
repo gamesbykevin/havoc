@@ -1,4 +1,4 @@
-package com.gamesbykevin.havoc.collectables;
+package com.gamesbykevin.havoc.collectibles;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
 import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.dungeon.Leaf;
+import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.entities.Entity3d;
@@ -66,7 +67,7 @@ public final class Collectibles extends Entities {
     @Override
     public void spawn() {
 
-        //spawn
+        //spawn ammo for every enemy created, so we can use that ammo when they die
         for (int i = 0; i < getLevel().getEnemies().getEntityList().size(); i++) {
             spawnAmmo();
         }
@@ -86,6 +87,7 @@ public final class Collectibles extends Entities {
         weapons.add(Type.buzzsaw);
         weapons.add(Type.shotgun);
 
+        //keep track how much has been added
         int countAmmo = 0;
         int countAmmoCrate = 0;
         int countHealthSmall = 0;
@@ -103,6 +105,7 @@ public final class Collectibles extends Entities {
         //list of options where the collectibles can be placed
         List<Cell> options = null;
 
+        //continue until we check every room
         while (!leaves.isEmpty()) {
 
             //choose random leaf
@@ -125,13 +128,13 @@ public final class Collectibles extends Entities {
             boolean roomHealthSmall = false;
             boolean roomHealthLarge = false;
 
-            //pick random number of collectibles for the current room
+            //pick random number limit of collectibles allowed for the current room
             final int limit = getRandom().nextInt(COLLECTIBLES_PER_ROOM_MAX) + 1;
 
             //continue until we reach limit or there are no more options
             while (!options.isEmpty() && count < limit) {
 
-                //if there is nothing left
+                //if there is nothing left to add
                 if (collectibles.isEmpty() && weapons.isEmpty())
                     break;
 
@@ -248,9 +251,6 @@ public final class Collectibles extends Entities {
         options = null;
         collectibles = null;
         weapons = null;
-
-        //update the map
-        getLevel().getDungeon().updateMap();
     }
 
     public void spawnAmmo() {
@@ -306,6 +306,48 @@ public final class Collectibles extends Entities {
 
         //add at the location
         super.add(collectible, col, row);
+    }
+
+    private List<Cell> getLocationOptions(Room room) {
+
+        List<Cell> options = new ArrayList<>();
+
+        //check the cells in the room
+        for (int col = room.getX() + 1; col < room.getX() + room.getW() - 1; col++) {
+
+            //skip every other col
+            if (col % 2 != 0)
+                continue;
+
+            for (int row = room.getY() + 1; row < room.getY() + room.getH() - 1; row++) {
+
+                //skip every other row
+                if (row % 2 != 0)
+                    continue;
+
+                if (!isAvailable(col, row))
+                    continue;
+
+                //add to the list of options
+                options.add(getLevel().getDungeon().getCells()[row][col]);
+            }
+        }
+
+        //return our list of options
+        return options;
+    }
+
+    private boolean isAvailable(int col, int row) {
+
+        //we need it to be an open space
+        if (!getLevel().getDungeon().hasMap(col, row))
+            return false;
+
+        //also don't add it where there are enemies
+        if (getLevel().getEnemies().hasCollision(col, row))
+            return false;
+
+        return true;
     }
 
     @Override

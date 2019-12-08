@@ -68,9 +68,6 @@ public final class Obstacles extends Entities {
 
         //clean up lists
         recycle();
-
-        //update the map
-        getLevel().getDungeon().updateMap();
     }
 
     public static HashMap<Type, TextureRegion> getTextures(AssetManager assetManager) {
@@ -130,6 +127,7 @@ public final class Obstacles extends Entities {
 
         switch (getRandom().nextInt(5)) {
 
+            //lights in 1 line
             case 0:
                 for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
 
@@ -140,6 +138,7 @@ public final class Obstacles extends Entities {
                 }
                 break;
 
+                //lights in 1 line
             case 1:
                 for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
 
@@ -150,6 +149,7 @@ public final class Obstacles extends Entities {
                 }
                 break;
 
+                //scattered lights throughout the room
             case 2:
                 for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
                     for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
@@ -162,6 +162,7 @@ public final class Obstacles extends Entities {
                 }
                 break;
 
+                //lights across the middle col and middle row
             case 3:
                 for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
 
@@ -180,6 +181,7 @@ public final class Obstacles extends Entities {
                 }
                 break;
 
+                //add lights in corners
             case 4:
                 int offset = 4;
                 add(type, room.getX() + offset, room.getY() + offset);
@@ -191,6 +193,8 @@ public final class Obstacles extends Entities {
     }
 
     private void add(Obstacles.Type type, int col, int row) {
+
+        //we won't add if already occupied
         if (hasEntityLocation(col, row))
             return;
         if (nearInteract(col, row))

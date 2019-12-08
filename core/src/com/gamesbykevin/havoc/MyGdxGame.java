@@ -12,6 +12,7 @@ import com.gamesbykevin.havoc.assets.AssetManagerHelper;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.player.Player;
 
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 import static com.gamesbykevin.havoc.texture.TextureHelper.addTextures;
 
 public class MyGdxGame extends ApplicationAdapter {
@@ -48,7 +49,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private static final float PROGRESS_BAR_HEIGHT = 50f;
 
 	//change the size of the font
-	private static final float FONT_SCALE = 2f;
+	private static final float FONT_SCALE = 1.75f;
 
 	public enum Steps {
 		Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8
@@ -149,10 +150,38 @@ public class MyGdxGame extends ApplicationAdapter {
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
 		switch (getStep()) {
+
 			case Step1:
 				//if assets are loaded move to the next step
 				if (getAssetManager().update()) {
-					setStep(Steps.Step2);
+
+					boolean success = true;
+
+					//verify everything is loaded
+					for (int i = 0; i < getPaths().size(); i++) {
+
+						String path = getPaths().get(i);
+
+						//if an asset is not loaded, we need to verify the remaining
+						if (!getAssetManager().isLoaded(path)) {
+							success = false;
+
+							//check if the asset is a texture
+							if (path.contains(ASSET_EXT_BMP) || path.contains(ASSET_EXT_PNG)) {
+								getAssetManager().load(path, Texture.class);
+							}
+
+							renderProgressBar(true, "Verifying assets");
+							break;
+						}
+					}
+
+					//if we are good, go to the next step
+					if (success) {
+						setStep(Steps.Step2);
+						renderProgressBar(true, "Generating dungeon");
+					}
+
 				} else {
 					getAssetManager().update();
 					renderProgressBar(false, "Loading assets");
@@ -160,11 +189,9 @@ public class MyGdxGame extends ApplicationAdapter {
 				}
 				break;
 
-				//generate dungeon
 			case Step2:
 
 				//generate dungeon
-				System.out.println("Generating dungeon");
 				renderProgressBar(true, "Generating dungeon");
 				getLevel().getDungeon().generate();
 
@@ -176,42 +203,45 @@ public class MyGdxGame extends ApplicationAdapter {
 			case Step3:
 
 				//creating weapons
-				System.out.println("Creating weapons");
 				renderProgressBar(true, "Creating weapons");
 				getLevel().getPlayer().createWeapons(getLevel());
 				setStep(Steps.Step4);
 				break;
 
 			case Step4:
-				System.out.println("Spawning obstacles");
-				renderProgressBar(true, "Spawn obstacles");
+
+				//add obstacles
+				renderProgressBar(true, "Spawning obstacles");
 				getLevel().getObstacles().spawn();
 				setStep(Steps.Step5);
 				break;
 
 			case Step5:
-				System.out.println("Spawning enemies");
-				renderProgressBar(true, "Spawn enemies");
+
+				//add enemies
+				renderProgressBar(true, "Spawning enemies");
 				getLevel().getEnemies().spawn();
 				setStep(Steps.Step6);
 				break;
 
 			case Step6:
-				System.out.println("Spawning collectibles");
-				renderProgressBar(true, "Spawn collectibles");
+
+				//add collectibles
+				renderProgressBar(true, "Spawning collectibles");
 				getLevel().getCollectibles().spawn();
 				setStep(Steps.Step7);
 				break;
 
 			case Step7:
-				System.out.println("Applying textures");
+
+				//create level textures
 				renderProgressBar(true, "Applying textures");
 				addTextures(getLevel());
 				setStep(Steps.Step8);
 				break;
 
-				//at this point render the game
 			case Step8:
+				//at this point render the game
 				final long time = System.currentTimeMillis();
 
 				//render the level
@@ -237,6 +267,8 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 
 	private void renderProgressBar(boolean fill, String description) {
+
+		System.out.println(description);
 
 		//get the progress
 		float progress = getAssetManager().getProgress();

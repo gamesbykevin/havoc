@@ -202,33 +202,45 @@ public class Dungeon implements Disposable {
     }
 
     //mark where the player can go and where the obstacles are
-    public void updateMap() {
+    protected void updateMap() {
 
         for (int row = 0; row < getRows(); row++) {
             for (int col = 0; col < getCols(); col++) {
 
-                Cell cell = getCells()[row][col];
-
-                if (cell.isDoor()) {
-                    getMap()[row][col] = true;
-                    getInteract()[row][col] = true;
-                } else if (cell.isOpen() || cell.isUnvisited()) {
-                    getMap()[row][col] = true;
-                    getInteract()[row][col] = false;
-                } else if (cell.isGoal()) {
-                    getMap()[row][col] = false;
-                    getInteract()[row][col] = true;
-                } else if (cell.isWall()) {
-                    getMap()[row][col] = false;
-                    getInteract()[row][col] = false;
-                }
-
-                //if we are including obstacles
-                if (getLevel().getObstacles() != null && getLevel().getObstacles().hasCollision(col, row)) {
-                    getMap()[row][col] = false;
-                    getInteract()[row][col] = false;
-                }
+                updateMap(col, row);
             }
+        }
+
+        //update the map for our path finding
+        getAStar().setMap(getMap());
+    }
+
+    public void updateMap(int col, int row) {
+
+        //ignore if out of bounds
+        if (col < 0 || row < 0 || col >= getCells()[0].length || row >= getCells().length)
+            return;
+
+        Cell cell = getCells()[row][col];
+
+        if (cell.isDoor()) {
+            getMap()[row][col] = true;
+            getInteract()[row][col] = true;
+        } else if (cell.isOpen() || cell.isUnvisited()) {
+            getMap()[row][col] = true;
+            getInteract()[row][col] = false;
+        } else if (cell.isGoal()) {
+            getMap()[row][col] = false;
+            getInteract()[row][col] = true;
+        } else if (cell.isWall()) {
+            getMap()[row][col] = false;
+            getInteract()[row][col] = false;
+        }
+
+        //if we are including obstacles
+        if (getLevel().getObstacles() != null && getLevel().getObstacles().hasCollision(col, row)) {
+            getMap()[row][col] = false;
+            getInteract()[row][col] = false;
         }
 
         //update the map for our path finding

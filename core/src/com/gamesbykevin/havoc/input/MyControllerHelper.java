@@ -3,7 +3,9 @@ package com.gamesbykevin.havoc.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -13,8 +15,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.gamesbykevin.havoc.player.Player;
 
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
+import static com.gamesbykevin.havoc.input.MyController.*;
+import static com.gamesbykevin.havoc.player.PlayerHelper.DEAD_ZONE_IGNORE;
 
 public class MyControllerHelper {
 
@@ -186,5 +191,89 @@ public class MyControllerHelper {
                 controller.setChange(flag);
                 break;
         }
+    }
+
+    public static void updateLocation(Player player) {
+
+        //nothing to update when dead
+        if (player.isDead())
+            return;
+
+        //get our location
+        PerspectiveCamera camera = player.getCamera3d();
+
+        //get the controller as well
+        MyController controller = player.getController();
+
+        double xMove = 0;
+        double yMove = 0;
+
+        //which direction are we moving
+        if (controller.isMoveForward())
+            yMove++;
+        if (controller.isMoveBackward())
+            yMove--;
+
+        if (controller.isStrafeLeft())
+            xMove--;
+        if (controller.isStrafeRight())
+            xMove++;
+
+        float rotationA = 0f;
+
+        if (controller.isTurnLeft()) {
+            rotationA += DEFAULT_SPEED_ROTATE;
+        } else if (controller.isTurnRight()) {
+            rotationA -= DEFAULT_SPEED_ROTATE;
+        }
+
+        //if we aren't moving let's check the joystick
+        if (yMove == 0 && xMove == 0) {
+
+            //make sure we are moving enough
+            if (controller.getKnobPercentY() < -DEAD_ZONE_IGNORE) {
+                yMove = controller.getKnobPercentY();
+                //yMove = controller.getKnobPercentY() + DEAD_ZONE_IGNORE;
+            } else if (controller.getKnobPercentY() > DEAD_ZONE_IGNORE) {
+                yMove = controller.getKnobPercentY();
+                //yMove = controller.getKnobPercentY() - DEAD_ZONE_IGNORE;
+            }
+
+            //make sure we are moving enough
+            if (controller.getKnobPercentX() < -DEAD_ZONE_IGNORE) {
+                rotationA = (DEFAULT_SPEED_ROTATE * -controller.getKnobPercentX());
+                //rotationA = (DEFAULT_SPEED_ROTATE * (-controller.getKnobPercentX() - DEAD_ZONE_IGNORE));
+            } else if (controller.getKnobPercentX() > DEAD_ZONE_IGNORE) {
+                rotationA = (DEFAULT_SPEED_ROTATE * -controller.getKnobPercentX());
+                //rotationA = (DEFAULT_SPEED_ROTATE * (-controller.getKnobPercentX() + DEAD_ZONE_IGNORE));
+            }
+        }
+
+        //convert to radians
+        double angle = Math.toRadians(controller.getRotation());
+
+        //calculate distance moved
+        double xa = (xMove * Math.cos(angle)) - (yMove * Math.sin(angle));
+        xa *= SPEED_WALK;
+        double ya = (yMove * Math.cos(angle)) + (xMove * Math.sin(angle));
+        ya *= SPEED_WALK;
+
+        //store previous position
+        if (xMove != 0 || yMove != 0)
+            player.updatePrevious(camera.position);
+
+        //update camera location?
+        camera.position.x += xa;
+        camera.position.y += ya;
+        camera.rotate(Vector3.Z, rotationA);
+
+        //add rotation angle to overall rotation
+        controller.setRotation(controller.getRotation() + rotationA);
+
+        //keep radian value from getting to large/small
+        if (controller.getRotation() > ROTATION_ANGLE_MAX)
+            controller.setRotation(controller.getRotation() - ROTATION_ANGLE_MAX);
+        if (controller.getRotation() < ROTATION_ANGLE_MIN)
+            controller.setRotation(controller.getRotation() + ROTATION_ANGLE_MAX);
     }
 }

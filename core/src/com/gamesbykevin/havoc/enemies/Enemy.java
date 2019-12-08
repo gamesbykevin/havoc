@@ -2,7 +2,7 @@ package com.gamesbykevin.havoc.enemies;
 
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.astar.Node;
-import com.gamesbykevin.havoc.collectables.Collectibles;
+import com.gamesbykevin.havoc.collectibles.Collectibles;
 import com.gamesbykevin.havoc.dungeon.Dungeon;
 import com.gamesbykevin.havoc.entities.Entity3d;
 import com.gamesbykevin.havoc.level.Level;
@@ -24,6 +24,9 @@ public abstract class Enemy extends Entity3d {
 
     //how much damage can the enemy do?
     private int damage;
+
+    //how close can the player get to the enemy
+    private static final float DISTANCE_COLLISION = 0.65f;
 
     //how fast can the enemy move
     public static final float SPEED_DEFAULT = 0.01f;
@@ -131,6 +134,21 @@ public abstract class Enemy extends Entity3d {
     //is the enemy able to shoot
     public boolean canShoot(double distance, Level level) {
         return (distance < RANGE_NOTICE && !isObstructed(level));
+    }
+
+    @Override
+    public boolean hasCollision(float x, float y) {
+
+        //skip if not solid
+        if (!isSolid())
+            return false;
+
+        //if close enough we have collision
+        if (getDistance(getCol(), getRow(), x, y) <= DISTANCE_COLLISION)
+            return true;
+
+        //no collision
+        return false;
     }
 
     @Override
