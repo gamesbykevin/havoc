@@ -68,7 +68,7 @@ public class Dungeon implements Disposable {
                 Type type = (col == 0 || row == 0 || col == cols - 1 || row == rows - 1) ? Type.Wall : Type.Unvisited;
 
                 //create the cell
-                getCells()[row][col] = new Cell(col, row, type);
+                this.cells[row][col] = new Cell(col, row, type);
             }
         }
 
@@ -115,10 +115,10 @@ public class Dungeon implements Disposable {
     private void calculateCost() {
 
         //set cost of start to be 0
-        getCells()[getStartRow()][getStartCol()].setCost(0);
+        getCell(getStartCol(), getStartRow()).setCost(0);
 
         List<Cell> cells = new ArrayList<>();
-        cells.add(getCells()[getStartRow()][getStartCol()]);
+        cells.add(getCell(getStartCol(), getStartRow()));
 
         //continue as long as we have options
         while (!cells.isEmpty()) {
@@ -138,9 +138,9 @@ public class Dungeon implements Disposable {
                     if (row < 0 || row >= getRows())
                         continue;
 
-                    if (getMap()[row][col] && getCells()[row][col].getCost() < 0) {
-                        getCells()[row][col].setCost(cell.getCost() + 1);
-                        cells.add(getCells()[row][col]);
+                    if (getMap()[row][col] && getCell(col, row).getCost() < 0) {
+                        getCell(col, row).setCost(cell.getCost() + 1);
+                        cells.add(getCell(col, row));
                     }
                 }
             }
@@ -161,10 +161,10 @@ public class Dungeon implements Disposable {
             for (int col = 0; col < getCols(); col++) {
 
                 //if the cost is higher then this is the current goal
-                if (getCells()[row][col].getCost() > cost) {
+                if (getCell(col, row).getCost() > cost) {
 
                     //the new cost to beat
-                    cost = getCells()[row][col].getCost();
+                    cost = getCell(col, row).getCost();
 
                     //this is the current goal
                     setGoalCol(col);
@@ -174,7 +174,7 @@ public class Dungeon implements Disposable {
         }
 
         //flag the goal
-        getCells()[getGoalRow()][getGoalCol()].setType(Type.Goal);
+        getCell(getGoalCol(), getGoalRow()).setType(Type.Goal);
 
         //locate the child leaf containing the goal
         for (int i = 0; i < getLeafs().size(); i++) {
@@ -206,7 +206,6 @@ public class Dungeon implements Disposable {
 
         for (int row = 0; row < getRows(); row++) {
             for (int col = 0; col < getCols(); col++) {
-
                 updateMap(col, row);
             }
         }
@@ -218,10 +217,10 @@ public class Dungeon implements Disposable {
     public void updateMap(int col, int row) {
 
         //ignore if out of bounds
-        if (col < 0 || row < 0 || col >= getCells()[0].length || row >= getCells().length)
+        if (col < 0 || row < 0 || col >= getCols() || row >= getRows())
             return;
 
-        Cell cell = getCells()[row][col];
+        Cell cell = getCell(col, row);
 
         if (cell.isDoor()) {
             getMap()[row][col] = true;
@@ -266,14 +265,14 @@ public class Dungeon implements Disposable {
 
             for (int col = 0; col < getCols(); col++) {
 
-                if (getCells()[row][col].isUnvisited())
-                    getCells()[row][col].setType(type);
+                if (getCell(col, row).isUnvisited())
+                    getCell(col, row).setType(type);
             }
         }
     }
 
-    public Cell[][] getCells() {
-        return this.cells;
+    public Cell getCell(int col, int row) {
+        return this.cells[row][col];
     }
 
     private boolean[][] getMap() {
@@ -387,7 +386,7 @@ public class Dungeon implements Disposable {
     private void print() {
         for (int row = 0; row < getRows(); row++) {
             for (int col = 0; col < getCols(); col++) {
-                getCells()[row][col].print();
+                getCell(col, row).print();
             }
             System.out.println();
         }

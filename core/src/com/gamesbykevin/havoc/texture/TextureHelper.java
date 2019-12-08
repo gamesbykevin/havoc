@@ -49,7 +49,7 @@ public class TextureHelper {
                 //is this location part of the goal
                 boolean goal = (col >= room.getX() && col < room.getX() + room.getW() && row >= room.getY() && row < room.getY() + room.getH());
 
-                Cell current = dungeon.getCells()[row][col];
+                Cell current = dungeon.getCell(col, row);
 
                 //do we add a door texture
                 TextureRegion door = null;
@@ -61,16 +61,16 @@ public class TextureHelper {
                     TextureRegion texture = (goal) ? textureWallGoal : textures.get(current.getId());
 
                     if (dungeon.hasMap(col - 1, row) || dungeon.getLevel().getObstacles().hasCollision(col - 1, row))
-                        addWallDecal(level.getDecals(), texture, textureDoorSide, textureHallway, dungeon.getCells()[row][col - 1], current, col, row, Side.West);
+                        addWallDecal(level.getDecals(), texture, textureDoorSide, textureHallway, dungeon.getCell(col - 1, row), current, col, row, Side.West);
 
                     if (dungeon.hasMap(col + 1, row) || dungeon.getLevel().getObstacles().hasCollision(col + 1, row))
-                        addWallDecal(level.getDecals(), texture, textureDoorSide, textureHallway, dungeon.getCells()[row][col + 1], current, col, row, Side.East);
+                        addWallDecal(level.getDecals(), texture, textureDoorSide, textureHallway, dungeon.getCell(col + 1, row), current, col, row, Side.East);
 
                     if (dungeon.hasMap(col, row - 1) || dungeon.getLevel().getObstacles().hasCollision(col, row - 1))
-                        addWallDecal(level.getDecals(), texture, textureDoorSide, textureHallway, dungeon.getCells()[row - 1][col], current, col, row, Side.South);
+                        addWallDecal(level.getDecals(), texture, textureDoorSide, textureHallway, dungeon.getCell(col, row - 1), current, col, row, Side.South);
 
                     if (dungeon.hasMap(col, row + 1) || dungeon.getLevel().getObstacles().hasCollision(col, row + 1))
-                        addWallDecal(level.getDecals(), texture, textureDoorSide, textureHallway, dungeon.getCells()[row + 1][col], current, col, row, Side.North);
+                        addWallDecal(level.getDecals(), texture, textureDoorSide, textureHallway, dungeon.getCell(col, row + 1), current, col, row, Side.North);
 
                 } else if (current.isGoal()) {
                     level.getDecals().add(DecalCustom.createDecalWall(col, row, textureSwitchOff, Side.West));
@@ -92,17 +92,17 @@ public class TextureHelper {
                 if (door != null) {
                     if (dungeon.hasMap(col - 1, row)) {
 
-                        if (current.hasId(dungeon.getCells()[row][col - 1])) {
+                        if (current.hasId(dungeon.getCell(col - 1, row))) {
                             level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.West, secret), col, row);
-                        } else if (current.hasId(dungeon.getCells()[row][col + 1])) {
+                        } else if (current.hasId(dungeon.getCell(col + 1, row))) {
                             level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.East, secret), col, row);
                         }
 
                     } else if (dungeon.hasMap(col, row - 1)) {
 
-                        if (current.hasId(dungeon.getCells()[row - 1][col])) {
+                        if (current.hasId(dungeon.getCell(col, row - 1))) {
                             level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.South, secret), col, row);
-                        } else if (current.hasId(dungeon.getCells()[row + 1][col])) {
+                        } else if (current.hasId(dungeon.getCell(col, row + 1))) {
                             level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.North, secret), col, row);
                         }
                     }
@@ -161,28 +161,28 @@ public class TextureHelper {
                     continue;
 
                 //if there is only 1, make it part of the same group
-                if (getCount(dungeon, dungeon.getCells()[row][col].getId()) < 2) {
+                if (getCount(dungeon, dungeon.getCell(col, row).getId()) < 2) {
 
                     if (tmpId == null)
-                        tmpId = dungeon.getCells()[row][col].getId();
+                        tmpId = dungeon.getCell(col, row).getId();
 
-                    dungeon.getCells()[row][col].setId(dungeon.getCells()[row][col]);
+                    dungeon.getCell(col, row).setId(dungeon.getCell(col, row));
 
                     //if it already exists, skip to the next
-                    if (textures.get(dungeon.getCells()[row][col].getId()) != null)
+                    if (textures.get(dungeon.getCell(col, row).getId()) != null)
                         continue;
 
                     //put it in the hash map
-                    textures.put(dungeon.getCells()[row][col].getId(), textureHallway);
+                    textures.put(dungeon.getCell(col, row).getId(), textureHallway);
 
                 } else {
 
                     //if texture already exists, skip to the next
-                    if (textures.get(dungeon.getCells()[row][col].getId()) != null)
+                    if (textures.get(dungeon.getCell(col, row).getId()) != null)
                         continue;
 
                     int index = getRandom().nextInt(getPathsWall().size());
-                    textures.put(dungeon.getCells()[row][col].getId(), new TextureRegion(assetManager.get(getPathsWall().get(index), Texture.class)));
+                    textures.put(dungeon.getCell(col, row).getId(), new TextureRegion(assetManager.get(getPathsWall().get(index), Texture.class)));
                 }
             }
         }

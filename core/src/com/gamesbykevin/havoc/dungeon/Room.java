@@ -87,9 +87,9 @@ public class Room implements Disposable {
         for (int row = getY() - 1; row < getY() + getH() + 1; row++) {
             if (col < 0 || row < 0)
                 continue;
-            if (col >= dungeon.getCells()[0].length || row >= dungeon.getCells().length)
+            if (col >= dungeon.getCols() || row >= dungeon.getRows())
                 continue;
-            if (dungeon.getCells()[row][col].isDoor())
+            if (dungeon.getCell(col, row).isDoor())
                 return true;
         }
         return false;
@@ -99,9 +99,9 @@ public class Room implements Disposable {
         for (int col = getX() - 1; col < getX() + getW() + 1; col++) {
             if (col < 0 || row < 0)
                 continue;
-            if (col >= dungeon.getCells()[0].length || row >= dungeon.getCells().length)
+            if (col >= dungeon.getCols() || row >= dungeon.getRows())
                 continue;
-            if (dungeon.getCells()[row][col].isDoor())
+            if (dungeon.getCell(col, row).isDoor())
                 return true;
         }
         return false;

@@ -103,7 +103,7 @@ public class LevelHelper {
                     continue;
 
                 //get the current cell
-                Cell cell = level.getDungeon().getCells()[row][col];
+                Cell cell = level.getDungeon().getCell(col, row);
 
                 //is the cell a door
                 if (cell.isDoor()) {

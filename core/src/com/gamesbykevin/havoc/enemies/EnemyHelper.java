@@ -145,12 +145,17 @@ public class EnemyHelper {
 
         } else if (enemy.isShoot() || enemy.isAlert()) {
 
-            //if the enemy finished shooting flag the player as hurt
-            level.getPlayer().setHurt(true);
-            level.getPlayer().setHealth(level.getPlayer().getHealth() - enemy.getDamage());
+            //is the enemy obstructed
+            boolean obstructed = enemy.isObstructed(level);
+
+            //if the enemy finished shooting without being obstructed flag the player as hurt
+            if (!obstructed) {
+                level.getPlayer().setHurt(true);
+                level.getPlayer().setHealth(level.getPlayer().getHealth() - enemy.getDamage());
+            }
 
             //if close enough the enemy will remain alert
-            if (enemy.canShoot(distance, level)) {
+            if (distance < RANGE_NOTICE && !obstructed) {
                 enemy.setStatus(Status.Pause);
                 chase(level, enemy);
             } else {

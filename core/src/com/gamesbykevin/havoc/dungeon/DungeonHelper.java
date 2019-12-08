@@ -22,7 +22,7 @@ public class DungeonHelper {
 
         for (int row = 0; row < dungeon.getRows(); row++) {
             for (int col = 0; col < dungeon.getCols(); col++) {
-                if (dungeon.getCells()[row][col].hasId(id))
+                if (dungeon.getCell(col, row).hasId(id))
                     count++;
             }
         }
@@ -141,13 +141,13 @@ public class DungeonHelper {
 
                 //room will be surrounded by walls
                 if (col == room.getX() || col == room.getX() + room.getW() - 1 || row == room.getY() || row == room.getY() + room.getH() - 1) {
-                    dungeon.getCells()[row][col].setType(Type.Wall);
+                    dungeon.getCell(col, row).setType(Type.Wall);
                 } else {
-                    dungeon.getCells()[row][col].setType(Type.Open);
+                    dungeon.getCell(col, row).setType(Type.Open);
                 }
 
                 //every cell in this room will have the same id
-                dungeon.getCells()[row][col].setId(dungeon.getCells()[room.getY()][room.getX()]);
+                dungeon.getCell(col, row).setId(dungeon.getCell(room.getX(), room.getY()));
             }
         }
 
@@ -387,8 +387,8 @@ public class DungeonHelper {
             for (int rowW = roomW.getY() + offset; rowW < roomW.getY() + roomW.getH() - offset; rowW++) {
                 for (int rowE = roomE.getY() + offset; rowE < roomE.getY() + roomE.getH() - offset; rowE++) {
 
-                    Cell cell1 = dungeon.getCells()[rowW][roomW.getX() + roomW.getW() - 1];
-                    Cell cell2 = dungeon.getCells()[rowE][roomE.getX()];
+                    Cell cell1 = dungeon.getCell(roomW.getX() + roomW.getW() - 1, rowW);
+                    Cell cell2 = dungeon.getCell(roomE.getX(), rowE);
 
                     if (!isDoorValid(dungeon, cell1) || !isDoorValid(dungeon, cell2))
                         continue;
@@ -420,8 +420,8 @@ public class DungeonHelper {
             for (int colN = roomN.getX() + offset; colN < roomN.getX() + roomN.getW() - offset; colN++) {
                 for (int colS = roomS.getX() + offset; colS < roomS.getX() + roomS.getW() - offset; colS++) {
 
-                    Cell cell1 = dungeon.getCells()[roomN.getY()][colN];
-                    Cell cell2 = dungeon.getCells()[roomS.getY() + roomS.getH() - 1][colS];
+                    Cell cell1 = dungeon.getCell(colN, roomN.getY());
+                    Cell cell2 = dungeon.getCell(colS, roomS.getY() + roomS.getH() - 1);
 
                     if (!isDoorValid(dungeon, cell1) || !isDoorValid(dungeon, cell2))
                         continue;
@@ -456,7 +456,7 @@ public class DungeonHelper {
         //update the dungeon marking the open spaces
         for (int i = 1; i < dungeon.getAStar().getPath().size() - 1; i++) {
             Node node = dungeon.getAStar().getPath().get(i);
-            dungeon.getCells()[node.getRow()][node.getCol()].setType(Type.Open);
+            dungeon.getCell(node.getCol(), node.getRow()).setType(Type.Open);
         }
     }
 
@@ -465,7 +465,7 @@ public class DungeonHelper {
         List<Cell> options = new ArrayList<>();
 
         //mark goal open so we can calculate path to it
-        dungeon.getCells()[dungeon.getGoalRow()][dungeon.getGoalCol()].setType(Type.Open);
+        dungeon.getCell(dungeon.getGoalCol(), dungeon.getGoalRow()).setType(Type.Open);
         dungeon.updateMap();
         dungeon.getAStar().setDiagonal(false);
 
@@ -473,14 +473,14 @@ public class DungeonHelper {
         dungeon.getAStar().calculate(dungeon.getStartCol(), dungeon.getStartRow(), dungeon.getGoalCol(), dungeon.getGoalRow());
 
         //now that we made our calculation we can set it back to the goal
-        dungeon.getCells()[dungeon.getGoalRow()][dungeon.getGoalCol()].setType(Type.Goal);
+        dungeon.getCell(dungeon.getGoalCol(), dungeon.getGoalRow()).setType(Type.Goal);
         dungeon.updateMap();
 
         //create a list of doors we can possibly lock
         for (int i = 0; i < dungeon.getAStar().getPath().size(); i++) {
 
             Node node = dungeon.getAStar().getPath().get(i);
-            Cell cell = dungeon.getCells()[node.getRow()][node.getCol()];
+            Cell cell = dungeon.getCell(node.getCol(), node.getRow());
 
             if (!cell.isDoor())
                 continue;
@@ -540,7 +540,7 @@ public class DungeonHelper {
         for (int row = 0; row < dungeon.getRows(); row++) {
             for (int col = 0; col < dungeon.getCols(); col++) {
 
-                Cell tmp = dungeon.getCells()[row][col];
+                Cell tmp = dungeon.getCell(col, row);
 
                 //only place key on an open cell
                 if (!tmp.isOpen())

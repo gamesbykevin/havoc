@@ -184,31 +184,31 @@ public final class Enemies extends Entities {
 
         //all 4 sides
         for (int col = room.getX() + 2; col < room.getX() + room.getW() - 2; col++) {
-            add(options, getLevel().getDungeon().getCells()[room.getY() + 2][col], target);
-            add(options, getLevel().getDungeon().getCells()[room.getY() + room.getH() - 3][col], target);
+            add(options, getLevel().getDungeon().getCell(col, room.getY() + 2), target);
+            add(options, getLevel().getDungeon().getCell(col, room.getY() + room.getH() - 3), target);
         }
 
         for (int row = room.getY() + 2; row < room.getY() + room.getH() - 2; row++) {
-            add(options, getLevel().getDungeon().getCells()[row][room.getX() + 2], target);
-            add(options, getLevel().getDungeon().getCells()[row][room.getX() + room.getW() - 3], target);
+            add(options, getLevel().getDungeon().getCell(room.getX() + 2, row), target);
+            add(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - 3, row), target);
         }
 
         //north south east west
-        add(options, getLevel().getDungeon().getCells()[room.getY() + (room.getH() / 2)][room.getX() + 2], target);
-        add(options, getLevel().getDungeon().getCells()[room.getY() + (room.getH() / 2)][room.getX() + room.getW() - 3], target);
-        add(options, getLevel().getDungeon().getCells()[room.getY() + 2][room.getX() + (room.getW() / 2)], target);
-        add(options, getLevel().getDungeon().getCells()[room.getY() + room.getH() - 3][room.getX() + (room.getW() / 2)], target);
+        add(options, getLevel().getDungeon().getCell(room.getX() + 2, room.getY() + (room.getH() / 2)), target);
+        add(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - 3, room.getY() + (room.getH() / 2)), target);
+        add(options, getLevel().getDungeon().getCell(room.getX() + (room.getW() / 2), room.getY() + 2), target);
+        add(options, getLevel().getDungeon().getCell(room.getX() + (room.getW() / 2), room.getY() + room.getH() - 3), target);
 
         //4 corners inner
         for (int i = 2; i < (room.getW() / 2); i++) {
-            add(options, getLevel().getDungeon().getCells()[room.getY() + i][room.getX() + i], target);
-            add(options, getLevel().getDungeon().getCells()[room.getY() + room.getH() - i - 1][room.getX() + i], target);
-            add(options, getLevel().getDungeon().getCells()[room.getY() + i][room.getX() + room.getW() - i - 1], target);
-            add(options, getLevel().getDungeon().getCells()[room.getY() + room.getH() - i - 1][room.getX() + room.getW() - i - 1], target);
+            add(options, getLevel().getDungeon().getCell(room.getX() + i, room.getY() + i), target);
+            add(options, getLevel().getDungeon().getCell(room.getX() + i, room.getY() + room.getH() - i - 1), target);
+            add(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - i - 1, room.getY() + i), target);
+            add(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - i - 1, room.getY() + room.getH() - i - 1), target);
         }
 
         //center
-        add(options, getLevel().getDungeon().getCells()[room.getY() + (room.getH() / 2)][room.getX() + (room.getW() / 2)], target);
+        add(options, getLevel().getDungeon().getCell(room.getX() + (room.getW() / 2), room.getY() + (room.getH() / 2)), target);
 
         //return our options
         return options;

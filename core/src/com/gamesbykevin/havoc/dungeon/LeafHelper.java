@@ -81,9 +81,9 @@ public class LeafHelper {
         boolean valid = false;
 
         //there has to be walls on opposite sides
-        if (dungeon.getCells()[cell.getRow()][cell.getCol() - 1].isWall() && dungeon.getCells()[cell.getRow()][cell.getCol() + 1].isWall())
+        if (dungeon.getCell(cell.getCol() - 1, cell.getRow()).isWall() && dungeon.getCell(cell.getCol() + 1, cell.getRow()).isWall())
             valid = true;
-        if (dungeon.getCells()[cell.getRow() - 1][cell.getCol()].isWall() && dungeon.getCells()[cell.getRow() + 1][cell.getCol()].isWall())
+        if (dungeon.getCell(cell.getCol(), cell.getRow() - 1).isWall() && dungeon.getCell(cell.getCol(), cell.getRow() + 1).isWall())
             valid = true;
 
         if (!valid)
@@ -97,7 +97,7 @@ public class LeafHelper {
                 if ((col != 0 && row != 0) || (col == 0 && row == 0))
                     continue;
 
-                Cell tmp = dungeon.getCells()[cell.getRow() + row][cell.getCol() - col];
+                Cell tmp = dungeon.getCell(cell.getCol() - col, cell.getRow() + row);
 
                 //we only want to check cells that are part of the same room
                 if (!cell.hasId(tmp))

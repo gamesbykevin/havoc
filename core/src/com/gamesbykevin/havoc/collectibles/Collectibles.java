@@ -312,29 +312,47 @@ public final class Collectibles extends Entities {
 
         List<Cell> options = new ArrayList<>();
 
-        //check the cells in the room
-        for (int col = room.getX() + 1; col < room.getX() + room.getW() - 1; col++) {
+        int colStart = room.getX() + 3;
+        int rowStart = room.getY() + 3;
 
-            //skip every other col
-            if (col % 2 != 0)
-                continue;
+        int colQuart = room.getX() + (room.getW() / 4);
+        int rowQuart = room.getY() + (room.getH() / 4);
 
-            for (int row = room.getY() + 1; row < room.getY() + room.getH() - 1; row++) {
+        int colMiddle = room.getX() + (room.getW() / 2);
+        int rowMiddle = room.getY() + (room.getH() / 2);
 
-                //skip every other row
-                if (row % 2 != 0)
-                    continue;
+        int colEnd = room.getX() + room.getW() - 3;
+        int rowEnd = room.getY() + room.getH() - 3;
 
-                if (!isAvailable(col, row))
-                    continue;
+        addTmp(getLevel(), options, colStart, rowStart);
+        addTmp(getLevel(), options, colStart, rowQuart);
+        addTmp(getLevel(), options, colStart, rowMiddle);
+        addTmp(getLevel(), options, colStart, rowEnd);
 
-                //add to the list of options
-                options.add(getLevel().getDungeon().getCells()[row][col]);
-            }
-        }
+        addTmp(getLevel(), options, colQuart, rowStart);
+        addTmp(getLevel(), options, colQuart, rowQuart);
+        addTmp(getLevel(), options, colQuart, rowMiddle);
+        addTmp(getLevel(), options, colQuart, rowEnd);
+
+        addTmp(getLevel(), options, colMiddle, rowStart);
+        addTmp(getLevel(), options, colMiddle, rowQuart);
+        addTmp(getLevel(), options, colMiddle, rowMiddle);
+        addTmp(getLevel(), options, colMiddle, rowEnd);
+
+        addTmp(getLevel(), options, colEnd, rowStart);
+        addTmp(getLevel(), options, colEnd, rowQuart);
+        addTmp(getLevel(), options, colEnd, rowMiddle);
+        addTmp(getLevel(), options, colEnd, rowEnd);
 
         //return our list of options
         return options;
+    }
+
+    private void addTmp(Level level, List<Cell> options, int col, int row) {
+
+        //only add if available
+        if (isAvailable(col, row))
+            options.add(level.getDungeon().getCell(col, row));
     }
 
     private boolean isAvailable(int col, int row) {
@@ -343,7 +361,7 @@ public final class Collectibles extends Entities {
         if (!getLevel().getDungeon().hasMap(col, row))
             return false;
 
-        //also don't add it where there are enemies
+        //also don't add it if there are enemies
         if (getLevel().getEnemies().hasCollision(col, row))
             return false;
 

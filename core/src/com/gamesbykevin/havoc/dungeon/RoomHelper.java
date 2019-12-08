@@ -27,9 +27,9 @@ public class RoomHelper {
             for (int x = room.getX(); x < room.getX() + room.getW(); x++) {
 
                 if (col == x) {
-                    dungeon.getCells()[row][x].setType(Type.Door);
+                    dungeon.getCell(x, row).setType(Type.Door);
                 } else {
-                    dungeon.getCells()[row][x].setType(Type.Wall);
+                    dungeon.getCell(x, row).setType(Type.Wall);
                 }
             }
 
@@ -44,9 +44,9 @@ public class RoomHelper {
             for (int y = room.getY(); y < room.getY() + room.getH(); y++) {
 
                 if (row == y) {
-                    dungeon.getCells()[y][col].setType(Type.Door);
+                    dungeon.getCell(col, y).setType(Type.Door);
                 } else {
-                    dungeon.getCells()[y][col].setType(Type.Wall);
+                    dungeon.getCell(col, y).setType(Type.Wall);
                 }
             }
         }
@@ -103,7 +103,7 @@ public class RoomHelper {
                     unvisited = true;
 
                 if (unvisited)
-                    dungeon.getCells()[row][col].setType(Type.Wall);
+                    dungeon.getCell(col, row).setType(Type.Wall);
             }
         }
 
@@ -167,36 +167,36 @@ public class RoomHelper {
     private static void addMiniRoomNE(Dungeon dungeon, Room room, int middleCol, int middleRow) {
         addRow(dungeon, middleCol + 2, room.getX() + room.getW() - 1, middleRow + 2);
         addCol(dungeon, middleRow + 2, room.getY() + room.getH() - 1, middleCol + 2);
-        dungeon.getCells()[middleRow + 2][middleCol + ((room.getX() + room.getW() - middleCol) / 2)].setType(Type.Door);
+        dungeon.getCell(middleCol + ((room.getX() + room.getW() - middleCol) / 2), middleRow + 2).setType(Type.Door);
     }
 
     private static void addMiniRoomNW(Dungeon dungeon, Room room, int middleCol, int middleRow) {
         addRow(dungeon, room.getX(), middleCol - 2, middleRow + 2);
         addCol(dungeon, middleRow + 2, room.getY() + room.getH() - 1, middleCol - 2);
-        dungeon.getCells()[middleRow + 2][room.getX() + ((middleCol - room.getX()) / 2)].setType(Type.Door);
+        dungeon.getCell(room.getX() + ((middleCol - room.getX()) / 2), middleRow + 2).setType(Type.Door);
     }
 
     private static void addMiniRoomSE(Dungeon dungeon, Room room, int middleCol, int middleRow) {
         addRow(dungeon, middleCol + 2, room.getX() + room.getW() - 1, middleRow - 2);
         addCol(dungeon, room.getY(), middleRow - 2, middleCol + 2);
-        dungeon.getCells()[middleRow - 2][middleCol + ((room.getX() + room.getW() - middleCol) / 2)].setType(Type.Door);
+        dungeon.getCell(middleCol + ((room.getX() + room.getW() - middleCol) / 2), middleRow - 2).setType(Type.Door);
     }
 
     private static void addMiniRoomSW(Dungeon dungeon, Room room, int middleCol, int middleRow) {
         addRow(dungeon, room.getX(), middleCol - 2, middleRow - 2);
         addCol(dungeon, room.getY(), middleRow - 2, middleCol - 2);
-        dungeon.getCells()[middleRow - 2][room.getX() + ((middleCol - room.getX()) / 2)].setType(Type.Door);
+        dungeon.getCell(room.getX() + ((middleCol - room.getX()) / 2), middleRow - 2).setType(Type.Door);
     }
 
     private static void addRow(Dungeon dungeon, int startCol, int endCol, int row) {
         for (int col = startCol; col <= endCol; col++) {
-            dungeon.getCells()[row][col].setType(Type.Wall);
+            dungeon.getCell(col, row).setType(Type.Wall);
         }
     }
 
     private static void addCol(Dungeon dungeon, int startRow, int endRow, int col) {
         for (int row = startRow; row <= endRow; row++) {
-            dungeon.getCells()[row][col].setType(Type.Wall);
+            dungeon.getCell(col, row).setType(Type.Wall);
         }
     }
 
@@ -219,16 +219,16 @@ public class RoomHelper {
 
                 //center of the box
                 if (col > colW && col < colE && row > rowS && row < rowN) {
-                    dungeon.getCells()[row][col].setType(door ? Type.Open : Type.Wall);
+                    dungeon.getCell(col, row).setType(door ? Type.Open : Type.Wall);
                 } else {
                     if (row == rowN || row == rowS) {
                         if (col >= colW && col <= colE)
-                            dungeon.getCells()[row][col].setType(Type.Wall);
+                            dungeon.getCell(col, row).setType(Type.Wall);
                     }
 
                     if (col == colW || col == colE) {
                         if (row >= rowS && row <= rowN)
-                            dungeon.getCells()[row][col].setType(Type.Wall);
+                            dungeon.getCell(col, row).setType(Type.Wall);
                     }
                 }
             }
@@ -240,19 +240,19 @@ public class RoomHelper {
             //pick a random side for a door
             switch (getRandom().nextInt(4)) {
                 case 0:
-                    dungeon.getCells()[rowN][middleCol].setType(Type.Door);
+                    dungeon.getCell(middleCol, rowN).setType(Type.Door);
                     break;
 
                 case 1:
-                    dungeon.getCells()[rowS][middleCol].setType(Type.Door);
+                    dungeon.getCell(middleCol, rowS).setType(Type.Door);
                     break;
 
                 case 2:
-                    dungeon.getCells()[middleRow][colW].setType(Type.Door);
+                    dungeon.getCell(colW, middleRow).setType(Type.Door);
                     break;
 
                 case 3:
-                    dungeon.getCells()[middleRow][colE].setType(Type.Door);
+                    dungeon.getCell(colE, middleRow).setType(Type.Door);
                     break;
             }
         }
@@ -274,11 +274,11 @@ public class RoomHelper {
 
                 if (row == rowS || row == rowN) {
                     if (col >= colW && col < room.getX() + (room.getW() / 2) - 1)
-                        dungeon.getCells()[row][col].setType(Type.Wall);
+                        dungeon.getCell(col, row).setType(Type.Wall);
                     if (col > room.getX() + (room.getW() / 2) + 1 && col <= colE)
-                        dungeon.getCells()[row][col].setType(Type.Wall);
+                        dungeon.getCell(col, row).setType(Type.Wall);
                 } else if (row > rowS && row < rowN && (col == colW || col == colE)) {
-                    dungeon.getCells()[row][col].setType(Type.Wall);
+                    dungeon.getCell(col, row).setType(Type.Wall);
                 }
             }
         }
@@ -300,22 +300,22 @@ public class RoomHelper {
 
                 if (row == rowN && side != 0) {
                     if (col >= colW && col <= colE)
-                        dungeon.getCells()[row][col].setType(Type.Wall);
+                        dungeon.getCell(col, row).setType(Type.Wall);
                 }
 
                 if (row == rowS && side != 1) {
                     if (col >= colW && col <= colE)
-                        dungeon.getCells()[row][col].setType(Type.Wall);
+                        dungeon.getCell(col, row).setType(Type.Wall);
                 }
 
                 if (col == colW && side != 2) {
                     if (row >= rowS && row <= rowN)
-                        dungeon.getCells()[row][col].setType(Type.Wall);
+                        dungeon.getCell(col, row).setType(Type.Wall);
                 }
 
                 if (col == colE && side != 3) {
                     if (row >= rowS && row <= rowN)
-                        dungeon.getCells()[row][col].setType(Type.Wall);
+                        dungeon.getCell(col, row).setType(Type.Wall);
                 }
             }
         }
@@ -341,7 +341,7 @@ public class RoomHelper {
                 boolean west = (col >= colW && col <= colW + size);
 
                 if (north && west || north && east || south && west || south && east)
-                    dungeon.getCells()[row][col].setType(Type.Wall);
+                    dungeon.getCell(col, row).setType(Type.Wall);
             }
         }
     }
@@ -365,14 +365,14 @@ public class RoomHelper {
 
                     if (row > rowS && row < rowS + size || row < rowN && row > rowN - size) {
                         if (col > colW && col < colE)
-                            dungeon.getCells()[row][col].setType(Type.Wall);
+                            dungeon.getCell(col, row).setType(Type.Wall);
                     }
 
                 } else {
 
                     if (col > colW && col < colW + size || col < colE && col > colE - size)
                         if (row > rowS && row < rowN)
-                            dungeon.getCells()[row][col].setType(Type.Wall);
+                            dungeon.getCell(col, row).setType(Type.Wall);
                 }
             }
         }
@@ -390,7 +390,7 @@ public class RoomHelper {
 
         for (int row = rowS; row <= rowN; row++) {
             if (col <= colE)
-                dungeon.getCells()[row][col].setType(Type.Wall);
+                dungeon.getCell(col, row).setType(Type.Wall);
             col++;
         }
 
@@ -398,7 +398,7 @@ public class RoomHelper {
 
         for (int row = rowN; row >= rowS; row--) {
             if (col <= colE)
-                dungeon.getCells()[row][col].setType(Type.Wall);
+                dungeon.getCell(col, row).setType(Type.Wall);
             col++;
         }
     }
@@ -431,7 +431,7 @@ public class RoomHelper {
                 //get the room
                 Room tmp = leaves.get(x).getRoom();
 
-                if (dungeon.getCells()[tmp.getY()][tmp.getX()].hasId(door.getLink().getId())) {
+                if (dungeon.getCell(tmp.getX(), tmp.getY()).hasId(door.getLink().getId())) {
                     room = tmp;
                     break;
                 }
@@ -463,7 +463,7 @@ public class RoomHelper {
                 if (col != room.getX() && col != room.getX() + room.getW() - 1 && row != room.getY() && row != room.getY() + room.getH() - 1)
                     continue;
 
-                Cell cell = dungeon.getCells()[row][col];
+                Cell cell = dungeon.getCell(col, row);
 
                 //any of these are doors
                 if (cell.isDoor()) {
@@ -483,7 +483,7 @@ public class RoomHelper {
         for (int row = room.getY(); row < room.getY() + room.getH(); row++) {
             for (int col = room.getX(); col < room.getX() + room.getW(); col++) {
 
-                Cell cell = dungeon.getCells()[row][col];
+                Cell cell = dungeon.getCell(col, row);
 
                 //we are looking for doors
                 if (!cell.isDoor())
