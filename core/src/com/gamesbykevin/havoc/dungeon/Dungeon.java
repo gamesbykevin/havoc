@@ -272,6 +272,10 @@ public class Dungeon implements Disposable {
     }
 
     public Cell getCell(int col, int row) {
+
+        if (col < 0 || row < 0 || col >= getCols() || row >= getRows())
+            return null;
+
         return this.cells[row][col];
     }
 

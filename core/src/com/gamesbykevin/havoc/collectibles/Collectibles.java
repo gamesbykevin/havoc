@@ -97,16 +97,20 @@ public final class Collectibles extends Entities {
         List<Leaf> leaves = getLeafRooms(getLevel().getDungeon());
 
         //the max number allowed will depend on the number of rooms
-        int maxHealthSmall = (int)(MAX_RATIO_HEALTH_SMALL * leaves.size());
-        int maxHealthLarge = (int)(MAX_RATIO_HEALTH_LARGE * leaves.size());
         int maxAmmo = (int)(MAX_RATIO_AMMO * leaves.size());
         int maxAmmoCrate = (int)(MAX_RATIO_AMMO_CRATE * leaves.size());
+        int maxHealthSmall = (int)(MAX_RATIO_HEALTH_SMALL * leaves.size());
+        int maxHealthLarge = (int)(MAX_RATIO_HEALTH_LARGE * leaves.size());
 
         //list of options where the collectibles can be placed
         List<Cell> options = null;
 
         //continue until we check every room
         while (!leaves.isEmpty()) {
+
+            //if there is nothing left to add
+            if (collectibles.isEmpty() && weapons.isEmpty())
+                break;
 
             //choose random leaf
             final int randomIndex = getRandom().nextInt(leaves.size());
@@ -119,6 +123,10 @@ public final class Collectibles extends Entities {
 
             //get a list of options to place the collectibles
             options = getLocationOptions(leaf.getRoom());
+
+            //skip if nothing available
+            if (options.isEmpty())
+                continue;
 
             int count = 0;
 
@@ -143,16 +151,6 @@ public final class Collectibles extends Entities {
 
                 //get the location
                 Cell cell = options.get(index);
-
-                //can't place if there is something already here
-                if (hasEntityLocation(cell.getCol(), cell.getRow())) {
-
-                    //remove from the list of options
-                    options.remove(index);
-
-                    //skip to the next location
-                    continue;
-                }
 
                 //type of collectible
                 Type type = null;

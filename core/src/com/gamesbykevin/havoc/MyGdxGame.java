@@ -11,9 +11,10 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gamesbykevin.havoc.assets.AssetManagerHelper;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.player.Player;
+import com.gamesbykevin.havoc.texture.TextureHelper;
 
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
-import static com.gamesbykevin.havoc.texture.TextureHelper.addTextures;
+import static com.gamesbykevin.havoc.texture.TextureHelper.*;
 
 public class MyGdxGame extends ApplicationAdapter {
 
@@ -167,11 +168,10 @@ public class MyGdxGame extends ApplicationAdapter {
 							success = false;
 
 							//check if the asset is a texture
-							if (path.contains(ASSET_EXT_BMP) || path.contains(ASSET_EXT_PNG)) {
+							if (path.contains(ASSET_EXT_BMP) || path.contains(ASSET_EXT_PNG))
 								getAssetManager().load(path, Texture.class);
-							}
 
-							renderProgressBar(true, "Verifying assets");
+							renderProgressBar("Verifying assets");
 							break;
 						}
 					}
@@ -179,12 +179,12 @@ public class MyGdxGame extends ApplicationAdapter {
 					//if we are good, go to the next step
 					if (success) {
 						setStep(Steps.Step2);
-						renderProgressBar(true, "Generating dungeon");
+						renderProgressBar("Generating dungeon");
 					}
 
 				} else {
 					getAssetManager().update();
-					renderProgressBar(false, "Loading assets");
+					renderProgressBar(getAssetManager().getProgress(), "Loading assets");
 					System.out.println("progress: " + getAssetManager().getProgress());
 				}
 				break;
@@ -192,7 +192,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			case Step2:
 
 				//generate dungeon
-				renderProgressBar(true, "Generating dungeon");
+				renderProgressBar("Generating dungeon");
 				getLevel().getDungeon().generate();
 
 				//flag the players start location
@@ -203,7 +203,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			case Step3:
 
 				//creating weapons
-				renderProgressBar(true, "Creating weapons");
+				renderProgressBar("Creating weapons");
 				getLevel().getPlayer().createWeapons(getLevel());
 				setStep(Steps.Step4);
 				break;
@@ -211,7 +211,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			case Step4:
 
 				//add obstacles
-				renderProgressBar(true, "Spawning obstacles");
+				renderProgressBar("Spawning obstacles");
 				getLevel().getObstacles().spawn();
 				setStep(Steps.Step5);
 				break;
@@ -219,7 +219,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			case Step5:
 
 				//add enemies
-				renderProgressBar(true, "Spawning enemies");
+				renderProgressBar("Spawning enemies");
 				getLevel().getEnemies().spawn();
 				setStep(Steps.Step6);
 				break;
@@ -227,7 +227,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			case Step6:
 
 				//add collectibles
-				renderProgressBar(true, "Spawning collectibles");
+				renderProgressBar("Spawning collectibles");
 				getLevel().getCollectibles().spawn();
 				setStep(Steps.Step7);
 				break;
@@ -235,9 +235,13 @@ public class MyGdxGame extends ApplicationAdapter {
 			case Step7:
 
 				//create level textures
-				renderProgressBar(true, "Applying textures");
-				addTextures(getLevel());
-				setStep(Steps.Step8);
+				if (COUNT < TOTAL) {
+					renderProgressBar((COUNT / TOTAL), "Applying textures");
+					addTextures(getLevel());
+				} else {
+					renderProgressBar( "Applying textures");
+					setStep(Steps.Step8);
+				}
 				break;
 
 			case Step8:
@@ -266,12 +270,13 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
 	}
 
-	private void renderProgressBar(boolean fill, String description) {
+	private void renderProgressBar(String description) {
+		renderProgressBar(1.0f, description);
+	}
+
+	private void renderProgressBar(float progress, String description) {
 
 		System.out.println(description);
-
-		//get the progress
-		float progress = getAssetManager().getProgress();
 
 		float x = (SIZE_WIDTH - PROGRESS_BAR_WIDTH) / 2f;
 		float y = (SIZE_HEIGHT - PROGRESS_BAR_HEIGHT) / 2f;
@@ -286,11 +291,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
 		getShapeRenderer().setColor(Color.WHITE);
 
-		if (fill) {
-			getShapeRenderer().rect(x, y, PROGRESS_BAR_WIDTH, PROGRESS_BAR_HEIGHT);
-		} else {
-			getShapeRenderer().rect(x, y, PROGRESS_BAR_WIDTH * progress, PROGRESS_BAR_HEIGHT);
-		}
+		getShapeRenderer().rect(x, y, PROGRESS_BAR_WIDTH * progress, PROGRESS_BAR_HEIGHT);
 
 		//draw the info text
 		getBatch().begin();
@@ -318,6 +319,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			AssetManagerHelper.dispose(this.assetManager);
 			this.assetManager.dispose();
 		}
+
+		TextureHelper.dispose();
 
 		this.player = null;
 		this.level = null;

@@ -37,7 +37,7 @@ public final class Player implements Disposable, Restart {
     //the previous location of the player
     private Vector3 previous;
 
-    //is the player hurt?
+    //is the player?
     private boolean hurt = false, collect = false;
 
     //our 3d camera
@@ -209,13 +209,9 @@ public final class Player implements Disposable, Restart {
 
             } else {
 
-                //if the controller has been touched we reset
-                if (getController().isTouch()) {
-
-                    //reset everything
-                    level.reset();
-                    getWeapons().reset();
-                }
+                //if the controller has been touched, flag reset
+                if (getController().isTouch() || Gdx.input.justTouched())
+                    level.setReset(true);
             }
         }
     }

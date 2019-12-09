@@ -60,6 +60,9 @@ public class Level implements Disposable, Restart {
     //where we hold our assets
     private final AssetManager assetManager;
 
+    //do we reset?
+    private boolean reset = false;
+
     public Level(AssetManager assetManager, Player player) {
 
         //store reference to our asset manager
@@ -80,28 +83,14 @@ public class Level implements Disposable, Restart {
 
         //create and generate the dungeon
         this.dungeon = new Dungeon(this, size, size);
+    }
 
-        /*
-        getDungeon().generate();
+    public boolean isReset() {
+        return this.reset;
+    }
 
-        //flag the players start location
-        getPlayer().setStart(getDungeon().getStartCol(), getDungeon().getStartRow());
-
-        //create the weapons collection
-        getPlayer().createWeapons(this);
-
-        //create the obstacles
-        getObstacles().spawn();
-
-        //create the enemies
-        getEnemies().spawn();
-
-        //create the collectibles
-        getCollectibles().spawn();
-
-        //add textures
-        addTextures(this);
-        */
+    public void setReset(boolean reset) {
+        this.reset = reset;
     }
 
     @Override
@@ -110,7 +99,9 @@ public class Level implements Disposable, Restart {
         getObstacles().reset();
         getCollectibles().reset();
         getPlayer().reset();
+        getPlayer().getWeapons().reset();
         getPlayer().getController().reset();
+        setReset(false);
     }
 
     public AssetManager getAssetManager() {
@@ -214,6 +205,12 @@ public class Level implements Disposable, Restart {
     }
 
     public void render() {
+
+        //if we are flagged to reset, reset everything
+        if (isReset()) {
+            reset();
+            return;
+        }
 
         //update the camera
         getPlayer().getCamera3d().update();

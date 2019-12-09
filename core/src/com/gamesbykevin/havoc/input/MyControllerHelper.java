@@ -6,9 +6,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -84,6 +82,7 @@ public class MyControllerHelper {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 controller.setChange(true);
+                controller.setTouch(true);
                 updateFlag(controller, KEY_SHOOT, false);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -112,6 +111,7 @@ public class MyControllerHelper {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                controller.setTouch(true);
                 updateFlag(controller, KEY_SHOOT, false);
                 updateFlag(controller, KEY_CHANGE, false);
                 super.touchUp(event, x, y, pointer, button);
@@ -134,6 +134,7 @@ public class MyControllerHelper {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                controller.setTouch(true);
                 controller.setAction(true);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -150,9 +151,6 @@ public class MyControllerHelper {
     }
 
     protected static void updateFlag(MyController controller, int keycode, boolean flag) {
-
-        //flag input has been touched
-        controller.setTouch(true);
 
         switch (keycode) {
             case KEY_MOVE_BACKWARD:

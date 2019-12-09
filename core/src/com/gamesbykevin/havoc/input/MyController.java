@@ -72,7 +72,6 @@ public class MyController implements InputProcessor, Disposable, Restart {
                 break;
         }
 
-
         if (isDisplay())
             setupController(assetManager, this);
 
@@ -167,24 +166,24 @@ public class MyController implements InputProcessor, Disposable, Restart {
 
     @Override
     public boolean keyUp (int keycode) {
+        setTouch(true);
         updateFlag(this, keycode, false);
         return false;
     }
 
     @Override
     public boolean keyTyped (char character) {
-        setTouch(true);
         return false;
     }
 
     @Override
     public boolean touchDown (int x, int y, int pointer, int button) {
-        setTouch(true);
         return false;
     }
 
     @Override
     public boolean touchUp (int x, int y, int pointer, int button) {
+        setTouch(true);
         return false;
     }
 
@@ -195,7 +194,6 @@ public class MyController implements InputProcessor, Disposable, Restart {
 
     @Override
     public boolean mouseMoved (int x, int y) {
-        setTouch(true);
         return false;
     }
 

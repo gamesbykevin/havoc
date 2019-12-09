@@ -11,7 +11,6 @@ import com.gamesbykevin.havoc.dungeon.Dungeon;
 import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.level.Level;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,132 +21,207 @@ import static com.gamesbykevin.havoc.dungeon.DungeonHelper.getCount;
 
 public class TextureHelper {
 
+    private static HashMap<String, TextureRegion> TEXTURE_REGIONS;
+
+    private static TextureRegion TEXTURE_REGION_LOCKED;
+    private static TextureRegion TEXTURE_REGION_DOOR;
+    private static TextureRegion TEXTURE_REGION_DOOR_SIDE;
+    private static TextureRegion TEXTURE_REGION_WALL_GOAL;
+    private static TextureRegion TEXTURE_REGION_DOOR_GOAL;
+    private static TextureRegion TEXTURE_REGION_SWITCH_OFF;
+    private static TextureRegion TEXTURE_REGION_HALLWAY;
+    private static TextureRegion TEXTURE_REGION_FLOOR;
+    private static TextureRegion TEXTURE_REGION_CEILING;
+
+    //used to progress
+    public static float COUNT = 0;
+    public static float TOTAL = 1;
+    public static int COL;
+    public static int ROW;
+
+    //how many updates to make
+    public static int PROGRESS_COUNT = 100;
+
+    public static void dispose() {
+
+        if (TEXTURE_REGIONS != null)
+            TEXTURE_REGIONS.clear();
+
+        TEXTURE_REGIONS = null;
+        TEXTURE_REGION_LOCKED = null;
+        TEXTURE_REGION_DOOR = null;
+        TEXTURE_REGION_DOOR_SIDE = null;
+        TEXTURE_REGION_WALL_GOAL = null;
+        TEXTURE_REGION_DOOR_GOAL = null;
+        TEXTURE_REGION_SWITCH_OFF = null;
+        TEXTURE_REGION_HALLWAY = null;
+        TEXTURE_REGION_FLOOR = null;
+        TEXTURE_REGION_CEILING = null;
+    }
+
     public static void addTextures(Level level) {
+
+        for (int i = 0; i < PROGRESS_COUNT; i++) {
+            addTexture(level);
+        }
+    }
+
+    private static void addTexture(Level level) {
+
+        //our texture assets are here
+        AssetManager assetManager = level.getAssetManager();
+
+        //if null figure out the totals
+        if (TEXTURE_REGIONS == null || TEXTURE_REGIONS.isEmpty()) {
+            COUNT = 0;
+            TOTAL = level.getDungeon().getCols() * level.getDungeon().getRows();
+            COL = 0;
+            ROW = 0;
+
+            //load map of textures for our level
+            getTextureRegions(level);
+            getTextureRegionHallway(assetManager);
+            getTextureRegionLocked(assetManager);
+            getTextureRegionDoor(assetManager);
+            getTextureRegionDoorSide(assetManager);
+            getTextureRegionWallGoal(assetManager);
+            getTextureRegionDoorGoal(assetManager);
+            getTextureRegionSwitchOff(assetManager);
+            getTextureRegionFloor(assetManager);
+            getTextureRegionCeiling(assetManager);
+        }
+
+        //don't continue if finished
+        if (COUNT >= TOTAL)
+            return;
 
         //get our dungeon
         Dungeon dungeon = level.getDungeon();
 
-        //get hallway texture
-        TextureRegion textureHallway = new TextureRegion(level.getAssetManager().get(getPathsHallway().get(0), Texture.class));
-
-        //get map of textures for our level
-        HashMap<String, TextureRegion> textures = getTextures(dungeon, level.getAssetManager(), textureHallway);
-
         //get the leaf for the goal room
         Room room = dungeon.getLeafs().get(dungeon.getGoalLeafIndex()).getRoom();
 
-        TextureRegion textureDoorLocked = new TextureRegion(level.getAssetManager().get(PATH_DOOR_LOCKED, Texture.class));
-        TextureRegion textureDoor = new TextureRegion(level.getAssetManager().get(PATH_DOOR, Texture.class));
-        TextureRegion textureDoorSide = new TextureRegion(level.getAssetManager().get(PATH_SIDE, Texture.class));
-        TextureRegion textureWallGoal = new TextureRegion(level.getAssetManager().get(PATH_WALL_GOAL, Texture.class));
-        TextureRegion textureDoorGoal = new TextureRegion(level.getAssetManager().get(PATH_DOOR_GOAL, Texture.class));
-        TextureRegion textureSwitchOff = new TextureRegion(level.getAssetManager().get(PATH_SWITCH_OFF, Texture.class));
+        //get the current cell
+        Cell current = dungeon.getCell(COL, ROW);
 
-        for (int row = 0; row < dungeon.getRows(); row++) {
-            for (int col = 0; col < dungeon.getCols(); col++) {
+        //continue searching until we find a
+        while (!current.isWall() && !current.isGoal() && !current.isDoor()) {
 
-                //is this location part of the goal
-                boolean goal = (col >= room.getX() && col < room.getX() + room.getW() && row >= room.getY() && row < room.getY() + room.getH());
+            //keep making progress
+            COL++;
+            COUNT++;
 
-                Cell current = dungeon.getCell(col, row);
+            //if at the end, move to the next row
+            if (COL >= dungeon.getCols()) {
+                COL = 0;
+                ROW++;
+            }
 
-                //do we add a door texture
-                TextureRegion door = null;
+            //get the next cell
+            current = dungeon.getCell(COL, ROW);
 
-                boolean secret = false;
+            if (current == null)
+                return;
+        }
 
-                if (current.isWall()) {
+        int col = COL;
+        int row = ROW;
 
-                    TextureRegion texture = (goal) ? textureWallGoal : textures.get(current.getId());
+        //is this location part of the goal
+        boolean goal = (col >= room.getX() && col < room.getX() + room.getW() && row >= room.getY() && row < room.getY() + room.getH());
 
-                    if (dungeon.hasMap(col - 1, row) || dungeon.getLevel().getObstacles().hasCollision(col - 1, row))
-                        addWallDecal(level.getDecals(), texture, textureDoorSide, textureHallway, dungeon.getCell(col - 1, row), current, col, row, Side.West);
+        //do we add a door texture
+        TextureRegion door = null;
 
-                    if (dungeon.hasMap(col + 1, row) || dungeon.getLevel().getObstacles().hasCollision(col + 1, row))
-                        addWallDecal(level.getDecals(), texture, textureDoorSide, textureHallway, dungeon.getCell(col + 1, row), current, col, row, Side.East);
+        boolean secret = false;
 
-                    if (dungeon.hasMap(col, row - 1) || dungeon.getLevel().getObstacles().hasCollision(col, row - 1))
-                        addWallDecal(level.getDecals(), texture, textureDoorSide, textureHallway, dungeon.getCell(col, row - 1), current, col, row, Side.South);
+        if (current.isWall()) {
 
-                    if (dungeon.hasMap(col, row + 1) || dungeon.getLevel().getObstacles().hasCollision(col, row + 1))
-                        addWallDecal(level.getDecals(), texture, textureDoorSide, textureHallway, dungeon.getCell(col, row + 1), current, col, row, Side.North);
+            TextureRegion texture = (goal) ? getTextureRegionWallGoal(assetManager) : getTextureRegions(level).get(current.getId());
 
-                } else if (current.isGoal()) {
-                    level.getDecals().add(DecalCustom.createDecalWall(col, row, textureSwitchOff, Side.West));
-                    level.getDecals().add(DecalCustom.createDecalWall(col, row, textureSwitchOff, Side.East));
-                    level.getDecals().add(DecalCustom.createDecalWall(col, row, textureSwitchOff, Side.North));
-                    level.getDecals().add(DecalCustom.createDecalWall(col, row, textureSwitchOff, Side.South));
-                } else if (current.isDoor()) {
-                    if (current.isLocked()) {
-                        door = textureDoorLocked;
-                    } else if (current.isSecret()) {
-                        door = textures.get(current.getId());
-                        secret = true;
-                    } else {
-                        door = (goal) ? textureDoorGoal : textureDoor;
-                    }
+            if (dungeon.hasMap(col - 1, row) || dungeon.getLevel().getObstacles().hasCollision(col - 1, row))
+                addWallDecal(level.getDecals(), texture, dungeon.getCell(col - 1, row), current, col, row, Side.West);
+
+            if (dungeon.hasMap(col + 1, row) || dungeon.getLevel().getObstacles().hasCollision(col + 1, row))
+                addWallDecal(level.getDecals(), texture, dungeon.getCell(col + 1, row), current, col, row, Side.East);
+
+            if (dungeon.hasMap(col, row - 1) || dungeon.getLevel().getObstacles().hasCollision(col, row - 1))
+                addWallDecal(level.getDecals(), texture, dungeon.getCell(col, row - 1), current, col, row, Side.South);
+
+            if (dungeon.hasMap(col, row + 1) || dungeon.getLevel().getObstacles().hasCollision(col, row + 1))
+                addWallDecal(level.getDecals(), texture, dungeon.getCell(col, row + 1), current, col, row, Side.North);
+
+        } else if (current.isGoal()) {
+            level.getDecals().add(DecalCustom.createDecalWall(col, row, getTextureRegionSwitchOff(assetManager), Side.West));
+            level.getDecals().add(DecalCustom.createDecalWall(col, row, getTextureRegionSwitchOff(assetManager), Side.East));
+            level.getDecals().add(DecalCustom.createDecalWall(col, row, getTextureRegionSwitchOff(assetManager), Side.North));
+            level.getDecals().add(DecalCustom.createDecalWall(col, row, getTextureRegionSwitchOff(assetManager), Side.South));
+        } else if (current.isDoor()) {
+            if (current.isLocked()) {
+                door = getTextureRegionLocked(assetManager);
+            } else if (current.isSecret()) {
+                door = getTextureRegions(level).get(current.getId());
+                secret = true;
+            } else {
+                door = (goal) ? getTextureRegionDoorGoal(assetManager) : getTextureRegionDoor(assetManager);
+            }
+        }
+
+        //do we add a door
+        if (door != null) {
+            if (dungeon.hasMap(col - 1, row)) {
+
+                if (current.hasId(dungeon.getCell(col - 1, row))) {
+                    level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.West, secret), col, row);
+                } else if (current.hasId(dungeon.getCell(col + 1, row))) {
+                    level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.East, secret), col, row);
                 }
 
-                //do we add a door
-                if (door != null) {
-                    if (dungeon.hasMap(col - 1, row)) {
+            } else if (dungeon.hasMap(col, row - 1)) {
 
-                        if (current.hasId(dungeon.getCell(col - 1, row))) {
-                            level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.West, secret), col, row);
-                        } else if (current.hasId(dungeon.getCell(col + 1, row))) {
-                            level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.East, secret), col, row);
-                        }
-
-                    } else if (dungeon.hasMap(col, row - 1)) {
-
-                        if (current.hasId(dungeon.getCell(col, row - 1))) {
-                            level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.South, secret), col, row);
-                        } else if (current.hasId(dungeon.getCell(col, row + 1))) {
-                            level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.North, secret), col, row);
-                        }
-                    }
+                if (current.hasId(dungeon.getCell(col, row - 1))) {
+                    level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.South, secret), col, row);
+                } else if (current.hasId(dungeon.getCell(col, row + 1))) {
+                    level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.North, secret), col, row);
                 }
             }
         }
 
-        TextureRegion floor;
-        TextureRegion ceiling;
+        //keep making progress
+        COL++;
+        COUNT++;
 
-        //make sure floor/ceiling are different
-        if (getRandom().nextBoolean()) {
-            floor = new TextureRegion(level.getAssetManager().get(getPathsBackground().get(0), Texture.class));
-            ceiling = new TextureRegion(level.getAssetManager().get(getPathsBackground().get(1), Texture.class));
-        } else {
-            floor = new TextureRegion(level.getAssetManager().get(getPathsBackground().get(1), Texture.class));
-            ceiling = new TextureRegion(level.getAssetManager().get(getPathsBackground().get(0), Texture.class));
+        //if at the end, move to the next row
+        if (COL >= dungeon.getCols()) {
+            COL = 0;
+            ROW++;
         }
 
-        for (int row = (int)-Background.TEXTURE_HEIGHT; row <= dungeon.getRows() + Background.TEXTURE_HEIGHT; row += Background.TEXTURE_HEIGHT) {
-            for (int col = (int)-Background.TEXTURE_WIDTH; col <= dungeon.getCols() + Background.TEXTURE_WIDTH; col += Background.TEXTURE_WIDTH) {
-                level.getBackgrounds().add(createDecalBackground(col, row, floor, true));
-                level.getBackgrounds().add(createDecalBackground(col, row, ceiling, false));
+        //if we are at the end let's add the backgrounds
+        if (ROW >= dungeon.getRows()) {
+            for (int y = (int) -Background.TEXTURE_HEIGHT; y <= dungeon.getRows() + Background.TEXTURE_HEIGHT; y += Background.TEXTURE_HEIGHT) {
+                for (int x = (int) -Background.TEXTURE_WIDTH; x <= dungeon.getCols() + Background.TEXTURE_WIDTH; x += Background.TEXTURE_WIDTH) {
+                    level.getBackgrounds().add(createDecalBackground(x, y, getTextureRegionFloor(assetManager), true));
+                    level.getBackgrounds().add(createDecalBackground(x, y, getTextureRegionCeiling(assetManager), false));
+                }
             }
         }
-
-        //we are done with these objects
-        textures.clear();
-        textures = null;
     }
 
-    private static void addWallDecal(List<DecalCustom> decals, TextureRegion texture, TextureRegion textureDoorSide, TextureRegion textureHallway, Cell neighbor, Cell current, int col, int row, Side side) {
+    private static void addWallDecal(List<DecalCustom> decals, TextureRegion texture, Cell neighbor, Cell current, int col, int row, Side side) {
 
         if (neighbor.isDoor()) {
-            decals.add(DecalCustom.createDecalWall(col, row, textureDoorSide, side));
+            decals.add(DecalCustom.createDecalWall(col, row, getTextureRegionDoorSide(null), side));
         } else {
             if (current.getId() != neighbor.getId()) {
-                decals.add(DecalCustom.createDecalWall(col, row, textureHallway, side));
+                decals.add(DecalCustom.createDecalWall(col, row, getTextureRegionHallway(null), side));
             } else {
                 decals.add(DecalCustom.createDecalWall(col, row, texture, side));
             }
         }
     }
 
-    private static HashMap<String, TextureRegion> getTextures(Dungeon dungeon, AssetManager assetManager, TextureRegion textureHallway) {
+    private static HashMap<String, TextureRegion> getTextureRegions(Dungeon dungeon, AssetManager assetManager) {
 
         HashMap<String, TextureRegion> textures = new HashMap<>();
 
@@ -173,7 +247,7 @@ public class TextureHelper {
                         continue;
 
                     //put it in the hash map
-                    textures.put(dungeon.getCell(col, row).getId(), textureHallway);
+                    textures.put(dungeon.getCell(col, row).getId(), getTextureRegionHallway(assetManager));
 
                 } else {
 
@@ -189,5 +263,102 @@ public class TextureHelper {
 
         //return map of textures
         return textures;
+    }
+
+    private static HashMap<String, TextureRegion> getTextureRegions(Level level) {
+
+        if (TEXTURE_REGIONS == null)
+            TEXTURE_REGIONS = getTextureRegions(level.getDungeon(), level.getAssetManager());
+
+        return TEXTURE_REGIONS;
+    }
+
+    private static TextureRegion getTextureRegion(AssetManager assetManager, String path) {
+        return new TextureRegion(assetManager.get(path, Texture.class));
+    }
+
+    private static void getTextureRegionBackgrounds(AssetManager assetManager) {
+
+        if (TEXTURE_REGION_FLOOR == null || TEXTURE_REGION_CEILING == null) {
+            if (getRandom().nextBoolean()) {
+                TEXTURE_REGION_FLOOR = new TextureRegion(assetManager.get(getPathsBackground().get(0), Texture.class));
+                TEXTURE_REGION_CEILING = new TextureRegion(assetManager.get(getPathsBackground().get(1), Texture.class));
+            } else {
+                TEXTURE_REGION_FLOOR = new TextureRegion(assetManager.get(getPathsBackground().get(1), Texture.class));
+                TEXTURE_REGION_CEILING = new TextureRegion(assetManager.get(getPathsBackground().get(0), Texture.class));
+            }
+        }
+    }
+
+    private static TextureRegion getTextureRegionCeiling(AssetManager assetManager) {
+
+        if (TEXTURE_REGION_CEILING == null)
+            getTextureRegionBackgrounds(assetManager);
+
+        return TEXTURE_REGION_CEILING;
+    }
+
+    private static TextureRegion getTextureRegionFloor(AssetManager assetManager) {
+
+        if (TEXTURE_REGION_FLOOR == null)
+            getTextureRegionBackgrounds(assetManager);
+
+        return TEXTURE_REGION_FLOOR;
+    }
+
+    private static TextureRegion getTextureRegionHallway(AssetManager assetManager) {
+
+        if (TEXTURE_REGION_HALLWAY == null)
+            TEXTURE_REGION_HALLWAY = new TextureRegion(assetManager.get(getPathsHallway().get(0), Texture.class));
+
+        return TEXTURE_REGION_HALLWAY;
+    }
+
+    private static TextureRegion getTextureRegionLocked(AssetManager assetManager) {
+
+        if (TEXTURE_REGION_LOCKED == null)
+            TEXTURE_REGION_LOCKED = getTextureRegion(assetManager, PATH_DOOR_LOCKED);
+
+        return TEXTURE_REGION_LOCKED;
+    }
+
+    private static TextureRegion getTextureRegionDoor(AssetManager assetManager) {
+
+        if (TEXTURE_REGION_DOOR == null)
+            TEXTURE_REGION_DOOR = getTextureRegion(assetManager, PATH_DOOR);
+
+        return TEXTURE_REGION_DOOR;
+    }
+
+    private static TextureRegion getTextureRegionDoorSide(AssetManager assetManager) {
+
+        if (TEXTURE_REGION_DOOR_SIDE == null)
+            TEXTURE_REGION_DOOR_SIDE = getTextureRegion(assetManager, PATH_SIDE);
+
+        return TEXTURE_REGION_DOOR_SIDE;
+    }
+
+    private static TextureRegion getTextureRegionWallGoal(AssetManager assetManager) {
+
+        if (TEXTURE_REGION_WALL_GOAL == null)
+            TEXTURE_REGION_WALL_GOAL = getTextureRegion(assetManager, PATH_WALL_GOAL);
+
+        return TEXTURE_REGION_WALL_GOAL;
+    }
+
+    private static TextureRegion getTextureRegionDoorGoal(AssetManager assetManager) {
+
+        if (TEXTURE_REGION_DOOR_GOAL == null)
+            TEXTURE_REGION_DOOR_GOAL = getTextureRegion(assetManager, PATH_DOOR_GOAL);
+
+        return TEXTURE_REGION_DOOR_GOAL;
+    }
+
+    private static TextureRegion getTextureRegionSwitchOff(AssetManager assetManager) {
+
+        if (TEXTURE_REGION_SWITCH_OFF == null)
+            TEXTURE_REGION_SWITCH_OFF = getTextureRegion(assetManager, PATH_SWITCH_OFF);
+
+        return TEXTURE_REGION_SWITCH_OFF;
     }
 }
