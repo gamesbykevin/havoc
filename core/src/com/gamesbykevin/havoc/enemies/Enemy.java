@@ -307,7 +307,7 @@ public abstract class Enemy extends Entity3d {
             if (y < goalY)
                 y += OBSTRUCTION_VELOCITY;
             if (y > goalY)
-                y += OBSTRUCTION_VELOCITY;
+                y -= OBSTRUCTION_VELOCITY;
 
             //if not an open space then it is obstructed
             if (!dungeon.hasMap(x, y))

@@ -36,14 +36,6 @@ public final class Weapons extends Entities implements Disposable, Restart {
         add(Type.Lance);
         add(Type.Glock);
 
-        /*
-        add(Type.Buzz);
-        add(Type.Impact);
-        add(Type.Magnum);
-        add(Type.Shotgun);
-        add(Type.Smg);
-        */
-
         for (int i = 0; i < getEntityList().size(); i++) {
             getEntityList().get(i).reset();
         }

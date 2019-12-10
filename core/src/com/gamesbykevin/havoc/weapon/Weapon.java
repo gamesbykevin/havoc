@@ -169,7 +169,7 @@ public class Weapon extends Entity2d implements Disposable {
         MyController controller = level.getPlayer().getController();
 
         //if we are walking, move weapon as if we are carrying it
-        if (controller.isMoveForward() || controller.isMoveBackward()) {
+        if (controller.isMoveForward() || controller.isMoveBackward() || controller.getKnobPercentY() != 0) {
             carryWeapon();
         } else {
             holdWeapon();
