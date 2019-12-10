@@ -1,4 +1,4 @@
-package com.gamesbykevin.havoc.texture;
+package com.gamesbykevin.havoc.assets;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;

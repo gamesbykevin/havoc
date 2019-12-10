@@ -3,12 +3,16 @@ package com.gamesbykevin.havoc.level;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.dungeon.Cell;
 
 import java.util.List;
 
+import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
+import static com.gamesbykevin.havoc.decals.Door.DOOR_DISTANCE_SFX_RATIO;
+import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
@@ -108,28 +112,43 @@ public class LevelHelper {
                 //is the cell a door
                 if (cell.isDoor()) {
 
-                    //make sure if it's locked that we have a key
-                    if (!cell.isLocked() || (cell.isLocked() && key)) {
+                    Door door = level.getDoorDecal(col, row);
 
-                        Door door = level.getDoorDecal(col, row);
+                    if (door == null)
+                        continue;
 
-                        //we can only open the door if it exists and it's closed
-                        if (door != null && door.isClosed()) {
+                    //is the door closed
+                    boolean closed = (door.getState() == Door.State.Closed);
 
-                            //open the door
-                            door.open();
+                    //we can only open the door if it's closed
+                    if (!closed)
+                        continue;
 
-                            //if there is a linked door
-                            if (cell != null && cell.getLink() != null) {
+                    if (cell.isLocked()) {
 
-                                //open the linked door as long as long as we can
-                                if (!cell.getLink().isLocked())
-                                    level.getDoorDecal(cell.getLink().getCol(), cell.getLink().getRow()).open();
-                            }
+                        if (!key) {
+
+                            //if locked and we don't have a key
+                            playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelLocked);
+                            continue;
                         }
                     }
 
+                    //open the door
+                    door.open();
+
+                    //if there is a linked door
+                    if (cell != null && cell.getLink() != null) {
+
+                        //open the linked door as long as it's not locked
+                        if (!cell.getLink().isLocked())
+                            level.getDoorDecal(cell.getLink().getCol(), cell.getLink().getRow()).open();
+                    }
+
                 } else if (cell.isGoal()) {
+
+                    //sound we completed the level
+                    playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelSwitch);
                     System.out.println("LEVEL COMPLETE!!!!!!!!!!!!!!!!!!!");
                     goal = true;
                     /*
@@ -147,7 +166,7 @@ public class LevelHelper {
 
     protected static void updateLevel(Level level) {
 
-        updateDoors(level.getDoorDecals());
+        updateDoors(level);
 
         //if we are performing action check if we can open a door or hit a switch
         if (level.getPlayer().getController().isAction()) {
@@ -160,18 +179,73 @@ public class LevelHelper {
         }
     }
 
-    private static void updateDoors(Door[][] doors) {
+    private static void updateDoors(Level level) {
 
-        for (int col = 0; col < doors[0].length; col++) {
-            for (int row = 0; row < doors.length; row++) {
+        //if opening or closing we only want to play 1 sound effect
+        boolean open = false, close = false, secret = false;
 
-                if (doors[row][col] == null)
+        for (int col = 0; col < level.getDoorDecals()[0].length; col++) {
+            for (int row = 0; row < level.getDoorDecals().length; row++) {
+
+                //get the current door
+                Door door = level.getDoorDecal(col, row);
+
+                if (door == null)
                     continue;
 
+                //is the door currently opened
+                boolean opened = false;
+
+                switch (door.getState()) {
+                    case Start:
+
+                        //only need to confirm open once
+                        if (!open && !door.isSecret()) {
+                            if (getDistance(level.getPlayer(), door.getCol(), door.getRow()) <= ROOM_DIMENSION_MAX * DOOR_DISTANCE_SFX_RATIO)
+                                open = true;
+                        }
+
+                        if (!secret && door.isSecret()) {
+                            if (getDistance(level.getPlayer(), door.getCol(), door.getRow()) <= ROOM_DIMENSION_MAX * DOOR_DISTANCE_SFX_RATIO)
+                                secret = true;
+                        }
+
+                        break;
+
+                    case Open:
+                        opened = true;
+                        break;
+                }
+
                 //update the door
-                doors[row][col].update();
+                door.update();
+
+                switch (door.getState()) {
+
+                    case Closing:
+
+                        if (!close && opened) {
+                            if (getDistance(level.getPlayer(), door.getCol(), door.getRow()) <= ROOM_DIMENSION_MAX * DOOR_DISTANCE_SFX_RATIO)
+                                close = true;
+                        }
+                        break;
+                }
             }
         }
+
+        //only play the sound effects a single time
+        if (secret) {
+            playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelSecret);
+        } else if (open) {
+            playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelOpen);
+        }
+
+        if (close)
+            playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelClose);
+    }
+
+    public static boolean isDoorOpen(Level level, float col, float row) {
+        return isDoorOpen(level, (int)col, (int)row);
     }
 
     public static boolean isDoorOpen(Level level, int col, int row) {
@@ -183,7 +257,12 @@ public class LevelHelper {
         if (door == null)
             return false;
 
-        //is the door open?
-        return door.isOpen();
+        switch (door.getState()) {
+            case Open:
+                return true;
+
+            default:
+                return false;
+        }
     }
 }

@@ -95,11 +95,13 @@ public class PlayerHelper {
 
             Door door = level.getDoorDecal(col, row);
 
-            //door isn't open
-            if (!door.isOpen()) {
-                return true;
-            } else {
-                door.setLapsed(0);
+            switch (door.getState()) {
+                case Open:
+                    door.setLapsed(0);
+                    break;
+
+                default:
+                    return true;
             }
         }
 

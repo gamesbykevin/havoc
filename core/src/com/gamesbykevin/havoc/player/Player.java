@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector3;
+import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Restart;
@@ -17,6 +18,7 @@ import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
 import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_COLLECT;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_HURT;
+import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
 import static com.gamesbykevin.havoc.player.PlayerHelper.HEIGHT_MIN_Z;
 import static com.gamesbykevin.havoc.player.PlayerHelper.VELOCITY_Z;
@@ -198,6 +200,10 @@ public final class Player implements Disposable, Restart {
         if (isDead()) {
 
             if (getCamera3d().position.z > HEIGHT_MIN_Z) {
+
+                if (getCamera3d().position.z == HEIGHT_START)
+                    playSfx(level.getAssetManager(), AudioHelper.Sfx.HeroDead);
+
                 getCamera3d().position.z -= VELOCITY_Z;
 
                 //don't go below

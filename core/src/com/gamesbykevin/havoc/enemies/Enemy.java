@@ -1,6 +1,7 @@
 package com.gamesbykevin.havoc.enemies;
 
 import com.badlogic.gdx.math.Vector3;
+import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.astar.Node;
 import com.gamesbykevin.havoc.collectibles.Collectibles;
 import com.gamesbykevin.havoc.dungeon.Dungeon;
@@ -38,10 +39,13 @@ public abstract class Enemy extends Entity3d {
     private float speed;
 
     //how close to notice the player
-    public static final float RANGE_NOTICE = 6f;
+    public static final float RANGE_NOTICE = 10f;
 
     //how close do we need to be for the player to update
     public static final float RANGE_UPDATE = ROOM_DIMENSION_MAX * 3;
+
+    //how fast do we move when checking if the enemy is obstructed
+    public static final float OBSTRUCTION_VELOCITY = .1f;
 
     //what is the health
     private float health = 100f;
@@ -59,6 +63,9 @@ public abstract class Enemy extends Entity3d {
     public enum Status {
         Die, Hurt, Shoot, Walk, Alert, Pause, Idle
     }
+
+    //shooting sound effect
+    private AudioHelper.Sfx shoot = AudioHelper.Sfx.EnemyWeaponShoot1;
 
     //status of the player
     private Status status;
@@ -126,6 +133,14 @@ public abstract class Enemy extends Entity3d {
 
         //update the animation
         getAnimation().update();
+    }
+
+    public AudioHelper.Sfx getShoot() {
+        return this.shoot;
+    }
+
+    public void setShoot(AudioHelper.Sfx shoot) {
+        this.shoot = shoot;
     }
 
     //is the enemy walking, attacking, etc...
@@ -254,8 +269,8 @@ public abstract class Enemy extends Entity3d {
 
     public boolean isObstructed(Level level) {
 
-        int x = (int)getCol();
-        int y = (int)getRow();
+        float x = getCol();
+        float y = getRow();
 
         //get the dungeon
         Dungeon dungeon = level.getDungeon();
@@ -270,16 +285,16 @@ public abstract class Enemy extends Entity3d {
 
         Vector3 location = level.getPlayer().getCamera3d().position;
 
-        int goalX = (int)location.x;
-        int goalY = (int)location.y;
+        float goalX = location.x;
+        float goalY = location.y;
 
         //continue until we get to the location
         while (x != goalX || y != goalY) {
 
             if (x < goalX)
-                x++;
+                x += OBSTRUCTION_VELOCITY;
             if (x > goalX)
-                x--;
+                x -= OBSTRUCTION_VELOCITY;
 
             //if not an open space then it is obstructed
             if (!dungeon.hasMap(x, y))
@@ -290,9 +305,9 @@ public abstract class Enemy extends Entity3d {
                 return true;
 
             if (y < goalY)
-                y++;
+                y += OBSTRUCTION_VELOCITY;
             if (y > goalY)
-                y--;
+                y += OBSTRUCTION_VELOCITY;
 
             //if not an open space then it is obstructed
             if (!dungeon.hasMap(x, y))
@@ -301,6 +316,12 @@ public abstract class Enemy extends Entity3d {
             //if door isn't open, we are obstructed
             if (dungeon.hasInteract(x, y) && !isDoorOpen(level, x, y))
                 return true;
+
+            //if we are close enough
+            if (Math.abs(goalY - y) < OBSTRUCTION_VELOCITY)
+                y = goalY;
+            if (Math.abs(goalX - x) < OBSTRUCTION_VELOCITY)
+                x = goalX;
         }
 
         //nothing is blocking from viewing the player

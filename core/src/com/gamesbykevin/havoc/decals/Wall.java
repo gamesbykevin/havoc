@@ -10,6 +10,6 @@ public class Wall extends DecalCustom {
 
     @Override
     public void update() {
-
+        //do anything here?
     }
 }

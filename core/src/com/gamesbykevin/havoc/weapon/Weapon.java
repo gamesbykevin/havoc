@@ -7,6 +7,7 @@ import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Disposable;
 
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_EXT_PNG;
+import static com.gamesbykevin.havoc.assets.AudioHelper.playWeapon;
 import static com.gamesbykevin.havoc.weapon.WeaponHelper.*;
 
 public class Weapon extends Entity2d implements Disposable {
@@ -175,8 +176,15 @@ public class Weapon extends Entity2d implements Disposable {
         }
 
         //if we are resting and the player wants to shoot
-        if (isResting() && controller.isShooting() && getBullets() != 0)
-            setIndex(INDEX_STARTING);
+        if (isResting() && controller.isShooting()) {
+
+            if (getBullets() != 0) {
+                setIndex(INDEX_STARTING);
+            } else {
+                playWeapon(level.getAssetManager(), this);
+                controller.setShooting(false);
+            }
+        }
 
         //if the current animation is finished
         if (getAnimation().isFinish()) {
@@ -188,6 +196,9 @@ public class Weapon extends Entity2d implements Disposable {
                 //take a bullet away
                 setBullets(getBullets() - 1);
 
+                //play sound effect
+                playWeapon(level.getAssetManager(), this);
+
                 //check if attack hit enemy
                 checkAttack(level);
 
@@ -195,6 +206,10 @@ public class Weapon extends Entity2d implements Disposable {
 
                 //if the player no longer wishes to shoot, or we ran out of bullets we will stop
                 if (!controller.isShooting() || getBullets() == 0) {
+
+                    //play empty sound effect
+                    if (getBullets() == 0)
+                        playWeapon(level.getAssetManager(), this);
 
                     setIndex(INDEX_STOPPING);
 
@@ -205,6 +220,9 @@ public class Weapon extends Entity2d implements Disposable {
 
                     //take a bullet away
                     setBullets(getBullets() - 1);
+
+                    //play sound effect
+                    playWeapon(level.getAssetManager(), this);
 
                     //check if attack hit enemy
                     checkAttack(level);

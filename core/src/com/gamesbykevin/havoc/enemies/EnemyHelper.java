@@ -36,10 +36,14 @@ public class EnemyHelper {
                 door.open();
 
                 //enemy will remain idle until the door is open
-                if (!door.isOpen()) {
-                    enemy.setStatus(Status.Idle);
-                } else {
-                    enemy.setStatus(Status.Walk);
+                switch (door.getState()) {
+                    case Open:
+                        enemy.setStatus(Status.Walk);
+                        break;
+
+                    default:
+                        enemy.setStatus(Status.Idle);
+                        break;
                 }
 
             } else {
@@ -197,8 +201,25 @@ public class EnemyHelper {
         //change the speed since we are chasing
         enemy.setSpeed(SPEED_CHASE);
 
+        //start here
+        float col = level.getPlayer().getCamera3d().position.x;
+        float row = level.getPlayer().getCamera3d().position.y;
+
+        //let's make sure the player isn't walking into a door
+        if (level.getDungeon().hasInteract(col, row)) {
+            if (level.getDungeon().hasMap(col + 1, row) && !level.getDungeon().hasInteract(col + 1, row)) {
+                col++;
+            } else if (level.getDungeon().hasMap(col - 1, row) && !level.getDungeon().hasInteract(col - 1, row)) {
+                col--;
+            } else if (level.getDungeon().hasMap(col, row + 1) && !level.getDungeon().hasInteract(col, row + 1)) {
+                row++;
+            } else if (level.getDungeon().hasMap(col, row - 1) && !level.getDungeon().hasInteract(col, row - 1)) {
+                row--;
+            }
+        }
+
         //calculate the path to get to the player
-        calculatePath(level, enemy, enemy.getCol(), enemy.getRow(), level.getPlayer().getCamera3d().position.x, level.getPlayer().getCamera3d().position.y);
+        calculatePath(level, enemy, enemy.getCol(), enemy.getRow(), col, row);
     }
 
     public static void calculatePath(Level level, Enemy enemy, float startCol, float startRow, float finishCol, float finishRow) {

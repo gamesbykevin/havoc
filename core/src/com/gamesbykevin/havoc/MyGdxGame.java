@@ -2,6 +2,7 @@ package com.gamesbykevin.havoc;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,10 +12,11 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gamesbykevin.havoc.assets.AssetManagerHelper;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.player.Player;
-import com.gamesbykevin.havoc.texture.TextureHelper;
+import com.gamesbykevin.havoc.assets.TextureHelper;
 
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
-import static com.gamesbykevin.havoc.texture.TextureHelper.*;
+import static com.gamesbykevin.havoc.assets.AudioHelper.playHero;
+import static com.gamesbykevin.havoc.assets.TextureHelper.*;
 
 public class MyGdxGame extends ApplicationAdapter {
 
@@ -168,9 +170,11 @@ public class MyGdxGame extends ApplicationAdapter {
 							success = false;
 
 							//check if the asset is a texture
-							if (path.contains(ASSET_EXT_BMP) || path.contains(ASSET_EXT_PNG))
+							if (path.contains(ASSET_EXT_BMP) || path.contains(ASSET_EXT_PNG)) {
 								getAssetManager().load(path, Texture.class);
-
+							} else if (path.contains(ASSET_EXT_MP3) || path.contains(ASSET_EXT_OGG) || path.contains(ASSET_EXT_WAV)) {
+								getAssetManager().load(path, Sound.class);
+							}
 							renderProgressBar("Verifying assets");
 							break;
 						}
@@ -185,7 +189,6 @@ public class MyGdxGame extends ApplicationAdapter {
 				} else {
 					getAssetManager().update();
 					renderProgressBar(getAssetManager().getProgress(), "Loading assets");
-					System.out.println("progress: " + getAssetManager().getProgress());
 				}
 				break;
 
@@ -241,6 +244,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				} else {
 					renderProgressBar( "Applying textures");
 					setStep(Steps.Step8);
+					playHero(getAssetManager());
 				}
 				break;
 
@@ -275,8 +279,6 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 
 	private void renderProgressBar(float progress, String description) {
-
-		System.out.println(description);
 
 		float x = (SIZE_WIDTH - PROGRESS_BAR_WIDTH) / 2f;
 		float y = (SIZE_HEIGHT - PROGRESS_BAR_HEIGHT) / 2f;

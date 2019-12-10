@@ -6,6 +6,7 @@ import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.level.Level;
 
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_DIR_WEAPONS;
+import static com.gamesbykevin.havoc.assets.AudioHelper.*;
 import static com.gamesbykevin.havoc.enemies.Enemy.RANGE_NOTICE;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.chase;
 import static com.gamesbykevin.havoc.input.MyController.SPEED_WALK;
@@ -209,6 +210,9 @@ public class WeaponHelper {
                     //we can only hit 1 enemy
                     enemy = (Enemy)entity;
 
+                    if (!enemy.isHurt())
+                        playHurt(level.getAssetManager());
+
                     //the enemy is hurting
                     enemy.setStatus(Enemy.Status.Hurt);
 
@@ -264,9 +268,14 @@ public class WeaponHelper {
 
                 if (door != null) {
 
-                    //we hit the door
-                    if (!door.isOpen())
-                        return;
+                    switch (door.getState()) {
+                        case Open:
+                            break;
+
+                        //we hit the door
+                        default:
+                            return;
+                    }
 
                 } else {
 

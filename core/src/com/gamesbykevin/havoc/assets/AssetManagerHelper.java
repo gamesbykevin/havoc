@@ -1,6 +1,7 @@
 package com.gamesbykevin.havoc.assets;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.gamesbykevin.havoc.collectibles.Collectibles;
 import com.gamesbykevin.havoc.enemies.Boss;
@@ -49,8 +50,109 @@ public class AssetManagerHelper {
     private static List<Boss.Type> TYPE_BOSS;
     private static List<Soldier.Type> TYPE_SOLDIER;
 
+    //different file extensions
+    public static final String ASSET_EXT_BMP = ".bmp";
+    public static final String ASSET_EXT_PNG = ".png";
+    public static final String ASSET_EXT_OGG = ".ogg";
+    public static final String ASSET_EXT_WAV = ".wav";
+    public static final String ASSET_EXT_MP3 = ".mp3";
+
     //parent directory of our images
     public static final String PARENT_DIR_IMAGES = "images/";
+
+    //parent directory of our audio
+    public static final String PARENT_DIR_AUDIO = "audio/";
+
+    //directory of sound effects
+    public static final String PARENT_DIR_SOUND = PARENT_DIR_AUDIO + "sound/";
+
+    //where our sound effects are located
+    public static final String PARENT_DIR_SOUND_ENEMY   = PARENT_DIR_SOUND + "enemy/";
+    public static final String PARENT_DIR_SOUND_HERO    = PARENT_DIR_SOUND + "hero/";
+    public static final String PARENT_DIR_SOUND_ITEM    = PARENT_DIR_SOUND + "item/";
+    public static final String PARENT_DIR_SOUND_LEVEL   = PARENT_DIR_SOUND + "level/";
+    public static final String PARENT_DIR_SOUND_WEAPON  = PARENT_DIR_SOUND + "weapon/";
+
+    //direct path to sound effects
+    public static final String PATH_SHOOT_GLOCK = PARENT_DIR_SOUND_WEAPON + "glock" + ASSET_EXT_OGG;
+    public static final String PATH_SHOOT_SHOTGUN = PARENT_DIR_SOUND_WEAPON + "shotgun" + ASSET_EXT_WAV;
+    public static final String PATH_SHOOT_IMPACT = PARENT_DIR_SOUND_WEAPON + "impact" + ASSET_EXT_WAV;
+    public static final String PATH_SHOOT_SMG = PARENT_DIR_SOUND_WEAPON + "smg" + ASSET_EXT_WAV;
+    public static final String PATH_SHOOT_MAGNUM = PARENT_DIR_SOUND_WEAPON + "magnum" + ASSET_EXT_OGG;
+    public static final String PATH_SHOOT_BUZZ = PARENT_DIR_SOUND_WEAPON + "buzz" + ASSET_EXT_OGG;
+    public static final String PATH_SHOOT_LANCE = PARENT_DIR_SOUND_WEAPON + "lance" + ASSET_EXT_OGG;
+    public static final String PATH_SHOOT_EMPTY = PARENT_DIR_SOUND_WEAPON + "empty" + ASSET_EXT_OGG;
+    public static final String PATH_CHANGE = PARENT_DIR_SOUND_WEAPON + "change" + ASSET_EXT_OGG;
+
+    //sound effects for items
+    public static final String PATH_ADD_AMMO = PARENT_DIR_SOUND_ITEM + "ammo" + ASSET_EXT_WAV;
+    public static final String PATH_ADD_HEALTH_SMALL = PARENT_DIR_SOUND_ITEM + "healthSmall" + ASSET_EXT_WAV;
+    public static final String PATH_ADD_HEALTH_LARGE = PARENT_DIR_SOUND_ITEM + "healthLarge" + ASSET_EXT_WAV;
+    public static final String PATH_ADD_KEY = PARENT_DIR_SOUND_ITEM + "key" + ASSET_EXT_MP3;
+
+    //sound effects for level
+    public static final String PATH_LEVEL_SECRET = PARENT_DIR_SOUND_LEVEL + "secret" + ASSET_EXT_MP3;
+    public static final String PATH_LEVEL_OPEN = PARENT_DIR_SOUND_LEVEL + "open" + ASSET_EXT_WAV;
+    public static final String PATH_LEVEL_CLOSE = PARENT_DIR_SOUND_LEVEL + "close" + ASSET_EXT_WAV;
+    public static final String PATH_LEVEL_LOCK = PARENT_DIR_SOUND_LEVEL + "locked" + ASSET_EXT_MP3;
+    public static final String PATH_LEVEL_SWITCH = PARENT_DIR_SOUND_LEVEL + "switch" + ASSET_EXT_WAV;
+
+    //sound effects for hero
+    public static final String PATH_HERO_BRING_PAIN = PARENT_DIR_SOUND_HERO + "bringThePain" + ASSET_EXT_MP3;
+    public static final String PATH_HERO_GET_SOME_1 = PARENT_DIR_SOUND_HERO + "comeGetSome1" + ASSET_EXT_MP3;
+    public static final String PATH_HERO_GET_SOME_2 = PARENT_DIR_SOUND_HERO + "comeGetSome2" + ASSET_EXT_MP3;
+    public static final String PATH_HERO_GET_SOME_3 = PARENT_DIR_SOUND_HERO + "comeGetSome3" + ASSET_EXT_MP3;
+    public static final String PATH_HERO_GET_SOME_4 = PARENT_DIR_SOUND_HERO + "comeGetSome4" + ASSET_EXT_MP3;
+    public static final String PATH_HERO_TAKE_OUT = PARENT_DIR_SOUND_HERO + "takeEmOut" + ASSET_EXT_MP3;
+    public static final String PATH_HERO_TRASH_1 = PARENT_DIR_SOUND_HERO + "takeOutTrash1" + ASSET_EXT_MP3;
+    public static final String PATH_HERO_TRASH_2 = PARENT_DIR_SOUND_HERO + "takeOutTrash2" + ASSET_EXT_MP3;
+    public static final String PATH_HERO_TAKE_DOWN = PARENT_DIR_SOUND_HERO + "takeThemDown" + ASSET_EXT_MP3;
+    public static final String PATH_HERO_DEAD = PARENT_DIR_SOUND_HERO + "dead" + ASSET_EXT_MP3;
+
+    //sound effects for enemy alert
+    public static final String PATH_ENEMY_ALERT_1 = PARENT_DIR_SOUND_ENEMY + "alert1" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_ALERT_2 = PARENT_DIR_SOUND_ENEMY + "alert2" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_ALERT_3 = PARENT_DIR_SOUND_ENEMY + "alert3" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_ALERT_4 = PARENT_DIR_SOUND_ENEMY + "alert4" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_ALERT_5 = PARENT_DIR_SOUND_ENEMY + "alert5" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_ALERT_6 = PARENT_DIR_SOUND_ENEMY + "alert6" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_ALERT_7 = PARENT_DIR_SOUND_ENEMY + "alert7" + ASSET_EXT_MP3;
+
+    //sound effects for enemy hurt
+    public static final String PATH_ENEMY_HURT_1 = PARENT_DIR_SOUND_ENEMY + "hurt1" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_2 = PARENT_DIR_SOUND_ENEMY + "hurt2" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_3 = PARENT_DIR_SOUND_ENEMY + "hurt3" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_4 = PARENT_DIR_SOUND_ENEMY + "hurt4" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_5 = PARENT_DIR_SOUND_ENEMY + "hurt5" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_6 = PARENT_DIR_SOUND_ENEMY + "hurt6" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_7 = PARENT_DIR_SOUND_ENEMY + "hurt7" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_8 = PARENT_DIR_SOUND_ENEMY + "hurt8" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_9 = PARENT_DIR_SOUND_ENEMY + "hurt9" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_10 = PARENT_DIR_SOUND_ENEMY + "hurt10" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_11 = PARENT_DIR_SOUND_ENEMY + "hurt11" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_12 = PARENT_DIR_SOUND_ENEMY + "hurt12" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_13 = PARENT_DIR_SOUND_ENEMY + "hurt13" + ASSET_EXT_MP3;
+
+    //sound effects for enemy dead
+    public static final String PATH_ENEMY_DEAD_1 = PARENT_DIR_SOUND_ENEMY + "dead1" + ASSET_EXT_WAV;
+    public static final String PATH_ENEMY_DEAD_2 = PARENT_DIR_SOUND_ENEMY + "dead2" + ASSET_EXT_WAV;
+    public static final String PATH_ENEMY_DEAD_3 = PARENT_DIR_SOUND_ENEMY + "dead3" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_DEAD_4 = PARENT_DIR_SOUND_ENEMY + "dead4" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_DEAD_5 = PARENT_DIR_SOUND_ENEMY + "dead5" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_DEAD_6 = PARENT_DIR_SOUND_ENEMY + "dead6" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_DEAD_7 = PARENT_DIR_SOUND_ENEMY + "dead7" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_DEAD_8 = PARENT_DIR_SOUND_ENEMY + "dead8" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_DEAD_9 = PARENT_DIR_SOUND_ENEMY + "dead9" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_DEAD_10 = PARENT_DIR_SOUND_ENEMY + "dead10" + ASSET_EXT_OGG;
+
+    //sound effects for enemy shooting
+    public static final String PATH_ENEMY_SHOOT_1 = PARENT_DIR_SOUND_ENEMY + "weapon1" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_SHOOT_2 = PARENT_DIR_SOUND_ENEMY + "weapon2" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_SHOOT_3 = PARENT_DIR_SOUND_ENEMY + "weapon3" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_SHOOT_4 = PARENT_DIR_SOUND_ENEMY + "weapon4" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_SHOOT_5 = PARENT_DIR_SOUND_ENEMY + "weapon5" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_SHOOT_6 = PARENT_DIR_SOUND_ENEMY + "weapon6" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_SHOOT_7 = PARENT_DIR_SOUND_ENEMY + "weapon7" + ASSET_EXT_OGG;
 
     //where the sprite image is located
     public static final String ASSET_DIR_OBSTACLES = PARENT_DIR_IMAGES + "obstacles/";
@@ -68,10 +170,6 @@ public class AssetManagerHelper {
     public static final String ASSET_DIR_SOLDIER = ASSET_DIR_ENEMIES + "soldier/";
     public static final String ASSET_DIR_WEAPONS = PARENT_DIR_IMAGES + "weapons/";
     public static final String ASSET_DIR_HALLWAY     = PARENT_DIR_IMAGES + "hallway/";
-
-    //different file extensions
-    public static final String ASSET_EXT_BMP = ".bmp";
-    public static final String ASSET_EXT_PNG = ".png";
 
     //bulk of file names start with this
     public static final String FILENAME_WALL = "wall_";
@@ -241,6 +339,16 @@ public class AssetManagerHelper {
 
         //load the enemy sprites
         loadEnemies(assetManager);
+
+        //load the audio
+        loadAudioWeapon(assetManager);
+    }
+
+    private static void loadAudioWeapon(AssetManager assetManager) {
+
+        for (AudioHelper.Sfx sfx : AudioHelper.Sfx.values()) {
+            load(assetManager, sfx.getPath(), Sound.class);
+        }
     }
 
     private static void loadController(AssetManager assetManager) {

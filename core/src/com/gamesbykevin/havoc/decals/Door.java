@@ -6,18 +6,19 @@ import static com.gamesbykevin.havoc.MyGdxGame.FRAME_MS;
 
 public class Door extends DecalCustom {
 
-    //is the door open
-    private boolean open = false;
+    public enum State {
+        Start,
+        Opening,
+        Open,
+        Closing,
+        Closed
+    }
 
-    //are we opening or closing
-    private boolean opening = false;
-    private boolean closing = false;
-
-    //is the door closed
-    private boolean closed = false;
+    //what is the state of the door
+    private State state;
 
     //how fast we open / close the doors
-    private static final float DOOR_VELOCITY = .025f;
+    private static final float DOOR_VELOCITY = .0175f;
 
     //where we open the door to
     private float destination;
@@ -31,16 +32,24 @@ public class Door extends DecalCustom {
     //how long does the door stay open
     private static final float DOOR_OPEN_TIME = 3500f;
 
+    //how close do we need to be to hear the sound effect
+    public static final float DOOR_DISTANCE_SFX_RATIO = 0.5f;
+
     //is this door a secret
     private boolean secret;
 
     protected Door(TextureRegion texture, Side side, boolean secret) {
         super(texture, Type.Door, side, TEXTURE_WIDTH, TEXTURE_HEIGHT);
-        setOpen(false);
-        setOpening(false);
-        setClosing(false);
-        setClosed(true);
         setSecret(secret);
+        setState(State.Closed);
+    }
+
+    public State getState() {
+        return this.state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 
     public boolean isSecret() {
@@ -78,82 +87,88 @@ public class Door extends DecalCustom {
     @Override
     public void update() {
 
-        if (isOpening()) {
+        //distance from the door to the player
+        double dist = -1;
 
-            switch (getSide()) {
-                case East:
-                case West:
+        switch (getState()) {
 
-                    //slide door open
-                    getDecal().translate(0, -DOOR_VELOCITY, 0);
+            case Start:
+                setLapsed(0);
+                setState(State.Opening);
+                break;
 
-                    //door is open all the way now
-                    if (getDecal().getPosition().y < getDestination()) {
-                        getDecal().getPosition().y = getDestination();
-                        setLapsed(0);
-                        setOpening(false);
-                        setOpen(true);
-                    }
-                    break;
+            case Opening:
+                switch (getSide()) {
+                    case East:
+                    case West:
 
-                case North:
-                case South:
+                        //slide door open
+                        getDecal().translate(0, -DOOR_VELOCITY, 0);
 
-                    //slide door open
-                    getDecal().translate(-DOOR_VELOCITY, 0, 0);
+                        //door is open all the way now
+                        if (getDecal().getPosition().y < getDestination()) {
+                            getDecal().getPosition().y = getDestination();
+                            setLapsed(0);
+                            setState(State.Open);
+                        }
+                        break;
 
-                    //door is open all the way now
-                    if (getDecal().getPosition().x < getDestination()) {
-                        getDecal().getPosition().x = getDestination();
-                        setLapsed(0);
-                        setOpening(false);
-                        setOpen(true);
-                    }
-                    break;
-            }
+                    case North:
+                    case South:
 
-        } else if (isOpen()) {
+                        //slide door open
+                        getDecal().translate(-DOOR_VELOCITY, 0, 0);
 
-            //keep track of time
-            setLapsed(getLapsed() + FRAME_MS);
+                        //door is open all the way now
+                        if (getDecal().getPosition().x < getDestination()) {
+                            getDecal().getPosition().x = getDestination();
+                            setLapsed(0);
+                            setState(State.Open);
+                        }
+                        break;
+                }
+                break;
 
-            //if the door was open for long enough we can start to close it
-            if (getLapsed() >= DOOR_OPEN_TIME) {
-                setOpen(false);
-                setClosing(true);
-            }
+            case Open:
 
-        } else if (isClosing()) {
+                //keep track of time
+                setLapsed(getLapsed() + FRAME_MS);
 
-            switch (getSide()) {
-                case East:
-                case West:
+                //if the door was open for long enough we can start to close it
+                if (getLapsed() >= DOOR_OPEN_TIME)
+                    setState(State.Closing);
+                break;
 
-                    //slide door open
-                    getDecal().translate(0, DOOR_VELOCITY, 0);
+            case Closing:
 
-                    //door is open all the way now
-                    if (getDecal().getPosition().y >= getStart()) {
-                        getDecal().getPosition().y = getStart();
-                        setClosing(false);
-                        setClosed(true);
-                    }
-                    break;
+                switch (getSide()) {
+                    case East:
+                    case West:
 
-                case North:
-                case South:
+                        //slide door open
+                        getDecal().translate(0, DOOR_VELOCITY, 0);
 
-                    //slide door open
-                    getDecal().translate(DOOR_VELOCITY, 0, 0);
+                        //door is open all the way now
+                        if (getDecal().getPosition().y >= getStart()) {
+                            getDecal().getPosition().y = getStart();
+                            setState(State.Closed);
+                        }
+                        break;
 
-                    //door is open all the way now
-                    if (getDecal().getPosition().x >= getStart()) {
-                        getDecal().getPosition().x = getStart();
-                        setClosing(false);
-                        setClosed(true);
-                    }
-                    break;
-            }
+                    case North:
+                    case South:
+
+                        //slide door open
+                        getDecal().translate(DOOR_VELOCITY, 0, 0);
+
+                        //door is open all the way now
+                        if (getDecal().getPosition().x >= getStart()) {
+                            getDecal().getPosition().x = getStart();
+                            setState(State.Closed);
+                        }
+                        break;
+                }
+                break;
 
         }
     }
@@ -161,44 +176,12 @@ public class Door extends DecalCustom {
     //open the door
     public void open() {
 
-        //we can only open if the door is closed
-        if (!isClosed())
-            return;
+        switch (getState()) {
 
-        setClosed(false);
-        setOpening(true);
-        setLapsed(0);
-    }
-
-    public boolean isOpen() {
-        return this.open;
-    }
-
-    private void setOpen(boolean open) {
-        this.open = open;
-    }
-
-    public boolean isClosed() {
-        return this.closed;
-    }
-
-    private void setClosed(boolean closed) {
-        this.closed = closed;
-    }
-
-    public boolean isOpening() {
-        return this.opening;
-    }
-
-    private void setOpening(boolean opening) {
-        this.opening = opening;
-    }
-
-    public boolean isClosing() {
-        return this.closing;
-    }
-
-    private void setClosing(boolean closing) {
-        this.closing = closing;
+            //we can only open if the door is closed
+            case Closed:
+                setState(State.Start);
+                break;
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.gamesbykevin.havoc.weapon;
 
+import com.badlogic.gdx.audio.Sound;
 import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
@@ -7,6 +8,7 @@ import com.gamesbykevin.havoc.util.Disposable;
 import com.gamesbykevin.havoc.util.Hud;
 import com.gamesbykevin.havoc.util.Restart;
 
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_CHANGE;
 import static com.gamesbykevin.havoc.weapon.WeaponHelper.*;
 import static com.gamesbykevin.havoc.util.Hud.*;
 
@@ -33,6 +35,14 @@ public final class Weapons extends Entities implements Disposable, Restart {
         //add weapon to our list
         add(Type.Lance);
         add(Type.Glock);
+
+        /*
+        add(Type.Buzz);
+        add(Type.Impact);
+        add(Type.Magnum);
+        add(Type.Shotgun);
+        add(Type.Smg);
+        */
 
         for (int i = 0; i < getEntityList().size(); i++) {
             getEntityList().get(i).reset();
@@ -139,8 +149,10 @@ public final class Weapons extends Entities implements Disposable, Restart {
 
         } else {
 
-            if (controller.isChange())
+            if (controller.isChange()) {
                 weapon.setSwitchingOff(true);
+                getLevel().getAssetManager().get(PATH_CHANGE, Sound.class).play();
+            }
 
             //update the current weapon if we aren't switching
             weapon.update(getLevel());

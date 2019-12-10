@@ -1,5 +1,7 @@
 package com.gamesbykevin.havoc.collectibles;
 
+import com.badlogic.gdx.audio.Sound;
+import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.level.Level;
@@ -7,6 +9,7 @@ import com.gamesbykevin.havoc.player.Player;
 import com.gamesbykevin.havoc.weapon.WeaponHelper;
 import com.gamesbykevin.havoc.weapon.Weapons;
 
+import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.player.Player.HEALTH_MAX;
 import static com.gamesbykevin.havoc.player.PlayerHelper.HEALTH_LARGE;
 import static com.gamesbykevin.havoc.player.PlayerHelper.HEALTH_SMALL;
@@ -87,6 +90,7 @@ public class CollectibleHelper {
 
                     //only collect if we aren't at the max
                     if (weapons.getWeapon().getBullets() < weapons.getWeapon().getType().getBulletsMax()) {
+                        playSfx(level.getAssetManager(), AudioHelper.Sfx.ItemAddAmmo);
                         weapons.getWeapon().addAmmoSmall();
                         collected = true;
                     }
@@ -96,6 +100,7 @@ public class CollectibleHelper {
 
                     //only collect if we aren't at the max
                     if (weapons.getWeapon().getBullets() < weapons.getWeapon().getType().getBulletsMax()) {
+                        playSfx(level.getAssetManager(), AudioHelper.Sfx.ItemAddAmmo);
                         weapons.getWeapon().addAmmoLarge();
                         collected = true;
                     }
@@ -105,6 +110,7 @@ public class CollectibleHelper {
 
                     //only collect if we aren't at the max
                     if (player.getHealth() < HEALTH_MAX) {
+                        playSfx(level.getAssetManager(), AudioHelper.Sfx.ItemHealthLarge);
                         player.setHealth(player.getHealth() + HEALTH_LARGE);
                         collected = true;
                     }
@@ -114,12 +120,14 @@ public class CollectibleHelper {
 
                     //only collect if we aren't at the max
                     if (player.getHealth() < HEALTH_MAX) {
+                        playSfx(level.getAssetManager(), AudioHelper.Sfx.ItemHealthSmall);
                         player.setHealth(player.getHealth() + HEALTH_SMALL);
                         collected = true;
                     }
                     break;
 
                 case key:
+                    playSfx(level.getAssetManager(), AudioHelper.Sfx.ItemKey);
                     player.setKey(true);
                     collected = true;
                     break;
@@ -132,8 +140,10 @@ public class CollectibleHelper {
             }
 
             //flag we are switching weapons
-            if (add)
+            if (add) {
+                playSfx(level.getAssetManager(), AudioHelper.Sfx.WeaponChange);
                 player.getController().setChange(true);
+            }
         }
     }
 }

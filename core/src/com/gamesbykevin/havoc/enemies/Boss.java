@@ -3,6 +3,7 @@ package com.gamesbykevin.havoc.enemies;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
+import com.gamesbykevin.havoc.assets.AudioHelper;
 
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 import static com.gamesbykevin.havoc.player.Player.HEALTH_MAX;
@@ -66,6 +67,26 @@ public final class Boss extends Enemy {
 
         //assign the damage
         setDamage(type.damage);
+
+        switch (type) {
+            case boss_1:
+            case boss_2:
+            case boss_3:
+            case boss_4:
+            case boss_5:
+            case boss_6:
+            case boss_7:
+            case boss_8:
+            case boss_9:
+            case boss_10:
+            case boss_11:
+            case boss_12:
+            case boss_13:
+            case boss_14:
+            default:
+                super.setShoot(AudioHelper.Sfx.EnemyWeaponShoot7);
+                break;
+        }
 
         //setup animations
         getAnimations()[INDEX_IDLE] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, ASSET_EXT_BMP, 2, 1, DURATION_IDLE);

@@ -313,9 +313,6 @@ public final class Collectibles extends Entities {
         int colStart = room.getX() + 3;
         int rowStart = room.getY() + 3;
 
-        int colQuart = room.getX() + (room.getW() / 4);
-        int rowQuart = room.getY() + (room.getH() / 4);
-
         int colMiddle = room.getX() + (room.getW() / 2);
         int rowMiddle = room.getY() + (room.getH() / 2);
 
@@ -323,22 +320,14 @@ public final class Collectibles extends Entities {
         int rowEnd = room.getY() + room.getH() - 3;
 
         addTmp(getLevel(), options, colStart, rowStart);
-        addTmp(getLevel(), options, colStart, rowQuart);
         addTmp(getLevel(), options, colStart, rowMiddle);
         addTmp(getLevel(), options, colStart, rowEnd);
 
-        addTmp(getLevel(), options, colQuart, rowStart);
-        addTmp(getLevel(), options, colQuart, rowQuart);
-        addTmp(getLevel(), options, colQuart, rowMiddle);
-        addTmp(getLevel(), options, colQuart, rowEnd);
-
         addTmp(getLevel(), options, colMiddle, rowStart);
-        addTmp(getLevel(), options, colMiddle, rowQuart);
         addTmp(getLevel(), options, colMiddle, rowMiddle);
         addTmp(getLevel(), options, colMiddle, rowEnd);
 
         addTmp(getLevel(), options, colEnd, rowStart);
-        addTmp(getLevel(), options, colEnd, rowQuart);
         addTmp(getLevel(), options, colEnd, rowMiddle);
         addTmp(getLevel(), options, colEnd, rowEnd);
 

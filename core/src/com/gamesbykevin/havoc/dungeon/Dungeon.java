@@ -301,6 +301,10 @@ public class Dungeon implements Disposable {
         return this.interact;
     }
 
+    public boolean hasInteract(float col, float row) {
+        return hasInteract((int)col, (int)row);
+    }
+
     public boolean hasInteract(int col, int row) {
 
         if (col < 0 || row < 0)

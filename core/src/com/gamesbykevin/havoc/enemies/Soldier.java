@@ -3,6 +3,7 @@ package com.gamesbykevin.havoc.enemies;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
+import com.gamesbykevin.havoc.assets.AudioHelper;
 
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.*;
@@ -104,6 +105,58 @@ public final class Soldier extends Enemy {
 
         //set the allowed damage
         setDamage(type.damage);
+
+        switch (type) {
+            case guard_1:
+            case guard_2:
+            case guard_3:
+            case guard_4:
+            case guard_5:
+            case guard_6:
+            case guard_7:
+            case guard_8:
+            case guard_9:
+            case guard_10:
+            case guard_11:
+            case guard_12:
+            default:
+                super.setShoot(AudioHelper.Sfx.EnemyWeaponShoot1);
+                break;
+
+            case major_1:
+            case major_2:
+                super.setShoot(AudioHelper.Sfx.EnemyWeaponShoot2);
+                break;
+
+            case sergeant_1:
+            case sergeant_2:
+            case sergeant_3:
+            case sergeant_4:
+            case sergeant_5:
+                super.setShoot(AudioHelper.Sfx.EnemyWeaponShoot3);
+                break;
+
+            case officer_1:
+            case officer_2:
+            case officer_3:
+            case officer_4:
+            case officer_5:
+                super.setShoot(AudioHelper.Sfx.EnemyWeaponShoot4);
+                break;
+
+            case doctor_1:
+            case doctor_2:
+                super.setShoot(AudioHelper.Sfx.EnemyWeaponShoot5);
+                break;
+
+            case lieutenant_1:
+            case lieutenant_2:
+            case lieutenant_3:
+            case lieutenant_4:
+            case lieutenant_5:
+                super.setShoot(AudioHelper.Sfx.EnemyWeaponShoot6);
+                break;
+        }
 
         //setup animations
         getAnimations()[INDEX_DIE] = new DecalAnimation(assetManager, type.path, FILENAME_DIE, ASSET_EXT_BMP, 1, 4, DURATION_DIE);

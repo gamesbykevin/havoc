@@ -6,14 +6,17 @@ import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.level.Level;
+import com.gamesbykevin.havoc.util.Timer;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.getTypeBoss;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.getTypeSoldier;
+import static com.gamesbykevin.havoc.assets.AudioHelper.*;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
+import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.*;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
@@ -22,8 +25,26 @@ public final class Enemies extends Entities {
     //how many enemies in each room
     public static final int ENEMIES_PER_ROOM_MAX = 3;
 
+    //how close do we need to be to play the sound effect
+    public static final float ENEMY_DISTANCE_SFX_RATIO = 0.5f;
+
+    //different timers for playing sound effects
+    private Timer timerHurt, timerAlert, timerDead, timerShoot;
+
+    //how long until we can play the sfx again?
+    public static final float DURATION_HURT = 500f;
+    public static final float DURATION_ALERT = 2750f;
+    public static final float DURATION_DEAD = 500f;
+    public static final float DURATION_SHOOT = 400f;
+
     public Enemies(Level level) {
         super(level);
+
+        //create our timers
+        this.timerAlert = new Timer(DURATION_ALERT);
+        this.timerHurt = new Timer(DURATION_HURT);
+        this.timerDead = new Timer(DURATION_DEAD);
+        this.timerShoot = new Timer(DURATION_SHOOT);
     }
 
     public boolean hasCollision(float x, float y) {
@@ -184,43 +205,59 @@ public final class Enemies extends Entities {
 
         //all 4 sides
         for (int col = room.getX() + 2; col < room.getX() + room.getW() - 2; col++) {
-            add(options, getLevel().getDungeon().getCell(col, room.getY() + 2), target);
-            add(options, getLevel().getDungeon().getCell(col, room.getY() + room.getH() - 3), target);
+            addOption(options, getLevel().getDungeon().getCell(col, room.getY() + 2), target);
+            addOption(options, getLevel().getDungeon().getCell(col, room.getY() + room.getH() - 3), target);
         }
 
         for (int row = room.getY() + 2; row < room.getY() + room.getH() - 2; row++) {
-            add(options, getLevel().getDungeon().getCell(room.getX() + 2, row), target);
-            add(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - 3, row), target);
+            addOption(options, getLevel().getDungeon().getCell(room.getX() + 2, row), target);
+            addOption(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - 3, row), target);
         }
 
         //north south east west
-        add(options, getLevel().getDungeon().getCell(room.getX() + 2, room.getY() + (room.getH() / 2)), target);
-        add(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - 3, room.getY() + (room.getH() / 2)), target);
-        add(options, getLevel().getDungeon().getCell(room.getX() + (room.getW() / 2), room.getY() + 2), target);
-        add(options, getLevel().getDungeon().getCell(room.getX() + (room.getW() / 2), room.getY() + room.getH() - 3), target);
+        addOption(options, getLevel().getDungeon().getCell(room.getX() + 2, room.getY() + (room.getH() / 2)), target);
+        addOption(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - 3, room.getY() + (room.getH() / 2)), target);
+        addOption(options, getLevel().getDungeon().getCell(room.getX() + (room.getW() / 2), room.getY() + 2), target);
+        addOption(options, getLevel().getDungeon().getCell(room.getX() + (room.getW() / 2), room.getY() + room.getH() - 3), target);
 
         //4 corners inner
         for (int i = 2; i < (room.getW() / 2); i++) {
-            add(options, getLevel().getDungeon().getCell(room.getX() + i, room.getY() + i), target);
-            add(options, getLevel().getDungeon().getCell(room.getX() + i, room.getY() + room.getH() - i - 1), target);
-            add(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - i - 1, room.getY() + i), target);
-            add(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - i - 1, room.getY() + room.getH() - i - 1), target);
+            addOption(options, getLevel().getDungeon().getCell(room.getX() + i, room.getY() + i), target);
+            addOption(options, getLevel().getDungeon().getCell(room.getX() + i, room.getY() + room.getH() - i - 1), target);
+            addOption(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - i - 1, room.getY() + i), target);
+            addOption(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - i - 1, room.getY() + room.getH() - i - 1), target);
         }
 
         //center
-        add(options, getLevel().getDungeon().getCell(room.getX() + (room.getW() / 2), room.getY() + (room.getH() / 2)), target);
+        addOption(options, getLevel().getDungeon().getCell(room.getX() + (room.getW() / 2), room.getY() + (room.getH() / 2)), target);
 
         //return our options
         return options;
     }
 
-    private void add(List<Cell> options, Cell option, Cell target) {
+    private void addOption(List<Cell> options, Cell option, Cell target) {
 
         if (target != null && (option.getCol() == target.getCol() && option.getRow() == target.getRow()))
             return;
 
         if (!hasEntityLocation(option.getCol(), option.getRow()))
             options.add(option);
+    }
+
+    public Timer getTimerHurt() {
+        return this.timerHurt;
+    }
+
+    public Timer getTimerAlert() {
+        return this.timerAlert;
+    }
+
+    public Timer getTimerDead() {
+        return this.timerDead;
+    }
+
+    public Timer getTimerShoot() {
+        return this.timerShoot;
     }
 
     @Override
@@ -246,16 +283,82 @@ public final class Enemies extends Entities {
             //calculate the patrol path
             calculatePath(getLevel(), enemy, enemy.getStartCol(), enemy.getStartRow(), enemy.getFinishCol(), enemy.getFinishRow());
         }
+
+        //reset timers
+        getTimerAlert().reset();
+        getTimerDead().reset();
+        getTimerHurt().reset();
+        getTimerShoot().reset();
     }
 
     @Override
     public void update() {
 
+        //update timers
+        getTimerShoot().update();
+        getTimerHurt().update();
+        getTimerDead().update();
+        getTimerAlert().update();
+
+        //shoot sound effect
+        Sfx shoot = null;
+        boolean hurt = false;
+        boolean dead = false;
+        boolean alert = false;
+
         //update the enemies
         for (int i = 0; i < getEntityList().size(); i++) {
 
+            Enemy enemy = (Enemy)getEntityList().get(i);
+
+            boolean near = getDistance(getLevel().getPlayer(), enemy) < ROOM_DIMENSION_MAX * ENEMY_DISTANCE_SFX_RATIO;
+
+            boolean check = false;
+
+            //make sure we are near enough to play a sound effect
+            if (near) {
+
+                //check if any of the following happened
+                if (shoot == null && getTimerShoot().isExpired() && (enemy.isShoot() || enemy.isAlert()))
+                    check = true;
+                if (!hurt && getTimerHurt().isExpired() && enemy.isHurt())
+                    hurt = true;
+                if (!dead && getTimerDead().isExpired() && enemy.getHealth() <= 0 && !enemy.isDie())
+                    dead = true;
+                if (!alert && getTimerAlert().isExpired() && enemy.isAlert())
+                    alert = true;
+            }
+
             //update the current entity
-            getEntityList().get(i).update(getLevel());
+            enemy.update(getLevel());
+
+            if (near) {
+                if (check && shoot == null && !enemy.isShoot())
+                    shoot = enemy.getShoot();
+            }
+        }
+
+        if (!getLevel().getPlayer().isDead()) {
+
+            if (hurt) {
+                playHurt(getLevel().getAssetManager());
+                getTimerHurt().reset();
+            }
+
+            if (alert && shoot == null) {
+                playAlert(getLevel().getAssetManager());
+                getTimerAlert().reset();
+            }
+
+            if (dead) {
+                playDead(getLevel().getAssetManager());
+                getTimerDead().reset();
+            }
+
+            if (shoot != null) {
+                playSfx(getLevel().getAssetManager(), shoot);
+                getTimerShoot().reset();
+            }
         }
     }
 }

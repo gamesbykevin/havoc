@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.entities.Entity;
+import com.gamesbykevin.havoc.player.Player;
 
 public class Distance {
 
@@ -26,6 +27,14 @@ public class Distance {
 
     public static double getDistance(Entity entity, float x2, float y2) {
         return getDistance(entity.getCol(), entity.getRow(), x2, y2);
+    }
+
+    public static double getDistance(Player player, Entity entity) {
+        return getDistance(player.getCamera3d().position.x, player.getCamera3d().position.y, entity.getCol(), entity.getRow());
+    }
+
+    public static double getDistance(Player player, float x2, float y2) {
+        return getDistance(player.getCamera3d().position.x, player.getCamera3d().position.y, x2, y2);
     }
 
     public static double getDistance(float x1, float y1, float x2, float y2) {
