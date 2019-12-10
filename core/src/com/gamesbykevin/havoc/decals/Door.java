@@ -38,6 +38,9 @@ public class Door extends DecalCustom {
     //is this door a secret
     private boolean secret;
 
+    //was this door ever opened?
+    private boolean once;
+
     protected Door(TextureRegion texture, Side side, boolean secret) {
         super(texture, Type.Door, side, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         setSecret(secret);
@@ -50,6 +53,14 @@ public class Door extends DecalCustom {
 
     public void setState(State state) {
         this.state = state;
+    }
+
+    public boolean isOnce() {
+        return this.once;
+    }
+
+    public void setOnce(boolean once) {
+        this.once = once;
     }
 
     public boolean isSecret() {
@@ -178,9 +189,14 @@ public class Door extends DecalCustom {
 
         switch (getState()) {
 
-            //we can only open if the door is closed
             case Closed:
+
+                //flag that we can start opening the door
                 setState(State.Start);
+
+                //flag that the door was opened at least once if it is a secret
+                if (isSecret())
+                    setOnce(true);
                 break;
         }
     }

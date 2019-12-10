@@ -36,6 +36,9 @@ public final class Player implements Disposable, Restart {
     //do we have the key
     private boolean key = false;
 
+    //did we find the goal?
+    private boolean goal = false;
+
     //the previous location of the player
     private Vector3 previous;
 
@@ -152,6 +155,14 @@ public final class Player implements Disposable, Restart {
             this.health = HEALTH_MAX;
     }
 
+    public boolean isGoal() {
+        return this.goal;
+    }
+
+    public void setGoal(boolean goal) {
+        this.goal = goal;
+    }
+
     public boolean hasKey() {
         return this.key;
     }
@@ -219,6 +230,11 @@ public final class Player implements Disposable, Restart {
                 if (getController().isTouch() || Gdx.input.justTouched())
                     level.setReset(true);
             }
+        } else if (isGoal()) {
+
+            //if the controller has been touched, flag reset
+            //if (getController().isTouch() || Gdx.input.justTouched())
+            //    level.setReset(true);
         }
     }
 
@@ -250,6 +266,9 @@ public final class Player implements Disposable, Restart {
 
         //reset the camera position
         getCamera3d(true);
+
+        //we didn't find the goal yet
+        setGoal(false);
     }
 
     public void render() {
@@ -268,7 +287,7 @@ public final class Player implements Disposable, Restart {
         if (isHurt() || isDead()) {
             batch.draw(getAssetManager().get(PATH_HURT, Texture.class), 0, 0, SIZE_WIDTH, SIZE_HEIGHT);
             setHurt(false);
-        } else if (isCollect()) {
+        } else if (isCollect() || isGoal()) {
             batch.draw(getAssetManager().get(PATH_COLLECT, Texture.class), 0, 0, SIZE_WIDTH, SIZE_HEIGHT);
             setCollect(false);
         }

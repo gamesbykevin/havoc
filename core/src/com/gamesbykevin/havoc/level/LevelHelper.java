@@ -7,6 +7,7 @@ import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.dungeon.Cell;
+import com.gamesbykevin.havoc.player.Player;
 
 import java.util.List;
 
@@ -164,21 +165,6 @@ public class LevelHelper {
         return goal;
     }
 
-    protected static void updateLevel(Level level) {
-
-        updateDoors(level);
-
-        //if we are performing action check if we can open a door or hit a switch
-        if (level.getPlayer().getController().isAction()) {
-
-            //interact with the level
-            boolean goal = updateInteract(level, level.getPlayer().getCamera3d().position, level.getPlayer().hasKey());
-
-            //set action back to false
-            level.getPlayer().getController().setAction(false);
-        }
-    }
-
     private static void updateDoors(Level level) {
 
         //if opening or closing we only want to play 1 sound effect
@@ -201,15 +187,14 @@ public class LevelHelper {
 
                         //only need to confirm open once
                         if (!open && !door.isSecret()) {
-                            if (getDistance(level.getPlayer(), door.getCol(), door.getRow()) <= ROOM_DIMENSION_MAX * DOOR_DISTANCE_SFX_RATIO)
+                            if (getDistance(level.getPlayer(), door) <= ROOM_DIMENSION_MAX * DOOR_DISTANCE_SFX_RATIO)
                                 open = true;
                         }
 
                         if (!secret && door.isSecret()) {
-                            if (getDistance(level.getPlayer(), door.getCol(), door.getRow()) <= ROOM_DIMENSION_MAX * DOOR_DISTANCE_SFX_RATIO)
+                            if (getDistance(level.getPlayer(), door) <= ROOM_DIMENSION_MAX * DOOR_DISTANCE_SFX_RATIO)
                                 secret = true;
                         }
-
                         break;
 
                     case Open:
@@ -225,7 +210,7 @@ public class LevelHelper {
                     case Closing:
 
                         if (!close && opened) {
-                            if (getDistance(level.getPlayer(), door.getCol(), door.getRow()) <= ROOM_DIMENSION_MAX * DOOR_DISTANCE_SFX_RATIO)
+                            if (getDistance(level.getPlayer(), door) <= ROOM_DIMENSION_MAX * DOOR_DISTANCE_SFX_RATIO)
                                 close = true;
                         }
                         break;
@@ -263,6 +248,73 @@ public class LevelHelper {
 
             default:
                 return false;
+        }
+    }
+
+
+    protected static void updateLevel(Level level) {
+
+        //update the doors in the level
+        updateDoors(level);
+
+        Player player = level.getPlayer();
+
+        //if we are performing action check if we can open a door or hit a switch
+        if (player.getController().isAction()) {
+
+            //interact with the level
+            boolean goal = updateInteract(level, player.getCamera3d().position, player.hasKey());
+
+            //did the player interact with the goal?
+            player.setGoal(goal);
+
+            //if the player got the goal calculate the totals
+            if (player.isGoal()) {
+
+                //how many enemies are there?
+                float enemiesTotal = level.getEnemies().getEntityList().size();
+
+                //how many enemies did we kill?
+                float enemiesKilled = 0;
+                for (int i = 0; i < level.getEnemies().getEntityList().size(); i++) {
+                    if (!level.getEnemies().getEntityList().get(i).isSolid())
+                        enemiesKilled++;
+                }
+
+                //total # of collectibles
+                float collectiblesTotal = level.getCollectibles().getEntityList().size();
+
+                float collectiblesConsumed = 0;
+                for (int i = 0; i < level.getCollectibles().getEntityList().size(); i++) {
+                    if (!level.getCollectibles().getEntityList().get(i).isSolid())
+                        collectiblesConsumed++;
+                }
+
+                float secretTotal = 0;
+                float secretOpen = 0;
+
+                for (int row = 0; row < level.getDoorDecals().length; row++) {
+                    for (int col = 0; col < level.getDoorDecals()[0].length; col++) {
+
+                        Door door = level.getDoorDecal(col, row);
+
+                        if (door == null)
+                            continue;
+
+                        if (door.isSecret())
+                            secretTotal++;
+                        if (door.isOnce())
+                            secretOpen++;
+                    }
+                }
+
+                System.out.println("Enemies: " + enemiesKilled + " of " + enemiesTotal);
+                System.out.println("Collectibles: " + collectiblesConsumed + " of " + collectiblesTotal);
+                System.out.println("Secrets:" + secretOpen + " of " + secretTotal);
+            }
+
+            //set action back to false
+            player.getController().setAction(false);
         }
     }
 }
