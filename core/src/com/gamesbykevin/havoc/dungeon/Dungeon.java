@@ -2,6 +2,7 @@ package com.gamesbykevin.havoc.dungeon;
 
 import com.gamesbykevin.havoc.astar.AStar;
 import com.gamesbykevin.havoc.dungeon.Cell.Type;
+import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Disposable;
 
@@ -130,8 +131,8 @@ public class Dungeon implements Disposable {
                     if (x != 0 && y != 0 || x == 0 && y == 0)
                         continue;
 
-                    int row = cell.getRow() + y;
-                    int col = cell.getCol() + x;
+                    int row = (int)(cell.getRow() + y);
+                    int col = (int)(cell.getCol() + x);
 
                     if (col < 0 || col >= getCols())
                         continue;
@@ -271,6 +272,10 @@ public class Dungeon implements Disposable {
         }
     }
 
+    public Cell getCell(float col, float row) {
+        return getCell((int)col, (int)row);
+    }
+
     public Cell getCell(int col, int row) {
 
         if (col < 0 || row < 0 || col >= getCols() || row >= getRows())
@@ -299,6 +304,10 @@ public class Dungeon implements Disposable {
 
     private boolean[][] getInteract() {
         return this.interact;
+    }
+
+    public boolean hasInteract(Entity entity) {
+        return hasInteract(entity.getCol(), entity.getRow());
     }
 
     public boolean hasInteract(float col, float row) {

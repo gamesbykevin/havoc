@@ -143,6 +143,9 @@ public final class Enemies extends Entities {
                     }
                 }
 
+                //set the direction default when we reset
+                enemy.setDirectionDefault(enemy.getDirection());
+
                 //for patrol
                 Cell winner = null;
 

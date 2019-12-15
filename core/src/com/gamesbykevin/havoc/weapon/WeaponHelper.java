@@ -1,15 +1,17 @@
 package com.gamesbykevin.havoc.weapon;
 
-import com.gamesbykevin.havoc.decals.Door;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.collision.Ray;
 import com.gamesbykevin.havoc.enemies.Enemy;
-import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.level.Level;
 
+import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
+import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_DIR_WEAPONS;
 import static com.gamesbykevin.havoc.assets.AudioHelper.*;
+import static com.gamesbykevin.havoc.decals.Square.COLLISION_RADIUS;
 import static com.gamesbykevin.havoc.enemies.Enemy.RANGE_NOTICE;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.chase;
-import static com.gamesbykevin.havoc.input.MyController.SPEED_WALK;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public class WeaponHelper {
@@ -47,15 +49,9 @@ public class WeaponHelper {
     //how fast do we switch our weapon
     protected static final float DEFAULT_VELOCITY_SWITCH_Y = 6f;
 
-    //how many times do we check for collision
-    private static final int ATTEMPT_LIMIT = 200;
-
-    //how close does the bullet need to be for collision detection
-    private static final double BULLET_DISTANCE = 1.25d;
-
     //how much ammo to add when we collect a collectible
     public static final float AMMO_SMALL_RATIO = .10f;
-    public static final float AMMO_LARGE_RATIO = .33f;
+    public static final float AMMO_LARGE_RATIO = .25f;
 
     //different types of weapons
     public enum Type {
@@ -154,138 +150,97 @@ public class WeaponHelper {
 
     public static void checkAttack(Level level) {
 
-        final double rotation = level.getPlayer().getController().getRotation();
-
         //get the current assigned weapon
         Weapon weapon = level.getPlayer().getWeapons().getWeapon();
 
-        //what direction are we facing
-        double angle = Math.toRadians(rotation);
+        //we can only hit 1 enemy
+        boolean strike = false;
 
-        //start position of attack
-        float col = level.getPlayer().getCamera3d().position.x;
-        float row = level.getPlayer().getCamera3d().position.y;
+        //check every enemy
+        for (int i = 0; i < level.getEnemies().getEntityList().size(); i++) {
 
-        //calculate the distance moved
-        float xa = (float)((0 * Math.cos(angle)) - (1 * Math.sin(angle)));
-        float ya = (float)((1 * Math.cos(angle)) + (0 * Math.sin(angle)));
-        xa *= SPEED_WALK;
-        ya *= SPEED_WALK;
+            Enemy enemy = (Enemy)level.getEnemies().getEntityList().get(i);
 
-        int attempts = 0;
+            //skip if dead
+            if (!enemy.isSolid())
+                continue;
 
-        //do we have range
-        boolean range = false;
+            //how far are we from the enemy
+            double distance = getDistance(enemy, level.getPlayer().getCamera3d());
 
-        //enemy that we hit
-        Enemy enemy = null;
+            //if too far away to attack, skip this enemy
+            if (distance >= weapon.getRange())
+                continue;
 
-        //check for bullet impact only so many times
-        while (attempts < ATTEMPT_LIMIT) {
+            //we check the middle of the screen
+            Ray ray = level.getPlayer().getCamera3d().getPickRay(SIZE_WIDTH / 2, SIZE_HEIGHT / 2);
 
-            for (int i = 0; i < level.getEnemies().getEntityList().size(); i++) {
+            int colMin = (int)((level.getPlayer().getCamera3d().position.x > enemy.getCol()) ? enemy.getCol() : level.getPlayer().getCamera3d().position.x);
+            int colMax = (int)((level.getPlayer().getCamera3d().position.x < enemy.getCol()) ? enemy.getCol() : level.getPlayer().getCamera3d().position.x);
+            int rowMin = (int)((level.getPlayer().getCamera3d().position.y > enemy.getRow()) ? enemy.getRow() : level.getPlayer().getCamera3d().position.y);
+            int rowMax = (int)((level.getPlayer().getCamera3d().position.y < enemy.getRow()) ? enemy.getRow() : level.getPlayer().getCamera3d().position.y);
 
-                Entity entity = level.getEnemies().getEntityList().get(i);
+            //is there collision
+            boolean collisionWall = false;
 
-                //skip if dead
-                if (!entity.isSolid())
-                    continue;
+            //check if we hit a wall
+            for (int row = rowMin; row <= rowMax; row++) {
+                for (int col = colMin; col <= colMax; col++) {
 
-                //how far are we from the enemy
-                double playerDistance = getDistance(entity, level.getPlayer().getCamera3d().position);
+                    //skip on collision
+                    if (collisionWall)
+                        break;
 
-                //if too far away to attack skip this enemy
-                if (playerDistance >= weapon.getRange())
-                    continue;
-
-                //flag that we have range with at least 1 enemy
-                range = true;
-
-                //calculate distance
-                double distance = getDistance(entity, col, row);
-
-                //if close enough to cause damage to a single enemy
-                if (distance <= BULLET_DISTANCE && enemy == null) {
-
-                    //we can only hit 1 enemy
-                    enemy = (Enemy)entity;
-
-                    if (!enemy.isHurt())
-                        playHurt(level.getAssetManager());
-
-                    //the enemy is hurting
-                    enemy.setStatus(Enemy.Status.Hurt);
-
-                    //deduct the enemies health
-                    enemy.setHealth(enemy.getHealth() - weapon.getDamage());
-
-                    //setup the chase
-                    chase(level, enemy);
-
-                } else if (distance <= RANGE_NOTICE) {
-
-                    //if the bullet is close enough to the enemy they should be alerted
-                    Enemy tmp = (Enemy) entity;
-
-                    //don't do anything if hurt
-                    if (tmp.isHurt())
+                    if (level.getDungeon().hasMap(col, row))
                         continue;
 
-                    if (!tmp.isObstructed(level) && !tmp.isShoot()) {
-
-                        //if the enemy has a clear view of the player they can shoot
-                        tmp.setStatus(Enemy.Status.Shoot);
-                        chase(level, tmp);
-
-                    } else if (tmp.getPathIndex() > 0 || tmp.isIdle()) {
-
-                        //if we didn't calculate yet or the enemy is idle
-                        chase(level, tmp);
-                    }
+                    if (level.getWall(col, row) != null && level.getWall(col, row).hasCollision(ray))
+                        collisionWall = true;
                 }
             }
 
-            //if we don't have range with any enemies skip this
-            if (!range)
-                break;
+            boolean collisionEnemy = false;
 
-            //if we struck an enemy
-            if (enemy != null)
-                break;
+            //check if we hit the enemy if we didn't hit a wall
+            if (!collisionWall)
+                collisionEnemy = Intersector.intersectRaySphere(ray, enemy.getAnimation().getDecal().getPosition(), COLLISION_RADIUS, null);
 
-            //move to the next position
-            col += xa;
-            row += ya;
+            //if we have collision and have not hit an enemy yet
+            if (collisionEnemy && !strike) {
 
-            //check if we went out of bounds
-            if (!level.getDungeon().hasMap((int)col, (int)row))
-                return;
+                //flag we hit a single enemy
+                strike = true;
 
-            if (level.getDungeon().hasInteract((int)col, (int)row)) {
+                if (!enemy.isHurt())
+                    playHurt(level.getAssetManager());
 
-                //get the door at the current location
-                Door door = level.getDoorDecal((int)col, (int)row);
+                //the enemy is hurting
+                enemy.setStatus(Enemy.Status.Hurt);
 
-                if (door != null) {
+                //deduct the enemies health
+                enemy.setHealth(enemy.getHealth() - weapon.getDamage());
 
-                    switch (door.getState()) {
-                        case Open:
-                            break;
+                //setup the chase
+                chase(level, enemy);
 
-                        //we hit the door
-                        default:
-                            return;
-                    }
+            } else if (distance < RANGE_NOTICE) {
 
-                } else {
+                //don't do anything if hurt
+                if (enemy.isHurt())
+                    continue;
 
-                    //we hit something else
-                    return;
+                if (enemy.canShoot(level, distance) && !enemy.isShoot()) {
+
+                    //if the enemy has a clear view of the player they can shoot
+                    enemy.setStatus(Enemy.Status.Shoot);
+                    chase(level, enemy);
+
+                } else if (enemy.getPathIndex() > 0 || enemy.isIdle()) {
+
+                    //if we didn't calculate yet or the enemy is idle
+                    chase(level, enemy);
                 }
             }
-
-            //keep track of the attempts
-            attempts++;
         }
     }
 

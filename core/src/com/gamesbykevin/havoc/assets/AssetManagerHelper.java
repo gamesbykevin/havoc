@@ -32,10 +32,10 @@ public class AssetManagerHelper {
     private static final int COUNT_WALLS = 15;
 
     //how many different enemy types will we allow to be loaded
-    private static final int COUNT_BOSS = 2;
+    private static final int COUNT_BOSS = 1;
 
     //how many different enemy types will we allow to be loaded
-    private static final int COUNT_SOLDIER = 4;
+    private static final int COUNT_SOLDIER = 3;
 
     //here we will load multiple textures for the wall
     private static List<String> PATHS_WALL;

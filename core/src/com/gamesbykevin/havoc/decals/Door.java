@@ -3,6 +3,7 @@ package com.gamesbykevin.havoc.decals;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import static com.gamesbykevin.havoc.MyGdxGame.FRAME_MS;
+import static com.gamesbykevin.havoc.decals.Wall.*;
 
 public class Door extends DecalCustom {
 
@@ -41,7 +42,7 @@ public class Door extends DecalCustom {
     //was this door ever opened?
     private boolean once;
 
-    protected Door(TextureRegion texture, Side side, boolean secret) {
+    protected Door(TextureRegion texture, int side, boolean secret) {
         super(texture, Type.Door, side, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         setSecret(secret);
         setState(State.Closed);
@@ -98,9 +99,6 @@ public class Door extends DecalCustom {
     @Override
     public void update() {
 
-        //distance from the door to the player
-        double dist = -1;
-
         switch (getState()) {
 
             case Start:
@@ -110,8 +108,8 @@ public class Door extends DecalCustom {
 
             case Opening:
                 switch (getSide()) {
-                    case East:
-                    case West:
+                    case SIDE_EAST:
+                    case SIDE_WEST:
 
                         //slide door open
                         getDecal().translate(0, -DOOR_VELOCITY, 0);
@@ -124,8 +122,8 @@ public class Door extends DecalCustom {
                         }
                         break;
 
-                    case North:
-                    case South:
+                    case SIDE_NORTH:
+                    case SIDE_SOUTH:
 
                         //slide door open
                         getDecal().translate(-DOOR_VELOCITY, 0, 0);
@@ -153,8 +151,8 @@ public class Door extends DecalCustom {
             case Closing:
 
                 switch (getSide()) {
-                    case East:
-                    case West:
+                    case SIDE_EAST:
+                    case SIDE_WEST:
 
                         //slide door open
                         getDecal().translate(0, DOOR_VELOCITY, 0);
@@ -166,8 +164,8 @@ public class Door extends DecalCustom {
                         }
                         break;
 
-                    case North:
-                    case South:
+                    case SIDE_NORTH:
+                    case SIDE_SOUTH:
 
                         //slide door open
                         getDecal().translate(DOOR_VELOCITY, 0, 0);

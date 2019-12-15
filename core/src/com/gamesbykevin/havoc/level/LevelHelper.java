@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
+import com.gamesbykevin.havoc.decals.Square;
 import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.player.Player;
 
@@ -22,23 +23,32 @@ public class LevelHelper {
     //how close we have to be to open a door
     public static final float DOOR_DISTANCE = 1.0f;
 
-    protected static int renderWalls(List<DecalCustom> walls, DecalBatch batch, PerspectiveCamera camera) {
+    protected static int renderWalls(Square[][] walls, DecalBatch batch, PerspectiveCamera camera) {
 
         int count = 0;
 
-        for (int i = 0; i < walls.size(); i++) {
+        int rowMin = (int)(camera.position.y - RENDER_RANGE);
+        int rowMax = (int)(camera.position.y + RENDER_RANGE);
+        int colMin = (int)(camera.position.x - RENDER_RANGE);
+        int colMax = (int)(camera.position.x + RENDER_RANGE);
 
-            DecalCustom decal = walls.get(i);
+        if (rowMin < 0)
+            rowMin = 0;
+        if (colMin < 0)
+            colMin = 0;
+        if (rowMax >= walls.length)
+            rowMax = walls.length - 1;
+        if (colMax >= walls[0].length)
+            colMax = walls[0].length - 1;
 
-            //only render if in range
-            if (getDistance(decal, camera.position) > RENDER_RANGE)
-                continue;
+        for (int row = rowMin; row <= rowMax; row++) {
+            for (int col = colMin; col <= colMax; col++) {
 
-            if (decal.isBillboard())
-                decal.getDecal().lookAt(camera.position, camera.up);
+                Square square = walls[row][col];
 
-            count++;
-            batch.add(decal.getDecal());
+                if (square != null)
+                    count += square.render(batch, camera);
+            }
         }
 
         //return number of items rendered
@@ -183,6 +193,7 @@ public class LevelHelper {
                 boolean opened = false;
 
                 switch (door.getState()) {
+
                     case Start:
 
                         //only need to confirm open once
@@ -198,7 +209,13 @@ public class LevelHelper {
                         break;
 
                     case Open:
+
+                        //flag door is opened
                         opened = true;
+
+                        //make sure the player and enemies don't get stuck in the door
+                        if (level.getEnemies().hasCollision(col, row) || ((int)level.getPlayer().getCamera3d().position.x == col && (int)level.getPlayer().getCamera3d().position.y == row))
+                            door.setLapsed(0);
                         break;
                 }
 
@@ -250,7 +267,6 @@ public class LevelHelper {
                 return false;
         }
     }
-
 
     protected static void updateLevel(Level level) {
 

@@ -5,18 +5,16 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.gamesbykevin.havoc.level.Level;
+import com.gamesbykevin.havoc.location.Location;
 import com.gamesbykevin.havoc.util.Disposable;
 import com.gamesbykevin.havoc.util.Restart;
 
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
-public abstract class Entity implements Disposable, Restart {
+public abstract class Entity extends Location implements Disposable, Restart {
 
     //is the entity solid? for collision detection and rendering etc...
     private boolean solid;
-
-    //location of the entity
-    private float col, row;
 
     //location where the entity starts
     private float startCol, startRow;
@@ -48,22 +46,6 @@ public abstract class Entity implements Disposable, Restart {
 
     public void setSolid(boolean solid) {
         this.solid = solid;
-    }
-
-    public float getCol() {
-        return this.col;
-    }
-
-    public void setCol(float col) {
-        this.col = col;
-    }
-
-    public float getRow() {
-        return this.row;
-    }
-
-    public void setRow(float row) {
-        this.row = row;
     }
 
     public float getStartCol() {

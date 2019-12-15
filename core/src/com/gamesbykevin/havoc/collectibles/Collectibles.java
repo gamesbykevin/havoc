@@ -291,7 +291,7 @@ public final class Collectibles extends Entities {
         this.add(type, cell.getCol(), cell.getRow());
     }
 
-    public void add(Type type, int col, int row) {
+    public void add(Type type, float col, float row) {
 
         //create the collectible and make it solid so we can collect it
         Collectible collectible = new Collectible(type);
@@ -344,12 +344,8 @@ public final class Collectibles extends Entities {
 
     private boolean isAvailable(int col, int row) {
 
-        //we need it to be an open space
-        if (!getLevel().getDungeon().hasMap(col, row))
-            return false;
-
-        //also don't add it if there are enemies
-        if (getLevel().getEnemies().hasCollision(col, row))
+        //we need it to be an open space and no door / switch
+        if (!getLevel().getDungeon().hasMap(col, row) || getLevel().getDungeon().hasInteract(col, row))
             return false;
 
         return true;

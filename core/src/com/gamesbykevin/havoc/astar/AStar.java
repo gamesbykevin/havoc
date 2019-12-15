@@ -38,6 +38,10 @@ public class AStar implements Disposable {
         this.diagonal = diagonal;
     }
 
+    public void calculate(float startCol, float startRow, float endCol, float endRow) {
+        calculate((int)startCol, (int)startRow, (int)endCol, (int)endRow);
+    }
+
     public void calculate(int startCol, int startRow, int endCol, int endRow) {
 
         //clear the lists

@@ -5,17 +5,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gamesbykevin.havoc.decals.Background;
 import com.gamesbykevin.havoc.decals.DecalCustom;
-import com.gamesbykevin.havoc.decals.DecalCustom.Side;
+import com.gamesbykevin.havoc.decals.Square;
 import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.dungeon.Dungeon;
 import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.level.Level;
 
 import java.util.HashMap;
-import java.util.List;
 
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 import static com.gamesbykevin.havoc.decals.Background.createDecalBackground;
+import static com.gamesbykevin.havoc.decals.Wall.*;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.dungeon.DungeonHelper.getCount;
 
@@ -139,23 +139,34 @@ public class TextureHelper {
 
             TextureRegion texture = (goal) ? getTextureRegionWallGoal(assetManager) : getTextureRegions(level).get(current.getId());
 
-            if (dungeon.hasMap(col - 1, row) || dungeon.getLevel().getObstacles().hasCollision(col - 1, row))
-                addWallDecal(level.getDecals(), texture, dungeon.getCell(col - 1, row), current, col, row, Side.West);
+            boolean west = dungeon.hasMap(col - 1, row) || dungeon.getLevel().getObstacles().hasCollision(col - 1, row);
+            boolean east = dungeon.hasMap(col + 1, row) || dungeon.getLevel().getObstacles().hasCollision(col + 1, row);
+            boolean north = dungeon.hasMap(col, row + 1) || dungeon.getLevel().getObstacles().hasCollision(col, row + 1);
+            boolean south = dungeon.hasMap(col, row - 1) || dungeon.getLevel().getObstacles().hasCollision(col, row - 1);
 
-            if (dungeon.hasMap(col + 1, row) || dungeon.getLevel().getObstacles().hasCollision(col + 1, row))
-                addWallDecal(level.getDecals(), texture, dungeon.getCell(col + 1, row), current, col, row, Side.East);
+            //we need at least 1 to add a square with a wall(s)
+            if (west || east || north || south) {
 
-            if (dungeon.hasMap(col, row - 1) || dungeon.getLevel().getObstacles().hasCollision(col, row - 1))
-                addWallDecal(level.getDecals(), texture, dungeon.getCell(col, row - 1), current, col, row, Side.South);
+                //create our square
+                Square square = new Square(col, row);
 
-            if (dungeon.hasMap(col, row + 1) || dungeon.getLevel().getObstacles().hasCollision(col, row + 1))
-                addWallDecal(level.getDecals(), texture, dungeon.getCell(col, row + 1), current, col, row, Side.North);
+                if (west)
+                    square.addWallWest(getWallTexture(texture, dungeon.getCell(col - 1, row), current));
+                if (east)
+                    square.addWallEast(getWallTexture(texture, dungeon.getCell(col + 1, row), current));
+                if (north)
+                    square.addWallNorth(getWallTexture(texture, dungeon.getCell(col, row + 1), current));
+                if (south)
+                    square.addWallSouth(getWallTexture(texture, dungeon.getCell(col,row - 1), current));
+
+                //assign the square to our wall
+                level.setWall(col, row, square);
+            }
 
         } else if (current.isGoal()) {
-            level.getDecals().add(DecalCustom.createDecalWall(col, row, getTextureRegionSwitchOff(assetManager), Side.West));
-            level.getDecals().add(DecalCustom.createDecalWall(col, row, getTextureRegionSwitchOff(assetManager), Side.East));
-            level.getDecals().add(DecalCustom.createDecalWall(col, row, getTextureRegionSwitchOff(assetManager), Side.North));
-            level.getDecals().add(DecalCustom.createDecalWall(col, row, getTextureRegionSwitchOff(assetManager), Side.South));
+            Square square = new Square(col, row);
+            square.addWalls(getTextureRegionSwitchOff(assetManager));
+            level.setWall(col, row, square);
         } else if (current.isDoor()) {
             if (current.isLocked()) {
                 door = getTextureRegionLocked(assetManager);
@@ -172,17 +183,17 @@ public class TextureHelper {
             if (dungeon.hasMap(col - 1, row)) {
 
                 if (current.hasId(dungeon.getCell(col - 1, row))) {
-                    level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.West, secret), col, row);
+                    level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, SIDE_WEST, secret), col, row);
                 } else if (current.hasId(dungeon.getCell(col + 1, row))) {
-                    level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.East, secret), col, row);
+                    level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, SIDE_EAST, secret), col, row);
                 }
 
             } else if (dungeon.hasMap(col, row - 1)) {
 
                 if (current.hasId(dungeon.getCell(col, row - 1))) {
-                    level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.South, secret), col, row);
+                    level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, SIDE_SOUTH, secret), col, row);
                 } else if (current.hasId(dungeon.getCell(col, row + 1))) {
-                    level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, Side.North, secret), col, row);
+                    level.setDoorDecal(DecalCustom.createDecalDoor(col, row, door, SIDE_NORTH, secret), col, row);
                 }
             }
         }
@@ -208,17 +219,15 @@ public class TextureHelper {
         }
     }
 
-    private static void addWallDecal(List<DecalCustom> decals, TextureRegion texture, Cell neighbor, Cell current, int col, int row, Side side) {
+    //wall texture will depend on neighbor
+    private static TextureRegion getWallTexture(TextureRegion texture, Cell neighbor, Cell current) {
 
-        if (neighbor.isDoor()) {
-            decals.add(DecalCustom.createDecalWall(col, row, getTextureRegionDoorSide(null), side));
-        } else {
-            if (current.getId() != neighbor.getId()) {
-                decals.add(DecalCustom.createDecalWall(col, row, getTextureRegionHallway(null), side));
-            } else {
-                decals.add(DecalCustom.createDecalWall(col, row, texture, side));
-            }
-        }
+        if (neighbor.isDoor())
+            return getTextureRegionDoorSide(null);
+        if (current.getId() != neighbor.getId())
+            return getTextureRegionHallway(null);
+
+        return texture;
     }
 
     private static HashMap<String, TextureRegion> getTextureRegions(Dungeon dungeon, AssetManager assetManager) {

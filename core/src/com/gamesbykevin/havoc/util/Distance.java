@@ -1,5 +1,6 @@
 package com.gamesbykevin.havoc.util;
 
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.decals.DecalCustom;
@@ -16,6 +17,10 @@ public class Distance {
 
     public static double getDistance(DecalCustom decalCustom, Vector3 position) {
         return getDistance(decalCustom.getCol(), decalCustom.getRow(), position.x, position.y);
+    }
+
+    public static double getDistance(Entity entity, PerspectiveCamera camera) {
+        return getDistance(entity, camera.position);
     }
 
     public static double getDistance(Entity entity, Vector3 position) {

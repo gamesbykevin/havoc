@@ -1,6 +1,5 @@
 package com.gamesbykevin.havoc.obstacles;
 
-import com.gamesbykevin.havoc.animation.DecalAnimation;
 import com.gamesbykevin.havoc.entities.Entity3d;
 import com.gamesbykevin.havoc.level.Level;
 

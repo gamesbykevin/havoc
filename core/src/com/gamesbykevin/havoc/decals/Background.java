@@ -7,8 +7,10 @@ public class Background extends DecalCustom {
     public static final float TEXTURE_WIDTH = 16;
     public static final float TEXTURE_HEIGHT = 16;
 
-    protected Background(TextureRegion texture, Side side) {
-        super(texture, Type.Background, side, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+    public static final int SIDE_NONE = -1;
+
+    protected Background(TextureRegion texture) {
+        super(texture, Type.Background, SIDE_NONE, TEXTURE_WIDTH, TEXTURE_HEIGHT);
     }
 
     @Override
@@ -17,10 +19,10 @@ public class Background extends DecalCustom {
     }
 
     public static Background createDecalBackground(float col, float row, TextureRegion texture, boolean floor) {
-        Background decal = new Background(texture, null);
+        Background decal = new Background(texture);
         decal.setCol((int)col);
         decal.setRow((int)row);
-        decal.getDecal().setPosition(col + .5f, row + .5f, (floor) ? -.5f : .5f);
+        decal.getDecal().setPosition(col, row, (floor) ? -.5f : .5f);
         return decal;
     }
 }

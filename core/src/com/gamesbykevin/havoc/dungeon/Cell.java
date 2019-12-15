@@ -1,12 +1,10 @@
 package com.gamesbykevin.havoc.dungeon;
 
 import com.gamesbykevin.havoc.guid.GUID;
+import com.gamesbykevin.havoc.location.Location;
 import com.gamesbykevin.havoc.util.Disposable;
 
-public class Cell implements Disposable {
-
-    //location of cell
-    private int col, row;
+public class Cell extends Location implements Disposable {
 
     //cells part of a room will have the same id
     private String id;
@@ -31,8 +29,7 @@ public class Cell implements Disposable {
     }
 
     public Cell(int col, int row, Type type) {
-        this.col = col;
-        this.row = row;
+        super(col, row);
         this.id = GUID.generate();
         this.type = type;
     }
@@ -43,22 +40,6 @@ public class Cell implements Disposable {
 
     public void setCost(int cost) {
         this.cost = cost;
-    }
-
-    public int getCol() {
-        return this.col;
-    }
-
-    public int getRow() {
-        return this.row;
-    }
-
-    public void setCol(int col) {
-        this.col = col;
-    }
-
-    public void setRow(int row) {
-        this.row = row;
     }
 
     public String getId() {

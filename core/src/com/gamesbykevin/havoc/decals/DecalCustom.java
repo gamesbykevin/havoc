@@ -2,9 +2,12 @@ package com.gamesbykevin.havoc.decals;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
+import com.gamesbykevin.havoc.location.Location;
 import com.gamesbykevin.havoc.util.Disposable;
 
-public abstract class DecalCustom implements Disposable {
+import static com.gamesbykevin.havoc.decals.Wall.*;
+
+public abstract class DecalCustom extends Location implements Disposable {
 
     //size of a block
     public static final float TEXTURE_WIDTH = 1.0f;
@@ -13,11 +16,8 @@ public abstract class DecalCustom implements Disposable {
     //how deep is the door placed
     public static final float DOOR_DEPTH = .5f;
 
-    //the depth will be close to the walls
+    //the depth will be close to the walls for a secret
     public static final float SECRET_DEPTH = .075f;
-
-    //the location of this decal as it relates to the level
-    private int col, row;
 
     public enum Type {
         Wall,
@@ -28,20 +28,16 @@ public abstract class DecalCustom implements Disposable {
     //what type of decal is this?
     private final Type type;
 
-    //which side is the decal
-    public enum Side {
-        East, West, North, South
-    }
-
-    //the side
-    private final Side side;
+    //the side this decal is
+    private final int side;
 
     //billboard will always be facing the camera
     private boolean billboard = false;
 
+    //our decal for rendering
     private Decal decal;
 
-    protected DecalCustom(TextureRegion textureRegion, Type type, Side side, float textureWidth, float textureHeight) {
+    protected DecalCustom(TextureRegion textureRegion, Type type, int side, float textureWidth, float textureHeight) {
         this.decal = Decal.newDecal(textureWidth, textureHeight, textureRegion);
         this.type = type;
         this.side = side;
@@ -53,22 +49,6 @@ public abstract class DecalCustom implements Disposable {
 
     public abstract void update();
 
-    public int getCol() {
-        return this.col;
-    }
-
-    public void setCol(int col) {
-        this.col = col;
-    }
-
-    public int getRow() {
-        return this.row;
-    }
-
-    public void setRow(int row) {
-        this.row = row;
-    }
-
     public boolean isBillboard() {
         return this.billboard;
     }
@@ -77,7 +57,7 @@ public abstract class DecalCustom implements Disposable {
         this.billboard = billboard;
     }
 
-    public Side getSide() {
+    public int getSide() {
         return this.side;
     }
 
@@ -85,7 +65,7 @@ public abstract class DecalCustom implements Disposable {
         return this.type;
     }
 
-    public static Wall createDecalWall(float col, float row, TextureRegion texture, Side side) {
+    protected static Wall createDecalWall(float col, float row, TextureRegion texture, int side) {
         Wall wall = new Wall(texture, side);
         wall.setCol((int)col);
         wall.setRow((int)row);
@@ -93,21 +73,21 @@ public abstract class DecalCustom implements Disposable {
         return wall;
     }
 
-    public static Door createDecalDoor(float col, float row, TextureRegion texture, Side side, boolean secret) {
+    public static Door createDecalDoor(float col, float row, TextureRegion texture, int side, boolean secret) {
         Door door = new Door(texture, side, secret);
         door.setCol((int)col);
         door.setRow((int)row);
 
         //set the start and finish so the door knows how far to open and close
         switch (door.getSide()) {
-            case West:
-            case East:
+            case SIDE_WEST:
+            case SIDE_EAST:
                 door.setStart(row + (TEXTURE_HEIGHT/2));
                 door.setDestination(row - (TEXTURE_HEIGHT/2));
                 break;
 
-            case North:
-            case South:
+            case SIDE_NORTH:
+            case SIDE_SOUTH:
                 door.setStart(col + (TEXTURE_WIDTH/2));
                 door.setDestination(col - (TEXTURE_WIDTH/2));
                 break;
@@ -121,19 +101,19 @@ public abstract class DecalCustom implements Disposable {
 
         //increase the depth of the door so it is noticeable
         switch (door.getSide()) {
-            case West:
+            case SIDE_WEST:
                 door.getDecal().getPosition().x += depth;
                 break;
 
-            case East:
+            case SIDE_EAST:
                 door.getDecal().getPosition().x -= depth;
                 break;
 
-            case South:
+            case SIDE_SOUTH:
                 door.getDecal().getPosition().y += depth;
                 break;
 
-            case North:
+            case SIDE_NORTH:
                 door.getDecal().getPosition().y -= depth;
                 break;
         }
@@ -141,7 +121,7 @@ public abstract class DecalCustom implements Disposable {
         return door;
     }
 
-    private static void decalSetup(Decal decal, float col, float row, Side side) {
+    private static void decalSetup(Decal decal, float col, float row, int side) {
 
         //shift coordinates so they render correct
         float newCol = col + (TEXTURE_WIDTH / 2);
@@ -149,25 +129,25 @@ public abstract class DecalCustom implements Disposable {
 
         switch (side) {
 
-            case South:
+            case SIDE_SOUTH:
                 decal.setPosition(newCol, newRow - TEXTURE_HEIGHT, 0);
                 decal.rotateX(90);
                 break;
 
-            case North:
+            case SIDE_NORTH:
                 decal.setPosition(newCol, newRow , 0);
                 decal.rotateY(90);
                 decal.rotateZ(-270);
                 decal.rotateY(90);
                 break;
 
-            case West:
+            case SIDE_WEST:
                 decal.setPosition(newCol - (TEXTURE_WIDTH / 2), newRow - (TEXTURE_HEIGHT / 2), 0);
                 decal.rotateX(90);
                 decal.rotateY(90);
                 break;
 
-            case East:
+            case SIDE_EAST:
                 decal.setPosition(newCol + (TEXTURE_WIDTH / 2), newRow - (TEXTURE_HEIGHT / 2), 0);
                 decal.rotateX(90);
                 decal.rotateY(90);

@@ -97,8 +97,7 @@ public class PlayerHelper {
 
             switch (door.getState()) {
                 case Open:
-                    door.setLapsed(0);
-                    break;
+                    return false;
 
                 default:
                     return true;

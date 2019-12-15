@@ -7,6 +7,7 @@ import com.gamesbykevin.havoc.collectibles.CollectibleHelper;
 import com.gamesbykevin.havoc.collectibles.Collectibles;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
+import com.gamesbykevin.havoc.decals.Square;
 import com.gamesbykevin.havoc.dungeon.Dungeon;
 import com.gamesbykevin.havoc.enemies.Enemies;
 import com.gamesbykevin.havoc.entities.Entities;
@@ -33,14 +34,14 @@ public class Level implements Disposable, Restart {
     //needed to render multiple decals
     private DecalBatch decalBatch;
 
-    //this is where we will contain our walls
-    private List<DecalCustom> decals;
-
     //contain the floor / ceiling
     private List<DecalCustom> backgrounds;
 
     //contains our doors
     private Door[][] doorDecals;
+
+    //array of all wall decals
+    private Square[][] walls;
 
     //our enemies are contained here
     private Entities enemies;
@@ -83,14 +84,7 @@ public class Level implements Disposable, Restart {
 
         //create and generate the dungeon
         this.dungeon = new Dungeon(this, size, size);
-    }
-
-    public boolean isReset() {
-        return this.reset;
-    }
-
-    public void setReset(boolean reset) {
-        this.reset = reset;
+        getWalls();
     }
 
     @Override
@@ -102,6 +96,14 @@ public class Level implements Disposable, Restart {
         getPlayer().getWeapons().reset();
         getPlayer().getController().reset();
         setReset(false);
+    }
+
+    public boolean isReset() {
+        return this.reset;
+    }
+
+    public void setReset(boolean reset) {
+        this.reset = reset;
     }
 
     public AssetManager getAssetManager() {
@@ -156,16 +158,12 @@ public class Level implements Disposable, Restart {
         return this.backgrounds;
     }
 
-    public List<DecalCustom> getDecals() {
-
-        if (this.decals == null)
-            this.decals = new ArrayList<>();
-
-        return this.decals;
-    }
-
     public void setDoorDecal(Door door, int col, int row) {
         getDoorDecals()[row][col] = door;
+    }
+
+    public Door getDoorDecal(float col, float row) {
+        return getDoorDecal((int)col, (int)row);
     }
 
     public Door getDoorDecal(int col, int row) {
@@ -178,7 +176,29 @@ public class Level implements Disposable, Restart {
         return getDoorDecals()[row][col];
     }
 
-    protected Door[][] getDoorDecals() {
+    public Square getWall(int col, int row) {
+
+        if (col < 0 || row < 0)
+            return null;
+        if (col >= getWalls()[0].length || row >= getWalls().length)
+            return null;
+
+        return getWalls()[row][col];
+    }
+
+    public void setWall(int col, int row, Square square) {
+        getWalls()[row][col] = square;
+    }
+
+    protected Square[][] getWalls() {
+
+        if (this.walls == null)
+            this.walls = new Square[getDungeon().getRows()][getDungeon().getCols()];
+
+        return this.walls;
+    }
+
+    public Door[][] getDoorDecals() {
 
         if (this.doorDecals == null)
             this.doorDecals = new Door[getDungeon().getRows()][getDungeon().getCols()];
@@ -221,7 +241,7 @@ public class Level implements Disposable, Restart {
         int count = 0;
 
         //draw the walls
-        count += renderWalls(getDecals(), getDecalBatch(), getPlayer().getCamera3d());
+        count += renderWalls(getWalls(), getDecalBatch(), getPlayer().getCamera3d());
 
         //render the backgrounds
         count += renderBackground(getBackgrounds(), getPlayer().getCamera3d().position, getDecalBatch());
@@ -253,15 +273,16 @@ public class Level implements Disposable, Restart {
             this.dungeon.dispose();
         if (this.decalBatch != null)
             this.decalBatch.dispose();
-        if (this.decals != null) {
-            for (int i = 0; i < this.decals.size(); i++) {
-                if (this.decals.get(i) != null) {
-                    this.decals.get(i).dispose();
-                    this.decals.set(i, null);
+
+        if (this.walls != null) {
+            for (int row = 0; row < this.walls.length; row++) {
+                for (int col = 0; col < this.walls[0].length; col++) {
+                    if (this.walls[row][col] != null) {
+                        this.walls[row][col].dispose();
+                        this.walls[row][col] = null;
+                    }
                 }
             }
-
-            this.decals.clear();
         }
 
         if (this.backgrounds != null) {
@@ -296,7 +317,7 @@ public class Level implements Disposable, Restart {
 
         this.dungeon = null;
         this.decalBatch = null;
-        this.decals = null;
+        this.walls = null;
         this.backgrounds = null;
         this.enemies = null;
         this.obstacles = null;

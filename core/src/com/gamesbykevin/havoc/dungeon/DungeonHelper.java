@@ -2,6 +2,7 @@ package com.gamesbykevin.havoc.dungeon;
 
 import com.gamesbykevin.havoc.astar.Node;
 import com.gamesbykevin.havoc.collectibles.Collectibles;
+import com.gamesbykevin.havoc.level.Level;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.dungeon.Cell.Type;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.*;
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.*;
+import static com.gamesbykevin.havoc.level.LevelHelper.isDoorOpen;
 
 public class DungeonHelper {
 
@@ -577,5 +579,21 @@ public class DungeonHelper {
         //cleanup
         options.clear();
         options = null;
+    }
+
+    public static boolean isAvailable(Level level, float x, float y) {
+
+        Dungeon dungeon = level.getDungeon();
+
+        //if false, this location is not available
+        if (!dungeon.hasMap(x, y))
+            return false;
+
+        //if there is an interact item such as a door and it isn't open
+        if (dungeon.hasInteract(x, y) && !isDoorOpen(level, x, y))
+            return false;
+
+        //space is available
+        return true;
     }
 }

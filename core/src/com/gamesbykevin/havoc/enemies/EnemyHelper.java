@@ -6,6 +6,7 @@ import com.gamesbykevin.havoc.level.Level;
 
 import static com.gamesbykevin.havoc.enemies.Enemy.*;
 import static com.gamesbykevin.havoc.entities.Entities.OFFSET;
+import static com.gamesbykevin.havoc.entities.EntityHelper.isObstructed;
 
 public class EnemyHelper {
 
@@ -127,7 +128,7 @@ public class EnemyHelper {
         if (enemy.isIdle() || enemy.isWalk()) {
 
             //if enemy is facing the player and we can shoot, then don't wait
-            if (enemy.isFacing(level.getPlayer().getCamera3d().position) && enemy.canShoot(distance, level)) {
+            if (enemy.isFacing(level.getPlayer().getCamera3d().position) && enemy.canShoot(level, distance)) {
                 enemy.setStatus(Status.Shoot);
                 chase(level, enemy);
             }
@@ -140,7 +141,7 @@ public class EnemyHelper {
         if (enemy.isHurt()) {
 
             //are we close enough to check if we can attack?
-            if (!enemy.isObstructed(level)) {
+            if (enemy.canShoot(level, distance)) {
                 enemy.setStatus(Status.Shoot);
                 chase(level, enemy);
             } else {
@@ -150,7 +151,7 @@ public class EnemyHelper {
         } else if (enemy.isShoot() || enemy.isAlert()) {
 
             //is the enemy obstructed
-            boolean obstructed = enemy.isObstructed(level);
+            boolean obstructed = isObstructed(level, enemy);
 
             //if the enemy finished shooting without being obstructed flag the player as hurt
             if (!obstructed) {
@@ -169,7 +170,7 @@ public class EnemyHelper {
         } else if (enemy.isPause()) {
 
             //if close enough and our view isn't blocked
-            if (enemy.canShoot(distance, level)) {
+            if (enemy.canShoot(level, distance)) {
                 enemy.setStatus(Status.Alert);
                 chase(level, enemy);
             } else {
@@ -182,7 +183,7 @@ public class EnemyHelper {
             enemy.setStatus(Status.Idle);
 
             //if the player is shooting and the enemy has a clear view of them, start shooting
-            if (level.getPlayer().getController().isShooting() && !enemy.isObstructed(level)) {
+            if (level.getPlayer().getController().isShooting() && enemy.canShoot(level)) {
                 enemy.setStatus(Status.Shoot);
                 chase(level, enemy);
             }
@@ -229,26 +230,28 @@ public class EnemyHelper {
         finishCol += OFFSET;
         finishRow += OFFSET;
 
-        if (!level.getDungeon().hasMap(startCol, startRow)) {
-            if (startCol < finishCol && level.getDungeon().hasMap(startCol + OFFSET, startRow)) {
+        //location has to be valid
+        if (!level.getDungeon().hasMap(startCol, startRow) || level.getDungeon().hasInteract(startCol, startRow)) {
+            if (startCol < finishCol && level.getDungeon().hasMap(startCol + OFFSET, startRow) && !level.getDungeon().hasInteract(startCol + OFFSET, startRow)) {
                 startCol++;
-            } else if (startCol > finishCol && level.getDungeon().hasMap(startCol - OFFSET, startRow)) {
+            } else if (startCol > finishCol && level.getDungeon().hasMap(startCol - OFFSET, startRow) && !level.getDungeon().hasInteract(startCol - OFFSET, startRow)) {
                 startCol--;
-            } else if (startRow < finishRow && level.getDungeon().hasMap(startCol, startRow + OFFSET)) {
+            } else if (startRow < finishRow && level.getDungeon().hasMap(startCol, startRow + OFFSET) && !level.getDungeon().hasInteract(startCol, startRow + OFFSET)) {
                 startRow++;
-            } else if (startRow > finishRow && level.getDungeon().hasMap(startCol, startRow - OFFSET)) {
+            } else if (startRow > finishRow && level.getDungeon().hasMap(startCol, startRow - OFFSET) && !level.getDungeon().hasInteract(startCol, startRow - OFFSET)) {
                 startRow--;
             }
         }
 
-        if (!level.getDungeon().hasMap(finishCol, finishRow)) {
-            if (finishCol < startCol && level.getDungeon().hasMap(finishCol + OFFSET, finishRow)) {
+        //location has to be valid
+        if (!level.getDungeon().hasMap(finishCol, finishRow) || level.getDungeon().hasInteract(finishCol, finishRow)) {
+            if (finishCol < startCol && level.getDungeon().hasMap(finishCol + OFFSET, finishRow) && !level.getDungeon().hasInteract(finishCol + OFFSET, finishRow)) {
                 finishCol++;
-            } else if (finishCol > startCol && level.getDungeon().hasMap(finishCol - OFFSET, finishRow)) {
+            } else if (finishCol > startCol && level.getDungeon().hasMap(finishCol - OFFSET, finishRow) && !level.getDungeon().hasInteract(finishCol - OFFSET, finishRow)) {
                 finishCol--;
-            } else if (finishRow < startRow && level.getDungeon().hasMap(finishCol, finishRow + OFFSET)) {
+            } else if (finishRow < startRow && level.getDungeon().hasMap(finishCol, finishRow + OFFSET) && !level.getDungeon().hasInteract(finishCol, finishRow + OFFSET)) {
                 finishRow++;
-            } else if (finishRow > startRow && level.getDungeon().hasMap(finishCol, finishRow - OFFSET)) {
+            } else if (finishRow > startRow && level.getDungeon().hasMap(finishCol, finishRow - OFFSET) && !level.getDungeon().hasInteract(finishCol, finishRow - OFFSET)) {
                 finishRow--;
             }
         }
