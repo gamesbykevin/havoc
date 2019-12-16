@@ -26,10 +26,10 @@ public abstract class Enemy extends Entity3d {
     private int directionDefault = DIRECTION_E;
 
     //how much damage can the enemy do?
-    private int damage;
+    private int damageMax;
 
     //how close can the player get to the enemy
-    private static final float DISTANCE_COLLISION = 0.65f;
+    private static final float DISTANCE_COLLISION = 0.75f;
 
     //how fast can the enemy move
     public static final float SPEED_DEFAULT = 0.01f;
@@ -41,10 +41,21 @@ public abstract class Enemy extends Entity3d {
     private float speed;
 
     //how close to notice the player
-    public static final float RANGE_NOTICE = 10f;
+    public static final float RANGE_NOTICE = (ROOM_DIMENSION_MAX * .7f);
 
     //how close do we need to be for the player to update
     public static final float RANGE_UPDATE = ROOM_DIMENSION_MAX * 3;
+
+    //how much damage to be applied based on the distance
+    public static final float DAMAGE_RATIO_NEAR = 1.0f;
+    public static final float DAMAGE_RATIO_CLOSE = 0.75f;
+    public static final float DAMAGE_RATIO_FAR = 0.5f;
+    public static final float DAMAGE_RATIO_FURTHEST = 0.25f;
+
+    //how close to determine the damage ratio
+    public static final float DAMAGE_RANGE_NEAR = RANGE_NOTICE * .5f;
+    public static final float DAMAGE_RANGE_CLOSE = RANGE_NOTICE * .75f;
+    public static final float DAMAGE_RANGE_FAR = RANGE_NOTICE * 1.2f;
 
     //what is the health
     private float health = 100f;
@@ -248,12 +259,12 @@ public abstract class Enemy extends Entity3d {
         this.direction = direction;
     }
 
-    public int getDamage() {
-        return this.damage;
+    public int getDamageMax() {
+        return this.damageMax;
     }
 
-    public void setDamage(int damage) {
-        this.damage = damage;
+    public void setDamageMax(int damageMax) {
+        this.damageMax = damageMax;
     }
 
     public Status getStatus() {

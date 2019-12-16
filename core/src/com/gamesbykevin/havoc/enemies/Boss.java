@@ -11,10 +11,10 @@ import static com.gamesbykevin.havoc.player.Player.HEALTH_MAX;
 public final class Boss extends Enemy {
 
     //how much damage
-    public static final int DAMAGE_BOSS = 10;
+    public static final int DAMAGE_MAX_BOSS = 15;
 
     //how much health does the boss have compared to the soldier
-    public static final float HEALTH_MAX_RATIO = 2.0f;
+    public static final float HEALTH_MAX_RATIO = 4.0f;
 
     //different animations
     public static final int INDEX_IDLE = 0;
@@ -36,27 +36,27 @@ public final class Boss extends Enemy {
     protected static final float DURATION_PAUSE = 500f;
 
     public enum Type {
-        boss_1(ASSET_DIR_BOSS + "boss_1/", DAMAGE_BOSS),
-        boss_2(ASSET_DIR_BOSS + "boss_2/", DAMAGE_BOSS),
-        boss_3(ASSET_DIR_BOSS + "boss_3/", DAMAGE_BOSS),
-        boss_4(ASSET_DIR_BOSS + "boss_4/", DAMAGE_BOSS),
-        boss_5(ASSET_DIR_BOSS + "boss_5/", DAMAGE_BOSS),
-        boss_6(ASSET_DIR_BOSS + "boss_6/", DAMAGE_BOSS),
-        boss_7(ASSET_DIR_BOSS + "boss_7/", DAMAGE_BOSS),
-        boss_8(ASSET_DIR_BOSS + "boss_8/", DAMAGE_BOSS),
-        boss_9(ASSET_DIR_BOSS + "boss_9/", DAMAGE_BOSS),
-        boss_10(ASSET_DIR_BOSS + "boss_10/", DAMAGE_BOSS),
-        boss_11(ASSET_DIR_BOSS + "boss_11/", DAMAGE_BOSS),
-        boss_12(ASSET_DIR_BOSS + "boss_12/", DAMAGE_BOSS),
-        boss_13(ASSET_DIR_BOSS + "boss_13/", DAMAGE_BOSS),
-        boss_14(ASSET_DIR_BOSS + "boss_14/", DAMAGE_BOSS);
+        boss_1(ASSET_DIR_BOSS + "boss_1/", DAMAGE_MAX_BOSS),
+        boss_2(ASSET_DIR_BOSS + "boss_2/", DAMAGE_MAX_BOSS),
+        boss_3(ASSET_DIR_BOSS + "boss_3/", DAMAGE_MAX_BOSS),
+        boss_4(ASSET_DIR_BOSS + "boss_4/", DAMAGE_MAX_BOSS),
+        boss_5(ASSET_DIR_BOSS + "boss_5/", DAMAGE_MAX_BOSS),
+        boss_6(ASSET_DIR_BOSS + "boss_6/", DAMAGE_MAX_BOSS),
+        boss_7(ASSET_DIR_BOSS + "boss_7/", DAMAGE_MAX_BOSS),
+        boss_8(ASSET_DIR_BOSS + "boss_8/", DAMAGE_MAX_BOSS),
+        boss_9(ASSET_DIR_BOSS + "boss_9/", DAMAGE_MAX_BOSS),
+        boss_10(ASSET_DIR_BOSS + "boss_10/", DAMAGE_MAX_BOSS),
+        boss_11(ASSET_DIR_BOSS + "boss_11/", DAMAGE_MAX_BOSS),
+        boss_12(ASSET_DIR_BOSS + "boss_12/", DAMAGE_MAX_BOSS),
+        boss_13(ASSET_DIR_BOSS + "boss_13/", DAMAGE_MAX_BOSS),
+        boss_14(ASSET_DIR_BOSS + "boss_14/", DAMAGE_MAX_BOSS);
 
         public final String path;
-        public final int damage;
+        public final int damageMax;
 
-        Type(String path, int damage) {
+        Type(String path, int damageMax) {
             this.path = path;
-            this.damage = damage;
+            this.damageMax = damageMax;
         }
     }
 
@@ -66,7 +66,7 @@ public final class Boss extends Enemy {
         super(ANIMATION_COUNT);
 
         //assign the damage
-        setDamage(type.damage);
+        setDamageMax(type.damageMax);
 
         switch (type) {
             case boss_1:
@@ -137,7 +137,7 @@ public final class Boss extends Enemy {
     @Override
     public void setStatus(Status status) {
 
-        //some statuses the boss will ignore
+        //the boss will ignore being hurt
         switch (status) {
             case Hurt:
                 return;

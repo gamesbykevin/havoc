@@ -21,21 +21,6 @@ public class AudioHelper {
     //how many different enemy dead sound effects
     public static final int SFX_DEAD_COUNT = 10;
 
-    /*
-    public enum Music {
-
-        private final String path;
-
-        Music(String path) {
-            this.path = path;
-        }
-
-        public String getPath() {
-            return this.path;
-        }
-    }
-    */
-
     public enum Sfx {
         WeaponFireEmpty(PATH_SHOOT_EMPTY),
         WeaponFireGlock(PATH_SHOOT_GLOCK),

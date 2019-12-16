@@ -1,7 +1,6 @@
 package com.gamesbykevin.havoc.entities;
 
 import com.badlogic.gdx.math.Vector3;
-import com.gamesbykevin.havoc.dungeon.Dungeon;
 import com.gamesbykevin.havoc.level.Level;
 
 import static com.gamesbykevin.havoc.dungeon.DungeonHelper.isAvailable;
@@ -69,7 +68,7 @@ public class EntityHelper {
         double distance2 = getDistance(col, row, col, y);
 
         //if the distance from the center is less than a specified distance, there is an intersection
-        if (distance1 <= (OFFSET * 2) || distance2 <= (OFFSET * 2))
+        if (distance1 <= (OFFSET * 3.0f) || distance2 <= (OFFSET * 3.0f))
             return true;
 
         return false;

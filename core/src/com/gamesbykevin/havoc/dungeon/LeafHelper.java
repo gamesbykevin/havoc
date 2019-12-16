@@ -124,6 +124,28 @@ public class LeafHelper {
         return getDistance(west.getX(), west.getY() + (west.getH() / 2), east.getX() + east.getW() - 1, east.getY() + (east.getH() / 2));
     }
 
+    public static Leaf getLeafGoal(Dungeon dungeon) {
+
+        for (int i = 0; i < dungeon.getLeafs().size(); i++) {
+
+            Leaf leaf = dungeon.getLeafs().get(i);
+
+            //only want leafs containing rooms
+            if (leaf.hasChildren() || leaf.getRoom() == null)
+                continue;
+
+            //skip the starting room
+            if (leaf.getRoom().contains(dungeon.getStartCol(), dungeon.getStartRow()))
+                continue;
+
+            if (leaf.getRoom().contains(dungeon.getGoalCol(), dungeon.getGoalRow()))
+                return leaf;
+        }
+
+        //return null if not found
+        return null;
+    }
+
     public static List<Leaf> getLeafRooms(Dungeon dungeon) {
 
         //list of valid leaves to spawn collectibles

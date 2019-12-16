@@ -153,10 +153,32 @@ public class EnemyHelper {
             //is the enemy obstructed
             boolean obstructed = isObstructed(level, enemy);
 
-            //if the enemy finished shooting without being obstructed flag the player as hurt
+            //if the enemy finished shooting without being obstructed
             if (!obstructed) {
+
+                //flag player hurt
                 level.getPlayer().setHurt(true);
-                level.getPlayer().setHealth(level.getPlayer().getHealth() - enemy.getDamage());
+
+                //update the damage based on the distance
+                int damage = enemy.getDamageMax();
+
+                //adjust the damage based on the distance from the player
+                if (distance < DAMAGE_RANGE_NEAR) {
+                    damage *= DAMAGE_RATIO_NEAR;
+                } else if (distance < DAMAGE_RANGE_CLOSE) {
+                    damage *= DAMAGE_RATIO_CLOSE;
+                } else if (distance < DAMAGE_RANGE_FAR) {
+                    damage *= DAMAGE_RATIO_FAR;
+                } else {
+                    damage *= DAMAGE_RATIO_FURTHEST;
+                }
+
+                //some damage has to be applied
+                if (damage < 1)
+                    damage = 1;
+
+                //deduct health from the player
+                level.getPlayer().setHealth(level.getPlayer().getHealth() - damage);
             }
 
             //if close enough the enemy will remain alert

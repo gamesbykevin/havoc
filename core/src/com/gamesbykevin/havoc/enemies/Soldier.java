@@ -12,12 +12,12 @@ import static com.gamesbykevin.havoc.enemies.EnemyHelper.DIRECTION_E;
 public final class Soldier extends Enemy {
 
     //different amounts of damage for each soldier
-    public static final int DAMAGE_DOCTOR = 1;
-    public static final int DAMAGE_GUARD = 2;
-    public static final int DAMAGE_SERGEANT = 3;
-    public static final int DAMAGE_LIEUTENANT = 4;
-    public static final int DAMAGE_OFFICER = 5;
-    public static final int DAMAGE_MAJOR = 5;
+    public static final int DAMAGE_MAX_DOCTOR = 2;
+    public static final int DAMAGE_MAX_GUARD = 3;
+    public static final int DAMAGE_MAX_SERGEANT = 4;
+    public static final int DAMAGE_MAX_LIEUTENANT = 5;
+    public static final int DAMAGE_MAX_OFFICER = 6;
+    public static final int DAMAGE_MAX_MAJOR = 7;
 
     //animation delay
     protected static final float DURATION_IDLE =  1000f;
@@ -55,46 +55,46 @@ public final class Soldier extends Enemy {
     public static final int ANIMATION_COUNT = 21;
 
     public enum Type {
-        doctor_1(ASSET_DIR_SOLDIER +"doctor_1/", DAMAGE_DOCTOR),
-        doctor_2(ASSET_DIR_SOLDIER + "doctor_2/", DAMAGE_DOCTOR),
-        guard_1(ASSET_DIR_SOLDIER + "guard_1/", DAMAGE_GUARD),
-        guard_2(ASSET_DIR_SOLDIER + "guard_2/", DAMAGE_GUARD),
-        guard_3(ASSET_DIR_SOLDIER + "guard_3/", DAMAGE_GUARD),
-        guard_4(ASSET_DIR_SOLDIER + "guard_4/", DAMAGE_GUARD),
-        guard_5(ASSET_DIR_SOLDIER + "guard_5/", DAMAGE_GUARD),
-        guard_6(ASSET_DIR_SOLDIER + "guard_6/", DAMAGE_GUARD),
-        guard_7(ASSET_DIR_SOLDIER + "guard_7/", DAMAGE_GUARD),
-        guard_8(ASSET_DIR_SOLDIER + "guard_8/", DAMAGE_GUARD),
-        guard_9(ASSET_DIR_SOLDIER + "guard_9/", DAMAGE_GUARD),
-        guard_10(ASSET_DIR_SOLDIER + "guard_10/", DAMAGE_GUARD),
-        guard_11(ASSET_DIR_SOLDIER + "guard_11/", DAMAGE_GUARD),
-        guard_12(ASSET_DIR_SOLDIER + "guard_12/", DAMAGE_GUARD),
-        lieutenant_1(ASSET_DIR_SOLDIER + "lieutenant_1/", DAMAGE_LIEUTENANT),
-        lieutenant_2(ASSET_DIR_SOLDIER + "lieutenant_2/", DAMAGE_LIEUTENANT),
-        lieutenant_3(ASSET_DIR_SOLDIER + "lieutenant_3/", DAMAGE_LIEUTENANT),
-        lieutenant_4(ASSET_DIR_SOLDIER + "lieutenant_4/", DAMAGE_LIEUTENANT),
-        lieutenant_5(ASSET_DIR_SOLDIER + "lieutenant_5/", DAMAGE_LIEUTENANT),
-        major_1(ASSET_DIR_SOLDIER + "major_1/", DAMAGE_MAJOR),
-        major_2(ASSET_DIR_SOLDIER + "major_2/", DAMAGE_MAJOR),
-        officer_1(ASSET_DIR_SOLDIER + "officer_1/", DAMAGE_OFFICER),
-        officer_2(ASSET_DIR_SOLDIER + "officer_2/", DAMAGE_OFFICER),
-        officer_3(ASSET_DIR_SOLDIER + "officer_3/", DAMAGE_OFFICER),
-        officer_4(ASSET_DIR_SOLDIER + "officer_4/", DAMAGE_OFFICER),
-        officer_5(ASSET_DIR_SOLDIER + "officer_5/", DAMAGE_OFFICER),
-        sergeant_1(ASSET_DIR_SOLDIER + "sergeant_1/", DAMAGE_SERGEANT),
-        sergeant_2(ASSET_DIR_SOLDIER + "sergeant_2/", DAMAGE_SERGEANT),
-        sergeant_3(ASSET_DIR_SOLDIER + "sergeant_3/", DAMAGE_SERGEANT),
-        sergeant_4(ASSET_DIR_SOLDIER + "sergeant_4/", DAMAGE_SERGEANT),
-        sergeant_5(ASSET_DIR_SOLDIER + "sergeant_5/", DAMAGE_SERGEANT);
+        doctor_1(ASSET_DIR_SOLDIER +"doctor_1/", DAMAGE_MAX_DOCTOR),
+        doctor_2(ASSET_DIR_SOLDIER + "doctor_2/", DAMAGE_MAX_DOCTOR),
+        guard_1(ASSET_DIR_SOLDIER + "guard_1/", DAMAGE_MAX_GUARD),
+        guard_2(ASSET_DIR_SOLDIER + "guard_2/", DAMAGE_MAX_GUARD),
+        guard_3(ASSET_DIR_SOLDIER + "guard_3/", DAMAGE_MAX_GUARD),
+        guard_4(ASSET_DIR_SOLDIER + "guard_4/", DAMAGE_MAX_GUARD),
+        guard_5(ASSET_DIR_SOLDIER + "guard_5/", DAMAGE_MAX_GUARD),
+        guard_6(ASSET_DIR_SOLDIER + "guard_6/", DAMAGE_MAX_GUARD),
+        guard_7(ASSET_DIR_SOLDIER + "guard_7/", DAMAGE_MAX_GUARD),
+        guard_8(ASSET_DIR_SOLDIER + "guard_8/", DAMAGE_MAX_GUARD),
+        guard_9(ASSET_DIR_SOLDIER + "guard_9/", DAMAGE_MAX_GUARD),
+        guard_10(ASSET_DIR_SOLDIER + "guard_10/", DAMAGE_MAX_GUARD),
+        guard_11(ASSET_DIR_SOLDIER + "guard_11/", DAMAGE_MAX_GUARD),
+        guard_12(ASSET_DIR_SOLDIER + "guard_12/", DAMAGE_MAX_GUARD),
+        lieutenant_1(ASSET_DIR_SOLDIER + "lieutenant_1/", DAMAGE_MAX_LIEUTENANT),
+        lieutenant_2(ASSET_DIR_SOLDIER + "lieutenant_2/", DAMAGE_MAX_LIEUTENANT),
+        lieutenant_3(ASSET_DIR_SOLDIER + "lieutenant_3/", DAMAGE_MAX_LIEUTENANT),
+        lieutenant_4(ASSET_DIR_SOLDIER + "lieutenant_4/", DAMAGE_MAX_LIEUTENANT),
+        lieutenant_5(ASSET_DIR_SOLDIER + "lieutenant_5/", DAMAGE_MAX_LIEUTENANT),
+        major_1(ASSET_DIR_SOLDIER + "major_1/", DAMAGE_MAX_MAJOR),
+        major_2(ASSET_DIR_SOLDIER + "major_2/", DAMAGE_MAX_MAJOR),
+        officer_1(ASSET_DIR_SOLDIER + "officer_1/", DAMAGE_MAX_OFFICER),
+        officer_2(ASSET_DIR_SOLDIER + "officer_2/", DAMAGE_MAX_OFFICER),
+        officer_3(ASSET_DIR_SOLDIER + "officer_3/", DAMAGE_MAX_OFFICER),
+        officer_4(ASSET_DIR_SOLDIER + "officer_4/", DAMAGE_MAX_OFFICER),
+        officer_5(ASSET_DIR_SOLDIER + "officer_5/", DAMAGE_MAX_OFFICER),
+        sergeant_1(ASSET_DIR_SOLDIER + "sergeant_1/", DAMAGE_MAX_SERGEANT),
+        sergeant_2(ASSET_DIR_SOLDIER + "sergeant_2/", DAMAGE_MAX_SERGEANT),
+        sergeant_3(ASSET_DIR_SOLDIER + "sergeant_3/", DAMAGE_MAX_SERGEANT),
+        sergeant_4(ASSET_DIR_SOLDIER + "sergeant_4/", DAMAGE_MAX_SERGEANT),
+        sergeant_5(ASSET_DIR_SOLDIER + "sergeant_5/", DAMAGE_MAX_SERGEANT);
 
         public final String path;
 
         //how much damage can the enemy do?
-        public final int damage;
+        public final int damageMax;
 
-        Type(String path, int damage) {
+        Type(String path, int damageMax) {
             this.path = path;
-            this.damage = damage;
+            this.damageMax = damageMax;
         }
     }
 
@@ -104,7 +104,7 @@ public final class Soldier extends Enemy {
         super(ANIMATION_COUNT);
 
         //set the allowed damage
-        setDamage(type.damage);
+        setDamageMax(type.damageMax);
 
         switch (type) {
             case guard_1:

@@ -15,8 +15,10 @@ import static com.gamesbykevin.havoc.assets.AssetManagerHelper.getTypeBoss;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.getTypeSoldier;
 import static com.gamesbykevin.havoc.assets.AudioHelper.*;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
+import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafGoal;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
+import static com.gamesbykevin.havoc.enemies.Enemy.RANGE_NOTICE;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.*;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
@@ -26,7 +28,7 @@ public final class Enemies extends Entities {
     public static final int ENEMIES_PER_ROOM_MAX = 3;
 
     //how close do we need to be to play the sound effect
-    public static final float ENEMY_DISTANCE_SFX_RATIO = 0.5f;
+    public static final float ENEMY_DISTANCE_SFX_RATIO = 0.85f;
 
     //different timers for playing sound effects
     private Timer timerHurt, timerAlert, timerDead, timerShoot;
@@ -39,12 +41,6 @@ public final class Enemies extends Entities {
 
     public Enemies(Level level) {
         super(level);
-
-        //create our timers
-        this.timerAlert = new Timer(DURATION_ALERT);
-        this.timerHurt = new Timer(DURATION_HURT);
-        this.timerDead = new Timer(DURATION_DEAD);
-        this.timerShoot = new Timer(DURATION_SHOOT);
     }
 
     public boolean hasCollision(float x, float y) {
@@ -76,6 +72,9 @@ public final class Enemies extends Entities {
         //make sure map is updated and we won't allow diagonal movement
         getLevel().getDungeon().getAStar().setDiagonal(false);
 
+        //optional locations to place the enemies
+        List<Cell> options = null;
+
         while (!leaves.isEmpty()) {
 
             int randomIndex = getRandom().nextInt(leaves.size());
@@ -86,7 +85,7 @@ public final class Enemies extends Entities {
             //remove from the list
             leaves.remove(randomIndex);
 
-            List<Cell> options = getLocationOptions(leaf.getRoom(), null);
+            options = getLocationOptions(leaf.getRoom(), null);
 
             int middleCol = leaf.getRoom().getX() + (leaf.getRoom().getW() / 2);
             int middleRow = leaf.getRoom().getY() + (leaf.getRoom().getH() / 2);
@@ -105,86 +104,8 @@ public final class Enemies extends Entities {
                 //get the random location
                 Cell location = options.get(index);
 
-                //the enemy created
-                Enemy enemy = null;
-
-                //will the enemy patrol?
-                boolean patrol = getRandom().nextBoolean();
-
-                //create our enemy
-                if (getRandom().nextBoolean() && limit == 1) {
-
-                    //create the boss if by chance this room is limited to 1 enemy
-                    enemy = new Boss(getLevel().getAssetManager(), getTypeBoss().get(getRandom().nextInt(getTypeBoss().size())));
-
-                    //boss will never patrol
-                    patrol = false;
-
-                } else {
-
-                    //create the soldier
-                    enemy = new Soldier(getLevel().getAssetManager(), getTypeSoldier().get(getRandom().nextInt(getTypeSoldier().size())));
-                }
-
-                //assign location
-                enemy.setCol(location.getCol());
-                enemy.setRow(location.getRow());
-
-                //change the facing direction
-                if (location.getCol() < middleCol) {
-                    enemy.setDirection(DIRECTION_E);
-                } else if (location.getCol() > middleCol) {
-                    enemy.setDirection(DIRECTION_W);
-                } else {
-                    if (location.getRow() < middleRow) {
-                        enemy.setDirection(DIRECTION_N);
-                    } else {
-                        enemy.setDirection(DIRECTION_S);
-                    }
-                }
-
-                //set the direction default when we reset
-                enemy.setDirectionDefault(enemy.getDirection());
-
-                //for patrol
-                Cell winner = null;
-
-                //determine at random if the enemy will patrol the room
-                if (patrol) {
-
-                    //shortest distance
-                    double distance = -1;
-
-                    //pick random location in the room for the enemy to walk to
-                    List<Cell> tmpList = getLocationOptions(leaf.getRoom(), location);
-
-                    //pick the location furthest away so the enemy can patrol the room
-                    for (int i = 0; i < tmpList.size(); i++) {
-
-                        Cell tmp = tmpList.get(i);
-
-                        //calculate distance from enemy spawn point
-                        double dist = getDistance(location, tmp);
-
-                        //if the distance is longer this is the distance to beat
-                        if (distance < 0 || dist > distance) {
-                            distance = dist;
-                            winner = tmp;
-                        }
-                    }
-
-                    tmpList.clear();
-                    tmpList = null;
-                }
-
-                //add enemy at the location
-                add(enemy, location.getCol(), location.getRow());
-
-                //set the destination if we have one
-                if (winner != null) {
-                    enemy.setFinishCol(winner.getCol());
-                    enemy.setFinishRow(winner.getRow());
-                }
+                //spawn enemy here
+                spawnEnemy(leaf, location, middleCol, middleRow, false);
 
                 //increase the count
                 count++;
@@ -192,14 +113,116 @@ public final class Enemies extends Entities {
                 //remove the option from the list
                 options.remove(index);
             }
-
-            //clear the list
-            options.clear();
-            options = null;
         }
+
+        //decide at random if we are to add a boss to the goal room
+        if (getRandom().nextBoolean()) {
+
+            //get the leaf for the goal room
+            Leaf leaf = getLeafGoal(getLevel().getDungeon());
+
+            //populate our list of options
+            options = getLocationOptions(leaf.getRoom(), null);
+
+            //pick random index
+            int index = getRandom().nextInt(options.size());
+
+            int middleCol = leaf.getRoom().getX() + (leaf.getRoom().getW() / 2);
+            int middleRow = leaf.getRoom().getY() + (leaf.getRoom().getH() / 2);
+
+            //spawn enemy here
+            spawnEnemy(leaf, options.get(index), middleCol, middleRow, true);
+        }
+
+        options.clear();
+        options = null;
 
         //reset the enemies
         reset();
+    }
+
+    private void spawnEnemy(Leaf leaf, Cell location, int middleCol, int middleRow, boolean boss) {
+
+        //the enemy created
+        Enemy enemy = null;
+
+        //will the enemy patrol?
+        boolean patrol = getRandom().nextBoolean();
+
+        //create our enemy
+        if (boss) {
+
+            //create the boss if by chance this room is limited to 1 enemy
+            enemy = new Boss(getLevel().getAssetManager(), getTypeBoss().get(getRandom().nextInt(getTypeBoss().size())));
+
+            //boss will never patrol
+            patrol = false;
+
+        } else {
+
+            //create the soldier
+            enemy = new Soldier(getLevel().getAssetManager(), getTypeSoldier().get(getRandom().nextInt(getTypeSoldier().size())));
+        }
+
+        //assign location
+        enemy.setCol(location.getCol());
+        enemy.setRow(location.getRow());
+
+        //change the facing direction
+        if (location.getCol() < middleCol) {
+            enemy.setDirection(DIRECTION_E);
+        } else if (location.getCol() > middleCol) {
+            enemy.setDirection(DIRECTION_W);
+        } else {
+            if (location.getRow() < middleRow) {
+                enemy.setDirection(DIRECTION_N);
+            } else {
+                enemy.setDirection(DIRECTION_S);
+            }
+        }
+
+        //set the direction default when we reset
+        enemy.setDirectionDefault(enemy.getDirection());
+
+        //for patrol
+        Cell winner = null;
+
+        //determine at random if the enemy will patrol the room
+        if (patrol) {
+
+            //shortest distance
+            double distance = -1;
+
+            //pick random location in the room for the enemy to walk to
+            List<Cell> tmpList = getLocationOptions(leaf.getRoom(), location);
+
+            //pick the location furthest away so the enemy can patrol the room
+            for (int i = 0; i < tmpList.size(); i++) {
+
+                Cell tmp = tmpList.get(i);
+
+                //calculate distance from enemy spawn point
+                double dist = getDistance(location, tmp);
+
+                //if the distance is longer this is the distance to beat
+                if (distance < 0 || dist > distance) {
+                    distance = dist;
+                    winner = tmp;
+                }
+            }
+
+            tmpList.clear();
+            tmpList = null;
+        }
+
+        //add enemy at the location
+        add(enemy, location.getCol(), location.getRow());
+
+        //set the destination if we have one
+        if (winner != null) {
+            enemy.setFinishCol(winner.getCol());
+            enemy.setFinishRow(winner.getRow());
+        }
     }
 
     protected List<Cell> getLocationOptions(Room room, Cell target) {
@@ -248,18 +271,34 @@ public final class Enemies extends Entities {
     }
 
     public Timer getTimerHurt() {
+
+        if (this.timerHurt == null)
+            this.timerHurt = new Timer(DURATION_HURT);
+
         return this.timerHurt;
     }
 
     public Timer getTimerAlert() {
+
+        if (this.timerAlert == null)
+            this.timerAlert = new Timer(DURATION_ALERT);
+
         return this.timerAlert;
     }
 
     public Timer getTimerDead() {
+
+        if (this.timerDead == null)
+            this.timerDead = new Timer(DURATION_DEAD);
+
         return this.timerDead;
     }
 
     public Timer getTimerShoot() {
+
+        if (this.timerShoot == null)
+            this.timerShoot = new Timer(DURATION_SHOOT);
+
         return this.timerShoot;
     }
 
@@ -294,14 +333,49 @@ public final class Enemies extends Entities {
         getTimerShoot().reset();
     }
 
-    @Override
-    public void update() {
+    private void notifyNeighbors(int indexIgnore) {
 
-        //update timers
+        for (int i = 0; i < getEntityList().size(); i++) {
+
+            //don't notify self
+            if (i == indexIgnore)
+                continue;
+
+            //get the enemy
+            Enemy tmp = (Enemy)getEntityList().get(i);
+
+            //how far is the enemy from the other enemy?
+            double distance = getDistance(getEntityList().get(indexIgnore), tmp);
+
+            //make sure the enemy is close enough to notice and the enemy is walking
+            if (distance < RANGE_NOTICE && (tmp.isWalk() || tmp.isIdle())) {
+
+                if (tmp.canShoot(getLevel(), distance)) {
+
+                    //if the enemy can shoot the player, it should start
+                    tmp.setStatus(Enemy.Status.Shoot);
+
+                } else {
+
+                    //otherwise it should seek out the player
+                    chase(getLevel(), tmp);
+                }
+            }
+        }
+    }
+
+    private void updateTimers() {
         getTimerShoot().update();
         getTimerHurt().update();
         getTimerDead().update();
         getTimerAlert().update();
+    }
+
+    @Override
+    public void update() {
+
+        //update timers
+        updateTimers();
 
         //shoot sound effect
         Sfx shoot = null;
@@ -314,6 +388,7 @@ public final class Enemies extends Entities {
 
             Enemy enemy = (Enemy)getEntityList().get(i);
 
+            //are the enemies close to the player in order for the player to hear the sound effects?
             boolean near = getDistance(getLevel().getPlayer(), enemy) < ROOM_DIMENSION_MAX * ENEMY_DISTANCE_SFX_RATIO;
 
             boolean check = false;
@@ -339,8 +414,13 @@ public final class Enemies extends Entities {
                 if (check && shoot == null && !enemy.isShoot())
                     shoot = enemy.getShoot();
             }
+
+            //if an enemy is shooting we need to check other enemies nearby and notify them
+            if (check)
+                notifyNeighbors(i);
         }
 
+        //play the appropriate sound effects
         if (!getLevel().getPlayer().isDead()) {
 
             if (hurt) {
@@ -363,5 +443,14 @@ public final class Enemies extends Entities {
                 getTimerShoot().reset();
             }
         }
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        this.timerAlert = null;
+        this.timerDead = null;
+        this.timerHurt = null;
+        this.timerShoot = null;
     }
 }
