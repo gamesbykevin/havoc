@@ -287,7 +287,7 @@ public class AssetManagerHelper {
                 try {
                     assetManager.unload(PATHS.get(index));
                 } catch (Exception e) {
-
+                    e.printStackTrace();
                 }
             }
 

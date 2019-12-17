@@ -1,11 +1,11 @@
 package com.gamesbykevin.havoc.util;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
-import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
-import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
+import static com.gamesbykevin.havoc.MyGdxGame.*;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 import static com.gamesbykevin.havoc.player.PlayerHelper.*;
 import static com.gamesbykevin.havoc.player.PlayerHelper.HUD_KEY_HEIGHT;
@@ -16,10 +16,10 @@ public class Hud {
     public static final int HUD_NUMBER_HEIGHT = (int)(70 * HUD_RATIO);
 
     public static final int HUD_NUMBER_PAD = (int)(5 * HUD_RATIO);
-    public static final int HUD_BULLET_X = SIZE_WIDTH - (3 * HUD_NUMBER_WIDTH) - (3 * HUD_NUMBER_PAD);
-    public static final int HUD_BULLET_Y = SIZE_HEIGHT - (HUD_NUMBER_HEIGHT);
+    public static final int HUD_BULLET_X = getSizeWidth() - (3 * HUD_NUMBER_WIDTH) - (3 * HUD_NUMBER_PAD);
+    public static final int HUD_BULLET_Y = getSizeHeight() - (HUD_NUMBER_HEIGHT);
     public static final int HUD_HEALTH_X = (3 * HUD_NUMBER_PAD);
-    public static final int HUD_HEALTH_Y = SIZE_HEIGHT - HUD_NUMBER_HEIGHT - (HUD_NUMBER_PAD * 2);
+    public static final int HUD_HEALTH_Y = getSizeHeight() - HUD_NUMBER_HEIGHT - (HUD_NUMBER_PAD * 2);
 
     public static final void renderNumber(AssetManager assetManager, Batch batch, final int number, int renderX, int renderY, int width, int height, int padding) {
 

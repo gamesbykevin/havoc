@@ -1,4 +1,4 @@
-package com.gamesbykevin.havoc;
+package com.gamesbykevin;
 
 import android.os.Bundle;
 

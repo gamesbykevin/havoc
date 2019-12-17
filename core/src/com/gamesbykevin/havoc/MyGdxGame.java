@@ -48,7 +48,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private BitmapFont font;
 
 	//dimensions of the progress bar
-	private static final float PROGRESS_BAR_WIDTH = (SIZE_WIDTH / 2f);
+	private static final float PROGRESS_BAR_WIDTH = (getSizeWidth() / 2f);
 	private static final float PROGRESS_BAR_HEIGHT = 50f;
 
 	//change the size of the font
@@ -68,7 +68,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		getAssetManager();
 
 		//create view port
-		this.viewport = new StretchViewport(SIZE_WIDTH, SIZE_HEIGHT);
+		this.viewport = new StretchViewport(getSizeWidth(), getSizeHeight());
 
 		//create sprite batch
 		this.batch = new SpriteBatch();
@@ -91,9 +91,34 @@ public class MyGdxGame extends ApplicationAdapter {
 		super.resize(width, height);
 
 		//set it up for rendering
+		getPlayer().getViewport().update(width, height);
 		getViewport().update(width, height, true);
 		getBatch().setProjectionMatrix(getViewport().getCamera().combined);
 		getShapeRenderer().setProjectionMatrix(getViewport().getCamera().combined);
+	}
+
+	public static final int getSizeWidth() {
+
+		if (1==1)
+			return SIZE_WIDTH;
+
+		if (Gdx.graphics == null) {
+			return SIZE_WIDTH;
+		} else {
+			return Gdx.graphics.getWidth();
+		}
+	}
+
+	public static final int getSizeHeight() {
+
+		if (1==1)
+			return SIZE_HEIGHT;
+
+		if (Gdx.graphics == null) {
+			return SIZE_HEIGHT;
+		} else {
+			return Gdx.graphics.getHeight();
+		}
 	}
 
 	public Level getLevel() {
@@ -280,8 +305,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	private void renderProgressBar(float progress, String description) {
 
-		float x = (SIZE_WIDTH - PROGRESS_BAR_WIDTH) / 2f;
-		float y = (SIZE_HEIGHT - PROGRESS_BAR_HEIGHT) / 2f;
+		float x = (getSizeWidth() - PROGRESS_BAR_WIDTH) / 2f;
+		float y = (getSizeHeight() - PROGRESS_BAR_HEIGHT) / 2f;
 
 		//render the outline
 		getShapeRenderer().begin(ShapeRenderer.ShapeType.Line);

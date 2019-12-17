@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
@@ -14,8 +17,8 @@ import com.gamesbykevin.havoc.weapon.Weapons;
 import com.gamesbykevin.havoc.util.Disposable;
 import com.gamesbykevin.havoc.util.Hud;
 
-import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
-import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
+import static com.gamesbykevin.havoc.MyGdxGame.getSizeHeight;
+import static com.gamesbykevin.havoc.MyGdxGame.getSizeWidth;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_COLLECT;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_HURT;
 import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
@@ -47,6 +50,9 @@ public final class Player implements Disposable, Restart {
 
     //our 3d camera
     private PerspectiveCamera camera3d;
+
+    //view port for the camera
+    private Viewport viewport;
 
     //start location
     private int startCol, startRow;
@@ -100,9 +106,13 @@ public final class Player implements Disposable, Restart {
 
         //create if null
         if (this.camera3d == null) {
-            float w = Gdx.graphics.getWidth();
-            float h = Gdx.graphics.getHeight();
-            this.camera3d = new PerspectiveCamera(67, 1, h/w);
+
+            System.out.println("kevin size   " + getSizeWidth() + " - " + getSizeHeight());
+
+            this.camera3d = new PerspectiveCamera(67f, getSizeWidth(), getSizeHeight());
+            //this.camera3d = new PerspectiveCamera(67, 1, h/w);
+
+            this.viewport = new StretchViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), this.camera3d);
             this.camera3d.near = .05f;
             this.camera3d.far = (RENDER_RANGE * 2);
         }
@@ -126,6 +136,10 @@ public final class Player implements Disposable, Restart {
 
         //return our instance
         return this.camera3d;
+    }
+
+    public Viewport getViewport() {
+        return this.viewport;
     }
 
     public float getStartCol() {
@@ -285,10 +299,10 @@ public final class Player implements Disposable, Restart {
 
         //if hurt render the screen graphic
         if (isHurt() || isDead()) {
-            batch.draw(getAssetManager().get(PATH_HURT, Texture.class), 0, 0, SIZE_WIDTH, SIZE_HEIGHT);
+            batch.draw(getAssetManager().get(PATH_HURT, Texture.class), 0, 0, getSizeWidth(), getSizeHeight());
             setHurt(false);
         } else if (isCollect() || isGoal()) {
-            batch.draw(getAssetManager().get(PATH_COLLECT, Texture.class), 0, 0, SIZE_WIDTH, SIZE_HEIGHT);
+            batch.draw(getAssetManager().get(PATH_COLLECT, Texture.class), 0, 0, getSizeWidth(), getSizeHeight());
             setCollect(false);
         }
 

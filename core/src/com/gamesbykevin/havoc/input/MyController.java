@@ -9,8 +9,8 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.gamesbykevin.havoc.util.Restart;
 
-import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
-import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
+import static com.gamesbykevin.havoc.MyGdxGame.getSizeHeight;
+import static com.gamesbykevin.havoc.MyGdxGame.getSizeWidth;
 import static com.gamesbykevin.havoc.input.MyControllerHelper.*;
 
 public class MyController implements InputProcessor, Disposable, Restart {
@@ -136,7 +136,7 @@ public class MyController implements InputProcessor, Disposable, Restart {
         //create camera if null
         if (this.camera2d == null) {
             this.camera2d = new OrthographicCamera();
-            this.camera2d.setToOrtho(false, SIZE_WIDTH, SIZE_HEIGHT);
+            this.camera2d.setToOrtho(false, getSizeWidth(), getSizeHeight());
         }
 
         return this.camera2d;
@@ -285,7 +285,7 @@ public class MyController implements InputProcessor, Disposable, Restart {
     public Stage getStage() {
 
         if (this.stage == null)
-            this.stage = new Stage(new StretchViewport(SIZE_WIDTH, SIZE_HEIGHT));
+            this.stage = new Stage(new StretchViewport(getSizeWidth(), getSizeHeight()));
 
         return this.stage;
     }

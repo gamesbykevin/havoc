@@ -1,10 +1,10 @@
 sourceSets.main.java.srcDirs = [ "src/" ]
 
-sourceCompatibility = '1.8'
+sourceCompatibility = '1.7'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 ext {
-	mainClassName = "com.gamesbykevin.havoc.IOSLauncher"
+	mainClassName = "com.gamesbykevin.IOSLauncher"
 }
 
 launchIPhoneSimulator.dependsOn build
@@ -14,9 +14,4 @@ createIPA.dependsOn build
 
 robovm {
 	archs = "thumbv7:arm64"
-}
-
-eclipse.project {
-    name = appName + "-ios"
-    natures 'org.robovm.eclipse.RoboVMNature'
 }

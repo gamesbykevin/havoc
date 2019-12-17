@@ -1,12 +1,13 @@
 package com.gamesbykevin.havoc.weapon;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.collision.Ray;
 import com.gamesbykevin.havoc.enemies.Enemy;
 import com.gamesbykevin.havoc.level.Level;
 
-import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
-import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
+import static com.gamesbykevin.havoc.MyGdxGame.getSizeHeight;
+import static com.gamesbykevin.havoc.MyGdxGame.getSizeWidth;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_DIR_WEAPONS;
 import static com.gamesbykevin.havoc.assets.AudioHelper.*;
 import static com.gamesbykevin.havoc.decals.Square.COLLISION_RADIUS;
@@ -173,7 +174,7 @@ public class WeaponHelper {
                 continue;
 
             //we check the middle of the screen
-            Ray ray = level.getPlayer().getCamera3d().getPickRay(SIZE_WIDTH / 2, SIZE_HEIGHT / 2);
+            Ray ray = level.getPlayer().getCamera3d().getPickRay(getSizeWidth() / 2, getSizeHeight() / 2);
 
             int colMin = (int)((level.getPlayer().getCamera3d().position.x > enemy.getCol()) ? enemy.getCol() : level.getPlayer().getCamera3d().position.x);
             int colMax = (int)((level.getPlayer().getCamera3d().position.x < enemy.getCol()) ? enemy.getCol() : level.getPlayer().getCamera3d().position.x);
