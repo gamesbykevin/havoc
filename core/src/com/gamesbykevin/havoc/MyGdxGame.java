@@ -97,28 +97,12 @@ public class MyGdxGame extends ApplicationAdapter {
 		getShapeRenderer().setProjectionMatrix(getViewport().getCamera().combined);
 	}
 
-	public static final int getSizeWidth() {
-
-		if (1==1)
-			return SIZE_WIDTH;
-
-		if (Gdx.graphics == null) {
-			return SIZE_WIDTH;
-		} else {
-			return Gdx.graphics.getWidth();
-		}
+	public static int getSizeWidth() {
+		return SIZE_WIDTH;
 	}
 
-	public static final int getSizeHeight() {
-
-		if (1==1)
-			return SIZE_HEIGHT;
-
-		if (Gdx.graphics == null) {
-			return SIZE_HEIGHT;
-		} else {
-			return Gdx.graphics.getHeight();
-		}
+	public static int getSizeHeight() {
+		return SIZE_HEIGHT;
 	}
 
 	public Level getLevel() {
