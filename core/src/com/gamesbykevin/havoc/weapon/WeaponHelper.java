@@ -174,7 +174,7 @@ public class WeaponHelper {
                 continue;
 
             //we check the middle of the screen
-            Ray ray = level.getPlayer().getCamera3d().getPickRay(getSizeWidth() / 2, getSizeHeight() / 2);
+            Ray ray = level.getPlayer().getCamera3d().getPickRay(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
 
             int colMin = (int)((level.getPlayer().getCamera3d().position.x > enemy.getCol()) ? enemy.getCol() : level.getPlayer().getCamera3d().position.x);
             int colMax = (int)((level.getPlayer().getCamera3d().position.x < enemy.getCol()) ? enemy.getCol() : level.getPlayer().getCamera3d().position.x);
