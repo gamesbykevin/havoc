@@ -130,7 +130,9 @@ public class EnemyHelper {
             //if enemy is facing the player and we can shoot, then don't wait
             if (enemy.isFacing(level.getPlayer().getCamera3d().position) && enemy.canShoot(level, distance)) {
                 enemy.setStatus(Status.Shoot);
-                chase(level, enemy);
+
+                //flag chase the player
+                enemy.setChase(true);
             }
         }
 
@@ -143,7 +145,9 @@ public class EnemyHelper {
             //are we close enough to check if we can attack?
             if (enemy.canShoot(level, distance)) {
                 enemy.setStatus(Status.Shoot);
-                chase(level, enemy);
+
+                //flag chase the player
+                enemy.setChase(true);
             } else {
                 enemy.setStatus(Status.Idle);
             }
@@ -184,7 +188,9 @@ public class EnemyHelper {
             //if close enough the enemy will remain alert
             if (distance < RANGE_NOTICE && !obstructed) {
                 enemy.setStatus(Status.Pause);
-                chase(level, enemy);
+
+                //flag chase the player
+                enemy.setChase(true);
             } else {
                 enemy.setStatus(Status.Idle);
             }
@@ -194,7 +200,9 @@ public class EnemyHelper {
             //if close enough and our view isn't blocked
             if (enemy.canShoot(level, distance)) {
                 enemy.setStatus(Status.Alert);
-                chase(level, enemy);
+
+                //flag chase the player
+                enemy.setChase(true);
             } else {
                 enemy.setStatus(Status.Idle);
             }
@@ -207,7 +215,9 @@ public class EnemyHelper {
             //if the player is shooting and the enemy has a clear view of them, start shooting
             if (level.getPlayer().getController().isShooting() && enemy.canShoot(level)) {
                 enemy.setStatus(Status.Shoot);
-                chase(level, enemy);
+
+                //flag chase the player
+                enemy.setChase(true);
             }
 
             //if we are idle but we have a patrol path, start walking again

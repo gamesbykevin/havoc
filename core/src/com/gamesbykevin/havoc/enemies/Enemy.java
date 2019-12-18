@@ -80,6 +80,9 @@ public abstract class Enemy extends Entity3d {
     //status of the player
     private Status status;
 
+    //do we calculate path to the player?
+    private boolean chase = false;
+
     public Enemy(int count) {
         super(count);
     }
@@ -96,6 +99,7 @@ public abstract class Enemy extends Entity3d {
         setSolid(true);
         setAscending(true);
         setStatus(Status.Idle);
+        setChase(false);
     }
 
     @Override
@@ -143,6 +147,14 @@ public abstract class Enemy extends Entity3d {
 
         //update the animation
         getAnimation().update();
+    }
+
+    public boolean isChase() {
+        return this.chase;
+    }
+
+    public void setChase(boolean chase) {
+        this.chase = chase;
     }
 
     public int getDirectionDefault() {

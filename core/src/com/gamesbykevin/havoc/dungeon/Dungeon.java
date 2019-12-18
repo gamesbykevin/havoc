@@ -226,7 +226,7 @@ public class Dungeon implements Disposable {
         if (cell.isDoor()) {
             getMap()[row][col] = true;
             getInteract()[row][col] = true;
-        } else if (cell.isOpen() || cell.isUnvisited()) {
+        } else if (cell.isOpen() || cell.isUnvisited() || cell.isHallway()) {
             getMap()[row][col] = true;
             getInteract()[row][col] = false;
         } else if (cell.isGoal()) {

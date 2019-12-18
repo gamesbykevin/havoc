@@ -18,21 +18,6 @@ public class DungeonHelper {
     //how big is the dungeon
     public static final int DUNGEON_SIZE = ROOM_DIMENSION_MAX * 5;
 
-    public static int getCount(Dungeon dungeon, String id) {
-
-        int count = 0;
-
-        for (int row = 0; row < dungeon.getRows(); row++) {
-            for (int col = 0; col < dungeon.getCols(); col++) {
-                if (dungeon.getCell(col, row).hasId(id))
-                    count++;
-            }
-        }
-
-        //return our count
-        return count;
-    }
-
     protected static void divide(Dungeon dungeon) {
 
         //parent leaf
@@ -382,10 +367,6 @@ public class DungeonHelper {
             Room roomW = (room1.getX() < room2.getX()) ? room1 : room2;
             Room roomE = (room1.getX() < room2.getX()) ? room2 : room1;
 
-            //we prefer to connect rooms at the center
-            int middleW = roomW.getY() + (roomW.getH() / 2);
-            int middleE = roomW.getY() + (roomE.getH() / 2);
-
             for (int rowW = roomW.getY() + offset; rowW < roomW.getY() + roomW.getH() - offset; rowW++) {
                 for (int rowE = roomE.getY() + offset; rowE < roomE.getY() + roomE.getH() - offset; rowE++) {
 
@@ -397,10 +378,6 @@ public class DungeonHelper {
 
                     //calculate the difference
                     int difference = Math.abs(rowW - rowE);
-
-                    //penalize for being away from the center
-                    //difference += Math.abs(rowE - middleE);
-                    //difference += Math.abs(rowW - middleW);
 
                     if (diff < 0 || difference < diff) {
                         start = cell1;
@@ -415,10 +392,6 @@ public class DungeonHelper {
             Room roomN = (room1.getY() < room2.getY()) ? room2 : room1;
             Room roomS = (room1.getY() < room2.getY()) ? room1 : room2;
 
-            //we prefer to connect rooms at the center
-            int middleN = roomN.getX() + (roomN.getW() / 2);
-            int middleS = roomS.getX() + (roomS.getW() / 2);
-
             for (int colN = roomN.getX() + offset; colN < roomN.getX() + roomN.getW() - offset; colN++) {
                 for (int colS = roomS.getX() + offset; colS < roomS.getX() + roomS.getW() - offset; colS++) {
 
@@ -430,10 +403,6 @@ public class DungeonHelper {
 
                     //calculate the difference
                     int difference = Math.abs(colN - colS);
-
-                    //penalize for being away from the center
-                    //difference += Math.abs(colN - middleN);
-                    //difference += Math.abs(colS - middleS);
 
                     if (diff < 0 || difference < diff) {
                         start = cell1;
@@ -455,10 +424,10 @@ public class DungeonHelper {
         dungeon.getAStar().setDiagonal(false);
         dungeon.getAStar().calculate(start.getCol(), start.getRow(), goal.getCol(), goal.getRow());
 
-        //update the dungeon marking the open spaces
+        //update the dungeon marking the hallway
         for (int i = 1; i < dungeon.getAStar().getPath().size() - 1; i++) {
             Node node = dungeon.getAStar().getPath().get(i);
-            dungeon.getCell(node.getCol(), node.getRow()).setType(Type.Open);
+            dungeon.getCell(node.getCol(), node.getRow()).setType(Type.Hallway);
         }
     }
 

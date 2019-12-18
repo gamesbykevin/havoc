@@ -106,15 +106,10 @@ public final class Player implements Disposable, Restart {
 
         //create if null
         if (this.camera3d == null) {
-
-            System.out.println("kevin size   " + getSizeWidth() + " - " + getSizeHeight());
-
             this.camera3d = new PerspectiveCamera(67f, getSizeWidth(), getSizeHeight());
-            //this.camera3d = new PerspectiveCamera(67, 1, h/w);
-
             this.viewport = new StretchViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), this.camera3d);
             this.camera3d.near = .05f;
-            this.camera3d.far = (RENDER_RANGE * 2);
+            this.camera3d.far = (RENDER_RANGE * 3);
         }
 
         if (reset) {

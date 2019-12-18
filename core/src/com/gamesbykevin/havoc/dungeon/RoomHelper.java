@@ -431,7 +431,7 @@ public class RoomHelper {
                 //get the room
                 Room tmp = leaves.get(x).getRoom();
 
-                if (dungeon.getCell(tmp.getX(), tmp.getY()).hasId(door.getLink().getId())) {
+                if (dungeon.getCell(tmp.getX(), tmp.getY()).hasId(door.getLink())) {
                     room = tmp;
                     break;
                 }
@@ -467,7 +467,7 @@ public class RoomHelper {
 
                 //any of these are doors
                 if (cell.isDoor()) {
-                    if (cell.hasId(door.getLink().getId()) && door.hasId(cell.getLink().getId()))
+                    if (cell.hasId(door.getLink()) && door.hasId(cell.getLink()))
                         return cell;
                 }
             }

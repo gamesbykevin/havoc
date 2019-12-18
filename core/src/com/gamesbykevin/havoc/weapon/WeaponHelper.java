@@ -6,13 +6,10 @@ import com.badlogic.gdx.math.collision.Ray;
 import com.gamesbykevin.havoc.enemies.Enemy;
 import com.gamesbykevin.havoc.level.Level;
 
-import static com.gamesbykevin.havoc.MyGdxGame.getSizeHeight;
-import static com.gamesbykevin.havoc.MyGdxGame.getSizeWidth;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_DIR_WEAPONS;
-import static com.gamesbykevin.havoc.assets.AudioHelper.*;
+import static com.gamesbykevin.havoc.assets.AudioHelper.playHurt;
 import static com.gamesbykevin.havoc.decals.Square.COLLISION_RADIUS;
 import static com.gamesbykevin.havoc.enemies.Enemy.RANGE_NOTICE;
-import static com.gamesbykevin.havoc.enemies.EnemyHelper.chase;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public class WeaponHelper {
@@ -221,8 +218,8 @@ public class WeaponHelper {
                 //deduct the enemies health
                 enemy.setHealth(enemy.getHealth() - weapon.getDamage());
 
-                //setup the chase
-                chase(level, enemy);
+                //flag chase the player
+                enemy.setChase(true);
 
             } else if (distance < RANGE_NOTICE) {
 
@@ -234,12 +231,14 @@ public class WeaponHelper {
 
                     //if the enemy has a clear view of the player they can shoot
                     enemy.setStatus(Enemy.Status.Shoot);
-                    chase(level, enemy);
+
+                    //flag chase the player
+                    enemy.setChase(true);
 
                 } else if (enemy.getPathIndex() > 0 || enemy.isIdle()) {
 
-                    //if we didn't calculate yet or the enemy is idle
-                    chase(level, enemy);
+                    //flag chase the player
+                    enemy.setChase(true);
                 }
             }
         }

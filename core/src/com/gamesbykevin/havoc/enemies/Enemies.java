@@ -28,7 +28,7 @@ public final class Enemies extends Entities {
     public static final int ENEMIES_PER_ROOM_MAX = 3;
 
     //how close do we need to be to play the sound effect
-    public static final float ENEMY_DISTANCE_SFX_RATIO = 0.85f;
+    public static final float ENEMY_DISTANCE_SFX_RATIO = 1.25f;
 
     //different timers for playing sound effects
     private Timer timerHurt, timerAlert, timerDead, timerShoot;
@@ -344,6 +344,10 @@ public final class Enemies extends Entities {
             //get the enemy
             Enemy tmp = (Enemy)getEntityList().get(i);
 
+            //skip if dead
+            if (tmp.isDie())
+                continue;
+
             //how far is the enemy from the other enemy?
             double distance = getDistance(getEntityList().get(indexIgnore), tmp);
 
@@ -357,8 +361,8 @@ public final class Enemies extends Entities {
 
                 } else {
 
-                    //otherwise it should seek out the player
-                    chase(getLevel(), tmp);
+                    //flag chase the player
+                    tmp.setChase(true);
                 }
             }
         }
@@ -383,14 +387,18 @@ public final class Enemies extends Entities {
         boolean dead = false;
         boolean alert = false;
 
+        //did we calculate chase yet?
+        boolean chase = false;
+
         //update the enemies
         for (int i = 0; i < getEntityList().size(); i++) {
 
             Enemy enemy = (Enemy)getEntityList().get(i);
 
             //are the enemies close to the player in order for the player to hear the sound effects?
-            boolean near = getDistance(getLevel().getPlayer(), enemy) < ROOM_DIMENSION_MAX * ENEMY_DISTANCE_SFX_RATIO;
+            boolean near = (getDistance(getLevel().getPlayer(), enemy) < ROOM_DIMENSION_MAX * ENEMY_DISTANCE_SFX_RATIO);
 
+            //we need to play shoot sfx at the right time when the animation finishes
             boolean check = false;
 
             //make sure we are near enough to play a sound effect
@@ -407,10 +415,25 @@ public final class Enemies extends Entities {
                     alert = true;
             }
 
+            //if we haven't chased anyone yet and the enemy is flagged to chase
+            if (!chase && enemy.isChase() && !enemy.isDie()) {
+
+                //calculate path to chase the player
+                chase(getLevel(), enemy);
+
+                //turn flag off
+                enemy.setChase(false);
+
+                //flag we chased so we don't do it for the other enemies
+                chase = true;
+            }
+
             //update the current entity
             enemy.update(getLevel());
 
+            //if close enough to hear the gun shoot
             if (near) {
+
                 if (check && shoot == null && !enemy.isShoot())
                     shoot = enemy.getShoot();
             }

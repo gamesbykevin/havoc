@@ -21,6 +21,7 @@ public class Cell extends Location implements Disposable {
     public enum Type {
         Wall,
         Open,
+        Hallway,
         Door,
         DoorLocked,
         Secret,
@@ -50,7 +51,7 @@ public class Cell extends Location implements Disposable {
         return hasId(cell.getId());
     }
 
-    public boolean hasId(String id) {
+    private boolean hasId(String id) {
         return getId().equals(id);
     }
 
@@ -144,6 +145,16 @@ public class Cell extends Location implements Disposable {
     public boolean isUnvisited() {
         switch (getType()) {
             case Unvisited:
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    public boolean isHallway(){
+        switch (getType()) {
+            case Hallway:
                 return true;
 
             default:

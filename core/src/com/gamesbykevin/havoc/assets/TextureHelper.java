@@ -17,7 +17,6 @@ import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 import static com.gamesbykevin.havoc.decals.Background.createDecalBackground;
 import static com.gamesbykevin.havoc.decals.Wall.*;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
-import static com.gamesbykevin.havoc.dungeon.DungeonHelper.getCount;
 
 public class TextureHelper {
 
@@ -230,54 +229,51 @@ public class TextureHelper {
         return texture;
     }
 
-    private static HashMap<String, TextureRegion> getTextureRegions(Dungeon dungeon, AssetManager assetManager) {
+    private static HashMap<String, TextureRegion> getTextureRegions(Level level) {
 
-        HashMap<String, TextureRegion> textures = new HashMap<>();
+        if (TEXTURE_REGIONS == null) {
 
-        String tmpId = null;
+            TEXTURE_REGIONS = new HashMap<>();
 
-        for (int row = 0; row < dungeon.getRows(); row++) {
-            for (int col = 0; col < dungeon.getCols(); col++) {
+            String tmpId = null;
 
-                //true means this space is open, so there should be no walls
-                if (dungeon.hasMap(col, row))
-                    continue;
+            Dungeon dungeon = level.getDungeon();
+            AssetManager assetManager = level.getAssetManager();
 
-                //if there is only 1, make it part of the same group
-                if (getCount(dungeon, dungeon.getCell(col, row).getId()) < 2) {
+            for (int row = 0; row < dungeon.getRows(); row++) {
+                for (int col = 0; col < dungeon.getCols(); col++) {
 
-                    if (tmpId == null)
-                        tmpId = dungeon.getCell(col, row).getId();
-
-                    dungeon.getCell(col, row).setId(dungeon.getCell(col, row));
-
-                    //if it already exists, skip to the next
-                    if (textures.get(dungeon.getCell(col, row).getId()) != null)
+                    //true means this space is open, so there should be no walls
+                    if (dungeon.hasMap(col, row))
                         continue;
 
-                    //put it in the hash map
-                    textures.put(dungeon.getCell(col, row).getId(), getTextureRegionHallway(assetManager));
+                    //if there is only 1, make it part of the same group as this will be part of the hallways
+                    if (dungeon.getCell(col, row).isHallway()) {
 
-                } else {
+                        if (tmpId == null)
+                            tmpId = dungeon.getCell(col, row).getId();
 
-                    //if texture already exists, skip to the next
-                    if (textures.get(dungeon.getCell(col, row).getId()) != null)
-                        continue;
+                        dungeon.getCell(col, row).setId(dungeon.getCell(col, row));
 
-                    int index = getRandom().nextInt(getPathsWall().size());
-                    textures.put(dungeon.getCell(col, row).getId(), new TextureRegion(assetManager.get(getPathsWall().get(index), Texture.class)));
+                        //if it already exists, skip to the next
+                        if (TEXTURE_REGIONS.get(dungeon.getCell(col, row).getId()) != null)
+                            continue;
+
+                        //put it in the hash map
+                        TEXTURE_REGIONS.put(dungeon.getCell(col, row).getId(), getTextureRegionHallway(assetManager));
+
+                    } else {
+
+                        //if texture already exists, skip to the next
+                        if (TEXTURE_REGIONS.get(dungeon.getCell(col, row).getId()) != null)
+                            continue;
+
+                        int index = getRandom().nextInt(getPathsWall().size());
+                        TEXTURE_REGIONS.put(dungeon.getCell(col, row).getId(), new TextureRegion(assetManager.get(getPathsWall().get(index), Texture.class)));
+                    }
                 }
             }
         }
-
-        //return map of textures
-        return textures;
-    }
-
-    private static HashMap<String, TextureRegion> getTextureRegions(Level level) {
-
-        if (TEXTURE_REGIONS == null)
-            TEXTURE_REGIONS = getTextureRegions(level.getDungeon(), level.getAssetManager());
 
         return TEXTURE_REGIONS;
     }

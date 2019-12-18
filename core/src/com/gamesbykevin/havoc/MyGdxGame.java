@@ -28,7 +28,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	public static final float FPS = 90f;
 
 	/**
-	 * How long is 1 frame in milliseconds
+	 * How long is 1 frame in milliseconds?
 	 */
 	public static final float FRAME_MS = (1000f / FPS);
 
@@ -52,7 +52,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private static final float PROGRESS_BAR_HEIGHT = 50f;
 
 	//change the size of the font
-	private static final float FONT_SCALE = 1.75f;
+	private static final float FONT_SCALE = 1.25f;
 
 	public enum Steps {
 		Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8
@@ -60,6 +60,9 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	//current step
 	private Steps step;
+
+	//has the game been created
+	private boolean created = false;
 
 	@Override
 	public void create () {
@@ -82,6 +85,9 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		//start at step 1
 		setStep(Steps.Step1);
+
+		//flag the game has not been created
+		setCreated(false);
 	}
 
 	@Override
@@ -95,6 +101,14 @@ public class MyGdxGame extends ApplicationAdapter {
 		getViewport().update(width, height, true);
 		getBatch().setProjectionMatrix(getViewport().getCamera().combined);
 		getShapeRenderer().setProjectionMatrix(getViewport().getCamera().combined);
+	}
+
+	public boolean isCreated() {
+		return this.created;
+	}
+
+	public void setCreated(boolean created) {
+		this.created = created;
 	}
 
 	public static int getSizeWidth() {
@@ -156,6 +170,22 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 
 	@Override
+	public void pause() {
+		super.pause();
+	}
+
+	@Override
+	public void resume() {
+		super.resume();
+
+		//use the asset manager
+		Texture.setAssetManager(getAssetManager());
+
+		//go back to reloading our assets
+		setStep(Steps.Step1);
+	}
+
+	@Override
 	public void render () {
 
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -164,6 +194,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		switch (getStep()) {
 
 			case Step1:
+
 				//if assets are loaded move to the next step
 				if (getAssetManager().update()) {
 
@@ -189,22 +220,30 @@ public class MyGdxGame extends ApplicationAdapter {
 						}
 					}
 
-					//if we are good, go to the next step
-					if (success) {
-						setStep(Steps.Step2);
-						renderProgressBar("Generating dungeon");
+					if (isCreated()) {
+
+						//if the game was already created go to step 8
+						setStep(Steps.Step8);
+
+					} else {
+
+						//if we are good, go to the next step
+						if (success) {
+							setStep(Steps.Step2);
+							renderProgressBar("Step 2 of 7 Generating dungeon");
+						}
 					}
 
 				} else {
 					getAssetManager().update();
-					renderProgressBar(getAssetManager().getProgress(), "Loading assets");
+					renderProgressBar(getAssetManager().getProgress(), "Step 1 of 7 Loading assets");
 				}
 				break;
 
 			case Step2:
 
 				//generate dungeon
-				renderProgressBar("Generating dungeon");
+				renderProgressBar("Step 2 of 7 Generating dungeon");
 				getLevel().getDungeon().generate();
 
 				//flag the players start location
@@ -215,7 +254,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			case Step3:
 
 				//creating weapons
-				renderProgressBar("Creating weapons");
+				renderProgressBar("Step 3 of 7 Creating weapons");
 				getLevel().getPlayer().createWeapons(getLevel());
 				setStep(Steps.Step4);
 				break;
@@ -223,7 +262,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			case Step4:
 
 				//add obstacles
-				renderProgressBar("Spawning obstacles");
+				renderProgressBar("Step 4 of 7 Spawning obstacles");
 				getLevel().getObstacles().spawn();
 				setStep(Steps.Step5);
 				break;
@@ -231,7 +270,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			case Step5:
 
 				//add enemies
-				renderProgressBar("Spawning enemies");
+				renderProgressBar("Step 5 of 7 Spawning enemies");
 				getLevel().getEnemies().spawn();
 				setStep(Steps.Step6);
 				break;
@@ -239,7 +278,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			case Step6:
 
 				//add collectibles
-				renderProgressBar("Spawning collectibles");
+				renderProgressBar("Step 6 of 7 Spawning collectibles");
 				getLevel().getCollectibles().spawn();
 				setStep(Steps.Step7);
 				break;
@@ -248,16 +287,20 @@ public class MyGdxGame extends ApplicationAdapter {
 
 				//create level textures
 				if (COUNT < TOTAL) {
-					renderProgressBar((COUNT / TOTAL), "Applying textures");
+					renderProgressBar((COUNT / TOTAL), "Step 7 of 7 Applying textures");
 					addTextures(getLevel());
 				} else {
-					renderProgressBar( "Applying textures");
+					renderProgressBar( "Step 7 of 7 Applying textures");
 					setStep(Steps.Step8);
 					playHero(getAssetManager());
+
+					//flag game has been created
+					setCreated(true);
 				}
 				break;
 
 			case Step8:
+
 				//at this point render the game
 				final long time = System.currentTimeMillis();
 

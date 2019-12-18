@@ -267,20 +267,20 @@ public final class Collectibles extends Entities {
             Entity3d tmp = (Entity3d)getEntityList().get(i);
 
             //search for a nearby spot to place the ammo
-            for (float x = 0; x <= OFFSET * 3; x += OFFSET) {
-                for (float y = 0; y <= OFFSET * 3; y += OFFSET) {
+            for (int x = 0; x <= 3; x ++) {
+                for (int y = 0; y <= 3; y ++) {
 
                     //avoid this location
-                    if (x == OFFSET || y == OFFSET)
+                    if (x == 0 && y == 0)
                         continue;
 
-                    if (hasEntityLocation((int)(entity.getCol() + x), (int)(entity.getRow() + y)) || hasEntityLocation(entity.getCol() + x, entity.getRow() + y))
+                    if (hasEntityLocation(entity.getCol() + x, entity.getRow() + y))
                         continue;
 
                     tmp.setCol(entity.getCol() + x);
                     tmp.setRow(entity.getRow() + y);
                     tmp.getAnimation().reset();
-                    tmp.getAnimation().setPosition(entity.getCol() + x, entity.getRow() + y, 0);
+                    tmp.getAnimation().setPosition(entity.getCol() + x + OFFSET, entity.getRow() + y + OFFSET, 0);
                     return;
                 }
             }
