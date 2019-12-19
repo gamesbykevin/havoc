@@ -55,46 +55,56 @@ public final class Soldier extends Enemy {
     public static final int ANIMATION_COUNT = 21;
 
     public enum Type {
-        doctor_1(ASSET_DIR_SOLDIER +"doctor_1/", DAMAGE_MAX_DOCTOR),
-        doctor_2(ASSET_DIR_SOLDIER + "doctor_2/", DAMAGE_MAX_DOCTOR),
-        guard_1(ASSET_DIR_SOLDIER + "guard_1/", DAMAGE_MAX_GUARD),
-        guard_2(ASSET_DIR_SOLDIER + "guard_2/", DAMAGE_MAX_GUARD),
-        guard_3(ASSET_DIR_SOLDIER + "guard_3/", DAMAGE_MAX_GUARD),
-        guard_4(ASSET_DIR_SOLDIER + "guard_4/", DAMAGE_MAX_GUARD),
-        guard_5(ASSET_DIR_SOLDIER + "guard_5/", DAMAGE_MAX_GUARD),
-        guard_6(ASSET_DIR_SOLDIER + "guard_6/", DAMAGE_MAX_GUARD),
-        guard_7(ASSET_DIR_SOLDIER + "guard_7/", DAMAGE_MAX_GUARD),
-        guard_8(ASSET_DIR_SOLDIER + "guard_8/", DAMAGE_MAX_GUARD),
-        guard_9(ASSET_DIR_SOLDIER + "guard_9/", DAMAGE_MAX_GUARD),
-        guard_10(ASSET_DIR_SOLDIER + "guard_10/", DAMAGE_MAX_GUARD),
-        guard_11(ASSET_DIR_SOLDIER + "guard_11/", DAMAGE_MAX_GUARD),
-        guard_12(ASSET_DIR_SOLDIER + "guard_12/", DAMAGE_MAX_GUARD),
-        lieutenant_1(ASSET_DIR_SOLDIER + "lieutenant_1/", DAMAGE_MAX_LIEUTENANT),
-        lieutenant_2(ASSET_DIR_SOLDIER + "lieutenant_2/", DAMAGE_MAX_LIEUTENANT),
-        lieutenant_3(ASSET_DIR_SOLDIER + "lieutenant_3/", DAMAGE_MAX_LIEUTENANT),
-        lieutenant_4(ASSET_DIR_SOLDIER + "lieutenant_4/", DAMAGE_MAX_LIEUTENANT),
-        lieutenant_5(ASSET_DIR_SOLDIER + "lieutenant_5/", DAMAGE_MAX_LIEUTENANT),
-        major_1(ASSET_DIR_SOLDIER + "major_1/", DAMAGE_MAX_MAJOR),
-        major_2(ASSET_DIR_SOLDIER + "major_2/", DAMAGE_MAX_MAJOR),
-        officer_1(ASSET_DIR_SOLDIER + "officer_1/", DAMAGE_MAX_OFFICER),
-        officer_2(ASSET_DIR_SOLDIER + "officer_2/", DAMAGE_MAX_OFFICER),
-        officer_3(ASSET_DIR_SOLDIER + "officer_3/", DAMAGE_MAX_OFFICER),
-        officer_4(ASSET_DIR_SOLDIER + "officer_4/", DAMAGE_MAX_OFFICER),
-        officer_5(ASSET_DIR_SOLDIER + "officer_5/", DAMAGE_MAX_OFFICER),
-        sergeant_1(ASSET_DIR_SOLDIER + "sergeant_1/", DAMAGE_MAX_SERGEANT),
-        sergeant_2(ASSET_DIR_SOLDIER + "sergeant_2/", DAMAGE_MAX_SERGEANT),
-        sergeant_3(ASSET_DIR_SOLDIER + "sergeant_3/", DAMAGE_MAX_SERGEANT),
-        sergeant_4(ASSET_DIR_SOLDIER + "sergeant_4/", DAMAGE_MAX_SERGEANT),
-        sergeant_5(ASSET_DIR_SOLDIER + "sergeant_5/", DAMAGE_MAX_SERGEANT);
+        doctor_1(ASSET_DIR_SOLDIER +"doctor_1/", DAMAGE_MAX_DOCTOR, AudioHelper.Sfx.EnemyWeaponShoot5, AudioHelper.Sfx.EnemyDead5, AudioHelper.Sfx.EnemyAlert5, AudioHelper.Sfx.EnemyHurt5),
+        doctor_2(ASSET_DIR_SOLDIER + "doctor_2/", DAMAGE_MAX_DOCTOR, AudioHelper.Sfx.EnemyWeaponShoot5, AudioHelper.Sfx.EnemyDead5, AudioHelper.Sfx.EnemyAlert5, AudioHelper.Sfx.EnemyHurt5),
+        guard_1(ASSET_DIR_SOLDIER + "guard_1/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
+        guard_2(ASSET_DIR_SOLDIER + "guard_2/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
+        guard_3(ASSET_DIR_SOLDIER + "guard_3/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
+        guard_4(ASSET_DIR_SOLDIER + "guard_4/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
+        guard_5(ASSET_DIR_SOLDIER + "guard_5/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
+        guard_6(ASSET_DIR_SOLDIER + "guard_6/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
+        guard_7(ASSET_DIR_SOLDIER + "guard_7/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
+        guard_8(ASSET_DIR_SOLDIER + "guard_8/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
+        guard_9(ASSET_DIR_SOLDIER + "guard_9/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
+        guard_10(ASSET_DIR_SOLDIER + "guard_10/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
+        guard_11(ASSET_DIR_SOLDIER + "guard_11/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
+        guard_12(ASSET_DIR_SOLDIER + "guard_12/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
+        lieutenant_1(ASSET_DIR_SOLDIER + "lieutenant_1/", DAMAGE_MAX_LIEUTENANT, AudioHelper.Sfx.EnemyWeaponShoot6, AudioHelper.Sfx.EnemyDead6, AudioHelper.Sfx.EnemyAlert6, AudioHelper.Sfx.EnemyHurt6),
+        lieutenant_2(ASSET_DIR_SOLDIER + "lieutenant_2/", DAMAGE_MAX_LIEUTENANT, AudioHelper.Sfx.EnemyWeaponShoot6, AudioHelper.Sfx.EnemyDead6, AudioHelper.Sfx.EnemyAlert6, AudioHelper.Sfx.EnemyHurt6),
+        lieutenant_3(ASSET_DIR_SOLDIER + "lieutenant_3/", DAMAGE_MAX_LIEUTENANT, AudioHelper.Sfx.EnemyWeaponShoot6, AudioHelper.Sfx.EnemyDead6, AudioHelper.Sfx.EnemyAlert6, AudioHelper.Sfx.EnemyHurt6),
+        lieutenant_4(ASSET_DIR_SOLDIER + "lieutenant_4/", DAMAGE_MAX_LIEUTENANT, AudioHelper.Sfx.EnemyWeaponShoot6, AudioHelper.Sfx.EnemyDead6, AudioHelper.Sfx.EnemyAlert6, AudioHelper.Sfx.EnemyHurt6),
+        lieutenant_5(ASSET_DIR_SOLDIER + "lieutenant_5/", DAMAGE_MAX_LIEUTENANT, AudioHelper.Sfx.EnemyWeaponShoot6, AudioHelper.Sfx.EnemyDead6, AudioHelper.Sfx.EnemyAlert6, AudioHelper.Sfx.EnemyHurt6),
+        major_1(ASSET_DIR_SOLDIER + "major_1/", DAMAGE_MAX_MAJOR, AudioHelper.Sfx.EnemyWeaponShoot2, AudioHelper.Sfx.EnemyDead2, AudioHelper.Sfx.EnemyAlert2, AudioHelper.Sfx.EnemyHurt2),
+        major_2(ASSET_DIR_SOLDIER + "major_2/", DAMAGE_MAX_MAJOR, AudioHelper.Sfx.EnemyWeaponShoot2, AudioHelper.Sfx.EnemyDead2, AudioHelper.Sfx.EnemyAlert2, AudioHelper.Sfx.EnemyHurt2),
+        officer_1(ASSET_DIR_SOLDIER + "officer_1/", DAMAGE_MAX_OFFICER, AudioHelper.Sfx.EnemyWeaponShoot4, AudioHelper.Sfx.EnemyDead4, AudioHelper.Sfx.EnemyAlert4, AudioHelper.Sfx.EnemyHurt4),
+        officer_2(ASSET_DIR_SOLDIER + "officer_2/", DAMAGE_MAX_OFFICER, AudioHelper.Sfx.EnemyWeaponShoot4, AudioHelper.Sfx.EnemyDead4, AudioHelper.Sfx.EnemyAlert4, AudioHelper.Sfx.EnemyHurt4),
+        officer_3(ASSET_DIR_SOLDIER + "officer_3/", DAMAGE_MAX_OFFICER, AudioHelper.Sfx.EnemyWeaponShoot4, AudioHelper.Sfx.EnemyDead4, AudioHelper.Sfx.EnemyAlert4, AudioHelper.Sfx.EnemyHurt4),
+        officer_4(ASSET_DIR_SOLDIER + "officer_4/", DAMAGE_MAX_OFFICER, AudioHelper.Sfx.EnemyWeaponShoot4, AudioHelper.Sfx.EnemyDead4, AudioHelper.Sfx.EnemyAlert4, AudioHelper.Sfx.EnemyHurt4),
+        officer_5(ASSET_DIR_SOLDIER + "officer_5/", DAMAGE_MAX_OFFICER, AudioHelper.Sfx.EnemyWeaponShoot4, AudioHelper.Sfx.EnemyDead4, AudioHelper.Sfx.EnemyAlert4, AudioHelper.Sfx.EnemyHurt4),
+        sergeant_1(ASSET_DIR_SOLDIER + "sergeant_1/", DAMAGE_MAX_SERGEANT, AudioHelper.Sfx.EnemyWeaponShoot3, AudioHelper.Sfx.EnemyDead3, AudioHelper.Sfx.EnemyAlert3, AudioHelper.Sfx.EnemyHurt3),
+        sergeant_2(ASSET_DIR_SOLDIER + "sergeant_2/", DAMAGE_MAX_SERGEANT, AudioHelper.Sfx.EnemyWeaponShoot3, AudioHelper.Sfx.EnemyDead3, AudioHelper.Sfx.EnemyAlert3, AudioHelper.Sfx.EnemyHurt3),
+        sergeant_3(ASSET_DIR_SOLDIER + "sergeant_3/", DAMAGE_MAX_SERGEANT, AudioHelper.Sfx.EnemyWeaponShoot3, AudioHelper.Sfx.EnemyDead3, AudioHelper.Sfx.EnemyAlert3, AudioHelper.Sfx.EnemyHurt3),
+        sergeant_4(ASSET_DIR_SOLDIER + "sergeant_4/", DAMAGE_MAX_SERGEANT, AudioHelper.Sfx.EnemyWeaponShoot3, AudioHelper.Sfx.EnemyDead3, AudioHelper.Sfx.EnemyAlert3, AudioHelper.Sfx.EnemyHurt3),
+        sergeant_5(ASSET_DIR_SOLDIER + "sergeant_5/", DAMAGE_MAX_SERGEANT, AudioHelper.Sfx.EnemyWeaponShoot3, AudioHelper.Sfx.EnemyDead3, AudioHelper.Sfx.EnemyAlert3, AudioHelper.Sfx.EnemyHurt3);
 
         public final String path;
 
         //how much damage can the enemy do?
         public final int damageMax;
 
-        Type(String path, int damageMax) {
+        //sound effects to play
+        public final AudioHelper.Sfx shoot;
+        public final AudioHelper.Sfx dead;
+        public final AudioHelper.Sfx alert;
+        public final AudioHelper.Sfx hurt;
+
+        Type(String path, int damageMax, AudioHelper.Sfx shoot, AudioHelper.Sfx dead, AudioHelper.Sfx alert, AudioHelper.Sfx hurt) {
             this.path = path;
             this.damageMax = damageMax;
+            this.shoot = shoot;
+            this.dead = dead;
+            this.alert = alert;
+            this.hurt = hurt;
         }
     }
 
@@ -106,57 +116,11 @@ public final class Soldier extends Enemy {
         //set the allowed damage
         setDamageMax(type.damageMax);
 
-        switch (type) {
-            case guard_1:
-            case guard_2:
-            case guard_3:
-            case guard_4:
-            case guard_5:
-            case guard_6:
-            case guard_7:
-            case guard_8:
-            case guard_9:
-            case guard_10:
-            case guard_11:
-            case guard_12:
-            default:
-                super.setShoot(AudioHelper.Sfx.EnemyWeaponShoot1);
-                break;
-
-            case major_1:
-            case major_2:
-                super.setShoot(AudioHelper.Sfx.EnemyWeaponShoot2);
-                break;
-
-            case sergeant_1:
-            case sergeant_2:
-            case sergeant_3:
-            case sergeant_4:
-            case sergeant_5:
-                super.setShoot(AudioHelper.Sfx.EnemyWeaponShoot3);
-                break;
-
-            case officer_1:
-            case officer_2:
-            case officer_3:
-            case officer_4:
-            case officer_5:
-                super.setShoot(AudioHelper.Sfx.EnemyWeaponShoot4);
-                break;
-
-            case doctor_1:
-            case doctor_2:
-                super.setShoot(AudioHelper.Sfx.EnemyWeaponShoot5);
-                break;
-
-            case lieutenant_1:
-            case lieutenant_2:
-            case lieutenant_3:
-            case lieutenant_4:
-            case lieutenant_5:
-                super.setShoot(AudioHelper.Sfx.EnemyWeaponShoot6);
-                break;
-        }
+        //assign sound effects
+        setShoot(type.shoot);
+        setDead(type.dead);
+        setAlert(type.alert);
+        setHurt(type.hurt);
 
         //setup animations
         getAnimations()[INDEX_DIE] = new DecalAnimation(assetManager, type.path, FILENAME_DIE, ASSET_EXT_BMP, 1, 4, DURATION_DIE);

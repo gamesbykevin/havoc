@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.gamesbykevin.havoc.assets.AudioHelper.Sfx.*;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 
 public class AssetManagerHelper {
@@ -29,13 +30,13 @@ public class AssetManagerHelper {
     private static final int TILES_HALLWAY = 38;
 
     //how many wall textures will we allow to be loaded
-    private static final int COUNT_WALLS = 15;
+    private static final int COUNT_WALLS = 10;
 
     //how many different enemy types will we allow to be loaded
     private static final int COUNT_BOSS = 1;
 
     //how many different enemy types will we allow to be loaded
-    private static final int COUNT_SOLDIER = 3;
+    private static final int COUNT_SOLDIER = 2;
 
     //here we will load multiple textures for the wall
     private static List<String> PATHS_WALL;
@@ -73,7 +74,13 @@ public class AssetManagerHelper {
     public static final String PARENT_DIR_SOUND_LEVEL   = PARENT_DIR_SOUND + "level/";
     public static final String PARENT_DIR_SOUND_WEAPON  = PARENT_DIR_SOUND + "weapon/";
 
-    //direct path to sound effects
+    public static final String PARENT_DIR_SOUND_ENEMY_HURT   = PARENT_DIR_SOUND_ENEMY + "hurt/";
+    public static final String PARENT_DIR_SOUND_ENEMY_DEAD   = PARENT_DIR_SOUND_ENEMY + "dead/";
+    public static final String PARENT_DIR_SOUND_ENEMY_ALERT   = PARENT_DIR_SOUND_ENEMY + "alert/";
+    public static final String PARENT_DIR_SOUND_ENEMY_SHOOT   = PARENT_DIR_SOUND_ENEMY + "shoot/";
+
+
+    //direct path to sound effects for the hero weapon shooting
     public static final String PATH_SHOOT_GLOCK = PARENT_DIR_SOUND_WEAPON + "glock" + ASSET_EXT_OGG;
     public static final String PATH_SHOOT_SHOTGUN = PARENT_DIR_SOUND_WEAPON + "shotgun" + ASSET_EXT_WAV;
     public static final String PATH_SHOOT_IMPACT = PARENT_DIR_SOUND_WEAPON + "impact" + ASSET_EXT_WAV;
@@ -81,6 +88,8 @@ public class AssetManagerHelper {
     public static final String PATH_SHOOT_MAGNUM = PARENT_DIR_SOUND_WEAPON + "magnum" + ASSET_EXT_OGG;
     public static final String PATH_SHOOT_BUZZ = PARENT_DIR_SOUND_WEAPON + "buzz" + ASSET_EXT_OGG;
     public static final String PATH_SHOOT_LANCE = PARENT_DIR_SOUND_WEAPON + "lance" + ASSET_EXT_OGG;
+
+
     public static final String PATH_SHOOT_EMPTY = PARENT_DIR_SOUND_WEAPON + "empty" + ASSET_EXT_OGG;
     public static final String PATH_CHANGE = PARENT_DIR_SOUND_WEAPON + "change" + ASSET_EXT_OGG;
 
@@ -110,49 +119,40 @@ public class AssetManagerHelper {
     public static final String PATH_HERO_DEAD = PARENT_DIR_SOUND_HERO + "dead" + ASSET_EXT_MP3;
 
     //sound effects for enemy alert
-    public static final String PATH_ENEMY_ALERT_1 = PARENT_DIR_SOUND_ENEMY + "alert1" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_ALERT_2 = PARENT_DIR_SOUND_ENEMY + "alert2" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_ALERT_3 = PARENT_DIR_SOUND_ENEMY + "alert3" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_ALERT_4 = PARENT_DIR_SOUND_ENEMY + "alert4" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_ALERT_5 = PARENT_DIR_SOUND_ENEMY + "alert5" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_ALERT_6 = PARENT_DIR_SOUND_ENEMY + "alert6" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_ALERT_7 = PARENT_DIR_SOUND_ENEMY + "alert7" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_ALERT_1 = PARENT_DIR_SOUND_ENEMY_ALERT + "alert1" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_ALERT_2 = PARENT_DIR_SOUND_ENEMY_ALERT + "alert2" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_ALERT_3 = PARENT_DIR_SOUND_ENEMY_ALERT + "alert3" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_ALERT_4 = PARENT_DIR_SOUND_ENEMY_ALERT + "alert4" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_ALERT_5 = PARENT_DIR_SOUND_ENEMY_ALERT + "alert5" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_ALERT_6 = PARENT_DIR_SOUND_ENEMY_ALERT + "alert6" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_ALERT_7 = PARENT_DIR_SOUND_ENEMY_ALERT + "alert7" + ASSET_EXT_MP3;
 
     //sound effects for enemy hurt
-    public static final String PATH_ENEMY_HURT_1 = PARENT_DIR_SOUND_ENEMY + "hurt1" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_HURT_2 = PARENT_DIR_SOUND_ENEMY + "hurt2" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_HURT_3 = PARENT_DIR_SOUND_ENEMY + "hurt3" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_HURT_4 = PARENT_DIR_SOUND_ENEMY + "hurt4" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_HURT_5 = PARENT_DIR_SOUND_ENEMY + "hurt5" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_HURT_6 = PARENT_DIR_SOUND_ENEMY + "hurt6" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_HURT_7 = PARENT_DIR_SOUND_ENEMY + "hurt7" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_HURT_8 = PARENT_DIR_SOUND_ENEMY + "hurt8" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_HURT_9 = PARENT_DIR_SOUND_ENEMY + "hurt9" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_HURT_10 = PARENT_DIR_SOUND_ENEMY + "hurt10" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_HURT_11 = PARENT_DIR_SOUND_ENEMY + "hurt11" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_HURT_12 = PARENT_DIR_SOUND_ENEMY + "hurt12" + ASSET_EXT_MP3;
-    public static final String PATH_ENEMY_HURT_13 = PARENT_DIR_SOUND_ENEMY + "hurt13" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_1 = PARENT_DIR_SOUND_ENEMY_HURT + "hurt1" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_2 = PARENT_DIR_SOUND_ENEMY_HURT + "hurt2" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_3 = PARENT_DIR_SOUND_ENEMY_HURT + "hurt3" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_4 = PARENT_DIR_SOUND_ENEMY_HURT + "hurt4" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_5 = PARENT_DIR_SOUND_ENEMY_HURT + "hurt5" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_6 = PARENT_DIR_SOUND_ENEMY_HURT + "hurt6" + ASSET_EXT_MP3;
+    public static final String PATH_ENEMY_HURT_7 = PARENT_DIR_SOUND_ENEMY_HURT + "hurt7" + ASSET_EXT_MP3;
 
     //sound effects for enemy dead
-    public static final String PATH_ENEMY_DEAD_1 = PARENT_DIR_SOUND_ENEMY + "dead1" + ASSET_EXT_WAV;
-    public static final String PATH_ENEMY_DEAD_2 = PARENT_DIR_SOUND_ENEMY + "dead2" + ASSET_EXT_WAV;
-    public static final String PATH_ENEMY_DEAD_3 = PARENT_DIR_SOUND_ENEMY + "dead3" + ASSET_EXT_OGG;
-    public static final String PATH_ENEMY_DEAD_4 = PARENT_DIR_SOUND_ENEMY + "dead4" + ASSET_EXT_OGG;
-    public static final String PATH_ENEMY_DEAD_5 = PARENT_DIR_SOUND_ENEMY + "dead5" + ASSET_EXT_OGG;
-    public static final String PATH_ENEMY_DEAD_6 = PARENT_DIR_SOUND_ENEMY + "dead6" + ASSET_EXT_OGG;
-    public static final String PATH_ENEMY_DEAD_7 = PARENT_DIR_SOUND_ENEMY + "dead7" + ASSET_EXT_OGG;
-    public static final String PATH_ENEMY_DEAD_8 = PARENT_DIR_SOUND_ENEMY + "dead8" + ASSET_EXT_OGG;
-    public static final String PATH_ENEMY_DEAD_9 = PARENT_DIR_SOUND_ENEMY + "dead9" + ASSET_EXT_OGG;
-    public static final String PATH_ENEMY_DEAD_10 = PARENT_DIR_SOUND_ENEMY + "dead10" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_DEAD_1 = PARENT_DIR_SOUND_ENEMY_DEAD + "dead1" + ASSET_EXT_WAV;
+    public static final String PATH_ENEMY_DEAD_2 = PARENT_DIR_SOUND_ENEMY_DEAD + "dead2" + ASSET_EXT_WAV;
+    public static final String PATH_ENEMY_DEAD_3 = PARENT_DIR_SOUND_ENEMY_DEAD + "dead3" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_DEAD_4 = PARENT_DIR_SOUND_ENEMY_DEAD + "dead4" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_DEAD_5 = PARENT_DIR_SOUND_ENEMY_DEAD + "dead5" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_DEAD_6 = PARENT_DIR_SOUND_ENEMY_DEAD + "dead6" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_DEAD_7 = PARENT_DIR_SOUND_ENEMY_DEAD + "dead7" + ASSET_EXT_OGG;
 
     //sound effects for enemy shooting
-    public static final String PATH_ENEMY_SHOOT_1 = PARENT_DIR_SOUND_ENEMY + "weapon1" + ASSET_EXT_OGG;
-    public static final String PATH_ENEMY_SHOOT_2 = PARENT_DIR_SOUND_ENEMY + "weapon2" + ASSET_EXT_OGG;
-    public static final String PATH_ENEMY_SHOOT_3 = PARENT_DIR_SOUND_ENEMY + "weapon3" + ASSET_EXT_OGG;
-    public static final String PATH_ENEMY_SHOOT_4 = PARENT_DIR_SOUND_ENEMY + "weapon4" + ASSET_EXT_OGG;
-    public static final String PATH_ENEMY_SHOOT_5 = PARENT_DIR_SOUND_ENEMY + "weapon5" + ASSET_EXT_OGG;
-    public static final String PATH_ENEMY_SHOOT_6 = PARENT_DIR_SOUND_ENEMY + "weapon6" + ASSET_EXT_OGG;
-    public static final String PATH_ENEMY_SHOOT_7 = PARENT_DIR_SOUND_ENEMY + "weapon7" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_SHOOT_1 = PARENT_DIR_SOUND_ENEMY_SHOOT + "weapon1" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_SHOOT_2 = PARENT_DIR_SOUND_ENEMY_SHOOT + "weapon2" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_SHOOT_3 = PARENT_DIR_SOUND_ENEMY_SHOOT + "weapon3" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_SHOOT_4 = PARENT_DIR_SOUND_ENEMY_SHOOT + "weapon4" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_SHOOT_5 = PARENT_DIR_SOUND_ENEMY_SHOOT + "weapon5" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_SHOOT_6 = PARENT_DIR_SOUND_ENEMY_SHOOT + "weapon6" + ASSET_EXT_OGG;
+    public static final String PATH_ENEMY_SHOOT_7 = PARENT_DIR_SOUND_ENEMY_SHOOT + "weapon7" + ASSET_EXT_OGG;
 
     //where the sprite image is located
     public static final String ASSET_DIR_OBSTACLES = PARENT_DIR_IMAGES + "obstacles/";
@@ -316,6 +316,7 @@ public class AssetManagerHelper {
         //load every collectible
         for (Collectibles.Type type : Collectibles.Type.values()) {
             load(assetManager, ASSET_DIR_COLLECTIBLES + type.toString() + ASSET_EXT_BMP, Texture.class);
+            load(assetManager, type.sound.getPath(), Sound.class);
         }
 
         //load controller images
@@ -327,11 +328,13 @@ public class AssetManagerHelper {
         //load hud images
         loadHud(assetManager);
 
-        //load weapon images
+        //load weapon
         for (WeaponHelper.Type type : WeaponHelper.Type.values()) {
             for (int index = 1; index <= type.getStopIndexStart() + type.getStopIndexCount(); index++) {
                 load(assetManager, type.getDir() + type.getFileName() + index + ASSET_EXT_PNG, Texture.class);
             }
+
+            load(assetManager, type.shoot.getPath(), Sound.class);
         }
 
         //load the floor / ceiling images
@@ -340,15 +343,28 @@ public class AssetManagerHelper {
         //load the enemy sprites
         loadEnemies(assetManager);
 
-        //load the audio
-        loadAudioWeapon(assetManager);
+        //load the rest of the audio
+        loadAudio(assetManager);
     }
 
-    private static void loadAudioWeapon(AssetManager assetManager) {
-
-        for (AudioHelper.Sfx sfx : AudioHelper.Sfx.values()) {
-            load(assetManager, sfx.getPath(), Sound.class);
-        }
+    private static void loadAudio(AssetManager assetManager) {
+        load(assetManager, WeaponFireEmpty.getPath(), Sound.class);
+        load(assetManager, WeaponChange.getPath(), Sound.class);
+        load(assetManager, LevelSecret.getPath(), Sound.class);
+        load(assetManager, LevelOpen.getPath(), Sound.class);
+        load(assetManager, LevelClose.getPath(), Sound.class);
+        load(assetManager, LevelSwitch.getPath(), Sound.class);
+        load(assetManager, LevelLocked.getPath(), Sound.class);
+        load(assetManager, HeroBringPain.getPath(), Sound.class);
+        load(assetManager, HeroGetSome1.getPath(), Sound.class);
+        load(assetManager, HeroGetSome2.getPath(), Sound.class);
+        load(assetManager, HeroGetSome3.getPath(), Sound.class);
+        load(assetManager, HeroGetSome4.getPath(), Sound.class);
+        load(assetManager, HeroTakeOut.getPath(), Sound.class);
+        load(assetManager, HeroTrash1.getPath(), Sound.class);
+        load(assetManager, HeroTrash2.getPath(), Sound.class);
+        load(assetManager, HeroTakeDown.getPath(), Sound.class);
+        load(assetManager, HeroDead.getPath(), Sound.class);
     }
 
     private static void loadController(AssetManager assetManager) {
@@ -413,11 +429,11 @@ public class AssetManagerHelper {
         }
 
         for (int i = 0; i < getTypeBoss().size(); i++) {
-            loadTexturesBoss(assetManager, getTypeBoss().get(i));
+            loadBoss(assetManager, getTypeBoss().get(i));
         }
 
         for (int i = 0; i < getTypeSoldier().size(); i++) {
-            loadTexturesSoldier(assetManager, getTypeSoldier().get(i));
+            loadSoldier(assetManager, getTypeSoldier().get(i));
         }
     }
 
@@ -484,7 +500,7 @@ public class AssetManagerHelper {
         load(assetManager, PATH_KEY_2, Texture.class);
     }
 
-    private static void loadTexturesSoldier(AssetManager assetManager, Soldier.Type type) {
+    private static void loadSoldier(AssetManager assetManager, Soldier.Type type) {
 
         for (int i = 1; i <= 4; i++) {
             load(assetManager, type.path + FILENAME_DIE + i + ASSET_EXT_BMP, Texture.class);
@@ -508,9 +524,14 @@ public class AssetManagerHelper {
             load(assetManager, type.path + FILENAME_WALK_3 + i + ASSET_EXT_BMP, Texture.class);
             load(assetManager, type.path + FILENAME_WALK_4 + i + ASSET_EXT_BMP, Texture.class);
         }
+
+        load(assetManager, type.alert.getPath(), Sound.class);
+        load(assetManager, type.hurt.getPath(), Sound.class);
+        load(assetManager, type.dead.getPath(), Sound.class);
+        load(assetManager, type.shoot.getPath(), Sound.class);
     }
 
-    private static void loadTexturesBoss(AssetManager assetManager, Boss.Type type) {
+    private static void loadBoss(AssetManager assetManager, Boss.Type type) {
 
         for (int i = 1; i <= 4; i++) {
             load(assetManager, type.path + FILENAME_WALK + i + ASSET_EXT_BMP, Texture.class);
@@ -523,5 +544,10 @@ public class AssetManagerHelper {
         for (int i = 1; i <= 4; i++) {
             load(assetManager, type.path + FILENAME_DIE + i + ASSET_EXT_BMP, Texture.class);
         }
+
+        load(assetManager, type.alert.getPath(), Sound.class);
+        load(assetManager, type.hurt.getPath(), Sound.class);
+        load(assetManager, type.dead.getPath(), Sound.class);
+        load(assetManager, type.shoot.getPath(), Sound.class);
     }
 }

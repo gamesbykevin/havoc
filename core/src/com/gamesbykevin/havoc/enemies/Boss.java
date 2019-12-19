@@ -53,10 +53,18 @@ public final class Boss extends Enemy {
 
         public final String path;
         public final int damageMax;
+        public final AudioHelper.Sfx shoot;
+        public final AudioHelper.Sfx dead;
+        public final AudioHelper.Sfx alert;
+        public final AudioHelper.Sfx hurt;
 
         Type(String path, int damageMax) {
             this.path = path;
             this.damageMax = damageMax;
+            this.shoot = AudioHelper.Sfx.EnemyWeaponShoot7;
+            this.dead = AudioHelper.Sfx.EnemyDead7;
+            this.alert = AudioHelper.Sfx.EnemyAlert7;
+            this.hurt = AudioHelper.Sfx.EnemyHurt7;
         }
     }
 
@@ -68,25 +76,11 @@ public final class Boss extends Enemy {
         //assign the damage
         setDamageMax(type.damageMax);
 
-        switch (type) {
-            case boss_1:
-            case boss_2:
-            case boss_3:
-            case boss_4:
-            case boss_5:
-            case boss_6:
-            case boss_7:
-            case boss_8:
-            case boss_9:
-            case boss_10:
-            case boss_11:
-            case boss_12:
-            case boss_13:
-            case boss_14:
-            default:
-                super.setShoot(AudioHelper.Sfx.EnemyWeaponShoot7);
-                break;
-        }
+        //assign sound effects
+        super.setShoot(type.shoot);
+        super.setDead(type.dead);
+        super.setAlert(type.alert);
+        super.setHurt(type.hurt);
 
         //setup animations
         getAnimations()[INDEX_IDLE] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, ASSET_EXT_BMP, 2, 1, DURATION_IDLE);

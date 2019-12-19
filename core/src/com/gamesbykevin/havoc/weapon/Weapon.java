@@ -1,6 +1,7 @@
 package com.gamesbykevin.havoc.weapon;
 
 import com.gamesbykevin.havoc.animation.SpriteAnimation;
+import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.entities.Entity2d;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
@@ -36,6 +37,9 @@ public class Weapon extends Entity2d implements Disposable {
     //how many bullets to add by default
     public static final float BULLETS_DEFAULT_RATIO = .33f;
 
+    //shoot sound effect
+    private AudioHelper.Sfx shoot;
+
     public Weapon(Type type) {
 
         //call parent
@@ -43,6 +47,9 @@ public class Weapon extends Entity2d implements Disposable {
 
         //save the type of weapon
         this.type = type;
+
+        //assign sound effect
+        setShoot(type.shoot);
 
         //setup the weapons animations
         getAnimations()[INDEX_RESTING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), ASSET_EXT_PNG, getType().getRestIndexStart(), getType().getRestIndexCount(), FRAME_DURATION);
@@ -108,6 +115,14 @@ public class Weapon extends Entity2d implements Disposable {
 
         if (this.bullets > getType().getBulletsMax())
             this.bullets = getType().getBulletsMax();
+    }
+
+    public AudioHelper.Sfx getShoot() {
+        return this.shoot;
+    }
+
+    public void setShoot(AudioHelper.Sfx shoot) {
+        this.shoot = shoot;
     }
 
     public float getDamage() {

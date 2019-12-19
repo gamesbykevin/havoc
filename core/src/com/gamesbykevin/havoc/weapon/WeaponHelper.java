@@ -3,11 +3,12 @@ package com.gamesbykevin.havoc.weapon;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.collision.Ray;
+import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.enemies.Enemy;
 import com.gamesbykevin.havoc.level.Level;
 
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_DIR_WEAPONS;
-import static com.gamesbykevin.havoc.assets.AudioHelper.playHurt;
+import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.decals.Square.COLLISION_RADIUS;
 import static com.gamesbykevin.havoc.enemies.Enemy.RANGE_NOTICE;
 import static com.gamesbykevin.havoc.entities.Entities.OFFSET;
@@ -58,13 +59,13 @@ public class WeaponHelper {
 
     //different types of weapons
     public enum Type {
-        Buzz(35f, 30f, BULLETS_MAX_BUZZ, "buzzsaw_cannon_f", "buzzsaw_cannon/", 0, 1, 0, 3, 3, 2, 15, 5),
-        Glock(33f, 30f, BULLETS_MAX_GLOCK, "glock_handgun_f", "glock_handgun/", 0, 1, 0, 3, 2, 8, 9, 1),
-        Impact(30f, 20f, BULLETS_MAX_IMPACT, "impact_cannon_f", "impact_cannon/", 0, 1, 0, 2, 2, 2, 8, 6),
-        Magnum(50f, 30f, BULLETS_MAX_MAGNUM, "magnum_f", "magnum/", 0, 1, 0, 4, 4, 11, 14, 1),
-        Shotgun(75f, 8f, BULLETS_MAX_SHOTGUN, "shotgun_f", "shotgun/", 0, 1, 0, 1, 1, 16, 17, 2),
-        Smg(20f, 30f, BULLETS_MAX_SMG, "smg_f", "smg/", 0, 1, 0, 1, 1, 3, 9, 2),
-        Lance(3f, 1f, BULLETS_MAX_LANCE, "thermic_lance_f", "thermic_lance/", 0, 1, 1, 3, 4, 2, 16, 4);
+        Buzz(35f, 30f, BULLETS_MAX_BUZZ, "buzzsaw_cannon_f", "buzzsaw_cannon/", 0, 1, 0, 3, 3, 2, 15, 5, AudioHelper.Sfx.WeaponFireBuzz),
+        Glock(33f, 30f, BULLETS_MAX_GLOCK, "glock_handgun_f", "glock_handgun/", 0, 1, 0, 3, 2, 8, 9, 1, AudioHelper.Sfx.WeaponFireGlock),
+        Impact(30f, 20f, BULLETS_MAX_IMPACT, "impact_cannon_f", "impact_cannon/", 0, 1, 0, 2, 2, 2, 8, 6, AudioHelper.Sfx.WeaponFireImpact),
+        Magnum(50f, 30f, BULLETS_MAX_MAGNUM, "magnum_f", "magnum/", 0, 1, 0, 4, 4, 11, 14, 1, AudioHelper.Sfx.WeaponFireMagnum),
+        Shotgun(75f, 8f, BULLETS_MAX_SHOTGUN, "shotgun_f", "shotgun/", 0, 1, 0, 1, 1, 16, 17, 2, AudioHelper.Sfx.WeaponFireShotgun),
+        Smg(20f, 30f, BULLETS_MAX_SMG, "smg_f", "smg/", 0, 1, 0, 1, 1, 3, 9, 2, AudioHelper.Sfx.WeaponFireSmg),
+        Lance(3f, 1f, BULLETS_MAX_LANCE, "thermic_lance_f", "thermic_lance/", 0, 1, 1, 3, 4, 2, 16, 4, AudioHelper.Sfx.WeaponFireLance);
 
             private final float damage;
             private final float range;
@@ -79,10 +80,11 @@ public class WeaponHelper {
             private final int attackIndexCount;
             private final int stopIndexStart;
             private final int stopIndexCount;
+            public final AudioHelper.Sfx shoot;
 
             Type(float damage, float range, int bulletsMax, String fileName, String dir,
-            int restIndexStart, int restIndexCount, int startIndexStart, int startIndexCount,
-            int attackIndexStart, int attackIndexCount, int stopIndexStart, int stopIndexCount) {
+                 int restIndexStart, int restIndexCount, int startIndexStart, int startIndexCount,
+                 int attackIndexStart, int attackIndexCount, int stopIndexStart, int stopIndexCount, AudioHelper.Sfx shoot) {
                 this.damage = damage;
                 this.range = range;
                 this.bulletsMax = bulletsMax;
@@ -96,6 +98,7 @@ public class WeaponHelper {
                 this.attackIndexCount = attackIndexCount;
                 this.stopIndexStart = stopIndexStart;
                 this.stopIndexCount = stopIndexCount;
+                this.shoot = shoot;
             }
 
             public float getDamage() {
@@ -244,7 +247,7 @@ public class WeaponHelper {
                 strike = true;
 
                 if (!enemy.isHurt())
-                    playHurt(level.getAssetManager());
+                    playSfx(level.getAssetManager(), enemy.getHurt());
 
                 //the enemy is hurting
                 enemy.setStatus(Enemy.Status.Hurt);

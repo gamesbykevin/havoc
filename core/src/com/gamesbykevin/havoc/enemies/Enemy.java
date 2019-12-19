@@ -74,8 +74,11 @@ public abstract class Enemy extends Entity3d {
         Die, Hurt, Shoot, Walk, Alert, Pause, Idle
     }
 
-    //shooting sound effect
+    //sound effects for our enemy
     private AudioHelper.Sfx shoot = AudioHelper.Sfx.EnemyWeaponShoot1;
+    private AudioHelper.Sfx dead = AudioHelper.Sfx.EnemyDead1;
+    private AudioHelper.Sfx alert = AudioHelper.Sfx.EnemyAlert1;
+    private AudioHelper.Sfx hurt = AudioHelper.Sfx.EnemyHurt1;
 
     //status of the player
     private Status status;
@@ -171,6 +174,30 @@ public abstract class Enemy extends Entity3d {
 
     public void setShoot(AudioHelper.Sfx shoot) {
         this.shoot = shoot;
+    }
+
+    public AudioHelper.Sfx getAlert() {
+        return this.alert;
+    }
+
+    public void setAlert(AudioHelper.Sfx alert) {
+        this.alert = alert;
+    }
+
+    public AudioHelper.Sfx getDead() {
+        return this.dead;
+    }
+
+    public void setDead(AudioHelper.Sfx dead) {
+        this.dead = dead;
+    }
+
+    public AudioHelper.Sfx getHurt() {
+        return this.hurt;
+    }
+
+    public void setHurt(AudioHelper.Sfx hurt) {
+        this.hurt = hurt;
     }
 
     //is the enemy walking, attacking, etc...

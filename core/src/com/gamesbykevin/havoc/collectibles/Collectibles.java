@@ -4,6 +4,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
+import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.dungeon.Leaf;
 import com.gamesbykevin.havoc.dungeon.Room;
@@ -25,7 +26,23 @@ public final class Collectibles extends Entities {
 
     //different type of collectibles
     public enum Type {
-        ammo, ammo_crate, buzzsaw, glock, health_large, health_small, impact, magnum, shotgun, smg, key,
+        ammo(AudioHelper.Sfx.ItemAddAmmo),
+        ammo_crate(AudioHelper.Sfx.ItemAddAmmo),
+        buzzsaw(AudioHelper.Sfx.ItemAddAmmo),
+        glock(AudioHelper.Sfx.ItemAddAmmo),
+        health_large(AudioHelper.Sfx.ItemHealthLarge),
+        health_small(AudioHelper.Sfx.ItemHealthSmall),
+        impact(AudioHelper.Sfx.ItemAddAmmo),
+        magnum(AudioHelper.Sfx.ItemAddAmmo),
+        shotgun(AudioHelper.Sfx.ItemAddAmmo),
+        smg(AudioHelper.Sfx.ItemAddAmmo),
+        key(AudioHelper.Sfx.ItemKey);
+
+        public final AudioHelper.Sfx sound;
+
+        Type(AudioHelper.Sfx sound) {
+            this.sound = sound;
+        }
     }
 
     //the total number of allowed will depend on the number of rooms

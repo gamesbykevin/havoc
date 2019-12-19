@@ -393,10 +393,7 @@ public final class Enemies extends Entities {
         updateTimers();
 
         //shoot sound effect
-        Sfx shoot = null;
-        boolean hurt = false;
-        boolean dead = false;
-        boolean alert = false;
+        Sfx shoot = null, dead = null, alert = null, hurt = null;
 
         //did we calculate chase yet?
         boolean chase = false;
@@ -418,12 +415,12 @@ public final class Enemies extends Entities {
                 //check if any of the following happened
                 if (shoot == null && getTimerShoot().isExpired() && (enemy.isShoot() || enemy.isAlert()))
                     check = true;
-                if (!hurt && getTimerHurt().isExpired() && enemy.isHurt())
-                    hurt = true;
-                if (!dead && getTimerDead().isExpired() && enemy.getHealth() <= 0 && !enemy.isDie())
-                    dead = true;
-                if (!alert && getTimerAlert().isExpired() && enemy.isAlert())
-                    alert = true;
+                if (hurt == null && getTimerHurt().isExpired() && enemy.isHurt())
+                    hurt = enemy.getHurt();
+                if (dead == null && getTimerDead().isExpired() && enemy.getHealth() <= 0 && !enemy.isDie())
+                    dead = enemy.getDead();
+                if (alert == null && getTimerAlert().isExpired() && enemy.isAlert())
+                    alert = enemy.getAlert();
             }
 
             //if we haven't chased anyone yet and the enemy is flagged to chase
@@ -460,18 +457,18 @@ public final class Enemies extends Entities {
         //play the appropriate sound effects
         if (!getLevel().getPlayer().isDead()) {
 
-            if (hurt) {
-                playHurt(getLevel().getAssetManager());
+            if (hurt != null) {
+                playSfx(getLevel().getAssetManager(), hurt);
                 getTimerHurt().reset();
             }
 
-            if (alert && shoot == null) {
-                playAlert(getLevel().getAssetManager());
+            if (alert != null && shoot == null) {
+                playSfx(getLevel().getAssetManager(), alert);
                 getTimerAlert().reset();
             }
 
-            if (dead) {
-                playDead(getLevel().getAssetManager());
+            if (dead != null) {
+                playSfx(getLevel().getAssetManager(), dead);
                 getTimerDead().reset();
             }
 
