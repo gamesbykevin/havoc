@@ -238,19 +238,6 @@ public class EnemyHelper {
         float col = level.getPlayer().getCamera3d().position.x;
         float row = level.getPlayer().getCamera3d().position.y;
 
-        //let's make sure the player isn't walking into a door
-        if (level.getDungeon().hasInteract(col, row)) {
-            if (level.getDungeon().hasMap(col + 1, row) && !level.getDungeon().hasInteract(col + 1, row)) {
-                col++;
-            } else if (level.getDungeon().hasMap(col - 1, row) && !level.getDungeon().hasInteract(col - 1, row)) {
-                col--;
-            } else if (level.getDungeon().hasMap(col, row + 1) && !level.getDungeon().hasInteract(col, row + 1)) {
-                row++;
-            } else if (level.getDungeon().hasMap(col, row - 1) && !level.getDungeon().hasInteract(col, row - 1)) {
-                row--;
-            }
-        }
-
         //calculate the path to get to the player
         calculatePath(level, enemy, enemy.getCol(), enemy.getRow(), col, row);
     }

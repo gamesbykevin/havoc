@@ -30,14 +30,15 @@ public final class Enemies extends Entities {
     //how close do we need to be to play the sound effect
     public static final float ENEMY_DISTANCE_SFX_RATIO = 1.25f;
 
-    //different timers for playing sound effects
-    private Timer timerHurt, timerAlert, timerDead, timerShoot;
+    //different timers
+    private Timer timerHurt, timerAlert, timerDead, timerShoot, timerChase;
 
-    //how long until we can play the sfx again?
+    //how long until update again
     public static final float DURATION_HURT = 500f;
     public static final float DURATION_ALERT = 2750f;
     public static final float DURATION_DEAD = 500f;
     public static final float DURATION_SHOOT = 400f;
+    public static final float DURATION_CHASE = 500f;
 
     public Enemies(Level level) {
         super(level);
@@ -302,6 +303,14 @@ public final class Enemies extends Entities {
         return this.timerShoot;
     }
 
+    public Timer getTimerChase() {
+
+        if (this.timerChase == null)
+            this.timerChase = new Timer(DURATION_CHASE);
+
+        return this.timerChase;
+    }
+
     @Override
     public void reset() {
 
@@ -331,6 +340,7 @@ public final class Enemies extends Entities {
         getTimerDead().reset();
         getTimerHurt().reset();
         getTimerShoot().reset();
+        getTimerChase().reset();
     }
 
     private void notifyNeighbors(int indexIgnore) {
@@ -373,6 +383,7 @@ public final class Enemies extends Entities {
         getTimerHurt().update();
         getTimerDead().update();
         getTimerAlert().update();
+        getTimerChase().update();
     }
 
     @Override
@@ -416,7 +427,7 @@ public final class Enemies extends Entities {
             }
 
             //if we haven't chased anyone yet and the enemy is flagged to chase
-            if (!chase && enemy.isChase() && !enemy.isDie()) {
+            if (!chase && getTimerChase().isExpired() && enemy.isChase() && !enemy.isDie()) {
 
                 //calculate path to chase the player
                 chase(getLevel(), enemy);
@@ -426,6 +437,9 @@ public final class Enemies extends Entities {
 
                 //flag we chased so we don't do it for the other enemies
                 chase = true;
+
+                //reset timer
+                getTimerChase().reset();
             }
 
             //update the current entity

@@ -47,6 +47,16 @@ public class EntityHelper {
                     continue;
 
                 //if we intersected a wall we are obstructed
+                if (intersects(col - OFFSET, row, m, b))
+                    return true;
+                if (intersects(col, row - OFFSET, m, b))
+                    return true;
+                if (intersects(col + OFFSET, row, m, b))
+                    return true;
+                if (intersects(col, row + OFFSET, m, b))
+                    return true;
+                if (intersects(col - OFFSET, row - OFFSET, m, b))
+                    return true;
                 if (intersects(col + OFFSET, row + OFFSET, m, b))
                     return true;
             }
@@ -56,7 +66,7 @@ public class EntityHelper {
         return false;
     }
 
-    private static boolean intersects(float col, float row, float m, float b) {
+    public static boolean intersects(float col, float row, float m, float b) {
 
         //calculate the x-coordinate
         float x = solveX(m, row, b);

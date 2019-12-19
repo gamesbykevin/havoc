@@ -10,7 +10,12 @@ import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_DIR_WEAPONS
 import static com.gamesbykevin.havoc.assets.AudioHelper.playHurt;
 import static com.gamesbykevin.havoc.decals.Square.COLLISION_RADIUS;
 import static com.gamesbykevin.havoc.enemies.Enemy.RANGE_NOTICE;
+import static com.gamesbykevin.havoc.entities.Entities.OFFSET;
+import static com.gamesbykevin.havoc.entities.EntityHelper.intersects;
+import static com.gamesbykevin.havoc.level.LevelHelper.isDoorOpen;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
+import static com.gamesbykevin.havoc.util.Slope.getSlope;
+import static com.gamesbykevin.havoc.util.Slope.getYintercept;
 
 public class WeaponHelper {
 
@@ -154,6 +159,9 @@ public class WeaponHelper {
         //we can only hit 1 enemy
         boolean strike = false;
 
+        final float startX = level.getPlayer().getCamera3d().position.x;
+        final float startY = level.getPlayer().getCamera3d().position.y;
+
         //check every enemy
         for (int i = 0; i < level.getEnemies().getEntityList().size(); i++) {
 
@@ -164,7 +172,7 @@ public class WeaponHelper {
                 continue;
 
             //how far are we from the enemy
-            double distance = getDistance(enemy, level.getPlayer().getCamera3d());
+            double distance = getDistance(enemy, startX, startY);
 
             //if too far away to attack, skip this enemy
             if (distance >= weapon.getRange())
@@ -173,13 +181,19 @@ public class WeaponHelper {
             //we check the middle of the screen
             Ray ray = level.getPlayer().getCamera3d().getPickRay(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
 
-            int colMin = (int)((level.getPlayer().getCamera3d().position.x > enemy.getCol()) ? enemy.getCol() : level.getPlayer().getCamera3d().position.x);
-            int colMax = (int)((level.getPlayer().getCamera3d().position.x < enemy.getCol()) ? enemy.getCol() : level.getPlayer().getCamera3d().position.x);
-            int rowMin = (int)((level.getPlayer().getCamera3d().position.y > enemy.getRow()) ? enemy.getRow() : level.getPlayer().getCamera3d().position.y);
-            int rowMax = (int)((level.getPlayer().getCamera3d().position.y < enemy.getRow()) ? enemy.getRow() : level.getPlayer().getCamera3d().position.y);
+            int colMin = (int)((startX > enemy.getCol()) ? enemy.getCol() : startX);
+            int colMax = (int)((startX < enemy.getCol()) ? enemy.getCol() : startX);
+            int rowMin = (int)((startY > enemy.getRow()) ? enemy.getRow() : startY);
+            int rowMax = (int)((startY < enemy.getRow()) ? enemy.getRow() : startY);
 
             //is there collision
             boolean collisionWall = false;
+
+            //get the slope of the line
+            final float m = getSlope(startX, startY, enemy.getCol(), enemy.getRow());
+
+            //get the y-intercept
+            final float b = getYintercept(startX, startY, m);
 
             //check if we hit a wall
             for (int row = rowMin; row <= rowMax; row++) {
@@ -189,11 +203,31 @@ public class WeaponHelper {
                     if (collisionWall)
                         break;
 
-                    if (level.getDungeon().hasMap(col, row))
+                    //if available and not a door
+                    if (level.getDungeon().hasMap(col, row) && !level.getDungeon().hasInteract(col, row))
                         continue;
 
-                    if (level.getWall(col, row) != null && level.getWall(col, row).hasCollision(ray))
+                    //if the door is open skip this
+                    if (level.getDungeon().hasInteract(col, row) && isDoorOpen(level, col, row))
+                        continue;
+
+                    if (intersects(col, row, m, b))
                         collisionWall = true;
+                    if (intersects(col - OFFSET, row, m, b))
+                        collisionWall = true;
+                    if (intersects(col + OFFSET, row, m, b))
+                        collisionWall = true;
+                    if (intersects(col, row - OFFSET, m, b))
+                        collisionWall = true;
+                    if (intersects(col, row + OFFSET, m, b))
+                        collisionWall = true;
+                    if (intersects(col - OFFSET, row - OFFSET, m, b))
+                        collisionWall = true;
+                    if (intersects(col + OFFSET, row + OFFSET, m, b))
+                        collisionWall = true;
+
+                    //if (level.getWall(col, row) != null && level.getWall(col, row).hasCollision(ray))
+                    //    collisionWall = true;
                 }
             }
 
