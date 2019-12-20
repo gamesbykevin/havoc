@@ -38,7 +38,7 @@ public final class Enemies extends Entities {
     public static final float DURATION_ALERT = 2750f;
     public static final float DURATION_DEAD = 500f;
     public static final float DURATION_SHOOT = 400f;
-    public static final float DURATION_CHASE = 500f;
+    public static final float DURATION_CHASE = 750f;
 
     public Enemies(Level level) {
         super(level);

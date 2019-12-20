@@ -7,8 +7,10 @@ import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Disposable;
 import com.gamesbykevin.havoc.util.Hud;
 import com.gamesbykevin.havoc.util.Restart;
+import com.gamesbykevin.havoc.util.Timer;
 
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_CHANGE;
+import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.weapon.WeaponHelper.*;
 import static com.gamesbykevin.havoc.util.Hud.*;
 
@@ -16,6 +18,12 @@ public final class Weapons extends Entities implements Disposable, Restart {
 
     //current selected weapon
     private int index = 0;
+
+    //we may need to control how often we play sound
+    private Timer timer;
+
+    //how long to delay between
+    public static final float DURATION_SOUND = 700f;
 
     public Weapons(Level level) {
 
@@ -93,8 +101,19 @@ public final class Weapons extends Entities implements Disposable, Restart {
         return this.index;
     }
 
+    public Timer getTimer() {
+
+        if (this.timer == null)
+            this.timer = new Timer(DURATION_SOUND);
+
+        return timer;
+    }
+
     @Override
     public void update() {
+
+        //update our timer
+        getTimer().update();
 
         //get our current weapon
         Weapon weapon = getWeapon();
@@ -148,6 +167,29 @@ public final class Weapons extends Entities implements Disposable, Restart {
 
             //update the current weapon if we aren't switching
             weapon.update(getLevel());
+
+            //if the weapon has a sound effect play it
+            if (weapon.getSoundEffect() != null) {
+
+                switch (weapon.getSoundEffect()) {
+
+                    case WeaponFireEmpty:
+
+                        //only play empty sound effect periodically
+                        if (getTimer().isExpired()) {
+                            playSfx(getLevel().getAssetManager(), weapon.getSoundEffect());
+                            getTimer().reset();
+                        }
+                        break;
+
+                    default:
+                        playSfx(getLevel().getAssetManager(), weapon.getSoundEffect());
+                        break;
+                }
+
+                //remove sound effect
+                weapon.setSoundEffect(null);
+            }
         }
     }
 
@@ -162,6 +204,9 @@ public final class Weapons extends Entities implements Disposable, Restart {
 
         //spawn default weapons
         spawn();
+
+        //reset the timer
+        getTimer().reset();
     }
 
     @Override
@@ -194,5 +239,6 @@ public final class Weapons extends Entities implements Disposable, Restart {
     @Override
     public void dispose() {
         super.dispose();
+        this.timer = null;
     }
 }

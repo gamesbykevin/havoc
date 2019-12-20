@@ -132,19 +132,4 @@ public class AudioHelper {
         if (sfx != null)
             playSfx(assetManager, sfx);
     }
-
-    public static void playWeapon(AssetManager assetManager, Weapon weapon) {
-
-        Sfx sfx;
-
-        if (weapon.getBullets() == 0) {
-            sfx = Sfx.WeaponFireEmpty;
-        } else {
-            sfx = weapon.getShoot();
-        }
-
-        //play sound
-        if (sfx != null)
-            playSfx(assetManager, sfx);
-    }
 }

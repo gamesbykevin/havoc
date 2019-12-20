@@ -8,7 +8,6 @@ import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Disposable;
 
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_EXT_PNG;
-import static com.gamesbykevin.havoc.assets.AudioHelper.playWeapon;
 import static com.gamesbykevin.havoc.weapon.WeaponHelper.*;
 
 public class Weapon extends Entity2d implements Disposable {
@@ -39,6 +38,9 @@ public class Weapon extends Entity2d implements Disposable {
 
     //shoot sound effect
     private AudioHelper.Sfx shoot;
+
+    //do we play a sound effect?
+    private AudioHelper.Sfx soundEffect;
 
     public Weapon(Type type) {
 
@@ -115,6 +117,14 @@ public class Weapon extends Entity2d implements Disposable {
 
         if (this.bullets > getType().getBulletsMax())
             this.bullets = getType().getBulletsMax();
+    }
+
+    public AudioHelper.Sfx getSoundEffect() {
+        return this.soundEffect;
+    }
+
+    public void setSoundEffect(AudioHelper.Sfx soundEffect) {
+        this.soundEffect = soundEffect;
     }
 
     public AudioHelper.Sfx getShoot() {
@@ -196,7 +206,7 @@ public class Weapon extends Entity2d implements Disposable {
             if (getBullets() != 0) {
                 setIndex(INDEX_STARTING);
             } else {
-                playWeapon(level.getAssetManager(), this);
+                setSoundEffect(AudioHelper.Sfx.WeaponFireEmpty);
                 controller.setShooting(false);
             }
         }
@@ -212,7 +222,7 @@ public class Weapon extends Entity2d implements Disposable {
                 setBullets(getBullets() - 1);
 
                 //play sound effect
-                playWeapon(level.getAssetManager(), this);
+                setSoundEffect((getBullets() > 0) ? getShoot() : AudioHelper.Sfx.WeaponFireEmpty);
 
                 //check if attack hit enemy
                 checkAttack(level);
@@ -224,7 +234,7 @@ public class Weapon extends Entity2d implements Disposable {
 
                     //play empty sound effect
                     if (getBullets() == 0)
-                        playWeapon(level.getAssetManager(), this);
+                        setSoundEffect(AudioHelper.Sfx.WeaponFireEmpty);
 
                     setIndex(INDEX_STOPPING);
 
@@ -237,7 +247,7 @@ public class Weapon extends Entity2d implements Disposable {
                     setBullets(getBullets() - 1);
 
                     //play sound effect
-                    playWeapon(level.getAssetManager(), this);
+                    setSoundEffect((getBullets() > 0) ? getShoot() : AudioHelper.Sfx.WeaponFireEmpty);
 
                     //check if attack hit enemy
                     checkAttack(level);
