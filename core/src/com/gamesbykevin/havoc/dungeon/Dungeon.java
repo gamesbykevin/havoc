@@ -118,7 +118,10 @@ public class Dungeon implements Disposable {
         //set cost of start to be 0
         getCell(getStartCol(), getStartRow()).setCost(0);
 
+        //this will be our list of cells to calculate cost
         List<Cell> cells = new ArrayList<>();
+
+        //we start with the start location
         cells.add(getCell(getStartCol(), getStartRow()));
 
         //continue as long as we have options

@@ -1,6 +1,9 @@
 package com.gamesbykevin.havoc.collectibles;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.entities.Entity;
@@ -9,12 +12,19 @@ import com.gamesbykevin.havoc.player.Player;
 import com.gamesbykevin.havoc.weapon.WeaponHelper;
 import com.gamesbykevin.havoc.weapon.Weapons;
 
+import java.util.HashMap;
+
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_DIR_COLLECTIBLES;
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_EXT_BMP;
 import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.player.Player.HEALTH_MAX;
 import static com.gamesbykevin.havoc.player.PlayerHelper.HEALTH_LARGE;
 import static com.gamesbykevin.havoc.player.PlayerHelper.HEALTH_SMALL;
 
 public class CollectibleHelper {
+
+    //list of textures to be re-used
+    private static HashMap<Collectibles.Type, TextureRegion> TEXTURES;
 
     //check if we collected any collectibles
     public static void check(Level level) {
@@ -52,12 +62,6 @@ public class CollectibleHelper {
 
                 case smg:
                     weapons.add(WeaponHelper.Type.Smg);
-                    add = true;
-                    collected = true;
-                    break;
-
-                case glock:
-                    weapons.add(WeaponHelper.Type.Glock);
                     add = true;
                     collected = true;
                     break;
@@ -145,5 +149,33 @@ public class CollectibleHelper {
                 player.getController().setChange(true);
             }
         }
+    }
+
+    protected static HashMap<Collectibles.Type, TextureRegion> getTextures(AssetManager assetManager) {
+
+        if (TEXTURES == null) {
+            TEXTURES = new HashMap<>();
+            for (Collectibles.Type type : Collectibles.Type.values()) {
+                TEXTURES.put(type, new TextureRegion(assetManager.get(ASSET_DIR_COLLECTIBLES + type.toString() + ASSET_EXT_BMP, Texture.class)));
+            }
+        }
+
+        return TEXTURES;
+    }
+
+    protected static void dispose() {
+
+        if (TEXTURES != null) {
+            for (Collectibles.Type type : Collectibles.Type.values()) {
+
+                if (TEXTURES.get(type) != null) {
+                    TEXTURES.get(type).getTexture().dispose();
+                    TEXTURES.put(type, null);
+                }
+            }
+            TEXTURES.clear();
+        }
+
+        TEXTURES = null;
     }
 }

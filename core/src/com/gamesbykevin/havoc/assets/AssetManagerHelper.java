@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.gamesbykevin.havoc.collectibles.Collectibles;
 import com.gamesbykevin.havoc.enemies.Boss;
 import com.gamesbykevin.havoc.enemies.Soldier;
-import com.gamesbykevin.havoc.obstacles.Obstacles;
+import com.gamesbykevin.havoc.obstacles.Obstacle;
 import com.gamesbykevin.havoc.weapon.WeaponHelper;
 
 import java.util.ArrayList;
@@ -15,6 +15,7 @@ import java.util.List;
 
 import static com.gamesbykevin.havoc.assets.AudioHelper.Sfx.*;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
+import static com.gamesbykevin.havoc.obstacles.ObstacleHelper.*;
 
 public class AssetManagerHelper {
 
@@ -50,6 +51,8 @@ public class AssetManagerHelper {
     //here we will store the types we want to load textures for
     private static List<Boss.Type> TYPE_BOSS;
     private static List<Soldier.Type> TYPE_SOLDIER;
+    private static List<Obstacle.Type> TYPE_OBSTACLE;
+    private static Obstacle.Type TYPE_LIGHT;
 
     //different file extensions
     public static final String ASSET_EXT_BMP = ".bmp";
@@ -88,7 +91,6 @@ public class AssetManagerHelper {
     public static final String PATH_SHOOT_MAGNUM = PARENT_DIR_SOUND_WEAPON + "magnum" + ASSET_EXT_OGG;
     public static final String PATH_SHOOT_BUZZ = PARENT_DIR_SOUND_WEAPON + "buzz" + ASSET_EXT_OGG;
     public static final String PATH_SHOOT_LANCE = PARENT_DIR_SOUND_WEAPON + "lance" + ASSET_EXT_OGG;
-
 
     public static final String PATH_SHOOT_EMPTY = PARENT_DIR_SOUND_WEAPON + "empty" + ASSET_EXT_OGG;
     public static final String PATH_CHANGE = PARENT_DIR_SOUND_WEAPON + "change" + ASSET_EXT_OGG;
@@ -204,7 +206,6 @@ public class AssetManagerHelper {
     public static final String PATH_8   = ASSET_DIR_HUD + "8" + ASSET_EXT_PNG;
     public static final String PATH_9   = ASSET_DIR_HUD + "9" + ASSET_EXT_PNG;
     public static final String PATH_KEY_1 = ASSET_DIR_HUD + "key_1_small" + ASSET_EXT_PNG;
-    public static final String PATH_KEY_2 = ASSET_DIR_HUD + "key_2_small" + ASSET_EXT_PNG;
     public static final String PATH_PERCENT = ASSET_DIR_HUD + "percent" + ASSET_EXT_PNG;
     public static final String PATH_HURT = ASSET_DIR_HUD + "hurt" + ASSET_EXT_PNG;
     public static final String PATH_COLLECT = ASSET_DIR_HUD + "collect" + ASSET_EXT_PNG;
@@ -262,6 +263,18 @@ public class AssetManagerHelper {
         return TYPE_SOLDIER;
     }
 
+    public static List<Obstacle.Type> getTypeObstacle() {
+
+        if (TYPE_OBSTACLE == null)
+            TYPE_OBSTACLE = new ArrayList<>();
+
+        return TYPE_OBSTACLE;
+    }
+
+    public static Obstacle.Type getTypeLight() {
+        return TYPE_LIGHT;
+    }
+
     public static void dispose(AssetManager assetManager) {
 
         if (PATHS_WALL != null)
@@ -274,12 +287,16 @@ public class AssetManagerHelper {
             TYPE_BOSS.clear();
         if (TYPE_SOLDIER != null)
             TYPE_SOLDIER.clear();
+        if (TYPE_OBSTACLE != null)
+            TYPE_OBSTACLE.clear();
 
         PATHS_WALL = null;
         PATHS_HALLWAY = null;
         PATHS_BACKGROUND = null;
         TYPE_BOSS = null;
         TYPE_SOLDIER = null;
+        TYPE_OBSTACLE = null;
+        TYPE_LIGHT = null;
 
         if (PATHS != null) {
 
@@ -298,6 +315,14 @@ public class AssetManagerHelper {
     }
 
     private static void load(AssetManager assetManager, String path, Class assetClass) {
+
+        //make sure we aren't adding the same path more than once
+        for (int i = 0; i < getPaths().size(); i++) {
+
+            if (getPaths().get(i).equals(path))
+                return;
+        }
+
         assetManager.load(path, assetClass);
         getPaths().add(path);
     }
@@ -308,10 +333,8 @@ public class AssetManagerHelper {
         //unload any assets (if they exist)
         dispose(assetManager);
 
-        //load every obstacle
-        for (Obstacles.Type type : Obstacles.Type.values()) {
-            load(assetManager, ASSET_DIR_OBSTACLES + type.toString() + ASSET_EXT_BMP, Texture.class);
-        }
+        //load select obstacles
+        loadObstacles(assetManager);
 
         //load every collectible
         for (Collectibles.Type type : Collectibles.Type.values()) {
@@ -345,6 +368,30 @@ public class AssetManagerHelper {
 
         //load the rest of the audio
         loadAudio(assetManager);
+    }
+
+    private static void loadObstacles(AssetManager assetManager) {
+
+        //clear list
+        getTypeObstacle().clear();
+
+        //pick a random light
+        TYPE_LIGHT = getRandomTypeLight();
+
+        //populate with random types
+        getTypeObstacle().add(getRandomTypePillar());
+        getTypeObstacle().add(getRandomTypeFlag());
+        getTypeObstacle().add(getRandomTypeStatue());
+        getTypeObstacle().add(getRandomTypeGrass());
+        getTypeObstacle().add(getRandomTypeCage());
+        getTypeObstacle().add(getRandomTypeOther());
+
+        //load each of the optional obstacles
+        for (int i = 0; i < getTypeObstacle().size(); i++) {
+            load(assetManager, ASSET_DIR_OBSTACLES + getTypeObstacle().get(i).toString() + ASSET_EXT_BMP, Texture.class);
+        }
+
+        load(assetManager, ASSET_DIR_OBSTACLES + TYPE_LIGHT.toString() + ASSET_EXT_BMP, Texture.class);
     }
 
     private static void loadAudio(AssetManager assetManager) {
@@ -497,7 +544,6 @@ public class AssetManagerHelper {
         load(assetManager, PATH_9, Texture.class);
         load(assetManager, PATH_PERCENT, Texture.class);
         load(assetManager, PATH_KEY_1, Texture.class);
-        load(assetManager, PATH_KEY_2, Texture.class);
     }
 
     private static void loadSoldier(AssetManager assetManager, Soldier.Type type) {

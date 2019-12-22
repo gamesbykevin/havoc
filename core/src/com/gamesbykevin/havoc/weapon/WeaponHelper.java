@@ -11,7 +11,6 @@ import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_DIR_WEAPONS
 import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.decals.Square.COLLISION_RADIUS;
 import static com.gamesbykevin.havoc.enemies.Enemy.RANGE_NOTICE;
-import static com.gamesbykevin.havoc.entities.Entities.OFFSET;
 import static com.gamesbykevin.havoc.entities.EntityHelper.intersects;
 import static com.gamesbykevin.havoc.level.LevelHelper.isDoorOpen;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
@@ -215,18 +214,6 @@ public class WeaponHelper {
                         continue;
 
                     if (intersects(col, row, m, b))
-                        collisionWall = true;
-                    if (intersects(col - OFFSET, row, m, b))
-                        collisionWall = true;
-                    if (intersects(col + OFFSET, row, m, b))
-                        collisionWall = true;
-                    if (intersects(col, row - OFFSET, m, b))
-                        collisionWall = true;
-                    if (intersects(col, row + OFFSET, m, b))
-                        collisionWall = true;
-                    if (intersects(col - OFFSET, row - OFFSET, m, b))
-                        collisionWall = true;
-                    if (intersects(col + OFFSET, row + OFFSET, m, b))
                         collisionWall = true;
 
                     //if (level.getWall(col, row) != null && level.getWall(col, row).hasCollision(ray))

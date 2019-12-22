@@ -12,36 +12,18 @@ import com.gamesbykevin.havoc.level.Level;
 
 import java.util.HashMap;
 
-import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_DIR_OBSTACLES;
-import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_EXT_BMP;
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
-import static com.gamesbykevin.havoc.obstacles.ObstacleHelper.*;
+import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public final class Obstacles extends Entities {
-
-    public enum Type {
-        Light1, Light2, Light3, Light4, Light5, Light6, Light7,
-        Grass1, Grass2, Grass3, Grass4, Grass5, Grass6, Grass7, Grass8, Grass9, Grass10, Grass11,
-        pillar1, pillar2, pillar3, pillar4, pillar5,
-        random1, random2, random3, random4,
-        cage1, cage2, cage3, cage4,
-        statue1, statue2, statue3, statue4, statue5,
-        BluePotLargeEmpty, BluePotPlant1, BluePotPlant2, YellowPotPlant,
-        Candle,
-        spear1, spear2,
-        flag1, flag2,
-        barrel1, barrel2,
-        pots1, pots2,
-        table,
-        FloorLamp1, FloorLamp2
-    }
 
     //how close can we get to the obstacle
     private static final float OBSTACLE_COLLISION = .33f;
 
     //list of textures so we don't have to load the same texture repeatedly
-    private static HashMap<Type, TextureRegion> TEXTURES;
+    private static HashMap<Obstacle.Type, TextureRegion> TEXTURES;
 
     public Obstacles(Level level) {
         super(level);
@@ -65,18 +47,17 @@ public final class Obstacles extends Entities {
             if (getRandom().nextBoolean())
                 addNextToWalls(leaf.getRoom());
         }
-
-        //clean up lists
-        recycle();
     }
 
-    public static HashMap<Type, TextureRegion> getTextures(AssetManager assetManager) {
+    public static HashMap<Obstacle.Type, TextureRegion> getTextures(AssetManager assetManager) {
 
         if (TEXTURES == null) {
             TEXTURES = new HashMap<>();
-            for (Type type : Type.values()) {
-                TEXTURES.put(type, new TextureRegion(assetManager.get(ASSET_DIR_OBSTACLES + type.toString() + ASSET_EXT_BMP, Texture.class)));
+            for (int i = 0; i < getTypeObstacle().size(); i++) {
+                TEXTURES.put(getTypeObstacle().get(i), new TextureRegion(assetManager.get(ASSET_DIR_OBSTACLES + getTypeObstacle().get(i).toString() + ASSET_EXT_BMP, Texture.class)));
             }
+
+            TEXTURES.put(getTypeLight(), new TextureRegion(assetManager.get(ASSET_DIR_OBSTACLES + getTypeLight().toString() + ASSET_EXT_BMP, Texture.class)));
         }
 
         //return our list of textures
@@ -86,7 +67,7 @@ public final class Obstacles extends Entities {
     private void addNextToWalls(Room room) {
 
         //assign random obstacle type
-        Obstacles.Type type = assignRandomType();
+        Obstacle.Type type = getTypeObstacle().get(getRandom().nextInt(getTypeObstacle().size()));
 
         //how frequent do we add an obstacle
         int offset = getRandom().nextInt(4) + 1;
@@ -120,7 +101,7 @@ public final class Obstacles extends Entities {
         //frequency of lights
         int frequency = getRandom().nextInt(4) + 2;
 
-        Obstacles.Type type = getRandomLight();
+        Obstacle.Type type = getTypeLight();
 
         int middleCol = room.getX() + (room.getW() / 2);
         int middleRow = room.getY() + (room.getH() / 2);
@@ -192,7 +173,7 @@ public final class Obstacles extends Entities {
         }
     }
 
-    private void add(Obstacles.Type type, int col, int row) {
+    private void add(Obstacle.Type type, int col, int row) {
 
         //we won't add if already occupied
         if (hasEntityLocation(col, row))
@@ -256,7 +237,7 @@ public final class Obstacles extends Entities {
 
         if (TEXTURES != null) {
 
-            for (Type type : Type.values()) {
+            for (Obstacle.Type type : Obstacle.Type.values()) {
 
                 if (TEXTURES.get(type) != null) {
                     TEXTURES.get(type).getTexture().dispose();
@@ -268,5 +249,45 @@ public final class Obstacles extends Entities {
         }
 
         TEXTURES = null;
+    }
+
+    @Override
+    public int render() {
+
+        //update the entities accordingly
+        update();
+
+        int count = 0;
+
+        for (int i = 0; i < getEntityList().size(); i++) {
+
+            //get the current entity
+            Entity entity = getEntityList().get(i);
+
+            //how far is the player from the entity
+            double distance = getDistance(entity, getLevel().getPlayer());
+
+            //don't render if not solid and too close to the player
+            if (!entity.isSolid() && distance < DISTANCE_RENDER_IGNORE)
+                continue;
+
+            //don't render if too far away
+            if (distance > RENDER_RANGE)
+                continue;
+
+            //render the entity
+            entity.render(
+                    getLevel().getAssetManager(),
+                    getLevel().getPlayer().getCamera3d(),
+                    getLevel().getDecalBatch(),
+                    getLevel().getPlayer().getController().getStage().getBatch()
+            );
+
+            //keep track of how many items we rendered
+            count++;
+        }
+
+        //return the count
+        return count;
     }
 }

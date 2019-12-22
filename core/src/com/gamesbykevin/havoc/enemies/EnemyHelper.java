@@ -2,11 +2,15 @@ package com.gamesbykevin.havoc.enemies;
 
 import com.gamesbykevin.havoc.astar.Node;
 import com.gamesbykevin.havoc.decals.Door;
+import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.level.Level;
+import com.gamesbykevin.havoc.player.Player;
+
+import java.util.List;
 
 import static com.gamesbykevin.havoc.enemies.Enemy.*;
-import static com.gamesbykevin.havoc.entities.Entities.OFFSET;
 import static com.gamesbykevin.havoc.entities.EntityHelper.isObstructed;
+import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public class EnemyHelper {
 
@@ -244,37 +248,6 @@ public class EnemyHelper {
 
     public static void calculatePath(Level level, Enemy enemy, float startCol, float startRow, float finishCol, float finishRow) {
 
-        startCol += OFFSET;
-        startRow += OFFSET;
-        finishCol += OFFSET;
-        finishRow += OFFSET;
-
-        //location has to be valid
-        if (!level.getDungeon().hasMap(startCol, startRow) || level.getDungeon().hasInteract(startCol, startRow)) {
-            if (startCol < finishCol && level.getDungeon().hasMap(startCol + OFFSET, startRow) && !level.getDungeon().hasInteract(startCol + OFFSET, startRow)) {
-                startCol++;
-            } else if (startCol > finishCol && level.getDungeon().hasMap(startCol - OFFSET, startRow) && !level.getDungeon().hasInteract(startCol - OFFSET, startRow)) {
-                startCol--;
-            } else if (startRow < finishRow && level.getDungeon().hasMap(startCol, startRow + OFFSET) && !level.getDungeon().hasInteract(startCol, startRow + OFFSET)) {
-                startRow++;
-            } else if (startRow > finishRow && level.getDungeon().hasMap(startCol, startRow - OFFSET) && !level.getDungeon().hasInteract(startCol, startRow - OFFSET)) {
-                startRow--;
-            }
-        }
-
-        //location has to be valid
-        if (!level.getDungeon().hasMap(finishCol, finishRow) || level.getDungeon().hasInteract(finishCol, finishRow)) {
-            if (finishCol < startCol && level.getDungeon().hasMap(finishCol + OFFSET, finishRow) && !level.getDungeon().hasInteract(finishCol + OFFSET, finishRow)) {
-                finishCol++;
-            } else if (finishCol > startCol && level.getDungeon().hasMap(finishCol - OFFSET, finishRow) && !level.getDungeon().hasInteract(finishCol - OFFSET, finishRow)) {
-                finishCol--;
-            } else if (finishRow < startRow && level.getDungeon().hasMap(finishCol, finishRow + OFFSET) && !level.getDungeon().hasInteract(finishCol, finishRow + OFFSET)) {
-                finishRow++;
-            } else if (finishRow > startRow && level.getDungeon().hasMap(finishCol, finishRow - OFFSET) && !level.getDungeon().hasInteract(finishCol, finishRow - OFFSET)) {
-                finishRow--;
-            }
-        }
-
         //clear the path, if it exists
         if (enemy.getPathPatrol() != null)
             enemy.getPathPatrol().clear();
@@ -285,5 +258,61 @@ public class EnemyHelper {
 
         //set the path for the enemy to follow
         enemy.setPathPatrol(level.getDungeon().getAStar().getPath());
+    }
+
+    public static void sortEnemies(List<Entity> entities, Player player) {
+
+        for (int i = 0; i < entities.size(); i++) {
+            for (int j = i + 1; j < entities.size(); j++) {
+
+                //get the entities
+                Entity entity1 = entities.get(i);
+                Entity entity2 = entities.get(j);
+
+                double dist1 = getDistance(entity1, player.getCamera3d().position);
+                double dist2 = getDistance(entity2, player.getCamera3d().position);
+
+                //switch if the distance is less and the entity is not dead
+                if (dist2 < dist1 && entity2.isSolid()) {
+                    entities.set(j, entity1);
+                    entities.set(i, entity2);
+                }
+            }
+        }
+    }
+
+    protected static void notifyNeighbors(Level level, List<Entity> entities, int indexIgnore) {
+
+        for (int i = 0; i < entities.size(); i++) {
+
+            //don't notify self
+            if (i == indexIgnore)
+                continue;
+
+            //get the enemy
+            Enemy tmp = (Enemy)entities.get(i);
+
+            //skip if dead
+            if (tmp.isDie())
+                continue;
+
+            //how far is the enemy from the other enemy?
+            double distance = getDistance(entities.get(indexIgnore), tmp);
+
+            //make sure the enemy is close enough to notice and the enemy is walking
+            if (distance < RANGE_NOTICE && (tmp.isWalk() || tmp.isIdle())) {
+
+                if (tmp.canShoot(level, distance)) {
+
+                    //if the enemy can shoot the player, it should start
+                    tmp.setStatus(Enemy.Status.Shoot);
+
+                } else {
+
+                    //flag chase the player
+                    tmp.setChase(true);
+                }
+            }
+        }
     }
 }

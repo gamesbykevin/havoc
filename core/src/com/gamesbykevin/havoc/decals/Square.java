@@ -3,14 +3,10 @@ package com.gamesbykevin.havoc.decals;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
-import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.Ray;
 import com.gamesbykevin.havoc.location.Location;
 import com.gamesbykevin.havoc.util.Disposable;
 
 import static com.gamesbykevin.havoc.decals.Wall.*;
-import static com.gamesbykevin.havoc.entities.Entities.OFFSET;
 
 public class Square extends Location implements Disposable {
 
@@ -20,21 +16,9 @@ public class Square extends Location implements Disposable {
     //used for collision
     public static final float COLLISION_RADIUS = .5f;
 
-    //used for collision
-    private Vector3 center;
-
     public Square(float col, float row) {
         super(col, row);
         this.walls = new Wall[4];
-        this.center = new Vector3(getCol() + OFFSET, getRow() + OFFSET, OFFSET);
-    }
-
-    public Vector3 getCenter() {
-        return this.center;
-    }
-
-    public boolean hasCollision(Ray ray) {
-        return Intersector.intersectRaySphere(ray, getCenter(), COLLISION_RADIUS, null);
     }
 
     public void addWalls(TextureRegion textureRegion) {
@@ -62,6 +46,46 @@ public class Square extends Location implements Disposable {
 
     private void addWall(TextureRegion textureRegion, int side) {
         getWalls()[side] = DecalCustom.createDecalWall(getCol(), getRow(), textureRegion, side);
+    }
+
+    public boolean hasCollisionNorth(float col, float row) {
+        return hasCollision(col, row, SIDE_NORTH);
+    }
+
+    public boolean hasCollisionSouth(float col, float row) {
+        return hasCollision(col, row, SIDE_SOUTH);
+    }
+
+    public boolean hasCollisionWest(float col, float row) {
+        return hasCollision(col, row, SIDE_WEST);
+    }
+
+    public boolean hasCollisionEast(float col, float row) {
+        return hasCollision(col, row, SIDE_EAST);
+    }
+
+    private boolean hasCollision(float col, float row, int side) {
+
+        //if no wall exists there
+        if (getWalls()[side] == null)
+            return false;
+
+        switch (side) {
+
+            case SIDE_NORTH:
+                return getWalls()[side].hasCollisionNorth(col, row);
+
+            case SIDE_SOUTH:
+                return getWalls()[side].hasCollisionSouth(col, row);
+
+            case SIDE_WEST:
+                return getWalls()[side].hasCollisionWest(col, row);
+
+            case SIDE_EAST:
+                return getWalls()[side].hasCollisionEast(col, row);
+        }
+
+        return false;
     }
 
     public Wall[] getWalls() {
@@ -100,6 +124,5 @@ public class Square extends Location implements Disposable {
         }
 
         this.walls = null;
-        this.center = null;
     }
 }

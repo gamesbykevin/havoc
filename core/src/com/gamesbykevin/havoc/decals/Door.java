@@ -7,6 +7,12 @@ import static com.gamesbykevin.havoc.decals.Wall.*;
 
 public class Door extends DecalCustom {
 
+    //how deep is the door placed
+    public static final float DOOR_DEPTH = .5f;
+
+    //the depth will be close to the walls for a secret
+    public static final float SECRET_DEPTH = .075f;
+
     public enum State {
         Start,
         Opening,
@@ -43,7 +49,7 @@ public class Door extends DecalCustom {
     private boolean once;
 
     protected Door(TextureRegion texture, int side, boolean secret) {
-        super(texture, Type.Door, side, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+        super(texture, side, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         setSecret(secret);
         setState(State.Closed);
     }
@@ -94,6 +100,18 @@ public class Door extends DecalCustom {
 
     public void setLapsed(float lapsed) {
         this.lapsed = lapsed;
+    }
+
+    public boolean isOpen() {
+
+        //is the door open
+        switch (getState()) {
+            case Open:
+                return true;
+
+            default:
+                return false;
+        }
     }
 
     @Override

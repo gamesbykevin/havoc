@@ -21,8 +21,8 @@ public abstract class Entities implements Disposable, Restart {
     //store reference to the level
     private final Level level;
 
-    //offset the animation so it doesn't get stuck in the walls
-    public static final float OFFSET = 0.5f;
+    //don't render items that aren't solid and too close to the player
+    public static final float DISTANCE_RENDER_IGNORE = 1.0f;
 
     public Entities(Level level) {
         this.level = level;
@@ -53,7 +53,7 @@ public abstract class Entities implements Disposable, Restart {
     public void add(Entity3d entity, float col, float row) {
 
         //update the location of our animation
-        entity.getAnimation().setPosition(col + OFFSET, row + OFFSET, 0);
+        entity.getAnimation().setPosition(col, row, 0);
 
         //assign the location
         entity.setCol(col);
@@ -113,13 +113,8 @@ public abstract class Entities implements Disposable, Restart {
         this.entityList = null;
     }
 
-    public int render() {
-        return render(false, RENDER_RANGE);
-    }
-
-    public int render(boolean hide) {
-        return render(hide, RENDER_RANGE);
-    }
+    //implement logic to render the entities, return count of entities rendered
+    public abstract int render();
 
     //logic to render the entities
     public int render(boolean hide, int range) {

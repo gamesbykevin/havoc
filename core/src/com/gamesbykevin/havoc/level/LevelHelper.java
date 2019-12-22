@@ -21,7 +21,7 @@ import static com.gamesbykevin.havoc.util.Distance.getDistance;
 public class LevelHelper {
 
     //how close we have to be to open a door
-    public static final float DOOR_DISTANCE = 1.0f;
+    public static final int DOOR_DISTANCE = 1;
 
     protected static int renderWalls(Square[][] walls, DecalBatch batch, PerspectiveCamera camera) {
 
@@ -107,8 +107,8 @@ public class LevelHelper {
 
         boolean goal = false;
 
-        for (float colDiff = -DOOR_DISTANCE; colDiff <= DOOR_DISTANCE; colDiff += DOOR_DISTANCE) {
-            for (float rowDiff = -DOOR_DISTANCE; rowDiff <= DOOR_DISTANCE; rowDiff += DOOR_DISTANCE) {
+        for (int colDiff = -DOOR_DISTANCE; colDiff <= DOOR_DISTANCE; colDiff ++) {
+            for (int rowDiff = -DOOR_DISTANCE; rowDiff <= DOOR_DISTANCE; rowDiff ++) {
 
                 int col = (int)(position.x + colDiff);
                 int row = (int)(position.y + rowDiff);
@@ -128,21 +128,14 @@ public class LevelHelper {
                     if (door == null)
                         continue;
 
-                    //is the door closed
-                    boolean closed = (door.getState() == Door.State.Closed);
-
                     //we can only open the door if it's closed
-                    if (!closed)
+                    if (door.getState() != Door.State.Closed)
                         continue;
 
-                    if (cell.isLocked()) {
-
-                        if (!key) {
-
-                            //if locked and we don't have a key
-                            playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelLocked);
-                            continue;
-                        }
+                    //if locked and we don't have a key
+                    if (cell.isLocked() && !key) {
+                        playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelLocked);
+                        continue;
                     }
 
                     //open the door
@@ -242,6 +235,7 @@ public class LevelHelper {
             playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelOpen);
         }
 
+        //play separately as a door could be closing while another is opening at the same time
         if (close)
             playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelClose);
     }

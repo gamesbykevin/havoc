@@ -19,6 +19,10 @@ public class Distance {
         return getDistance(decalCustom.getCol(), decalCustom.getRow(), position.x, position.y);
     }
 
+    public static double getDistance(Entity entity, Player player) {
+        return getDistance(entity, player.getCamera3d());
+    }
+
     public static double getDistance(Entity entity, PerspectiveCamera camera) {
         return getDistance(entity, camera.position);
     }

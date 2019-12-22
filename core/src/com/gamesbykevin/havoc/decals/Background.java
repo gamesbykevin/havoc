@@ -10,7 +10,7 @@ public class Background extends DecalCustom {
     public static final int SIDE_NONE = -1;
 
     protected Background(TextureRegion texture) {
-        super(texture, Type.Background, SIDE_NONE, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+        super(texture, SIDE_NONE, TEXTURE_WIDTH, TEXTURE_HEIGHT);
     }
 
     @Override

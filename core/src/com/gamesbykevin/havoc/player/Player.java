@@ -65,6 +65,7 @@ public final class Player implements Disposable, Restart {
 
     //height the camera will be at
     private static final float HEIGHT_START = 0.075f;
+    //private static final float HEIGHT_START = 1.5f;
 
     //reference to our assets
     private final AssetManager assetManager;

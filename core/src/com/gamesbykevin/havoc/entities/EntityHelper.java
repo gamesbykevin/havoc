@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.level.Level;
 
 import static com.gamesbykevin.havoc.dungeon.DungeonHelper.isAvailable;
-import static com.gamesbykevin.havoc.entities.Entities.OFFSET;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 import static com.gamesbykevin.havoc.util.Slope.*;
 
@@ -43,21 +42,11 @@ public class EntityHelper {
             for (int col = xMin; col <= xMax; col++) {
 
                 //we don't need to check available spaces
-                if (isAvailable(level, col + OFFSET, row + OFFSET))
+                if (isAvailable(level, col, row))
                     continue;
 
                 //if we intersected a wall we are obstructed
-                if (intersects(col - OFFSET, row, m, b))
-                    return true;
-                if (intersects(col, row - OFFSET, m, b))
-                    return true;
-                if (intersects(col + OFFSET, row, m, b))
-                    return true;
-                if (intersects(col, row + OFFSET, m, b))
-                    return true;
-                if (intersects(col - OFFSET, row - OFFSET, m, b))
-                    return true;
-                if (intersects(col + OFFSET, row + OFFSET, m, b))
+                if (intersects(col, row, m, b))
                     return true;
             }
         }
@@ -78,7 +67,7 @@ public class EntityHelper {
         double distance2 = getDistance(col, row, col, y);
 
         //if the distance from the center is less than a specified distance, there is an intersection
-        if (distance1 <= (OFFSET * 3.0f) || distance2 <= (OFFSET * 3.0f))
+        if (distance1 <= 1f || distance2 <= 1f)
             return true;
 
         return false;

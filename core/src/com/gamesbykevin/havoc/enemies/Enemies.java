@@ -18,8 +18,8 @@ import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafGoal;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
-import static com.gamesbykevin.havoc.enemies.Enemy.RANGE_NOTICE;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.*;
+import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public final class Enemies extends Entities {
@@ -34,11 +34,11 @@ public final class Enemies extends Entities {
     private Timer timerHurt, timerAlert, timerDead, timerShoot, timerChase;
 
     //how long until update again
-    public static final float DURATION_HURT = 500f;
+    public static final float DURATION_HURT = 750f;
     public static final float DURATION_ALERT = 2750f;
     public static final float DURATION_DEAD = 500f;
     public static final float DURATION_SHOOT = 400f;
-    public static final float DURATION_CHASE = 750f;
+    public static final float DURATION_CHASE = 850f;
 
     public Enemies(Level level) {
         super(level);
@@ -343,41 +343,6 @@ public final class Enemies extends Entities {
         getTimerChase().reset();
     }
 
-    private void notifyNeighbors(int indexIgnore) {
-
-        for (int i = 0; i < getEntityList().size(); i++) {
-
-            //don't notify self
-            if (i == indexIgnore)
-                continue;
-
-            //get the enemy
-            Enemy tmp = (Enemy)getEntityList().get(i);
-
-            //skip if dead
-            if (tmp.isDie())
-                continue;
-
-            //how far is the enemy from the other enemy?
-            double distance = getDistance(getEntityList().get(indexIgnore), tmp);
-
-            //make sure the enemy is close enough to notice and the enemy is walking
-            if (distance < RANGE_NOTICE && (tmp.isWalk() || tmp.isIdle())) {
-
-                if (tmp.canShoot(getLevel(), distance)) {
-
-                    //if the enemy can shoot the player, it should start
-                    tmp.setStatus(Enemy.Status.Shoot);
-
-                } else {
-
-                    //flag chase the player
-                    tmp.setChase(true);
-                }
-            }
-        }
-    }
-
     private void updateTimers() {
         getTimerShoot().update();
         getTimerHurt().update();
@@ -397,6 +362,9 @@ public final class Enemies extends Entities {
 
         //did we calculate chase yet?
         boolean chase = false;
+
+        //sort the enemies so the closest one to the player is first
+        sortEnemies(getEntityList(), getLevel().getPlayer());
 
         //update the enemies
         for (int i = 0; i < getEntityList().size(); i++) {
@@ -451,7 +419,7 @@ public final class Enemies extends Entities {
 
             //if an enemy is shooting we need to check other enemies nearby and notify them
             if (check)
-                notifyNeighbors(i);
+                notifyNeighbors(getLevel(), getEntityList(), i);
         }
 
         //play the appropriate sound effects
@@ -486,5 +454,45 @@ public final class Enemies extends Entities {
         this.timerDead = null;
         this.timerHurt = null;
         this.timerShoot = null;
+    }
+
+    @Override
+    public int render() {
+
+        //update the entities accordingly
+        update();
+
+        int count = 0;
+
+        for (int i = 0; i < getEntityList().size(); i++) {
+
+            //get the current entity
+            Entity entity = getEntityList().get(i);
+
+            //how far away from the player
+            double distance = getDistance(entity, getLevel().getPlayer());
+
+            //don't bother drawing if dead and too close
+            if (!entity.isSolid() && distance < DISTANCE_RENDER_IGNORE)
+                continue;
+
+            //don't render if too far away
+            if (distance > RENDER_RANGE)
+                continue;
+
+            //render the entity
+            entity.render(
+                    getLevel().getAssetManager(),
+                    getLevel().getPlayer().getCamera3d(),
+                    getLevel().getDecalBatch(),
+                    getLevel().getPlayer().getController().getStage().getBatch()
+            );
+
+            //keep track of how many items we rendered
+            count++;
+        }
+
+        //return the count
+        return count;
     }
 }

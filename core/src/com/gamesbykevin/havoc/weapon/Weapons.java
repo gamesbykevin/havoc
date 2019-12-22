@@ -2,6 +2,7 @@ package com.gamesbykevin.havoc.weapon;
 
 import com.badlogic.gdx.audio.Sound;
 import com.gamesbykevin.havoc.entities.Entities;
+import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Disposable;
@@ -219,8 +220,22 @@ public final class Weapons extends Entities implements Disposable, Restart {
     @Override
     public int render() {
 
-        //render entity
-        super.render(true, -1);
+        //update the entities accordingly
+        update();
+
+        //keep track of the number of objects rendered
+        int count = 0;
+
+        //render the entity
+        getEntityList().get(getIndex()).render(
+                getLevel().getAssetManager(),
+                getLevel().getPlayer().getCamera3d(),
+                getLevel().getDecalBatch(),
+                getLevel().getPlayer().getController().getStage().getBatch()
+        );
+
+        //keep track of how many items we rendered
+        count++;
 
         //render weapon bullet count
         Hud.renderNumber(
@@ -233,7 +248,7 @@ public final class Weapons extends Entities implements Disposable, Restart {
         );
 
         //we rendered 1 item
-        return 1;
+        return count;
     }
 
     @Override

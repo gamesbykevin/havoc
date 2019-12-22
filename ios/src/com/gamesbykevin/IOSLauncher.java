@@ -1,5 +1,6 @@
 package com.gamesbykevin;
 
+import com.gamesbykevin.havoc.MyGdxGame;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.uikit.UIApplication;
 

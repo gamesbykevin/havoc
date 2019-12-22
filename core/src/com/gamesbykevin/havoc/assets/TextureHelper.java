@@ -123,8 +123,8 @@ public class TextureHelper {
                 return;
         }
 
-        int col = COL;
-        int row = ROW;
+        final int col = COL;
+        final int row = ROW;
 
         //is this location part of the goal
         boolean goal = (col >= room.getX() && col < room.getX() + room.getW() && row >= room.getY() && row < room.getY() + room.getH());

@@ -1,13 +1,10 @@
 package com.gamesbykevin.havoc.player;
 
-import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.decals.Door;
+import com.gamesbykevin.havoc.decals.Square;
 import com.gamesbykevin.havoc.level.Level;
 
 public class PlayerHelper {
-
-    //distance from wall to detect collision
-    public static final float WALL_DISTANCE = .25f;
 
     //if we aren't moving the joystick enough we will ignore
     public static final float DEAD_ZONE_IGNORE = .2f;
@@ -44,28 +41,57 @@ public class PlayerHelper {
 
         Player player = level.getPlayer();
 
-        //which direction are we heading
+        //which direction are we heading?
         final float xDiff = x - player.getPrevious().x;
         final float yDiff = y - player.getPrevious().y;
 
         //and then what specific column in the room
-        final float roomCol = player.getCamera3d().position.x;
-        final float roomRow = player.getCamera3d().position.y;
+        int col = (int)player.getCamera3d().position.x;
+        int row = (int)player.getCamera3d().position.y;
 
-        if (yDiff > 0) {
-            if (checkBounds(level, roomRow + WALL_DISTANCE, roomCol))
-                return true;
-        } else if (yDiff < 0) {
-            if (checkBounds(level, roomRow - WALL_DISTANCE, roomCol))
-                return true;
-        }
+        //check the area around the current location for collision
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
 
-        if (xDiff > 0) {
-            if (checkBounds(level, roomRow, roomCol + WALL_DISTANCE))
-                return true;
-        } else if (xDiff < 0) {
-            if (checkBounds(level, roomRow, roomCol - WALL_DISTANCE))
-                return true;
+                //if this location is open, check if there is a door
+                if (level.getDungeon().hasMap(col + i, row + j)) {
+
+                    //can we interact with this location?
+                    if (level.getDungeon().hasInteract(col + i, row + j)) {
+
+                        Door door = level.getDoorDecal(col + i, row + j);
+
+                        //if the door is there and isn't open
+                        if (door != null && !door.isOpen()) {
+                            if (xDiff < 0 && door.hasCollisionEast(x, y))
+                                return true;
+                            if (xDiff > 0 && door.hasCollisionWest(x, y))
+                                return true;
+                            if (yDiff < 0 && door.hasCollisionNorth(x, y))
+                                return true;
+                            if (yDiff > 0 && door.hasCollisionSouth(x, y))
+                                return true;
+                        }
+                    }
+
+                } else {
+
+                    //get the square wall
+                    Square wall = level.getWall(col + i, row + j);
+
+                    //if there is a wall check for collision
+                    if (wall != null) {
+                        if (xDiff < 0 && wall.hasCollisionEast(x, y))
+                            return true;
+                        if (xDiff > 0 && wall.hasCollisionWest(x, y))
+                            return true;
+                        if (yDiff < 0 && wall.hasCollisionNorth(x, y))
+                            return true;
+                        if (yDiff > 0 && wall.hasCollisionSouth(x, y))
+                            return true;
+                    }
+                }
+            }
         }
 
         //if collision with an enemy return true
@@ -77,33 +103,6 @@ public class PlayerHelper {
             return true;
 
         //no collision
-        return false;
-    }
-
-    private static boolean checkBounds(Level level, float row, float col) {
-        return checkBounds(level, (int)row, (int)col);
-    }
-
-    private static boolean checkBounds(Level level, int row, int col) {
-
-        //if not true we aren't in open space
-        if (!level.getDungeon().hasMap(col, row))
-            return true;
-
-        //is there a door/switch here
-        if (level.getDungeon().hasInteract(col, row)) {
-
-            Door door = level.getDoorDecal(col, row);
-
-            switch (door.getState()) {
-                case Open:
-                    return false;
-
-                default:
-                    return true;
-            }
-        }
-
         return false;
     }
 }

@@ -12,7 +12,6 @@ import java.util.List;
 
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.*;
-import static com.gamesbykevin.havoc.entities.Entities.OFFSET;
 import static com.gamesbykevin.havoc.entities.EntityHelper.isObstructed;
 import static com.gamesbykevin.havoc.player.Player.HEALTH_MAX;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
@@ -41,7 +40,7 @@ public abstract class Enemy extends Entity3d {
     private float speed;
 
     //how close to notice the player
-    public static final float RANGE_NOTICE = (ROOM_DIMENSION_MAX * .7f);
+    public static final float RANGE_NOTICE = (ROOM_DIMENSION_MAX * .5f);
 
     //how close do we need to be for the player to update
     public static final float RANGE_UPDATE = ROOM_DIMENSION_MAX * 3;
@@ -146,7 +145,7 @@ public abstract class Enemy extends Entity3d {
         }
 
         //update the location for the animation
-        getAnimation().setPosition(getCol() + OFFSET, getRow() + OFFSET, 0);
+        getAnimation().setPosition(getCol(), getRow(), 0);
 
         //update the animation
         getAnimation().update();

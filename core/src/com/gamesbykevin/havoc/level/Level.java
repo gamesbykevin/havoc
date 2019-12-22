@@ -250,13 +250,13 @@ public class Level implements Disposable, Restart {
         count += renderDoorDecals(getDoorDecals(), getDecalBatch(), getPlayer().getCamera3d());
 
         //render the enemies
-        count += getEnemies().render(false);
+        count += getEnemies().render();
 
         //render the obstacles
-        count += getObstacles().render(false);
+        count += getObstacles().render();
 
         //render the collectibles
-        count += getCollectibles().render(true);
+        count += getCollectibles().render();
 
         //tracking performance
         if (count > 400)

@@ -222,7 +222,7 @@ public class Weapon extends Entity2d implements Disposable {
                 setBullets(getBullets() - 1);
 
                 //play sound effect
-                setSoundEffect((getBullets() > 0) ? getShoot() : AudioHelper.Sfx.WeaponFireEmpty);
+                setSoundEffect((getBullets() != 0) ? getShoot() : AudioHelper.Sfx.WeaponFireEmpty);
 
                 //check if attack hit enemy
                 checkAttack(level);
@@ -247,7 +247,7 @@ public class Weapon extends Entity2d implements Disposable {
                     setBullets(getBullets() - 1);
 
                     //play sound effect
-                    setSoundEffect((getBullets() > 0) ? getShoot() : AudioHelper.Sfx.WeaponFireEmpty);
+                    setSoundEffect((getBullets() != 0) ? getShoot() : AudioHelper.Sfx.WeaponFireEmpty);
 
                     //check if attack hit enemy
                     checkAttack(level);

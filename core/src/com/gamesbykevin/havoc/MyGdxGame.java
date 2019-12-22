@@ -235,7 +235,6 @@ public class MyGdxGame extends ApplicationAdapter {
 					}
 
 				} else {
-					getAssetManager().update();
 					renderProgressBar(getAssetManager().getProgress(), "Step 1 of 7 Loading assets");
 				}
 				break;

@@ -1,8 +1,5 @@
 package com.gamesbykevin.havoc.collectibles;
 
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
 import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.dungeon.Cell;
@@ -14,13 +11,13 @@ import com.gamesbykevin.havoc.entities.Entity3d;
 import com.gamesbykevin.havoc.level.Level;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_DIR_COLLECTIBLES;
-import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_EXT_BMP;
+import static com.gamesbykevin.havoc.collectibles.CollectibleHelper.getTextures;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
+import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
+import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public final class Collectibles extends Entities {
 
@@ -29,7 +26,6 @@ public final class Collectibles extends Entities {
         ammo(AudioHelper.Sfx.ItemAddAmmo),
         ammo_crate(AudioHelper.Sfx.ItemAddAmmo),
         buzzsaw(AudioHelper.Sfx.ItemAddAmmo),
-        glock(AudioHelper.Sfx.ItemAddAmmo),
         health_large(AudioHelper.Sfx.ItemHealthLarge),
         health_small(AudioHelper.Sfx.ItemHealthSmall),
         impact(AudioHelper.Sfx.ItemAddAmmo),
@@ -58,27 +54,11 @@ public final class Collectibles extends Entities {
     private static final int SPAWN_AMMO_COL = -1;
     private static final int SPAWN_AMMO_ROW = -1;
 
-    //list of textures to be re-used
-    private static HashMap<Type, TextureRegion> TEXTURES;
-
     public Collectibles(Level level) {
         super(level);
 
         //load the collectible textures
         getTextures(level.getAssetManager());
-    }
-
-    public static HashMap<Type, TextureRegion> getTextures(AssetManager assetManager) {
-
-        if (TEXTURES == null) {
-            TEXTURES = new HashMap<>();
-            for (Type type : Type.values()) {
-                TEXTURES.put(type, new TextureRegion(assetManager.get(ASSET_DIR_COLLECTIBLES + type.toString() + ASSET_EXT_BMP, Texture.class)));
-            }
-        }
-
-        //return our instance
-        return TEXTURES;
     }
 
     @Override
@@ -297,7 +277,7 @@ public final class Collectibles extends Entities {
                     tmp.setCol(entity.getCol() + x);
                     tmp.setRow(entity.getRow() + y);
                     tmp.getAnimation().reset();
-                    tmp.getAnimation().setPosition(entity.getCol() + x + OFFSET, entity.getRow() + y + OFFSET, 0);
+                    tmp.getAnimation().setPosition(entity.getCol() + x, entity.getRow() + y, 0);
                     return;
                 }
             }
@@ -314,7 +294,7 @@ public final class Collectibles extends Entities {
         Collectible collectible = new Collectible(type);
 
         //setup the single animation
-        collectible.getAnimations()[0] = new DecalAnimation(Collectibles.getTextures(getLevel().getAssetManager()).get(type));
+        collectible.getAnimations()[0] = new DecalAnimation(getTextures(getLevel().getAssetManager()).get(type));
 
         //reset the animation
         collectible.getAnimation().reset();
@@ -397,18 +377,43 @@ public final class Collectibles extends Entities {
     @Override
     public void dispose() {
         super.dispose();
+        CollectibleHelper.dispose();
+    }
 
-        if (TEXTURES != null) {
-            for (Type type : Type.values()) {
+    @Override
+    public int render() {
 
-                if (TEXTURES.get(type) != null) {
-                    TEXTURES.get(type).getTexture().dispose();
-                    TEXTURES.put(type, null);
-                }
-            }
-            TEXTURES.clear();
+        //update the entities accordingly
+        update();
+
+        int count = 0;
+
+        for (int i = 0; i < getEntityList().size(); i++) {
+
+            //get the current entity
+            Entity entity = getEntityList().get(i);
+
+            //hide entities that are not solid
+            if (!entity.isSolid())
+                continue;
+
+            //don't render if too far away
+            if (getDistance(entity, getLevel().getPlayer().getCamera3d().position) > RENDER_RANGE)
+                continue;
+
+            //render the entity
+            entity.render(
+                getLevel().getAssetManager(),
+                getLevel().getPlayer().getCamera3d(),
+                getLevel().getDecalBatch(),
+                getLevel().getPlayer().getController().getStage().getBatch()
+            );
+
+            //keep track of how many items we rendered
+            count++;
         }
 
-        TEXTURES = null;
+        //return the count
+        return count;
     }
 }
