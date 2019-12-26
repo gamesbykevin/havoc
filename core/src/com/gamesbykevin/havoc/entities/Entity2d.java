@@ -46,10 +46,10 @@ public abstract class Entity2d extends Entity {
             assetManager.get(getAnimation().getTexturePath(), Texture.class),
             getCol(),
             getRow(),
-            getAnimation().getCoordinate().x,
-            getAnimation().getCoordinate().y,
-            getAnimation().getCoordinate().width,
-            getAnimation().getCoordinate().height
+            getAnimation().getCoordinate().getX(),
+            getAnimation().getCoordinate().getY(),
+            getAnimation().getCoordinate().getWidth(),
+            getAnimation().getCoordinate().getHeight()
         );
     }
 }

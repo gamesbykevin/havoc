@@ -1,6 +1,6 @@
 package com.gamesbykevin.havoc.animation;
 
-import java.awt.*;
+import com.gamesbykevin.havoc.awt.Rectangle;
 
 public class SpriteAnimation extends Animation {
 
