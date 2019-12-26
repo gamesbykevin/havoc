@@ -175,20 +175,6 @@ public class LeafHelper {
         return leaves;
     }
 
-    protected static Leaf getLeaf(Dungeon dungeon, String id) {
-
-        for (int i = 0; i < dungeon.getLeafs().size(); i++) {
-
-            Leaf leaf = dungeon.getLeafs().get(i);
-
-            if (leaf.hasId(id))
-                return leaf;
-        }
-
-        //leaf not found
-        return null;
-    }
-
     protected static boolean isRoom(List<Leaf> leaves, Cell cell) {
         return isRoom(leaves, cell.getCol(), cell.getRow());
     }

@@ -25,6 +25,10 @@ public class Room implements Disposable {
         setSecret(false);
     }
 
+    public boolean contains(Cell cell) {
+        return contains(cell.getCol(), cell.getRow());
+    }
+
     public boolean contains(float x, float y) {
 
         if (x < getX() || y < getY())
@@ -89,7 +93,10 @@ public class Room implements Disposable {
                 continue;
             if (col >= dungeon.getCols() || row >= dungeon.getRows())
                 continue;
-            if (dungeon.getCell(col, row).isDoor())
+
+            Cell cell = dungeon.getCell(col, row);
+
+            if (cell.isDoor() || cell.isLocked() || cell.isSecret())
                 return true;
         }
         return false;
@@ -101,7 +108,10 @@ public class Room implements Disposable {
                 continue;
             if (col >= dungeon.getCols() || row >= dungeon.getRows())
                 continue;
-            if (dungeon.getCell(col, row).isDoor())
+
+            Cell cell = dungeon.getCell(col, row);
+
+            if (cell.isDoor() || cell.isLocked() || cell.isSecret())
                 return true;
         }
         return false;

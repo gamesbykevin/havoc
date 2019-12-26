@@ -16,8 +16,12 @@ public abstract class Entity3d extends Entity {
         this.animations = new DecalAnimation[count];
     }
 
-    public DecalAnimation[] getAnimations() {
+    private DecalAnimation[] getAnimations() {
         return this.animations;
+    }
+
+    public void setAnimation(int index, DecalAnimation decalAnimation) {
+        getAnimations()[index] = decalAnimation;
     }
 
     public DecalAnimation getAnimation() {
@@ -42,10 +46,7 @@ public abstract class Entity3d extends Entity {
     @Override
     public void render(AssetManager assetManager, PerspectiveCamera camera, DecalBatch decalBatch, Batch batch) {
 
-        //render like a billboard
-        getAnimation().getDecal().lookAt(camera.position, camera.up);
-
-        //add to batch
-        decalBatch.add(getAnimation().getDecal());
+        //render the entity
+        getAnimation().render(camera, decalBatch);
     }
 }

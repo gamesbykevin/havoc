@@ -1,8 +1,9 @@
 package com.gamesbykevin.havoc.weapon;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.gamesbykevin.havoc.entities.Entities;
-import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Disposable;
@@ -42,8 +43,8 @@ public final class Weapons extends Entities implements Disposable, Restart {
     public void spawn() {
 
         //add weapon to our list
-        add(Type.Lance);
-        add(Type.Glock);
+        add(Type.lance);
+        add(Type.glock);
 
         for (int i = 0; i < getEntityList().size(); i++) {
             getEntityList().get(i).reset();
@@ -226,26 +227,17 @@ public final class Weapons extends Entities implements Disposable, Restart {
         //keep track of the number of objects rendered
         int count = 0;
 
+        Batch batch = getLevel().getPlayer().getController().getStage().getBatch();
+        AssetManager assetManager = getLevel().getAssetManager();
+
         //render the entity
-        getEntityList().get(getIndex()).render(
-                getLevel().getAssetManager(),
-                getLevel().getPlayer().getCamera3d(),
-                getLevel().getDecalBatch(),
-                getLevel().getPlayer().getController().getStage().getBatch()
-        );
+        getEntityList().get(getIndex()).render(assetManager, getLevel().getPlayer().getCamera3d(), getLevel().getDecalBatch(), batch);
 
         //keep track of how many items we rendered
         count++;
 
         //render weapon bullet count
-        Hud.renderNumber(
-            getLevel().getAssetManager(),
-            getLevel().getPlayer().getController().getStage().getBatch(),
-            getWeapon().getBullets(),
-            HUD_BULLET_X, HUD_BULLET_Y,
-            HUD_NUMBER_WIDTH, HUD_NUMBER_HEIGHT,
-            HUD_NUMBER_PAD
-        );
+        Hud.renderNumber(assetManager, batch, getWeapon().getBullets(), HUD_BULLET_X, HUD_BULLET_Y);
 
         //we rendered 1 item
         return count;

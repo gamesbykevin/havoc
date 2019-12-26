@@ -7,7 +7,6 @@ import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Disposable;
 
-import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_EXT_PNG;
 import static com.gamesbykevin.havoc.weapon.WeaponHelper.*;
 
 public class Weapon extends Entity2d implements Disposable {
@@ -51,13 +50,60 @@ public class Weapon extends Entity2d implements Disposable {
         this.type = type;
 
         //assign sound effect
-        setShoot(type.shoot);
+        setShoot(type.getShoot());
 
-        //setup the weapons animations
-        getAnimations()[INDEX_RESTING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), ASSET_EXT_PNG, getType().getRestIndexStart(), getType().getRestIndexCount(), FRAME_DURATION);
-        getAnimations()[INDEX_STARTING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), ASSET_EXT_PNG, getType().getStartIndexStart(), getType().getStartIndexCount(), FRAME_DURATION);
-        getAnimations()[INDEX_ATTACKING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), ASSET_EXT_PNG, getType().getAttackIndexStart(), getType().getAttackIndexCount(), FRAME_DURATION);
-        getAnimations()[INDEX_STOPPING] = new SpriteAnimation(getType().getDir(), getType().getFileName(), ASSET_EXT_PNG, getType().getStopIndexStart(), getType().getStopIndexCount(), FRAME_DURATION);
+        //setup the weapon animations for each weapon differently
+        switch (type) {
+
+            case buzz:
+                getAnimations()[INDEX_RESTING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, BUZZ_REST_COL, BUZZ_REST_ROW, SPRITE_SHEET_INCREMENT, BUZZ_REST_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_STARTING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT,BUZZ_START_COL, BUZZ_START_ROW, SPRITE_SHEET_INCREMENT, BUZZ_START_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_ATTACKING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, BUZZ_ATTACK_COL, BUZZ_ATTACK_ROW, SPRITE_SHEET_INCREMENT, BUZZ_ATTACK_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_STOPPING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, BUZZ_STOP_COL, BUZZ_STOP_ROW, SPRITE_SHEET_INCREMENT, BUZZ_STOP_COUNT, FRAME_DURATION);
+                break;
+
+            case smg:
+                getAnimations()[INDEX_RESTING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, SMG_REST_COL, SMG_REST_ROW, SPRITE_SHEET_INCREMENT, SMG_REST_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_STARTING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT,SMG_START_COL, SMG_START_ROW, SPRITE_SHEET_INCREMENT, SMG_START_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_ATTACKING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, SMG_ATTACK_COL, SMG_ATTACK_ROW, SPRITE_SHEET_INCREMENT, SMG_ATTACK_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_STOPPING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, SMG_STOP_COL, SMG_STOP_ROW, SPRITE_SHEET_INCREMENT, SMG_STOP_COUNT, FRAME_DURATION);
+                break;
+
+            case glock:
+                getAnimations()[INDEX_RESTING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, GLOCK_REST_COL, GLOCK_REST_ROW, SPRITE_SHEET_INCREMENT, GLOCK_REST_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_STARTING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT,GLOCK_START_COL, GLOCK_START_ROW, SPRITE_SHEET_INCREMENT, GLOCK_START_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_ATTACKING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, GLOCK_ATTACK_COL, GLOCK_ATTACK_ROW, SPRITE_SHEET_INCREMENT, GLOCK_ATTACK_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_STOPPING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, GLOCK_STOP_COL, GLOCK_STOP_ROW, SPRITE_SHEET_INCREMENT, GLOCK_STOP_COUNT, FRAME_DURATION);
+                break;
+
+            case lance:
+                getAnimations()[INDEX_RESTING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, LANCE_REST_COL, LANCE_REST_ROW, SPRITE_SHEET_INCREMENT, LANCE_REST_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_STARTING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT,LANCE_START_COL, LANCE_START_ROW, SPRITE_SHEET_INCREMENT, LANCE_START_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_ATTACKING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, LANCE_ATTACK_COL, LANCE_ATTACK_ROW, SPRITE_SHEET_INCREMENT, LANCE_ATTACK_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_STOPPING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, LANCE_STOP_COL, LANCE_STOP_ROW, SPRITE_SHEET_INCREMENT, LANCE_STOP_COUNT, FRAME_DURATION);
+                break;
+
+            case impact:
+                getAnimations()[INDEX_RESTING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, IMPACT_REST_COL, IMPACT_REST_ROW, SPRITE_SHEET_INCREMENT, IMPACT_REST_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_STARTING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT,IMPACT_START_COL, IMPACT_START_ROW, SPRITE_SHEET_INCREMENT, IMPACT_START_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_ATTACKING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, IMPACT_ATTACK_COL, IMPACT_ATTACK_ROW, SPRITE_SHEET_INCREMENT, IMPACT_ATTACK_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_STOPPING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, IMPACT_STOP_COL, IMPACT_STOP_ROW, SPRITE_SHEET_INCREMENT, IMPACT_STOP_COUNT, FRAME_DURATION);
+                break;
+
+            case magnum:
+                getAnimations()[INDEX_RESTING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, MAGNUM_REST_COL, MAGNUM_REST_ROW, SPRITE_SHEET_INCREMENT, MAGNUM_REST_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_STARTING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT,MAGNUM_START_COL, MAGNUM_START_ROW, SPRITE_SHEET_INCREMENT, MAGNUM_START_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_ATTACKING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, MAGNUM_ATTACK_COL, MAGNUM_ATTACK_ROW, SPRITE_SHEET_INCREMENT, MAGNUM_ATTACK_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_STOPPING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, MAGNUM_STOP_COL, MAGNUM_STOP_ROW, SPRITE_SHEET_INCREMENT, MAGNUM_STOP_COUNT, FRAME_DURATION);
+                break;
+
+            case shotgun:
+                getAnimations()[INDEX_RESTING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, SHOTGUN_REST_COL, SHOTGUN_REST_ROW, SPRITE_SHEET_INCREMENT, SHOTGUN_REST_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_STARTING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT,SHOTGUN_START_COL, SHOTGUN_START_ROW, SPRITE_SHEET_INCREMENT, SHOTGUN_START_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_ATTACKING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, SHOTGUN_ATTACK_COL, SHOTGUN_ATTACK_ROW, SPRITE_SHEET_INCREMENT, SHOTGUN_ATTACK_COUNT, FRAME_DURATION);
+                getAnimations()[INDEX_STOPPING] = new SpriteAnimation(type.getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_WIDTH, SPRITE_SHEET_HEIGHT, SHOTGUN_STOP_COL, SHOTGUN_STOP_ROW, SPRITE_SHEET_INCREMENT, SHOTGUN_STOP_COUNT, FRAME_DURATION);
+                break;
+        }
 
         //reset
         reset();
@@ -218,11 +264,11 @@ public class Weapon extends Entity2d implements Disposable {
 
                 setIndex(INDEX_ATTACKING);
 
-                //take a bullet away
-                setBullets(getBullets() - 1);
-
                 //play sound effect
                 setSoundEffect((getBullets() != 0) ? getShoot() : AudioHelper.Sfx.WeaponFireEmpty);
+
+                //take a bullet away
+                setBullets(getBullets() - 1);
 
                 //check if attack hit enemy
                 checkAttack(level);
@@ -243,11 +289,11 @@ public class Weapon extends Entity2d implements Disposable {
                     //continue to attack
                     getAnimation().reset();
 
-                    //take a bullet away
-                    setBullets(getBullets() - 1);
-
                     //play sound effect
                     setSoundEffect((getBullets() != 0) ? getShoot() : AudioHelper.Sfx.WeaponFireEmpty);
+
+                    //take a bullet away
+                    setBullets(getBullets() - 1);
 
                     //check if attack hit enemy
                     checkAttack(level);

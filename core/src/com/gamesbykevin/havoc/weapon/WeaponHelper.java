@@ -8,14 +8,12 @@ import com.gamesbykevin.havoc.enemies.Enemy;
 import com.gamesbykevin.havoc.level.Level;
 
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.ASSET_DIR_WEAPONS;
+import static com.gamesbykevin.havoc.assets.AssetManagerHelper.SPRITE_SHEET;
 import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.decals.Square.COLLISION_RADIUS;
 import static com.gamesbykevin.havoc.enemies.Enemy.RANGE_NOTICE;
-import static com.gamesbykevin.havoc.entities.EntityHelper.intersects;
-import static com.gamesbykevin.havoc.level.LevelHelper.isDoorOpen;
+import static com.gamesbykevin.havoc.entities.EntityHelper.isObstructed;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
-import static com.gamesbykevin.havoc.util.Slope.getSlope;
-import static com.gamesbykevin.havoc.util.Slope.getYintercept;
 
 public class WeaponHelper {
 
@@ -56,101 +54,157 @@ public class WeaponHelper {
     public static final float AMMO_SMALL_RATIO = .10f;
     public static final float AMMO_LARGE_RATIO = .25f;
 
+    //when firing the weapon everyone with in range will be notified
+    public static final float RANGE_FIRE_RATIO = 2.25f;
+
+    //sprite sheet dimensions
+    protected static final int SPRITE_SHEET_WIDTH = 200;
+    protected static final int SPRITE_SHEET_HEIGHT = 200;
+    protected static final int SPRITE_SHEET_COLS = 5;
+    protected static final int SPRITE_SHEET_ROWS = 4;
+    protected static final int SPRITE_SHEET_INCREMENT = 1;
+
+    //buzz
+    protected static final int BUZZ_REST_COL = 0;
+    protected static final int BUZZ_REST_ROW = 0;
+    protected static final int BUZZ_REST_COUNT = 1;
+    protected static final int BUZZ_START_COL = 0;
+    protected static final int BUZZ_START_ROW = 0;
+    protected static final int BUZZ_START_COUNT = 3;
+    protected static final int BUZZ_ATTACK_COL = 3;
+    protected static final int BUZZ_ATTACK_ROW = 0;
+    protected static final int BUZZ_ATTACK_COUNT = 2;
+    protected static final int BUZZ_STOP_COL = 0;
+    protected static final int BUZZ_STOP_ROW = 3;
+    protected static final int BUZZ_STOP_COUNT = 5;
+
+    //smg
+    protected static final int SMG_REST_COL = 0;
+    protected static final int SMG_REST_ROW = 0;
+    protected static final int SMG_REST_COUNT = 1;
+    protected static final int SMG_START_COL = 0;
+    protected static final int SMG_START_ROW = 0;
+    protected static final int SMG_START_COUNT = 1;
+    protected static final int SMG_ATTACK_COL = 1;
+    protected static final int SMG_ATTACK_ROW = 0;
+    protected static final int SMG_ATTACK_COUNT = 3;
+    protected static final int SMG_STOP_COL = 3;
+    protected static final int SMG_STOP_ROW = 1;
+    protected static final int SMG_STOP_COUNT = 3;
+
+    //glock
+    protected static final int GLOCK_REST_COL = 0;
+    protected static final int GLOCK_REST_ROW = 0;
+    protected static final int GLOCK_REST_COUNT = 1;
+    protected static final int GLOCK_START_COL = 0;
+    protected static final int GLOCK_START_ROW = 0;
+    protected static final int GLOCK_START_COUNT = 3;
+    protected static final int GLOCK_ATTACK_COL = 2;
+    protected static final int GLOCK_ATTACK_ROW = 0;
+    protected static final int GLOCK_ATTACK_COUNT = 8;
+    protected static final int GLOCK_STOP_COL = 4;
+    protected static final int GLOCK_STOP_ROW = 1;
+    protected static final int GLOCK_STOP_COUNT = 1;
+
+    //lance
+    protected static final int LANCE_REST_COL = 0;
+    protected static final int LANCE_REST_ROW = 0;
+    protected static final int LANCE_REST_COUNT = 1;
+    protected static final int LANCE_START_COL = 1;
+    protected static final int LANCE_START_ROW = 0;
+    protected static final int LANCE_START_COUNT = 3;
+    protected static final int LANCE_ATTACK_COL = 4;
+    protected static final int LANCE_ATTACK_ROW = 0;
+    protected static final int LANCE_ATTACK_COUNT = 2;
+    protected static final int LANCE_STOP_COL = 1;
+    protected static final int LANCE_STOP_ROW = 3;
+    protected static final int LANCE_STOP_COUNT = 4;
+
+    //impact
+    protected static final int IMPACT_REST_COL = 0;
+    protected static final int IMPACT_REST_ROW = 0;
+    protected static final int IMPACT_REST_COUNT = 1;
+    protected static final int IMPACT_START_COL = 0;
+    protected static final int IMPACT_START_ROW = 0;
+    protected static final int IMPACT_START_COUNT = 2;
+    protected static final int IMPACT_ATTACK_COL = 1;
+    protected static final int IMPACT_ATTACK_ROW = 0;
+    protected static final int IMPACT_ATTACK_COUNT = 3;
+    protected static final int IMPACT_STOP_COL = 3;
+    protected static final int IMPACT_STOP_ROW = 1;
+    protected static final int IMPACT_STOP_COUNT = 6;
+
+    //magnum
+    protected static final int MAGNUM_REST_COL = 0;
+    protected static final int MAGNUM_REST_ROW = 0;
+    protected static final int MAGNUM_REST_COUNT = 1;
+    protected static final int MAGNUM_START_COL = 0;
+    protected static final int MAGNUM_START_ROW = 0;
+    protected static final int MAGNUM_START_COUNT = 4;
+    protected static final int MAGNUM_ATTACK_COL = 4;
+    protected static final int MAGNUM_ATTACK_ROW = 0;
+    protected static final int MAGNUM_ATTACK_COUNT = 11;
+    protected static final int MAGNUM_STOP_COL = 3;
+    protected static final int MAGNUM_STOP_ROW = 2;
+    protected static final int MAGNUM_STOP_COUNT = 2;
+
+    //shotgun
+    protected static final int SHOTGUN_REST_COL = 0;
+    protected static final int SHOTGUN_REST_ROW = 0;
+    protected static final int SHOTGUN_REST_COUNT = 1;
+    protected static final int SHOTGUN_START_COL = 0;
+    protected static final int SHOTGUN_START_ROW = 0;
+    protected static final int SHOTGUN_START_COUNT = 1;
+    protected static final int SHOTGUN_ATTACK_COL = 1;
+    protected static final int SHOTGUN_ATTACK_ROW = 0;
+    protected static final int SHOTGUN_ATTACK_COUNT = 16;
+    protected static final int SHOTGUN_STOP_COL = 2;
+    protected static final int SHOTGUN_STOP_ROW = 3;
+    protected static final int SHOTGUN_STOP_COUNT = 2;
+
     //different types of weapons
     public enum Type {
-        Buzz(35f, 30f, BULLETS_MAX_BUZZ, "buzzsaw_cannon_f", "buzzsaw_cannon/", 0, 1, 0, 3, 3, 2, 15, 5, AudioHelper.Sfx.WeaponFireBuzz),
-        Glock(33f, 30f, BULLETS_MAX_GLOCK, "glock_handgun_f", "glock_handgun/", 0, 1, 0, 3, 2, 8, 9, 1, AudioHelper.Sfx.WeaponFireGlock),
-        Impact(30f, 20f, BULLETS_MAX_IMPACT, "impact_cannon_f", "impact_cannon/", 0, 1, 0, 2, 2, 2, 8, 6, AudioHelper.Sfx.WeaponFireImpact),
-        Magnum(50f, 30f, BULLETS_MAX_MAGNUM, "magnum_f", "magnum/", 0, 1, 0, 4, 4, 11, 14, 1, AudioHelper.Sfx.WeaponFireMagnum),
-        Shotgun(75f, 8f, BULLETS_MAX_SHOTGUN, "shotgun_f", "shotgun/", 0, 1, 0, 1, 1, 16, 17, 2, AudioHelper.Sfx.WeaponFireShotgun),
-        Smg(20f, 30f, BULLETS_MAX_SMG, "smg_f", "smg/", 0, 1, 0, 1, 1, 3, 9, 2, AudioHelper.Sfx.WeaponFireSmg),
-        Lance(3f, 1f, BULLETS_MAX_LANCE, "thermic_lance_f", "thermic_lance/", 0, 1, 1, 3, 4, 2, 16, 4, AudioHelper.Sfx.WeaponFireLance);
+        buzz(35f, 30f, BULLETS_MAX_BUZZ, AudioHelper.Sfx.WeaponFireBuzz),
+        glock(33f, 30f, BULLETS_MAX_GLOCK, AudioHelper.Sfx.WeaponFireGlock),
+        impact(30f, 20f, BULLETS_MAX_IMPACT, AudioHelper.Sfx.WeaponFireImpact),
+        magnum(50f, 30f, BULLETS_MAX_MAGNUM, AudioHelper.Sfx.WeaponFireMagnum),
+        shotgun(75f, 8f, BULLETS_MAX_SHOTGUN, AudioHelper.Sfx.WeaponFireShotgun),
+        smg(20f, 30f, BULLETS_MAX_SMG, AudioHelper.Sfx.WeaponFireSmg),
+        lance(3f, 1f, BULLETS_MAX_LANCE, AudioHelper.Sfx.WeaponFireLance);
 
-            private final float damage;
-            private final float range;
-            private final int bulletsMax;
-            private final String fileName;
-            private final String dir;
-            private final int restIndexStart;
-            private final int restIndexCount;
-            private final int startIndexStart;
-            private final int startIndexCount;
-            private final int attackIndexStart;
-            private final int attackIndexCount;
-            private final int stopIndexStart;
-            private final int stopIndexCount;
-            public final AudioHelper.Sfx shoot;
+        private final float damage;
+        private final float range;
+        private final int bulletsMax;
+        private final AudioHelper.Sfx shoot;
+        private final String path;
 
-            Type(float damage, float range, int bulletsMax, String fileName, String dir,
-                 int restIndexStart, int restIndexCount, int startIndexStart, int startIndexCount,
-                 int attackIndexStart, int attackIndexCount, int stopIndexStart, int stopIndexCount, AudioHelper.Sfx shoot) {
-                this.damage = damage;
-                this.range = range;
-                this.bulletsMax = bulletsMax;
-                this.fileName = fileName;
-                this.dir = ASSET_DIR_WEAPONS + dir;
-                this.restIndexStart = restIndexStart;
-                this.restIndexCount = restIndexCount;
-                this.startIndexStart = startIndexStart;
-                this.startIndexCount = startIndexCount;
-                this.attackIndexStart = attackIndexStart;
-                this.attackIndexCount = attackIndexCount;
-                this.stopIndexStart = stopIndexStart;
-                this.stopIndexCount = stopIndexCount;
-                this.shoot = shoot;
-            }
+        Type(float damage, float range, int bulletsMax, AudioHelper.Sfx shoot) {
+            this.damage = damage;
+            this.range = range;
+            this.bulletsMax = bulletsMax;
+            this.shoot = shoot;
+            this.path = ASSET_DIR_WEAPONS + name() + SPRITE_SHEET;
+        }
 
-            public float getDamage() {
-                return this.damage;
-            }
+        public float getDamage() {
+            return this.damage;
+        }
 
-            public float getRange() {
-                return this.range;
-            }
+        public float getRange() {
+            return this.range;
+        }
 
-            public int getBulletsMax() {
-                return this.bulletsMax;
-            }
+        public int getBulletsMax() {
+            return this.bulletsMax;
+        }
 
-            public String getDir() {
-                return this.dir;
-            }
+        public String getPath() {
+            return this.path;
+        }
 
-            public String getFileName() {
-                return this.fileName;
-            }
-
-            public int getRestIndexStart() {
-                return this.restIndexStart;
-            }
-
-            public int getRestIndexCount() {
-                return this.restIndexCount;
-            }
-
-            public int getStartIndexStart() {
-                return this.startIndexStart;
-            }
-
-            public int getStartIndexCount() {
-                return this.startIndexCount;
-            }
-
-            public int getAttackIndexStart() {
-                return this.attackIndexStart;
-            }
-
-            public int getAttackIndexCount() {
-                return this.attackIndexCount;
-            }
-
-            public int getStopIndexStart() {
-                return this.stopIndexStart;
-            }
-
-            public int getStopIndexCount() {
-                return this.stopIndexCount;
-            }
+        public AudioHelper.Sfx getShoot() {
+            return this.shoot;
+        }
     }
 
     public static void checkAttack(Level level) {
@@ -161,9 +215,6 @@ public class WeaponHelper {
         //we can only hit 1 enemy
         boolean strike = false;
 
-        final float startX = level.getPlayer().getCamera3d().position.x;
-        final float startY = level.getPlayer().getCamera3d().position.y;
-
         //check every enemy
         for (int i = 0; i < level.getEnemies().getEntityList().size(); i++) {
 
@@ -173,59 +224,24 @@ public class WeaponHelper {
             if (!enemy.isSolid())
                 continue;
 
-            //how far are we from the enemy
-            double distance = getDistance(enemy, startX, startY);
+            //if obstructed the bullet hit a wall
+            boolean collisionWall = isObstructed(level, enemy);
 
-            //if too far away to attack, skip this enemy
-            if (distance >= weapon.getRange())
-                continue;
-
-            //we check the middle of the screen
-            Ray ray = level.getPlayer().getCamera3d().getPickRay(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
-
-            int colMin = (int)((startX > enemy.getCol()) ? enemy.getCol() : startX);
-            int colMax = (int)((startX < enemy.getCol()) ? enemy.getCol() : startX);
-            int rowMin = (int)((startY > enemy.getRow()) ? enemy.getRow() : startY);
-            int rowMax = (int)((startY < enemy.getRow()) ? enemy.getRow() : startY);
-
-            //is there collision
-            boolean collisionWall = false;
-
-            //get the slope of the line
-            final float m = getSlope(startX, startY, enemy.getCol(), enemy.getRow());
-
-            //get the y-intercept
-            final float b = getYintercept(startX, startY, m);
-
-            //check if we hit a wall
-            for (int row = rowMin; row <= rowMax; row++) {
-                for (int col = colMin; col <= colMax; col++) {
-
-                    //skip on collision
-                    if (collisionWall)
-                        break;
-
-                    //if available and not a door
-                    if (level.getDungeon().hasMap(col, row) && !level.getDungeon().hasInteract(col, row))
-                        continue;
-
-                    //if the door is open skip this
-                    if (level.getDungeon().hasInteract(col, row) && isDoorOpen(level, col, row))
-                        continue;
-
-                    if (intersects(col, row, m, b))
-                        collisionWall = true;
-
-                    //if (level.getWall(col, row) != null && level.getWall(col, row).hasCollision(ray))
-                    //    collisionWall = true;
-                }
-            }
-
+            //did the bullet hit the enemy
             boolean collisionEnemy = false;
 
-            //check if we hit the enemy if we didn't hit a wall
-            if (!collisionWall)
+            //how far is the enemy from the player
+            double distance = getDistance(enemy, level.getPlayer());
+
+            //check if we are close enough to strike the enemy and make sure we didn't hit a wall
+            if (!collisionWall && distance <= weapon.getRange()) {
+
+                //we check the middle of the screen
+                Ray ray = level.getPlayer().getCamera3d().getPickRay(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+
+                //hopefully we hit the enemy
                 collisionEnemy = Intersector.intersectRaySphere(ray, enemy.getAnimation().getDecal().getPosition(), COLLISION_RADIUS, null);
+            }
 
             //if we have collision and have not hit an enemy yet
             if (collisionEnemy && !strike) {
@@ -245,7 +261,7 @@ public class WeaponHelper {
                 //flag chase the player
                 enemy.setChase(true);
 
-            } else if (distance < RANGE_NOTICE) {
+            } else if (distance < (RANGE_NOTICE * RANGE_FIRE_RATIO)) {
 
                 //don't do anything if hurt
                 if (enemy.isHurt())
@@ -255,9 +271,6 @@ public class WeaponHelper {
 
                     //if the enemy has a clear view of the player they can shoot
                     enemy.setStatus(Enemy.Status.Shoot);
-
-                    //flag chase the player
-                    enemy.setChase(true);
 
                 } else if (enemy.getPathIndex() > 0 || enemy.isIdle()) {
 

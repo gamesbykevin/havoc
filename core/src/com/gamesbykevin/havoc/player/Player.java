@@ -5,14 +5,15 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.input.MyController;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Restart;
+import com.gamesbykevin.havoc.util.Timer;
 import com.gamesbykevin.havoc.weapon.Weapons;
 import com.gamesbykevin.havoc.util.Disposable;
 import com.gamesbykevin.havoc.util.Hud;
@@ -32,6 +33,7 @@ public final class Player implements Disposable, Restart {
     //health range
     public static final int HEALTH_MAX = 100;
     public static final int HEALTH_MIN = 0;
+    public static final int HEALTH_LOW = 25;
 
     //what is our health
     private int health = 0;
@@ -65,10 +67,24 @@ public final class Player implements Disposable, Restart {
 
     //height the camera will be at
     private static final float HEIGHT_START = 0.075f;
-    //private static final float HEIGHT_START = 1.5f;
 
     //reference to our assets
     private final AssetManager assetManager;
+
+    //text to display for notifications
+    private String textNotify;
+
+    //keep track how long message is displayed
+    private Timer timerNotify;
+
+    //how long to display notification message
+    public static final float DURATION_NOTIFY = 5000f;
+
+    //font to display text
+    private BitmapFont font;
+
+    //pixel padding when drawing our text
+    private static final int PADDING = 5;
 
     public Player(AssetManager assetManager) {
 
@@ -77,6 +93,33 @@ public final class Player implements Disposable, Restart {
 
         //reset values
         reset();
+    }
+
+    public Timer getTimerNotify() {
+
+        if (this.timerNotify == null)
+            this.timerNotify = new Timer(DURATION_NOTIFY);
+
+        return this.timerNotify;
+    }
+
+    public BitmapFont getFont() {
+
+        if (this.font == null)
+            this.font = new BitmapFont();
+
+        return this.font;
+    }
+
+    public String getTextNotify() {
+        return this.textNotify;
+    }
+
+    public void setTextNotify(String textNotify) {
+        this.textNotify = textNotify;
+
+        if (this.textNotify != null)
+            getTimerNotify().reset();
     }
 
     public AssetManager getAssetManager() {
@@ -109,7 +152,7 @@ public final class Player implements Disposable, Restart {
         if (this.camera3d == null) {
             this.camera3d = new PerspectiveCamera(67f, getSizeWidth(), getSizeHeight());
             this.viewport = new StretchViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), this.camera3d);
-            this.camera3d.near = .05f;
+            this.camera3d.near = .1f;
             this.camera3d.far = (RENDER_RANGE * 3);
         }
 
@@ -163,6 +206,12 @@ public final class Player implements Disposable, Restart {
             this.health = HEALTH_MIN;
         if (this.health > HEALTH_MAX)
             this.health = HEALTH_MAX;
+
+        if (isDead()) {
+            setTextNotify("You died");
+        } else if (getHealth() <= HEALTH_LOW) {
+            setTextNotify("Low health");
+        }
     }
 
     public boolean isGoal() {
@@ -218,6 +267,9 @@ public final class Player implements Disposable, Restart {
     //update the player
     public void update(Level level) {
 
+        //update timer
+        getTimerNotify().update();
+
         if (isDead()) {
 
             if (getCamera3d().position.z > HEIGHT_MIN_Z) {
@@ -240,8 +292,10 @@ public final class Player implements Disposable, Restart {
                 if (getController().isTouch() || Gdx.input.justTouched())
                     level.setReset(true);
             }
+
         } else if (isGoal()) {
 
+            setTextNotify("Level Complete");
             //if the controller has been touched, flag reset
             //if (getController().isTouch() || Gdx.input.justTouched())
             //    level.setReset(true);
@@ -255,11 +309,16 @@ public final class Player implements Disposable, Restart {
             this.controller.dispose();
         if (this.weapons != null)
             this.weapons.dispose();
+        if (this.font != null)
+            this.font.dispose();
 
         this.previous = null;
         this.controller = null;
         this.camera3d = null;
         this.weapons = null;
+        this.font = null;
+        this.timerNotify = null;
+        this.textNotify = null;
     }
 
     @Override
@@ -279,6 +338,9 @@ public final class Player implements Disposable, Restart {
 
         //we didn't find the goal yet
         setGoal(false);
+
+        //reset timer
+        setTextNotify(null);
     }
 
     public void render() {
@@ -297,20 +359,13 @@ public final class Player implements Disposable, Restart {
         if (isHurt() || isDead()) {
             batch.draw(getAssetManager().get(PATH_HURT, Texture.class), 0, 0, getSizeWidth(), getSizeHeight());
             setHurt(false);
-        } else if (isCollect() || isGoal()) {
+        } else if (isCollect()) {
             batch.draw(getAssetManager().get(PATH_COLLECT, Texture.class), 0, 0, getSizeWidth(), getSizeHeight());
             setCollect(false);
         }
 
         //render health
-        Hud.renderNumber(
-            getAssetManager(),
-            batch,
-            getHealth(),
-            HUD_HEALTH_X, HUD_HEALTH_Y,
-            HUD_NUMBER_WIDTH, HUD_NUMBER_HEIGHT,
-            HUD_NUMBER_PAD
-        );
+        Hud.renderNumber(getAssetManager(), batch, getHealth(), HUD_HEALTH_X, HUD_HEALTH_Y);
 
         //render key?
         if (hasKey())
@@ -319,6 +374,10 @@ public final class Player implements Disposable, Restart {
         //render the weapons
         if (!isDead())
             getWeapons().render();
+
+        //if we have text to display and the timer hasn't expired yet
+        if (getTextNotify() != null && !getTimerNotify().isExpired())
+            getFont().draw(batch, getTextNotify(), PADDING, PADDING + getFont().getLineHeight());
 
         //we are done
         batch.end();

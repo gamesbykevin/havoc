@@ -16,7 +16,7 @@ import static com.gamesbykevin.havoc.level.LevelHelper.isDoorOpen;
 public class DungeonHelper {
 
     //how big is the dungeon
-    public static final int DUNGEON_SIZE = ROOM_DIMENSION_MAX * 5;
+    public static final int DUNGEON_SIZE = ROOM_DIMENSION_MAX * 2;
 
     protected static void divide(Dungeon dungeon) {
 
@@ -478,7 +478,7 @@ public class DungeonHelper {
         if ((options.size() / 2) > offsetStart)
             offsetStart = (options.size() / 2);
 
-        if (options.size() >= offsetStart) {
+        if (options.size() >= offsetStart && !options.isEmpty()) {
 
             //adjust the minimum cost so we don't place a key at the beginning
             costMin = options.get(offsetStart).getCost();

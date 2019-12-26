@@ -1,7 +1,6 @@
 package com.gamesbykevin.havoc.level;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.gamesbykevin.havoc.collectibles.CollectibleHelper;
 import com.gamesbykevin.havoc.collectibles.Collectibles;
@@ -15,6 +14,7 @@ import com.gamesbykevin.havoc.obstacles.Obstacles;
 import com.gamesbykevin.havoc.player.Player;
 import com.gamesbykevin.havoc.util.Disposable;
 import com.gamesbykevin.havoc.util.Restart;
+import com.gamesbykevin.havoc.decals.MyGroupStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +95,26 @@ public class Level implements Disposable, Restart {
         getPlayer().reset();
         getPlayer().getWeapons().reset();
         getPlayer().getController().reset();
+
+        //reset door decals as well
+        for (int row = 0; row < getDoorDecals().length; row++) {
+            for (int col = 0; col < getDoorDecals()[0].length; col++) {
+
+                if (getDoorDecal(col, row) != null)
+                    getDoorDecal(col, row).reset();
+            }
+        }
+
+        //reset wall decals as well
+        for (int row = 0; row < getWalls().length; row++) {
+            for (int col = 0; col < getWalls()[0].length; col++) {
+
+                if (getWall(col, row) != null)
+                    getWall(col, row).reset();
+            }
+        }
+
+        //we reset so change flag
         setReset(false);
     }
 
@@ -145,7 +165,7 @@ public class Level implements Disposable, Restart {
     public DecalBatch getDecalBatch() {
 
         if (this.decalBatch == null)
-            this.decalBatch = new DecalBatch(new CameraGroupStrategy(getPlayer().getCamera3d()));
+            this.decalBatch = new DecalBatch(new MyGroupStrategy(getPlayer().getCamera3d()));
 
         return this.decalBatch;
     }
@@ -156,6 +176,10 @@ public class Level implements Disposable, Restart {
             this.backgrounds = new ArrayList<>();
 
         return this.backgrounds;
+    }
+
+    public void setDoorDecal(Door door, float col, float row) {
+        setDoorDecal(door, (int)col, (int)row);
     }
 
     public void setDoorDecal(Door door, int col, int row) {
@@ -184,6 +208,10 @@ public class Level implements Disposable, Restart {
             return null;
 
         return getWalls()[row][col];
+    }
+
+    public void setWall(float col, float row, Square square) {
+        setWall((int)col, (int)row, square);
     }
 
     public void setWall(int col, int row, Square square) {

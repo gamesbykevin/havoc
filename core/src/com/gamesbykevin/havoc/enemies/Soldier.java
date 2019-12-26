@@ -3,9 +3,11 @@ package com.gamesbykevin.havoc.enemies;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
-import com.gamesbykevin.havoc.assets.AudioHelper;
+import com.gamesbykevin.havoc.assets.AudioHelper.Sfx;
 
+import static com.gamesbykevin.havoc.animation.DecalAnimation.*;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
+import static com.gamesbykevin.havoc.assets.AudioHelper.Sfx.*;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.*;
 import static com.gamesbykevin.havoc.enemies.EnemyHelper.DIRECTION_E;
 
@@ -54,96 +56,132 @@ public final class Soldier extends Enemy {
     //how many animations are there?
     public static final int ANIMATION_COUNT = 21;
 
+    //size of sprite sheet
+    private static final int SPRITE_SHEET_COLS = 7;
+    private static final int SPRITE_SHEET_ROWS = 7;
+
     public enum Type {
-        doctor_1(ASSET_DIR_SOLDIER +"doctor_1/", DAMAGE_MAX_DOCTOR, AudioHelper.Sfx.EnemyWeaponShoot5, AudioHelper.Sfx.EnemyDead5, AudioHelper.Sfx.EnemyAlert5, AudioHelper.Sfx.EnemyHurt5),
-        doctor_2(ASSET_DIR_SOLDIER + "doctor_2/", DAMAGE_MAX_DOCTOR, AudioHelper.Sfx.EnemyWeaponShoot5, AudioHelper.Sfx.EnemyDead5, AudioHelper.Sfx.EnemyAlert5, AudioHelper.Sfx.EnemyHurt5),
-        guard_1(ASSET_DIR_SOLDIER + "guard_1/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
-        guard_2(ASSET_DIR_SOLDIER + "guard_2/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
-        guard_3(ASSET_DIR_SOLDIER + "guard_3/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
-        guard_4(ASSET_DIR_SOLDIER + "guard_4/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
-        guard_5(ASSET_DIR_SOLDIER + "guard_5/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
-        guard_6(ASSET_DIR_SOLDIER + "guard_6/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
-        guard_7(ASSET_DIR_SOLDIER + "guard_7/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
-        guard_8(ASSET_DIR_SOLDIER + "guard_8/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
-        guard_9(ASSET_DIR_SOLDIER + "guard_9/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
-        guard_10(ASSET_DIR_SOLDIER + "guard_10/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
-        guard_11(ASSET_DIR_SOLDIER + "guard_11/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
-        guard_12(ASSET_DIR_SOLDIER + "guard_12/", DAMAGE_MAX_GUARD, AudioHelper.Sfx.EnemyWeaponShoot1, AudioHelper.Sfx.EnemyDead1, AudioHelper.Sfx.EnemyAlert1, AudioHelper.Sfx.EnemyHurt1),
-        lieutenant_1(ASSET_DIR_SOLDIER + "lieutenant_1/", DAMAGE_MAX_LIEUTENANT, AudioHelper.Sfx.EnemyWeaponShoot6, AudioHelper.Sfx.EnemyDead6, AudioHelper.Sfx.EnemyAlert6, AudioHelper.Sfx.EnemyHurt6),
-        lieutenant_2(ASSET_DIR_SOLDIER + "lieutenant_2/", DAMAGE_MAX_LIEUTENANT, AudioHelper.Sfx.EnemyWeaponShoot6, AudioHelper.Sfx.EnemyDead6, AudioHelper.Sfx.EnemyAlert6, AudioHelper.Sfx.EnemyHurt6),
-        lieutenant_3(ASSET_DIR_SOLDIER + "lieutenant_3/", DAMAGE_MAX_LIEUTENANT, AudioHelper.Sfx.EnemyWeaponShoot6, AudioHelper.Sfx.EnemyDead6, AudioHelper.Sfx.EnemyAlert6, AudioHelper.Sfx.EnemyHurt6),
-        lieutenant_4(ASSET_DIR_SOLDIER + "lieutenant_4/", DAMAGE_MAX_LIEUTENANT, AudioHelper.Sfx.EnemyWeaponShoot6, AudioHelper.Sfx.EnemyDead6, AudioHelper.Sfx.EnemyAlert6, AudioHelper.Sfx.EnemyHurt6),
-        lieutenant_5(ASSET_DIR_SOLDIER + "lieutenant_5/", DAMAGE_MAX_LIEUTENANT, AudioHelper.Sfx.EnemyWeaponShoot6, AudioHelper.Sfx.EnemyDead6, AudioHelper.Sfx.EnemyAlert6, AudioHelper.Sfx.EnemyHurt6),
-        major_1(ASSET_DIR_SOLDIER + "major_1/", DAMAGE_MAX_MAJOR, AudioHelper.Sfx.EnemyWeaponShoot2, AudioHelper.Sfx.EnemyDead2, AudioHelper.Sfx.EnemyAlert2, AudioHelper.Sfx.EnemyHurt2),
-        major_2(ASSET_DIR_SOLDIER + "major_2/", DAMAGE_MAX_MAJOR, AudioHelper.Sfx.EnemyWeaponShoot2, AudioHelper.Sfx.EnemyDead2, AudioHelper.Sfx.EnemyAlert2, AudioHelper.Sfx.EnemyHurt2),
-        officer_1(ASSET_DIR_SOLDIER + "officer_1/", DAMAGE_MAX_OFFICER, AudioHelper.Sfx.EnemyWeaponShoot4, AudioHelper.Sfx.EnemyDead4, AudioHelper.Sfx.EnemyAlert4, AudioHelper.Sfx.EnemyHurt4),
-        officer_2(ASSET_DIR_SOLDIER + "officer_2/", DAMAGE_MAX_OFFICER, AudioHelper.Sfx.EnemyWeaponShoot4, AudioHelper.Sfx.EnemyDead4, AudioHelper.Sfx.EnemyAlert4, AudioHelper.Sfx.EnemyHurt4),
-        officer_3(ASSET_DIR_SOLDIER + "officer_3/", DAMAGE_MAX_OFFICER, AudioHelper.Sfx.EnemyWeaponShoot4, AudioHelper.Sfx.EnemyDead4, AudioHelper.Sfx.EnemyAlert4, AudioHelper.Sfx.EnemyHurt4),
-        officer_4(ASSET_DIR_SOLDIER + "officer_4/", DAMAGE_MAX_OFFICER, AudioHelper.Sfx.EnemyWeaponShoot4, AudioHelper.Sfx.EnemyDead4, AudioHelper.Sfx.EnemyAlert4, AudioHelper.Sfx.EnemyHurt4),
-        officer_5(ASSET_DIR_SOLDIER + "officer_5/", DAMAGE_MAX_OFFICER, AudioHelper.Sfx.EnemyWeaponShoot4, AudioHelper.Sfx.EnemyDead4, AudioHelper.Sfx.EnemyAlert4, AudioHelper.Sfx.EnemyHurt4),
-        sergeant_1(ASSET_DIR_SOLDIER + "sergeant_1/", DAMAGE_MAX_SERGEANT, AudioHelper.Sfx.EnemyWeaponShoot3, AudioHelper.Sfx.EnemyDead3, AudioHelper.Sfx.EnemyAlert3, AudioHelper.Sfx.EnemyHurt3),
-        sergeant_2(ASSET_DIR_SOLDIER + "sergeant_2/", DAMAGE_MAX_SERGEANT, AudioHelper.Sfx.EnemyWeaponShoot3, AudioHelper.Sfx.EnemyDead3, AudioHelper.Sfx.EnemyAlert3, AudioHelper.Sfx.EnemyHurt3),
-        sergeant_3(ASSET_DIR_SOLDIER + "sergeant_3/", DAMAGE_MAX_SERGEANT, AudioHelper.Sfx.EnemyWeaponShoot3, AudioHelper.Sfx.EnemyDead3, AudioHelper.Sfx.EnemyAlert3, AudioHelper.Sfx.EnemyHurt3),
-        sergeant_4(ASSET_DIR_SOLDIER + "sergeant_4/", DAMAGE_MAX_SERGEANT, AudioHelper.Sfx.EnemyWeaponShoot3, AudioHelper.Sfx.EnemyDead3, AudioHelper.Sfx.EnemyAlert3, AudioHelper.Sfx.EnemyHurt3),
-        sergeant_5(ASSET_DIR_SOLDIER + "sergeant_5/", DAMAGE_MAX_SERGEANT, AudioHelper.Sfx.EnemyWeaponShoot3, AudioHelper.Sfx.EnemyDead3, AudioHelper.Sfx.EnemyAlert3, AudioHelper.Sfx.EnemyHurt3);
 
-        public final String path;
+        doctor_1(DAMAGE_MAX_DOCTOR, EnemyAlert5, EnemyHurt5, EnemyDead5, EnemyWeaponShoot5),
+        doctor_2(DAMAGE_MAX_DOCTOR, EnemyAlert5, EnemyHurt5, EnemyDead5, EnemyWeaponShoot5),
+        guard_1(DAMAGE_MAX_GUARD, EnemyAlert1, EnemyHurt1, EnemyDead1, EnemyWeaponShoot1),
+        guard_2(DAMAGE_MAX_GUARD, EnemyAlert1, EnemyHurt1, EnemyDead1, EnemyWeaponShoot1),
+        guard_3(DAMAGE_MAX_GUARD, EnemyAlert1, EnemyHurt1, EnemyDead1, EnemyWeaponShoot1),
+        guard_4(DAMAGE_MAX_GUARD, EnemyAlert1, EnemyHurt1, EnemyDead1, EnemyWeaponShoot1),
+        guard_5(DAMAGE_MAX_GUARD, EnemyAlert1, EnemyHurt1, EnemyDead1, EnemyWeaponShoot1),
+        guard_6(DAMAGE_MAX_GUARD, EnemyAlert1, EnemyHurt1, EnemyDead1, EnemyWeaponShoot1),
+        guard_7(DAMAGE_MAX_GUARD, EnemyAlert1, EnemyHurt1, EnemyDead1, EnemyWeaponShoot1),
+        guard_8(DAMAGE_MAX_GUARD, EnemyAlert1, EnemyHurt1, EnemyDead1, EnemyWeaponShoot1),
+        guard_9(DAMAGE_MAX_GUARD, EnemyAlert1, EnemyHurt1, EnemyDead1, EnemyWeaponShoot1),
+        guard_10(DAMAGE_MAX_GUARD, EnemyAlert1, EnemyHurt1, EnemyDead1, EnemyWeaponShoot1),
+        guard_11(DAMAGE_MAX_GUARD, EnemyAlert1, EnemyHurt1, EnemyDead1, EnemyWeaponShoot1),
+        guard_12(DAMAGE_MAX_GUARD, EnemyAlert1, EnemyHurt1, EnemyDead1, EnemyWeaponShoot1),
+        lieutenant_1(DAMAGE_MAX_LIEUTENANT, EnemyAlert6, EnemyHurt6, EnemyDead6, EnemyWeaponShoot6),
+        lieutenant_2(DAMAGE_MAX_LIEUTENANT, EnemyAlert6, EnemyHurt6, EnemyDead6, EnemyWeaponShoot6),
+        lieutenant_3(DAMAGE_MAX_LIEUTENANT, EnemyAlert6, EnemyHurt6, EnemyDead6, EnemyWeaponShoot6),
+        lieutenant_4(DAMAGE_MAX_LIEUTENANT, EnemyAlert6, EnemyHurt6, EnemyDead6, EnemyWeaponShoot6),
+        lieutenant_5(DAMAGE_MAX_LIEUTENANT, EnemyAlert6, EnemyHurt6, EnemyDead6, EnemyWeaponShoot6),
+        major_1(DAMAGE_MAX_MAJOR, EnemyAlert2, EnemyHurt2, EnemyDead2, EnemyWeaponShoot2),
+        major_2(DAMAGE_MAX_MAJOR, EnemyAlert2, EnemyHurt2, EnemyDead2, EnemyWeaponShoot2),
+        officer_1(DAMAGE_MAX_OFFICER, EnemyAlert4, EnemyHurt4, EnemyDead4, EnemyWeaponShoot4),
+        officer_2(DAMAGE_MAX_OFFICER, EnemyAlert4, EnemyHurt4, EnemyDead4, EnemyWeaponShoot4),
+        officer_3(DAMAGE_MAX_OFFICER, EnemyAlert4, EnemyHurt4, EnemyDead4, EnemyWeaponShoot4),
+        officer_4(DAMAGE_MAX_OFFICER, EnemyAlert4, EnemyHurt4, EnemyDead4, EnemyWeaponShoot4),
+        officer_5(DAMAGE_MAX_OFFICER, EnemyAlert4, EnemyHurt4, EnemyDead4, EnemyWeaponShoot4),
+        sergeant_1(DAMAGE_MAX_SERGEANT, EnemyAlert3, EnemyHurt3, EnemyDead3, EnemyWeaponShoot3),
+        sergeant_2(DAMAGE_MAX_SERGEANT, EnemyAlert3, EnemyHurt3, EnemyDead3, EnemyWeaponShoot3),
+        sergeant_3(DAMAGE_MAX_SERGEANT, EnemyAlert3, EnemyHurt3, EnemyDead3, EnemyWeaponShoot3),
+        sergeant_4(DAMAGE_MAX_SERGEANT, EnemyAlert3, EnemyHurt3, EnemyDead3, EnemyWeaponShoot3),
+        sergeant_5(DAMAGE_MAX_SERGEANT, EnemyAlert3, EnemyHurt3, EnemyDead3, EnemyWeaponShoot3);
 
-        //how much damage can the enemy do?
-        public final int damageMax;
+        private final Sfx alert, hurt, dead, shoot;
+        private final int damageMax;
+        private final String path;
 
-        //sound effects to play
-        public final AudioHelper.Sfx shoot;
-        public final AudioHelper.Sfx dead;
-        public final AudioHelper.Sfx alert;
-        public final AudioHelper.Sfx hurt;
-
-        Type(String path, int damageMax, AudioHelper.Sfx shoot, AudioHelper.Sfx dead, AudioHelper.Sfx alert, AudioHelper.Sfx hurt) {
-            this.path = path;
+        Type(int damageMax, Sfx alert, Sfx hurt, Sfx dead, Sfx shoot) {
             this.damageMax = damageMax;
-            this.shoot = shoot;
-            this.dead = dead;
             this.alert = alert;
             this.hurt = hurt;
+            this.dead = dead;
+            this.shoot = shoot;
+            this.path = ASSET_DIR_SOLDIER + name() + SPRITE_SHEET;
+        }
+
+        public String getPath() {
+            return this.path;
+        }
+
+        public Sfx getAlert() {
+            return this.alert;
+        }
+
+        public Sfx getHurt() {
+            return this.hurt;
+        }
+
+        public Sfx getDead() {
+            return this.dead;
+        }
+
+        public Sfx getShoot() {
+            return this.shoot;
+        }
+
+        public int getDamageMax() {
+            return this.damageMax;
         }
     }
+
+    //type of soldier
+    private final Type type;
 
     public Soldier(AssetManager assetManager, Type type) {
 
         //call parent
         super(ANIMATION_COUNT);
 
-        //set the allowed damage
-        setDamageMax(type.damageMax);
+        //assign type
+        this.type = type;
 
         //assign sound effects
-        setShoot(type.shoot);
-        setDead(type.dead);
-        setAlert(type.alert);
-        setHurt(type.hurt);
+        super.setShoot(getType().getShoot());
+        super.setDead(getType().getDead());
+        super.setAlert(getType().getAlert());
+        super.setHurt(getType().getHurt());
+
+        //how much damage can the soldier cause
+        setDamageMax(type.getDamageMax());
 
         //setup animations
-        getAnimations()[INDEX_DIE] = new DecalAnimation(assetManager, type.path, FILENAME_DIE, ASSET_EXT_BMP, 1, 4, DURATION_DIE);
-        getAnimations()[INDEX_PAIN] = new DecalAnimation(assetManager, type.path, FILENAME_PAIN, ASSET_EXT_BMP, 1, 2, DURATION_PAIN);
-        getAnimations()[INDEX_IDLE_S] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 1, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_SW] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 2, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_W] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 3, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_NW] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 4, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_N] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 5, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_NE] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 6, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_E] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 7, 1, DURATION_IDLE);
-        getAnimations()[INDEX_IDLE_SE] = new DecalAnimation(assetManager, type.path, FILENAME_IDLE, ASSET_EXT_BMP, 8, 1, DURATION_IDLE);
-        getAnimations()[INDEX_SHOOT] = new DecalAnimation(assetManager, type.path, FILENAME_SHOOT, ASSET_EXT_BMP, 1, 3, DURATION_SHOOT);
-        getAnimations()[INDEX_ALERT] = new DecalAnimation(assetManager, type.path, FILENAME_SHOOT, ASSET_EXT_BMP, 2, 2, DURATION_ALERT);
-        getAnimations()[INDEX_PAUSE] = new DecalAnimation(assetManager, type.path, FILENAME_SHOOT, ASSET_EXT_BMP, 2, 1, DURATION_PAUSE);
-        getAnimations()[INDEX_WALK_S] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_1" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_SW] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_2" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_W] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_3" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_NW] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_4" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_N] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_5" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_NE] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_6" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_E] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_7" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_WALK_SE] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, "_8" + ASSET_EXT_BMP, 1, 4, DURATION_WALK);
+        addAnimation(assetManager, INDEX_DIE, 0, 0, 1, 4, DURATION_DIE);
+        addAnimation(assetManager, INDEX_PAIN,4, 0, 1, 2, DURATION_PAIN);
+        addAnimation(assetManager, INDEX_IDLE_S,2, 1, 1, 1, DURATION_IDLE);
+        addAnimation(assetManager, INDEX_IDLE_SW,3, 1, 1, 1, DURATION_IDLE);
+        addAnimation(assetManager, INDEX_IDLE_W,4, 1, 1, 1, DURATION_IDLE);
+        addAnimation(assetManager, INDEX_IDLE_NW,5, 1, 1, 1, DURATION_IDLE);
+        addAnimation(assetManager, INDEX_IDLE_N,6, 1, 1, 1, DURATION_IDLE);
+        addAnimation(assetManager, INDEX_IDLE_NE,0, 2, 1, 1, DURATION_IDLE);
+        addAnimation(assetManager, INDEX_IDLE_E,1, 2, 1, 1, DURATION_IDLE);
+        addAnimation(assetManager, INDEX_IDLE_SE,2, 2, 1, 1, DURATION_IDLE);
+        addAnimation(assetManager, INDEX_SHOOT,6, 0, 1, 3, DURATION_SHOOT);
+        addAnimation(assetManager, INDEX_ALERT,0, 1, 1, 2, DURATION_ALERT);
+        addAnimation(assetManager, INDEX_PAUSE,6, 0, 1,1, DURATION_PAUSE);
+        addAnimation(assetManager, INDEX_WALK_S,3, 2, 8, 4, DURATION_WALK);
+        addAnimation(assetManager, INDEX_WALK_SW,4, 2, 8, 4, DURATION_WALK);
+        addAnimation(assetManager, INDEX_WALK_W,5, 2, 8, 4, DURATION_WALK);
+        addAnimation(assetManager, INDEX_WALK_NW,6, 2, 8, 4, DURATION_WALK);
+        addAnimation(assetManager, INDEX_WALK_N,0, 3, 8, 4, DURATION_WALK);
+        addAnimation(assetManager, INDEX_WALK_NE,1, 3, 8, 4, DURATION_WALK);
+        addAnimation(assetManager, INDEX_WALK_E, 2, 3, 8, 4, DURATION_WALK);
+        addAnimation(assetManager, INDEX_WALK_SE, 3, 3, 8, 4, DURATION_WALK);
+    }
+
+    private void addAnimation(AssetManager assetManager, int index, int startCol, int startRow, int increment, int count, float duration) {
+        setAnimation(index, new DecalAnimation(assetManager, getType().getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_FRAME_WIDTH, SPRITE_SHEET_FRAME_HEIGHT, startCol, startRow, increment, count, duration, DEFAULT_WIDTH, DEFAULT_HEIGHT, BILLBOARD_ENABLED));
+    }
+
+    public Type getType() {
+        return this.type;
     }
 
     @Override
@@ -200,10 +238,10 @@ public final class Soldier extends Enemy {
     protected static int getAnimationIndex(Enemy enemy, Vector3 position, boolean idle) {
 
         //where is the player in relation to this enemy
-        boolean n = ((int)position.y > (int)enemy.getAnimation().getDecal().getPosition().y);//getRow());
-        boolean s = ((int)position.y < (int)enemy.getAnimation().getDecal().getPosition().y);//enemy.getRow());
-        boolean w = ((int)position.x < (int)enemy.getAnimation().getDecal().getPosition().x);//enemy.getCol());
-        boolean e = ((int)position.x > (int)enemy.getAnimation().getDecal().getPosition().x);//enemy.getCol());
+        boolean n = ((int)position.y > (int)enemy.getRow());
+        boolean s = ((int)position.y < (int)enemy.getRow());
+        boolean w = ((int)position.x < (int)enemy.getCol());
+        boolean e = ((int)position.x > (int)enemy.getCol());
 
         //update the animation depending on where the enemy is facing
         switch (enemy.getDirection()) {

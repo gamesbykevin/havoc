@@ -100,7 +100,6 @@ public class Cell extends Location implements Disposable {
     }
 
     public boolean isGoal() {
-
         switch (getType()) {
             case Goal:
                 return true;
@@ -122,9 +121,7 @@ public class Cell extends Location implements Disposable {
 
     public boolean isDoor() {
         switch (getType()) {
-            case DoorLocked:
             case Door:
-            case Secret:
                 return true;
 
             default:
@@ -188,6 +185,10 @@ public class Cell extends Location implements Disposable {
 
             case Unvisited:
                 System.out.print("_");
+                break;
+
+            case Hallway:
+                System.out.print("m");
                 break;
         }
     }

@@ -9,11 +9,6 @@ public class PlayerHelper {
     //if we aren't moving the joystick enough we will ignore
     public static final float DEAD_ZONE_IGNORE = .2f;
 
-    //where to render our hud items
-    public static final float HUD_RATIO = .5f;
-    public static final int HUD_KEY_WIDTH = (int)(20 * HUD_RATIO);
-    public static final int HUD_KEY_HEIGHT = (int)(54 * HUD_RATIO);
-
     public static final int HEALTH_SMALL = 10;
     public static final int HEALTH_LARGE = 25;
 

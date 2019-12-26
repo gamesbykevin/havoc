@@ -1,9 +1,10 @@
 package com.gamesbykevin.havoc.decals;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.gamesbykevin.havoc.animation.DecalAnimation;
+import com.gamesbykevin.havoc.dungeon.Cell;
+import com.gamesbykevin.havoc.util.Timer;
 
 import static com.gamesbykevin.havoc.MyGdxGame.FRAME_MS;
-import static com.gamesbykevin.havoc.decals.Wall.*;
 
 public class Door extends DecalCustom {
 
@@ -33,11 +34,8 @@ public class Door extends DecalCustom {
     //where do we close the door
     private float start;
 
-    //how much time passed?
-    private float lapsed;
-
     //how long does the door stay open
-    private static final float DOOR_OPEN_TIME = 3500f;
+    private static final float DURATION_DOOR_OPEN = 3500f;
 
     //how close do we need to be to hear the sound effect
     public static final float DOOR_DISTANCE_SFX_RATIO = 0.5f;
@@ -46,12 +44,23 @@ public class Door extends DecalCustom {
     private boolean secret;
 
     //was this door ever opened?
-    private boolean once;
+    private boolean found;
 
-    protected Door(TextureRegion texture, int side, boolean secret) {
-        super(texture, side, TEXTURE_WIDTH, TEXTURE_HEIGHT);
-        setSecret(secret);
+    //timer to control the door open/close etc...
+    private Timer timer;
+
+    protected Door(Side side, DecalAnimation animation, Cell cell) {
+        super(side, animation);
+        setSecret(cell.isSecret());
         setState(State.Closed);
+    }
+
+    public Timer getTimer() {
+
+        if (this.timer == null)
+            this.timer = new Timer(DURATION_DOOR_OPEN);
+
+        return this.timer;
     }
 
     public State getState() {
@@ -62,12 +71,12 @@ public class Door extends DecalCustom {
         this.state = state;
     }
 
-    public boolean isOnce() {
-        return this.once;
+    public boolean isFound() {
+        return this.found;
     }
 
-    public void setOnce(boolean once) {
-        this.once = once;
+    public void setFound(boolean found) {
+        this.found = found;
     }
 
     public boolean isSecret() {
@@ -94,14 +103,6 @@ public class Door extends DecalCustom {
         this.start = start;
     }
 
-    private float getLapsed() {
-        return this.lapsed;
-    }
-
-    public void setLapsed(float lapsed) {
-        this.lapsed = lapsed;
-    }
-
     public boolean isOpen() {
 
         //is the door open
@@ -117,17 +118,20 @@ public class Door extends DecalCustom {
     @Override
     public void update() {
 
+        //update animation
+        getAnimation().update();
+
         switch (getState()) {
 
             case Start:
-                setLapsed(0);
+                getTimer().reset();
                 setState(State.Opening);
                 break;
 
             case Opening:
                 switch (getSide()) {
-                    case SIDE_EAST:
-                    case SIDE_WEST:
+                    case East:
+                    case West:
 
                         //slide door open
                         getDecal().translate(0, -DOOR_VELOCITY, 0);
@@ -135,13 +139,13 @@ public class Door extends DecalCustom {
                         //door is open all the way now
                         if (getDecal().getPosition().y < getDestination()) {
                             getDecal().getPosition().y = getDestination();
-                            setLapsed(0);
+                            getTimer().reset();
                             setState(State.Open);
                         }
                         break;
 
-                    case SIDE_NORTH:
-                    case SIDE_SOUTH:
+                    case North:
+                    case South:
 
                         //slide door open
                         getDecal().translate(-DOOR_VELOCITY, 0, 0);
@@ -149,7 +153,7 @@ public class Door extends DecalCustom {
                         //door is open all the way now
                         if (getDecal().getPosition().x < getDestination()) {
                             getDecal().getPosition().x = getDestination();
-                            setLapsed(0);
+                            getTimer().reset();
                             setState(State.Open);
                         }
                         break;
@@ -159,18 +163,18 @@ public class Door extends DecalCustom {
             case Open:
 
                 //keep track of time
-                setLapsed(getLapsed() + FRAME_MS);
+                getTimer().update();
 
                 //if the door was open for long enough we can start to close it
-                if (getLapsed() >= DOOR_OPEN_TIME)
+                if (getTimer().isExpired())
                     setState(State.Closing);
                 break;
 
             case Closing:
 
                 switch (getSide()) {
-                    case SIDE_EAST:
-                    case SIDE_WEST:
+                    case East:
+                    case West:
 
                         //slide door open
                         getDecal().translate(0, DOOR_VELOCITY, 0);
@@ -182,8 +186,8 @@ public class Door extends DecalCustom {
                         }
                         break;
 
-                    case SIDE_NORTH:
-                    case SIDE_SOUTH:
+                    case North:
+                    case South:
 
                         //slide door open
                         getDecal().translate(DOOR_VELOCITY, 0, 0);
@@ -196,7 +200,6 @@ public class Door extends DecalCustom {
                         break;
                 }
                 break;
-
         }
     }
 
@@ -210,10 +213,20 @@ public class Door extends DecalCustom {
                 //flag that we can start opening the door
                 setState(State.Start);
 
-                //flag that the door was opened at least once if it is a secret
+                //flag that we found the secret if the door was opened at least once
                 if (isSecret())
-                    setOnce(true);
+                    setFound(true);
                 break;
         }
+    }
+
+    @Override
+    public void reset() {
+
+        //call parent
+        super.reset();
+
+        //flag that the door has never been opened
+        setFound(false);
     }
 }

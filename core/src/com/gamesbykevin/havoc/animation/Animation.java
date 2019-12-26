@@ -1,10 +1,10 @@
 package com.gamesbykevin.havoc.animation;
 
-import com.badlogic.gdx.Gdx;
 import com.gamesbykevin.havoc.util.Disposable;
+import com.gamesbykevin.havoc.util.Restart;
 import com.gamesbykevin.havoc.util.Timer;
 
-public abstract class Animation implements Disposable {
+public abstract class Animation implements Disposable, Restart {
 
     //current animation
     private int index;
@@ -26,8 +26,8 @@ public abstract class Animation implements Disposable {
         this.count = count;
         this.timer = new Timer(duration);
 
-        setIndex(0);
         setLoop(false);
+        reset();
     }
 
     public int getCount() {

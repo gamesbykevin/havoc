@@ -109,8 +109,11 @@ public class Dungeon implements Disposable {
         //lock a random door and place a key
         lockDoor(this);
 
+        //update the map
+        updateMap();
+
         //print the dungeon so we can see it
-        //print();
+        print();
     }
 
     private void calculateCost() {
@@ -226,7 +229,7 @@ public class Dungeon implements Disposable {
 
         Cell cell = getCell(col, row);
 
-        if (cell.isDoor()) {
+        if (cell.isDoor() || cell.isLocked() || cell.isSecret()) {
             getMap()[row][col] = true;
             getInteract()[row][col] = true;
         } else if (cell.isOpen() || cell.isUnvisited() || cell.isHallway()) {
@@ -238,6 +241,8 @@ public class Dungeon implements Disposable {
         } else if (cell.isWall()) {
             getMap()[row][col] = false;
             getInteract()[row][col] = false;
+        } else {
+            throw new RuntimeException("cell not identified");
         }
 
         //if we are including obstacles

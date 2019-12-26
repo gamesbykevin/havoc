@@ -11,6 +11,7 @@ import java.util.List;
 import static com.gamesbykevin.havoc.enemies.Enemy.*;
 import static com.gamesbykevin.havoc.entities.EntityHelper.isObstructed;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
+import static com.gamesbykevin.havoc.weapon.WeaponHelper.RANGE_FIRE_RATIO;
 
 public class EnemyHelper {
 
@@ -52,6 +53,8 @@ public class EnemyHelper {
                 }
 
             } else {
+
+                //no door there means we can walk
                 enemy.setStatus(Status.Walk);
             }
         }
@@ -67,61 +70,63 @@ public class EnemyHelper {
         //if we are at the target we go to the next node
         if (colDiff < enemy.getSpeed() && rowDiff < enemy.getSpeed()) {
 
+            //since we are so close, place right on the location
+            enemy.setCol(node.getCol());
+            enemy.setRow(node.getRow());
+
             //change the index
             enemy.setPathIndex(enemy.isAscending() ? enemy.getPathIndex() + 1 : enemy.getPathIndex() - 1);
 
-            //make sure we stay in bounds
             if (enemy.getPathIndex() < 0) {
-
-                enemy.setPathIndex(1);
+                enemy.setPathIndex(0);
                 enemy.setAscending(!enemy.isAscending());
-
-                //we reached the end, so keep the enemy idle for a short time
                 enemy.setStatus(Status.Idle);
             }
 
             if (enemy.getPathIndex() >= enemy.getPathPatrol().size()) {
                 enemy.setPathIndex(enemy.getPathPatrol().size() - 1);
                 enemy.setAscending(!enemy.isAscending());
-
-                //we reached the end, so keep the enemy idle for a short time
                 enemy.setStatus(Status.Idle);
             }
 
-            node = enemy.getPathPatrol().get(enemy.getPathIndex());
-        }
 
-        if (enemy.isWalk()) {
+        } else {
 
-            //determine which direction to face
-            if (enemy.getCol() < node.getCol() && colDiff > enemy.getSpeed()) {
-                enemy.setDirection(DIRECTION_E);
-            } else if (enemy.getCol() > node.getCol() && colDiff > enemy.getSpeed()) {
-                enemy.setDirection(DIRECTION_W);
-            } else if (enemy.getRow() < node.getRow() && rowDiff > enemy.getSpeed()) {
-                enemy.setDirection(DIRECTION_N);
-            } else if (enemy.getRow() > node.getRow() && rowDiff > enemy.getSpeed()) {
-                enemy.setDirection(DIRECTION_S);
-            }
+            if (enemy.isWalk()) {
 
-            //move in the direction we are facing
-            switch (enemy.getDirection()) {
+                //our current target location
+                node = enemy.getPathPatrol().get(enemy.getPathIndex());
 
-                case DIRECTION_E:
-                    enemy.setCol(enemy.getCol() + enemy.getSpeed());
-                    break;
+                //determine which direction to face
+                if (enemy.getCol() < node.getCol() && colDiff > enemy.getSpeed()) {
+                    enemy.setDirection(DIRECTION_E);
+                } else if (enemy.getCol() > node.getCol() && colDiff > enemy.getSpeed()) {
+                    enemy.setDirection(DIRECTION_W);
+                } else if (enemy.getRow() < node.getRow() && rowDiff > enemy.getSpeed()) {
+                    enemy.setDirection(DIRECTION_N);
+                } else if (enemy.getRow() > node.getRow() && rowDiff > enemy.getSpeed()) {
+                    enemy.setDirection(DIRECTION_S);
+                }
 
-                case DIRECTION_N:
-                    enemy.setRow(enemy.getRow() + enemy.getSpeed());
-                    break;
+                //move in the direction we are facing
+                switch (enemy.getDirection()) {
 
-                case DIRECTION_S:
-                    enemy.setRow(enemy.getRow() - enemy.getSpeed());
-                    break;
+                    case DIRECTION_E:
+                        enemy.setCol(enemy.getCol() + enemy.getSpeed());
+                        break;
 
-                case DIRECTION_W:
-                    enemy.setCol(enemy.getCol() - enemy.getSpeed());
-                    break;
+                    case DIRECTION_N:
+                        enemy.setRow(enemy.getRow() + enemy.getSpeed());
+                        break;
+
+                    case DIRECTION_S:
+                        enemy.setRow(enemy.getRow() - enemy.getSpeed());
+                        break;
+
+                    case DIRECTION_W:
+                        enemy.setCol(enemy.getCol() - enemy.getSpeed());
+                        break;
+                }
             }
         }
     }
@@ -132,12 +137,8 @@ public class EnemyHelper {
         if (enemy.isIdle() || enemy.isWalk()) {
 
             //if enemy is facing the player and we can shoot, then don't wait
-            if (enemy.isFacing(level.getPlayer().getCamera3d().position) && enemy.canShoot(level, distance)) {
+            if (enemy.isFacing(level.getPlayer().getCamera3d().position) && enemy.canShoot(level, distance))
                 enemy.setStatus(Status.Shoot);
-
-                //flag chase the player
-                enemy.setChase(true);
-            }
         }
 
         //we only want to update when the animation is finished
@@ -148,12 +149,18 @@ public class EnemyHelper {
 
             //are we close enough to check if we can attack?
             if (enemy.canShoot(level, distance)) {
+
+                //flag status to shoot
                 enemy.setStatus(Status.Shoot);
 
-                //flag chase the player
-                enemy.setChase(true);
             } else {
+
+                //enemy can stand for now
                 enemy.setStatus(Status.Idle);
+
+                //but will need to follow the player
+                enemy.setChase(true);
+
             }
 
         } else if (enemy.isShoot() || enemy.isAlert()) {
@@ -191,11 +198,16 @@ public class EnemyHelper {
 
             //if close enough the enemy will remain alert
             if (distance < RANGE_NOTICE && !obstructed) {
+
+                //flag status to pause for now
                 enemy.setStatus(Status.Pause);
 
                 //flag chase the player
                 enemy.setChase(true);
+
             } else {
+
+                //if too far way or obstructed we will be idle
                 enemy.setStatus(Status.Idle);
             }
 
@@ -203,11 +215,16 @@ public class EnemyHelper {
 
             //if close enough and our view isn't blocked
             if (enemy.canShoot(level, distance)) {
+
+                //flag status to alert
                 enemy.setStatus(Status.Alert);
 
                 //flag chase the player
                 enemy.setChase(true);
+
             } else {
+
+                //stay idle for a short time
                 enemy.setStatus(Status.Idle);
             }
 
@@ -217,11 +234,22 @@ public class EnemyHelper {
             enemy.setStatus(Status.Idle);
 
             //if the player is shooting and the enemy has a clear view of them, start shooting
-            if (level.getPlayer().getController().isShooting() && enemy.canShoot(level)) {
-                enemy.setStatus(Status.Shoot);
+            if (level.getPlayer().getController().isShooting()) {
 
-                //flag chase the player
-                enemy.setChase(true);
+                //in order for the enemy to do something, they have to be close enough to hear the player shooting
+                if (distance < (RANGE_NOTICE * RANGE_FIRE_RATIO)) {
+
+                    if (enemy.canShoot(level)) {
+
+                        //flag enemy to shoot
+                        enemy.setStatus(Status.Shoot);
+
+                    } else {
+
+                        //flag to chase the player
+                        enemy.setChase(true);
+                    }
+                }
             }
 
             //if we are idle but we have a patrol path, start walking again
@@ -269,8 +297,8 @@ public class EnemyHelper {
                 Entity entity1 = entities.get(i);
                 Entity entity2 = entities.get(j);
 
-                double dist1 = getDistance(entity1, player.getCamera3d().position);
-                double dist2 = getDistance(entity2, player.getCamera3d().position);
+                double dist1 = getDistance(entity1, player);
+                double dist2 = getDistance(entity2, player);
 
                 //switch if the distance is less and the entity is not dead
                 if (dist2 < dist1 && entity2.isSolid()) {
@@ -299,19 +327,23 @@ public class EnemyHelper {
             //how far is the enemy from the other enemy?
             double distance = getDistance(entities.get(indexIgnore), tmp);
 
-            //make sure the enemy is close enough to notice and the enemy is walking
-            if (distance < RANGE_NOTICE && (tmp.isWalk() || tmp.isIdle())) {
+            //not close enough to notice the enemy
+            if (distance > RANGE_NOTICE)
+                continue;
 
-                if (tmp.canShoot(level, distance)) {
+            //make sure the enemy is either walking or idle before chasing or shooting
+            if (!tmp.isWalk() && !tmp.isIdle())
+                continue;
 
-                    //if the enemy can shoot the player, it should start
-                    tmp.setStatus(Enemy.Status.Shoot);
+            if (tmp.canShoot(level, distance)) {
 
-                } else {
+                //if the enemy can shoot the player, it should start
+                tmp.setStatus(Enemy.Status.Shoot);
 
-                    //flag chase the player
-                    tmp.setChase(true);
-                }
+            } else {
+
+                //flag chase the player
+                tmp.setChase(true);
             }
         }
     }

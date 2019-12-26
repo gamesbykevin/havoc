@@ -6,13 +6,13 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.decals.DecalMaterial;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gamesbykevin.havoc.assets.AssetManagerHelper;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.player.Player;
-import com.gamesbykevin.havoc.assets.TextureHelper;
 
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 import static com.gamesbykevin.havoc.assets.AudioHelper.playHero;
@@ -176,6 +176,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	@Override
 	public void resume() {
+
+		//call parent
 		super.resume();
 
 		//use the asset manager
@@ -188,6 +190,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	@Override
 	public void render () {
 
+		//clear screen
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
@@ -372,8 +375,6 @@ public class MyGdxGame extends ApplicationAdapter {
 			AssetManagerHelper.dispose(this.assetManager);
 			this.assetManager.dispose();
 		}
-
-		TextureHelper.dispose();
 
 		this.player = null;
 		this.level = null;

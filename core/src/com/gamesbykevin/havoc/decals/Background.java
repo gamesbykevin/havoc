@@ -1,28 +1,29 @@
 package com.gamesbykevin.havoc.decals;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.gamesbykevin.havoc.animation.DecalAnimation;
 
 public class Background extends DecalCustom {
 
     public static final float TEXTURE_WIDTH = 16;
     public static final float TEXTURE_HEIGHT = 16;
 
-    public static final int SIDE_NONE = -1;
+    public static final float HEIGHT_CEILING = .5f;
+    public static final float HEIGHT_FLOOR = -.5f;
 
-    protected Background(TextureRegion texture) {
-        super(texture, SIDE_NONE, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+    protected Background(DecalAnimation animation) {
+        super(Side.None, animation);
     }
 
     @Override
     public void update() {
-        //do we need to update anything here?
+
+        //update animation
+        getAnimation().update();
     }
 
-    public static Background createDecalBackground(float col, float row, TextureRegion texture, boolean floor) {
-        Background decal = new Background(texture);
-        decal.setCol((int)col);
-        decal.setRow((int)row);
-        decal.getDecal().setPosition(col, row, (floor) ? -.5f : .5f);
-        return decal;
+    @Override
+    public void reset() {
+        //call parent
+        super.reset();
     }
 }

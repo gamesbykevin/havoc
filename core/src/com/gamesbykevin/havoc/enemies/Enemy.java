@@ -85,6 +85,10 @@ public abstract class Enemy extends Entity3d {
     //do we calculate path to the player?
     private boolean chase = false;
 
+    //dimensions
+    protected static final int SPRITE_SHEET_FRAME_WIDTH = 64;
+    protected static final int SPRITE_SHEET_FRAME_HEIGHT = 64;
+
     public Enemy(int count) {
         super(count);
     }
@@ -110,9 +114,6 @@ public abstract class Enemy extends Entity3d {
         //if solid, if not the enemy is dead
         if (isSolid()) {
 
-            //get the current player position
-            Vector3 position = level.getPlayer().getCamera3d().position;
-
             //check if enemy died
             if (getHealth() <= 0) {
 
@@ -126,7 +127,7 @@ public abstract class Enemy extends Entity3d {
             } else {
 
                 //calculate distance to player from enemy
-                double distance = getDistance(this, position);
+                double distance = getDistance(this, level.getPlayer());
 
                 //don't continue if too far away
                 if (distance > RANGE_UPDATE)
@@ -141,7 +142,7 @@ public abstract class Enemy extends Entity3d {
             }
 
             //ensure correct index is assigned
-            updateIndex(position);
+            updateIndex(level.getPlayer().getCamera3d().position);
         }
 
         //update the location for the animation
@@ -203,11 +204,15 @@ public abstract class Enemy extends Entity3d {
     public abstract void updateIndex(Vector3 position);
 
     public boolean canShoot(Level level) {
-        return canShoot(level, getDistance(this, level.getPlayer().getCamera3d()));
+        return canShoot(level, getDistance(this, level.getPlayer()));
     }
 
     //is the enemy able to shoot
     public boolean canShoot(Level level, double distance) {
+
+        //have to be in ideal location to shoot
+        if (getCol() != (int)getCol() || getRow() != (int)getRow())
+            return false;
 
         //if too far away, they can't shoot
         if (distance > RANGE_NOTICE)
@@ -310,7 +315,16 @@ public abstract class Enemy extends Entity3d {
     }
 
     public void setStatus(Status status) {
+
         this.status = status;
+
+        switch (status) {
+
+            //if enemy can shoot the player they should know how to chase
+            case Shoot:
+                setChase(true);
+                break;
+        }
     }
 
     public boolean isDie() {

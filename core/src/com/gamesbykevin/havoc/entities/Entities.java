@@ -134,7 +134,7 @@ public abstract class Entities implements Disposable, Restart {
                 continue;
 
             //don't render if too far away
-            if (range > 0 && getDistance(entity, getLevel().getPlayer().getCamera3d().position) > range)
+            if (range > 0 && getDistance(entity, getLevel().getPlayer()) > range)
                 continue;
 
             //render the entity

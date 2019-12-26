@@ -1,14 +1,16 @@
 package com.gamesbykevin.havoc.decals;
 
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
+import com.gamesbykevin.havoc.animation.DecalAnimation;
+import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.location.Location;
 import com.gamesbykevin.havoc.util.Disposable;
+import com.gamesbykevin.havoc.util.Restart;
 
 import static com.gamesbykevin.havoc.decals.Wall.*;
 
-public class Square extends Location implements Disposable {
+public class Square extends Location implements Disposable, Restart {
 
     //list of walls for this square
     private Wall[] walls;
@@ -16,73 +18,94 @@ public class Square extends Location implements Disposable {
     //used for collision
     public static final float COLLISION_RADIUS = .5f;
 
+    //each side of the wall
+    public static final int INDEX_SIDE_NORTH = 0;
+    public static final int INDEX_SIDE_SOUTH = 1;
+    public static final int INDEX_SIDE_WEST = 2;
+    public static final int INDEX_SIDE_EAST = 3;
+
     public Square(float col, float row) {
         super(col, row);
         this.walls = new Wall[4];
     }
 
-    public void addWalls(TextureRegion textureRegion) {
-        addWallNorth(textureRegion);
-        addWallSouth(textureRegion);
-        addWallWest(textureRegion);
-        addWallEast(textureRegion);
+    private int getIndex(Side side) {
+
+        switch (side) {
+
+            case None:
+            default:
+                return -1;
+
+            case East:
+                return INDEX_SIDE_EAST;
+
+            case West:
+                return INDEX_SIDE_WEST;
+
+            case North:
+                return INDEX_SIDE_NORTH;
+
+            case South:
+                return INDEX_SIDE_SOUTH;
+        }
     }
 
-    public void addWallNorth(TextureRegion textureRegion) {
-        addWall(textureRegion, SIDE_NORTH);
+    public void addWallNorth(DecalAnimation animation, Cell cell) {
+        addWall(Side.North, animation, cell);
     }
 
-    public void addWallSouth(TextureRegion textureRegion) {
-        addWall(textureRegion, SIDE_SOUTH);
+    public void addWallSouth(DecalAnimation animation, Cell cell) {
+        addWall(Side.South, animation, cell);
     }
 
-    public void addWallWest(TextureRegion textureRegion) {
-        addWall(textureRegion, SIDE_WEST);
+    public void addWallWest(DecalAnimation animation, Cell cell) {
+        addWall(Side.West, animation, cell);
     }
 
-    public void addWallEast(TextureRegion textureRegion) {
-        addWall(textureRegion, SIDE_EAST);
+    public void addWallEast(DecalAnimation animation, Cell cell) {
+        addWall(Side.East, animation, cell);
     }
 
-    private void addWall(TextureRegion textureRegion, int side) {
-        getWalls()[side] = DecalCustom.createDecalWall(getCol(), getRow(), textureRegion, side);
+    private void addWall(Side side, DecalAnimation animation, Cell cell) {
+        getWalls()[getIndex(side)] = DecalCustom.createDecalWall(side, animation,cell);
     }
 
     public boolean hasCollisionNorth(float col, float row) {
-        return hasCollision(col, row, SIDE_NORTH);
+        return hasCollision(col, row, Side.North);
     }
 
     public boolean hasCollisionSouth(float col, float row) {
-        return hasCollision(col, row, SIDE_SOUTH);
+        return hasCollision(col, row, Side.South);
     }
 
     public boolean hasCollisionWest(float col, float row) {
-        return hasCollision(col, row, SIDE_WEST);
+        return hasCollision(col, row, Side.West);
     }
 
     public boolean hasCollisionEast(float col, float row) {
-        return hasCollision(col, row, SIDE_EAST);
+        return hasCollision(col, row, Side.East);
     }
 
-    private boolean hasCollision(float col, float row, int side) {
+    private boolean hasCollision(float col, float row, Side side) {
 
         //if no wall exists there
-        if (getWalls()[side] == null)
+        if (getWalls()[getIndex(side)] == null)
             return false;
 
         switch (side) {
 
-            case SIDE_NORTH:
-                return getWalls()[side].hasCollisionNorth(col, row);
+            case North:
+                return getWalls()[getIndex(side)].hasCollisionNorth(col, row);
 
-            case SIDE_SOUTH:
-                return getWalls()[side].hasCollisionSouth(col, row);
+            case South:
+                return getWalls()[getIndex(side)].hasCollisionSouth(col, row);
 
-            case SIDE_WEST:
-                return getWalls()[side].hasCollisionWest(col, row);
+            case West:
+                return getWalls()[getIndex(side)].hasCollisionWest(col, row);
 
-            case SIDE_EAST:
-                return getWalls()[side].hasCollisionEast(col, row);
+            case East:
+                return getWalls()[getIndex(side)].hasCollisionEast(col, row);
         }
 
         return false;
@@ -90,6 +113,17 @@ public class Square extends Location implements Disposable {
 
     public Wall[] getWalls() {
         return this.walls;
+    }
+
+    public void update() {
+
+        for (int i = 0; i < getWalls().length; i++) {
+
+            if (getWalls()[i] == null)
+                continue;
+
+            getWalls()[i].update();
+        }
     }
 
     public int render(DecalBatch batch, PerspectiveCamera camera) {
@@ -101,11 +135,11 @@ public class Square extends Location implements Disposable {
             if (getWalls()[i] == null)
                 continue;
 
-            if (getWalls()[i].isBillboard())
-                getWalls()[i].getDecal().lookAt(camera.position, camera.up);
+            //render the wall
+            getWalls()[i].render(camera, batch);
 
+            //keep track of the number of items rendered
             count++;
-            batch.add(getWalls()[i].getDecal());
         }
 
         return count;
@@ -124,5 +158,13 @@ public class Square extends Location implements Disposable {
         }
 
         this.walls = null;
+    }
+
+    @Override
+    public void reset() {
+        for (int i = 0; i < getWalls().length; i++) {
+            if (getWalls()[i] != null)
+                getWalls()[i].reset();
+        }
     }
 }

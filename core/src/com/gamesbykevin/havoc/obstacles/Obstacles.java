@@ -1,29 +1,20 @@
 package com.gamesbykevin.havoc.obstacles;
 
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.gamesbykevin.havoc.animation.DecalAnimation;
 import com.gamesbykevin.havoc.dungeon.Leaf;
 import com.gamesbykevin.havoc.dungeon.Room;
 import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.level.Level;
 
-import java.util.HashMap;
-
-import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
+import static com.gamesbykevin.havoc.obstacles.ObstacleHelper.*;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public final class Obstacles extends Entities {
 
     //how close can we get to the obstacle
-    private static final float OBSTACLE_COLLISION = .33f;
-
-    //list of textures so we don't have to load the same texture repeatedly
-    private static HashMap<Obstacle.Type, TextureRegion> TEXTURES;
+    private static final float OBSTACLE_COLLISION = .75f;
 
     public Obstacles(Level level) {
         super(level);
@@ -49,25 +40,43 @@ public final class Obstacles extends Entities {
         }
     }
 
-    public static HashMap<Obstacle.Type, TextureRegion> getTextures(AssetManager assetManager) {
-
-        if (TEXTURES == null) {
-            TEXTURES = new HashMap<>();
-            for (int i = 0; i < getTypeObstacle().size(); i++) {
-                TEXTURES.put(getTypeObstacle().get(i), new TextureRegion(assetManager.get(ASSET_DIR_OBSTACLES + getTypeObstacle().get(i).toString() + ASSET_EXT_BMP, Texture.class)));
-            }
-
-            TEXTURES.put(getTypeLight(), new TextureRegion(assetManager.get(ASSET_DIR_OBSTACLES + getTypeLight().toString() + ASSET_EXT_BMP, Texture.class)));
-        }
-
-        //return our list of textures
-        return TEXTURES;
-    }
-
     private void addNextToWalls(Room room) {
 
+        Obstacle.Type type;
+
         //assign random obstacle type
-        Obstacle.Type type = getTypeObstacle().get(getRandom().nextInt(getTypeObstacle().size()));
+        switch (getRandom().nextInt(7)) {
+
+            case 0:
+            default:
+                type = getRandomTypePlant();
+                break;
+
+            case 1:
+                type = getRandomTypeCage();
+                break;
+
+            case 2:
+                type = getRandomTypeFlag();
+                break;
+
+            case 3:
+                type = getRandomTypeStatue();
+                break;
+
+            case 4:
+                type = getRandomTypePillar();
+                break;
+
+            case 5:
+                type = getRandomTypeGrass();
+                break;
+
+            case 6:
+                type = getRandomTypeOther();
+                break;
+        }
+
 
         //how frequent do we add an obstacle
         int offset = getRandom().nextInt(4) + 1;
@@ -101,7 +110,7 @@ public final class Obstacles extends Entities {
         //frequency of lights
         int frequency = getRandom().nextInt(4) + 2;
 
-        Obstacle.Type type = getTypeLight();
+        Obstacle.Type type = getRandomTypeLight();
 
         int middleCol = room.getX() + (room.getW() / 2);
         int middleRow = room.getY() + (room.getH() / 2);
@@ -182,10 +191,7 @@ public final class Obstacles extends Entities {
             return;
 
         //create our obstacle
-        Obstacle obstacle = new Obstacle(type);
-
-        //animation obstacles are a single frame
-        obstacle.getAnimations()[0] = new DecalAnimation(Obstacles.getTextures(getLevel().getAssetManager()).get(type));
+        Obstacle obstacle = new Obstacle(getLevel().getAssetManager(), type);
 
         //then add to entity list
         add(obstacle, col, row);
@@ -194,8 +200,8 @@ public final class Obstacles extends Entities {
     private boolean nearInteract(int col, int row) {
 
         //can't place it next to a door
-        for (int x = -2; x <= 2; x++) {
-            for (int y = -2; y <= 2; y++) {
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
 
                 if (x != 0 && y != 0)
                     continue;
@@ -234,21 +240,6 @@ public final class Obstacles extends Entities {
     @Override
     public void dispose() {
         super.dispose();
-
-        if (TEXTURES != null) {
-
-            for (Obstacle.Type type : Obstacle.Type.values()) {
-
-                if (TEXTURES.get(type) != null) {
-                    TEXTURES.get(type).getTexture().dispose();
-                    TEXTURES.put(type, null);
-                }
-            }
-
-            TEXTURES.clear();
-        }
-
-        TEXTURES = null;
     }
 
     @Override

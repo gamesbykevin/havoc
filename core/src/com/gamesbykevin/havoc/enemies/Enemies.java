@@ -86,6 +86,7 @@ public final class Enemies extends Entities {
             //remove from the list
             leaves.remove(randomIndex);
 
+            //get a list of options to place the enemy
             options = getLocationOptions(leaf.getRoom(), null);
 
             int middleCol = leaf.getRoom().getX() + (leaf.getRoom().getW() / 2);
@@ -145,7 +146,7 @@ public final class Enemies extends Entities {
     private void spawnEnemy(Leaf leaf, Cell location, int middleCol, int middleRow, boolean boss) {
 
         //the enemy created
-        Enemy enemy = null;
+        Enemy enemy;
 
         //will the enemy patrol?
         boolean patrol = getRandom().nextBoolean();
@@ -230,33 +231,35 @@ public final class Enemies extends Entities {
 
         List<Cell> options = new ArrayList<>();
 
-        //all 4 sides
-        for (int col = room.getX() + 2; col < room.getX() + room.getW() - 2; col++) {
-            addOption(options, getLevel().getDungeon().getCell(col, room.getY() + 2), target);
-            addOption(options, getLevel().getDungeon().getCell(col, room.getY() + room.getH() - 3), target);
-        }
-
-        for (int row = room.getY() + 2; row < room.getY() + room.getH() - 2; row++) {
-            addOption(options, getLevel().getDungeon().getCell(room.getX() + 2, row), target);
-            addOption(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - 3, row), target);
-        }
+        int centerX = room.getX() + (room.getW() / 2);
+        int centerY = room.getY() + (room.getH() / 2);
 
         //north south east west
-        addOption(options, getLevel().getDungeon().getCell(room.getX() + 2, room.getY() + (room.getH() / 2)), target);
-        addOption(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - 3, room.getY() + (room.getH() / 2)), target);
-        addOption(options, getLevel().getDungeon().getCell(room.getX() + (room.getW() / 2), room.getY() + 2), target);
-        addOption(options, getLevel().getDungeon().getCell(room.getX() + (room.getW() / 2), room.getY() + room.getH() - 3), target);
+        addOption(options, getLevel().getDungeon().getCell(room.getX() + 2, centerY), target);
+        addOption(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - 3, centerY), target);
+        addOption(options, getLevel().getDungeon().getCell(centerX, room.getY() + 2), target);
+        addOption(options, getLevel().getDungeon().getCell(centerX, room.getY() + room.getH() - 3), target);
 
-        //4 corners inner
-        for (int i = 2; i < (room.getW() / 2); i++) {
-            addOption(options, getLevel().getDungeon().getCell(room.getX() + i, room.getY() + i), target);
-            addOption(options, getLevel().getDungeon().getCell(room.getX() + i, room.getY() + room.getH() - i - 1), target);
-            addOption(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - i - 1, room.getY() + i), target);
-            addOption(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - i - 1, room.getY() + room.getH() - i - 1), target);
+        //center or close to it
+        for (int row = -2; row <= 2; row++) {
+            for (int col = -2; col <= 2; col++) {
+                addOption(options, getLevel().getDungeon().getCell(centerX + col, centerY + row), target);
+            }
         }
 
-        //center
-        addOption(options, getLevel().getDungeon().getCell(room.getX() + (room.getW() / 2), room.getY() + (room.getH() / 2)), target);
+        //if no options add on all sides
+        if (options.isEmpty()) {
+
+            for (int col = room.getX() + 2; col < room.getX() + room.getW() - 2; col++) {
+                addOption(options, getLevel().getDungeon().getCell(col, room.getY() + 2), target);
+                addOption(options, getLevel().getDungeon().getCell(col, room.getY() + room.getH() - 3), target);
+            }
+
+            for (int row = room.getY() + 2; row < room.getY() + room.getH() - 2; row++) {
+                addOption(options, getLevel().getDungeon().getCell(room.getX() + 2, row), target);
+                addOption(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - 3, row), target);
+            }
+        }
 
         //return our options
         return options;
@@ -394,17 +397,21 @@ public final class Enemies extends Entities {
             //if we haven't chased anyone yet and the enemy is flagged to chase
             if (!chase && getTimerChase().isExpired() && enemy.isChase() && !enemy.isDie()) {
 
-                //calculate path to chase the player
-                chase(getLevel(), enemy);
+                //let's also make sure we reached our current node location before calculating another path
+                if (enemy.getCol() == (int)enemy.getCol() && enemy.getRow() == (int)enemy.getRow()) {
 
-                //turn flag off
-                enemy.setChase(false);
+                    //calculate path to chase the player
+                    chase(getLevel(), enemy);
 
-                //flag we chased so we don't do it for the other enemies
-                chase = true;
+                    //turn flag off
+                    enemy.setChase(false);
 
-                //reset timer
-                getTimerChase().reset();
+                    //flag we chased so we don't do it for the other enemies
+                    chase = true;
+
+                    //reset timer
+                    getTimerChase().reset();
+                }
             }
 
             //update the current entity
@@ -417,8 +424,8 @@ public final class Enemies extends Entities {
                     shoot = enemy.getShoot();
             }
 
-            //if an enemy is shooting we need to check other enemies nearby and notify them
-            if (check)
+            //if the enemy is near and shooting, need to notify enemies nearby
+            if (near && enemy.isShoot())
                 notifyNeighbors(getLevel(), getEntityList(), i);
         }
 

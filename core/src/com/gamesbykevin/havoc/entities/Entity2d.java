@@ -41,6 +41,15 @@ public abstract class Entity2d extends Entity {
 
     @Override
     public void render(AssetManager assetManager, PerspectiveCamera camera, DecalBatch decalBatch, Batch batch) {
-        batch.draw(assetManager.get(getAnimation().getTexturePath(), Texture.class), getCol(), getRow());
+
+        batch.draw(
+            assetManager.get(getAnimation().getTexturePath(), Texture.class),
+            getCol(),
+            getRow(),
+            getAnimation().getCoordinate().x,
+            getAnimation().getCoordinate().y,
+            getAnimation().getCoordinate().width,
+            getAnimation().getCoordinate().height
+        );
     }
 }

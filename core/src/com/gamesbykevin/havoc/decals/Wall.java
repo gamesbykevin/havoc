@@ -1,21 +1,26 @@
 package com.gamesbykevin.havoc.decals;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.gamesbykevin.havoc.animation.DecalAnimation;
 
 public class Wall extends DecalCustom {
 
-    //each side of the wall
-    public static final int SIDE_NORTH = 0;
-    public static final int SIDE_SOUTH = 1;
-    public static final int SIDE_WEST = 2;
-    public static final int SIDE_EAST = 3;
-
-    protected Wall(TextureRegion texture, int side) {
-        super(texture, side, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+    protected Wall(Side side, DecalAnimation animation) {
+        super(side, animation);
     }
 
     @Override
     public void update() {
-        //do anything here?
+
+        //update animation
+        getAnimation().update();
+
+        if (getAnimation().isFinish())
+            getAnimation().reset();
+    }
+
+    @Override
+    public void reset() {
+        //call parent
+        super.reset();
     }
 }

@@ -466,7 +466,7 @@ public class RoomHelper {
                 Cell cell = dungeon.getCell(col, row);
 
                 //any of these are doors
-                if (cell.isDoor()) {
+                if (cell.isDoor() || cell.isSecret() || cell.isLocked()) {
                     if (cell.hasId(door.getLink()) && door.hasId(cell.getLink()))
                         return cell;
                 }
@@ -486,7 +486,7 @@ public class RoomHelper {
                 Cell cell = dungeon.getCell(col, row);
 
                 //we are looking for doors
-                if (!cell.isDoor())
+                if (!cell.isDoor() && !cell.isLocked() && !cell.isSecret())
                     continue;
 
                 //also make sure it's linked to another door in another room

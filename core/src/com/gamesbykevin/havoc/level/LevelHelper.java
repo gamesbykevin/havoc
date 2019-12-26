@@ -7,6 +7,7 @@ import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.decals.DecalCustom;
 import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.decals.Square;
+import com.gamesbykevin.havoc.decals.Wall;
 import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.player.Player;
 
@@ -21,7 +22,7 @@ import static com.gamesbykevin.havoc.util.Distance.getDistance;
 public class LevelHelper {
 
     //how close we have to be to open a door
-    public static final int DOOR_DISTANCE = 1;
+    public static final int DOOR_DISTANCE = 2;
 
     protected static int renderWalls(Square[][] walls, DecalBatch batch, PerspectiveCamera camera) {
 
@@ -82,20 +83,20 @@ public class LevelHelper {
         for (int col = 0; col < decals[0].length; col++) {
             for (int row = 0; row < decals.length; row++) {
 
-                DecalCustom decal = decals[row][col];
+                DecalCustom custom = decals[row][col];
 
-                if (decal == null)
+                if (custom == null)
                     continue;
 
                 //only render if in range
-                if (getDistance(decal, camera.position) > RENDER_RANGE)
+                if (getDistance(custom, camera.position) > RENDER_RANGE)
                     continue;
 
-                if (decal.isBillboard())
-                    decal.getDecal().lookAt(camera.position, camera.up);
+                //render item
+                custom.render(camera, batch);
 
+                //keep track of total number items rendered
                 count++;
-                batch.add(decal.getDecal());
             }
         }
 
@@ -107,8 +108,8 @@ public class LevelHelper {
 
         boolean goal = false;
 
-        for (int colDiff = -DOOR_DISTANCE; colDiff <= DOOR_DISTANCE; colDiff ++) {
-            for (int rowDiff = -DOOR_DISTANCE; rowDiff <= DOOR_DISTANCE; rowDiff ++) {
+        for (int colDiff = -DOOR_DISTANCE; colDiff <= DOOR_DISTANCE; colDiff++) {
+            for (int rowDiff = -DOOR_DISTANCE; rowDiff <= DOOR_DISTANCE; rowDiff++) {
 
                 int col = (int)(position.x + colDiff);
                 int row = (int)(position.y + rowDiff);
@@ -121,7 +122,7 @@ public class LevelHelper {
                 Cell cell = level.getDungeon().getCell(col, row);
 
                 //is the cell a door
-                if (cell.isDoor()) {
+                if (cell.isDoor() || cell.isSecret() || cell.isLocked()) {
 
                     Door door = level.getDoorDecal(col, row);
 
@@ -135,6 +136,7 @@ public class LevelHelper {
                     //if locked and we don't have a key
                     if (cell.isLocked() && !key) {
                         playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelLocked);
+                        level.getPlayer().setTextNotify("Door locked");
                         continue;
                     }
 
@@ -151,9 +153,19 @@ public class LevelHelper {
 
                 } else if (cell.isGoal()) {
 
+                    //update wall decals to switch on
+                    for (Wall wall : level.getWall(col, row).getWalls()) {
+                        if (wall == null)
+                            continue;
+
+                        //switch to the next frame in the animation
+                        wall.getAnimation().setIndex(1);
+                        wall.getAnimation().update();
+                    }
+
                     //sound we completed the level
                     playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelSwitch);
-                    System.out.println("LEVEL COMPLETE!!!!!!!!!!!!!!!!!!!");
+                    level.getPlayer().setTextNotify("Level completed");
                     goal = true;
                     /*
                     player.getController().setRotation(0);
@@ -208,7 +220,7 @@ public class LevelHelper {
 
                         //make sure the player and enemies don't get stuck in the door
                         if (level.getEnemies().hasCollision(col, row) || ((int)level.getPlayer().getCamera3d().position.x == col && (int)level.getPlayer().getCamera3d().position.y == row))
-                            door.setLapsed(0);
+                            door.getTimer().reset();
                         break;
                 }
 
@@ -313,7 +325,7 @@ public class LevelHelper {
 
                         if (door.isSecret())
                             secretTotal++;
-                        if (door.isOnce())
+                        if (door.isFound())
                             secretOpen++;
                     }
                 }

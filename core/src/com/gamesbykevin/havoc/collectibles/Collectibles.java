@@ -1,7 +1,6 @@
 package com.gamesbykevin.havoc.collectibles;
 
-import com.gamesbykevin.havoc.animation.DecalAnimation;
-import com.gamesbykevin.havoc.assets.AudioHelper;
+import com.gamesbykevin.havoc.assets.AudioHelper.Sfx;
 import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.dungeon.Leaf;
 import com.gamesbykevin.havoc.dungeon.Room;
@@ -13,7 +12,6 @@ import com.gamesbykevin.havoc.level.Level;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gamesbykevin.havoc.collectibles.CollectibleHelper.getTextures;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
@@ -23,20 +21,20 @@ public final class Collectibles extends Entities {
 
     //different type of collectibles
     public enum Type {
-        ammo(AudioHelper.Sfx.ItemAddAmmo),
-        ammo_crate(AudioHelper.Sfx.ItemAddAmmo),
-        buzzsaw(AudioHelper.Sfx.ItemAddAmmo),
-        health_large(AudioHelper.Sfx.ItemHealthLarge),
-        health_small(AudioHelper.Sfx.ItemHealthSmall),
-        impact(AudioHelper.Sfx.ItemAddAmmo),
-        magnum(AudioHelper.Sfx.ItemAddAmmo),
-        shotgun(AudioHelper.Sfx.ItemAddAmmo),
-        smg(AudioHelper.Sfx.ItemAddAmmo),
-        key(AudioHelper.Sfx.ItemKey);
+        ammo(Sfx.ItemAddAmmo),
+        ammo_crate(Sfx.ItemAddAmmo),
+        buzzsaw(Sfx.ItemAddAmmo),
+        health_large(Sfx.ItemHealthLarge),
+        health_small(Sfx.ItemHealthSmall),
+        impact(Sfx.ItemAddAmmo),
+        magnum(Sfx.ItemAddAmmo),
+        shotgun(Sfx.ItemAddAmmo),
+        smg(Sfx.ItemAddAmmo),
+        key(Sfx.ItemKey);
 
-        public final AudioHelper.Sfx sound;
+        public final Sfx sound;
 
-        Type(AudioHelper.Sfx sound) {
+        Type(Sfx sound) {
             this.sound = sound;
         }
     }
@@ -55,10 +53,8 @@ public final class Collectibles extends Entities {
     private static final int SPAWN_AMMO_ROW = -1;
 
     public Collectibles(Level level) {
-        super(level);
 
-        //load the collectible textures
-        getTextures(level.getAssetManager());
+        super(level);
     }
 
     @Override
@@ -261,26 +257,14 @@ public final class Collectibles extends Entities {
             if (getEntityList().get(i).getCol() != SPAWN_AMMO_COL && getEntityList().get(i).getRow() != SPAWN_AMMO_ROW)
                 continue;
 
+            //place ammo where the enemy is
             Entity3d tmp = (Entity3d)getEntityList().get(i);
-
-            //search for a nearby spot to place the ammo
-            for (int x = 0; x <= 3; x ++) {
-                for (int y = 0; y <= 3; y ++) {
-
-                    //avoid this location
-                    if (x == 0 && y == 0)
-                        continue;
-
-                    if (hasEntityLocation(entity.getCol() + x, entity.getRow() + y))
-                        continue;
-
-                    tmp.setCol(entity.getCol() + x);
-                    tmp.setRow(entity.getRow() + y);
-                    tmp.getAnimation().reset();
-                    tmp.getAnimation().setPosition(entity.getCol() + x, entity.getRow() + y, 0);
-                    return;
-                }
-            }
+            tmp.setCol(entity.getCol());
+            tmp.setRow(entity.getRow());
+            tmp.setSolid(true);
+            tmp.getAnimation().reset();
+            tmp.getAnimation().setPosition(entity.getCol(), entity.getRow(), 0);
+            return;
         }
     }
 
@@ -291,10 +275,7 @@ public final class Collectibles extends Entities {
     public void add(Type type, float col, float row) {
 
         //create the collectible and make it solid so we can collect it
-        Collectible collectible = new Collectible(type);
-
-        //setup the single animation
-        collectible.getAnimations()[0] = new DecalAnimation(getTextures(getLevel().getAssetManager()).get(type));
+        Collectible collectible = new Collectible(getLevel().getAssetManager(), type);
 
         //reset the animation
         collectible.getAnimation().reset();
@@ -377,7 +358,6 @@ public final class Collectibles extends Entities {
     @Override
     public void dispose() {
         super.dispose();
-        CollectibleHelper.dispose();
     }
 
     @Override
@@ -398,7 +378,7 @@ public final class Collectibles extends Entities {
                 continue;
 
             //don't render if too far away
-            if (getDistance(entity, getLevel().getPlayer().getCamera3d().position) > RENDER_RANGE)
+            if (getDistance(entity, getLevel().getPlayer()) > RENDER_RANGE)
                 continue;
 
             //render the entity

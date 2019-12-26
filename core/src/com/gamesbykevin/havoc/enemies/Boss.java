@@ -3,8 +3,9 @@ package com.gamesbykevin.havoc.enemies;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector3;
 import com.gamesbykevin.havoc.animation.DecalAnimation;
-import com.gamesbykevin.havoc.assets.AudioHelper;
+import com.gamesbykevin.havoc.assets.AudioHelper.Sfx;
 
+import static com.gamesbykevin.havoc.animation.DecalAnimation.*;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 import static com.gamesbykevin.havoc.player.Player.HEALTH_MAX;
 
@@ -35,60 +36,85 @@ public final class Boss extends Enemy {
     protected static final float DURATION_DIE = 375f;
     protected static final float DURATION_PAUSE = 500f;
 
+    //size of sprite sheet
+    private static final int SPRITE_SHEET_COLS = 4;
+    private static final int SPRITE_SHEET_ROWS = 3;
+
     public enum Type {
-        boss_1(ASSET_DIR_BOSS + "boss_1/", DAMAGE_MAX_BOSS),
-        boss_2(ASSET_DIR_BOSS + "boss_2/", DAMAGE_MAX_BOSS),
-        boss_3(ASSET_DIR_BOSS + "boss_3/", DAMAGE_MAX_BOSS),
-        boss_4(ASSET_DIR_BOSS + "boss_4/", DAMAGE_MAX_BOSS),
-        boss_5(ASSET_DIR_BOSS + "boss_5/", DAMAGE_MAX_BOSS),
-        boss_6(ASSET_DIR_BOSS + "boss_6/", DAMAGE_MAX_BOSS),
-        boss_7(ASSET_DIR_BOSS + "boss_7/", DAMAGE_MAX_BOSS),
-        boss_8(ASSET_DIR_BOSS + "boss_8/", DAMAGE_MAX_BOSS),
-        boss_9(ASSET_DIR_BOSS + "boss_9/", DAMAGE_MAX_BOSS),
-        boss_10(ASSET_DIR_BOSS + "boss_10/", DAMAGE_MAX_BOSS),
-        boss_11(ASSET_DIR_BOSS + "boss_11/", DAMAGE_MAX_BOSS),
-        boss_12(ASSET_DIR_BOSS + "boss_12/", DAMAGE_MAX_BOSS),
-        boss_13(ASSET_DIR_BOSS + "boss_13/", DAMAGE_MAX_BOSS),
-        boss_14(ASSET_DIR_BOSS + "boss_14/", DAMAGE_MAX_BOSS);
+        boss_1, boss_2, boss_3, boss_4, boss_5, boss_6, boss_7, boss_8,
+        boss_9, boss_10, boss_11, boss_12, boss_13, boss_14;
 
-        public final String path;
-        public final int damageMax;
-        public final AudioHelper.Sfx shoot;
-        public final AudioHelper.Sfx dead;
-        public final AudioHelper.Sfx alert;
-        public final AudioHelper.Sfx hurt;
+        private final int damageMax;
+        private final Sfx shoot, dead, alert, hurt;
+        private final String path;
 
-        Type(String path, int damageMax) {
-            this.path = path;
-            this.damageMax = damageMax;
-            this.shoot = AudioHelper.Sfx.EnemyWeaponShoot7;
-            this.dead = AudioHelper.Sfx.EnemyDead7;
-            this.alert = AudioHelper.Sfx.EnemyAlert7;
-            this.hurt = AudioHelper.Sfx.EnemyHurt7;
+        Type() {
+            this.damageMax = DAMAGE_MAX_BOSS;
+            this.shoot = Sfx.EnemyWeaponShoot7;
+            this.dead = Sfx.EnemyDead7;
+            this.alert = Sfx.EnemyAlert7;
+            this.hurt = Sfx.EnemyHurt7;
+            this.path = ASSET_DIR_BOSS + name() + SPRITE_SHEET;
+        }
+
+        public String getPath() {
+            return this.path;
+        }
+
+        public int getDamageMax() {
+            return this.damageMax;
+        }
+
+        public Sfx getShoot() {
+            return this.shoot;
+        }
+
+        public Sfx getDead() {
+            return this.dead;
+        }
+
+        public Sfx getAlert() {
+            return this.alert;
+        }
+
+        public Sfx getHurt() {
+            return this.hurt;
         }
     }
+
+    private final Type type;
 
     public Boss(AssetManager assetManager, Type type) {
 
         //call parent
         super(ANIMATION_COUNT);
 
+        this.type = type;
+
         //assign the damage
-        setDamageMax(type.damageMax);
+        setDamageMax(type.getDamageMax());
 
         //assign sound effects
-        super.setShoot(type.shoot);
-        super.setDead(type.dead);
-        super.setAlert(type.alert);
-        super.setHurt(type.hurt);
+        super.setShoot(type.getShoot());
+        super.setDead(type.getDead());
+        super.setAlert(type.getAlert());
+        super.setHurt(type.getHurt());
 
         //setup animations
-        getAnimations()[INDEX_IDLE] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, ASSET_EXT_BMP, 2, 1, DURATION_IDLE);
-        getAnimations()[INDEX_WALK] = new DecalAnimation(assetManager, type.path, FILENAME_WALK, ASSET_EXT_BMP, 1, 4, DURATION_WALK);
-        getAnimations()[INDEX_SHOOT] = new DecalAnimation(assetManager, type.path, FILENAME_SHOOT, ASSET_EXT_BMP, 1, 3, DURATION_SHOOT);
-        getAnimations()[INDEX_ALERT] = new DecalAnimation(assetManager, type.path, FILENAME_SHOOT, ASSET_EXT_BMP, 1, 3, DURATION_ALERT);
-        getAnimations()[INDEX_DIE] = new DecalAnimation(assetManager, type.path, FILENAME_DIE, ASSET_EXT_BMP, 1, 4, DURATION_DIE);
-        getAnimations()[INDEX_PAUSE] = new DecalAnimation(assetManager, type.path, FILENAME_SHOOT, ASSET_EXT_BMP, 1, 1, DURATION_PAUSE);
+        addAnimation(assetManager, INDEX_IDLE, 0, 2, 1, 1, DURATION_IDLE);
+        addAnimation(assetManager, INDEX_WALK, 3, 1, 1, 4, DURATION_WALK);
+        addAnimation(assetManager, INDEX_SHOOT, 0, 1, 1, 3, DURATION_SHOOT);
+        addAnimation(assetManager, INDEX_ALERT, 0, 1, 1, 3, DURATION_ALERT);
+        addAnimation(assetManager, INDEX_DIE, 0, 0, 1, 4, DURATION_DIE);
+        addAnimation(assetManager, INDEX_PAUSE, 0, 2, 1, 1, DURATION_PAUSE);
+    }
+
+    private void addAnimation(AssetManager assetManager, int index, int startCol, int startRow, int increment, int count, float duration) {
+        setAnimation(index, new DecalAnimation(assetManager, getType().getPath(), SPRITE_SHEET_COLS, SPRITE_SHEET_ROWS, SPRITE_SHEET_FRAME_WIDTH, SPRITE_SHEET_FRAME_HEIGHT, startCol, startRow, increment, count, duration, DEFAULT_WIDTH, DEFAULT_HEIGHT, BILLBOARD_ENABLED));
+    }
+
+    public Type getType() {
+        return this.type;
     }
 
     @Override
