@@ -167,11 +167,6 @@ public class LevelHelper {
                     playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelSwitch);
                     level.getPlayer().setTextNotify("Level completed");
                     goal = true;
-                    /*
-                    player.getController().setRotation(0);
-                    level.resetPosition();
-                    level.getEnemies().reset();
-                    */
                 }
             }
         }

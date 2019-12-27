@@ -167,7 +167,7 @@ public final class Boss extends Enemy {
     }
 
     @Override
-    protected boolean isFacing(Vector3 location) {
+    public boolean isFacing(Vector3 location) {
 
         //boss is always facing the specified location
         return true;

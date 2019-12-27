@@ -81,13 +81,22 @@ public class AudioHelper {
         }
     }
 
+
     public static void playSfx(AssetManager assetManager, Sfx sfx) {
-        assetManager.get(sfx.getPath(), Sound.class).play();
+        playSfx(assetManager, sfx, false);
+    }
+
+    public static void playSfx(AssetManager assetManager, Sfx sfx, boolean loop) {
+        if (loop) {
+            assetManager.get(sfx.getPath(), Sound.class).loop();
+        } else {
+            assetManager.get(sfx.getPath(), Sound.class).play();
+        }
     }
 
     public static void playHero(AssetManager assetManager) {
 
-        Sfx sfx = null;
+        Sfx sfx;
 
         switch (getRandom().nextInt(SFX_HERO_COUNT)) {
 
@@ -130,6 +139,6 @@ public class AudioHelper {
         }
 
         if (sfx != null)
-            playSfx(assetManager, sfx);
+            playSfx(assetManager, sfx, false);
     }
 }

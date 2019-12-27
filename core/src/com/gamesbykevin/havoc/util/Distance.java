@@ -9,6 +9,14 @@ import com.gamesbykevin.havoc.player.Player;
 
 public class Distance {
 
+    public static double getDistance(float col, float row, Cell cell) {
+        return getDistance(col, row, cell.getCol(), cell.getRow());
+    }
+
+    public static double getDistance(float col, float row, Entity entity) {
+        return getDistance(col, row, entity.getCol(), entity.getRow());
+    }
+
     public static double getDistance(Entity entity1, Entity entity2) {
         return getDistance(entity1.getCol(), entity1.getRow(), entity2.getCol(), entity2.getRow());
     }

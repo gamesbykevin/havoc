@@ -47,8 +47,8 @@ public final class Player implements Disposable, Restart {
     //the previous location of the player
     private Vector3 previous;
 
-    //track how long we played the level
-    private Timer timerGame;
+    //track how long we played the level and when to show the level summary screen
+    private Timer timerGame, timerGameOver;
 
     //is the player?
     private boolean hurt = false, collect = false;
@@ -59,6 +59,8 @@ public final class Player implements Disposable, Restart {
     //how long to display
     public static final float DURATION_HURT = 100f;
     public static final float DURATION_COLLECT = 100f;
+    public static final float DURATION_NOTIFY = 5000f;
+    public static final float DURATION_GAME_OVER = 1000f;
 
     //our 3d camera
     private PerspectiveCamera camera3d;
@@ -86,9 +88,6 @@ public final class Player implements Disposable, Restart {
 
     //keep track how long message is displayed
     private Timer timerNotify;
-
-    //how long to display
-    public static final float DURATION_NOTIFY = 5000f;
 
     //font to display text
     private BitmapFont font;
@@ -125,6 +124,14 @@ public final class Player implements Disposable, Restart {
 
     public void setNotifyY(int notifyY) {
         this.notifyY = notifyY;
+    }
+
+    public Timer getTimerGameOver() {
+
+        if (this.timerGameOver == null)
+            this.timerGameOver = new Timer(DURATION_GAME_OVER);
+
+        return this.timerGameOver;
     }
 
     public Timer getTimerGame() {
@@ -348,9 +355,8 @@ public final class Player implements Disposable, Restart {
     //update the player
     public void update(Level level) {
 
-        //update timer(s)
+        //update notification timer
         getTimerNotify().update();
-        getTimerGame().update();
 
         if (isDead()) {
 
@@ -378,6 +384,12 @@ public final class Player implements Disposable, Restart {
         } else if (isGoal()) {
 
             setTextNotify("Level Complete");
+            getTimerGameOver().update();
+
+        } else {
+
+            //if not dead or at the goal update the game timer
+            getTimerGame().update();
         }
     }
 
@@ -429,12 +441,13 @@ public final class Player implements Disposable, Restart {
         getTimerHurt().reset();
         getTimerNotify().reset();
         getTimerGame().reset();
+        getTimerGameOver().reset();
     }
 
     public void render() {
 
         //render the controller first if not dead
-        if (!isDead())
+        if (!isDead() && !isGoal())
             getController().render();
 
         //used to render 2d items etc...
@@ -449,7 +462,6 @@ public final class Player implements Disposable, Restart {
             batch.draw(getAssetManager().get(PATH_HURT, Texture.class), 0, 0, getSizeWidth(), getSizeHeight());
 
             if (getTimerHurt().isExpired()) {
-                //stop rendering if time expired
                 setHurt(false);
             } else {
                 getTimerHurt().update();
@@ -460,23 +472,32 @@ public final class Player implements Disposable, Restart {
             batch.draw(getAssetManager().get(PATH_COLLECT, Texture.class), 0, 0, getSizeWidth(), getSizeHeight());
 
             if (getTimerCollect().isExpired()) {
-                //stop rendering if time expired
                 setCollect(false);
             } else {
                 getTimerCollect().update();
             }
+
+        } else if (isGoal()) {
+
+            //if time expired show level stats
+            if (getTimerGameOver().isExpired()) {
+                //display stats
+            }
         }
 
-        //render health
-        Hud.renderNumber(getAssetManager(), batch, getHealth(), HUD_HEALTH_X, HUD_HEALTH_Y);
+        if (!isGoal()) {
 
-        //render key?
-        if (hasKey())
-            renderKey(getAssetManager(), batch);
+            //render health
+            Hud.renderNumber(getAssetManager(), batch, getHealth(), HUD_HEALTH_X, HUD_HEALTH_Y);
 
-        //render the weapons
-        if (!isDead())
-            getWeapons().render();
+            //render key?
+            if (hasKey())
+                renderKey(getAssetManager(), batch);
+
+            //render the weapons
+            if (!isDead())
+                getWeapons().render();
+        }
 
         //if we have text to display and the timer hasn't expired yet
         if (getTextNotify() != null && !getTimerNotify().isExpired())

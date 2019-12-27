@@ -241,6 +241,12 @@ public class WeaponHelper {
 
                 //hopefully we hit the enemy
                 collisionEnemy = Intersector.intersectRaySphere(ray, enemy.getAnimation().getDecal().getPosition(), COLLISION_RADIUS, null);
+
+                //if we didn't hit the enemy check 1 more spot
+                if (!collisionEnemy) {
+                    ray = level.getPlayer().getCamera3d().getPickRay(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 4);
+                    collisionEnemy = Intersector.intersectRaySphere(ray, enemy.getAnimation().getDecal().getPosition(), COLLISION_RADIUS, null);
+                }
             }
 
             //if we have collision and have not hit an enemy yet

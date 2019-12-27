@@ -137,8 +137,22 @@ public class EnemyHelper {
         if (enemy.isIdle() || enemy.isWalk()) {
 
             //if enemy is facing the player and we can shoot, then don't wait
-            if (enemy.isFacing(level.getPlayer().getCamera3d().position) && enemy.canShoot(level, distance))
-                enemy.setStatus(Status.Shoot);
+            if (enemy.isFacing(level.getPlayer().getCamera3d().position)) {
+
+                //is the view obstructed between player and enemy?
+                boolean obstructed = isObstructed(level, enemy);
+
+                if (enemy.canShoot(level, distance, obstructed)) {
+
+                    //if we can shoot do it!
+                    enemy.setStatus(Status.Shoot);
+
+                } else if (!obstructed) {
+
+                    //if we aren't obstructed but can't shoot yet, then we should chase the player
+                    enemy.setChase(true);
+                }
+            }
         }
 
         //we only want to update when the animation is finished

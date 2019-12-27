@@ -192,8 +192,8 @@ public class MyControllerHelper {
 
     public static void updateLocation(Player player) {
 
-        //nothing to update when dead
-        if (player.isDead())
+        //nothing to update when dead or reached the goal
+        if (player.isDead() || player.isGoal())
             return;
 
         //get our location

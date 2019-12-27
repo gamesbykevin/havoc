@@ -195,6 +195,27 @@ public final class Soldier extends Enemy {
     }
 
     @Override
+    public boolean isFacing(Vector3 location) {
+
+        switch (getDirection()) {
+            case DIRECTION_E:
+                return (location.x > getCol());
+
+            case DIRECTION_W:
+                return (location.x < getCol());
+
+            case DIRECTION_N:
+                return (location.y > getRow());
+
+            case DIRECTION_S:
+                return (location.y < getRow());
+
+            default:
+                return false;
+        }
+    }
+
+    @Override
     public void updateIndex(Vector3 position) {
 
         int index = -1;

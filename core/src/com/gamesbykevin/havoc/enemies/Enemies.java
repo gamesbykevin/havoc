@@ -88,7 +88,7 @@ public final class Enemies extends Entities {
             leaves.remove(randomIndex);
 
             //get a list of options to place the enemy
-            options = getLocationOptions(leaf.getRoom(), null);
+            options = getLocationOptions(leaf.getRoom(), -1, -1);
 
             int middleCol = leaf.getRoom().getX() + (leaf.getRoom().getW() / 2);
             int middleRow = leaf.getRoom().getY() + (leaf.getRoom().getH() / 2);
@@ -121,20 +121,51 @@ public final class Enemies extends Entities {
         //decide at random if we are to add a boss to the goal room
         if (getRandom().nextBoolean()) {
 
+            System.out.println("Boss spawned here");
+
             //get the leaf for the goal room
             Leaf leaf = getLeafGoal(getLevel().getDungeon());
 
-            //populate our list of options
-            options = getLocationOptions(leaf.getRoom(), null);
-
-            //pick random index
-            int index = getRandom().nextInt(options.size());
-
+            //center of the room
             int middleCol = leaf.getRoom().getX() + (leaf.getRoom().getW() / 2);
             int middleRow = leaf.getRoom().getY() + (leaf.getRoom().getH() / 2);
 
-            //spawn enemy here
-            spawnEnemy(leaf, options.get(index), middleCol, middleRow, true);
+            //did we succeed placing around the goal
+            boolean success = false;
+
+            //check to see if we can spawn around the goal
+            for (int row = -1; row <= 1; row++) {
+                for (int col = -1; col <= 1; col++) {
+
+                    if (success)
+                        break;
+
+                    if (row == 0 && col == 0)
+                        continue;
+
+                    int spawnCol = getLevel().getDungeon().getGoalCol() + col;
+                    int spawnRow = getLevel().getDungeon().getGoalRow() + row;
+
+                    //if available we will spawn here
+                    if (!hasEntityLocation(spawnCol, spawnRow)) {
+                        spawnEnemy(leaf, spawnCol, spawnRow, middleCol, middleRow, true);
+                        success = true;
+                    }
+                }
+            }
+
+            //if we couldn't find a good spawn location, spawn anywhere else in the room
+            if (!success) {
+
+                //populate our list of options
+                options = getLocationOptions(leaf.getRoom(), null);
+
+                //pick random index
+                int index = getRandom().nextInt(options.size());
+
+                //spawn enemy here
+                spawnEnemy(leaf, options.get(index), middleCol, middleRow, true);
+            }
         }
 
         options.clear();
@@ -145,6 +176,10 @@ public final class Enemies extends Entities {
     }
 
     private void spawnEnemy(Leaf leaf, Cell location, int middleCol, int middleRow, boolean boss) {
+        spawnEnemy(leaf, location.getCol(), location.getRow(), middleCol, middleRow, boss);
+    }
+
+    private void spawnEnemy(Leaf leaf, float col, float row, int middleCol, int middleRow, boolean boss) {
 
         //the enemy created
         Enemy enemy;
@@ -168,16 +203,16 @@ public final class Enemies extends Entities {
         }
 
         //assign location
-        enemy.setCol(location.getCol());
-        enemy.setRow(location.getRow());
+        enemy.setCol(col);
+        enemy.setRow(row);
 
         //change the facing direction
-        if (location.getCol() < middleCol) {
+        if (col < middleCol) {
             enemy.setDirection(DIRECTION_E);
-        } else if (location.getCol() > middleCol) {
+        } else if (col > middleCol) {
             enemy.setDirection(DIRECTION_W);
         } else {
-            if (location.getRow() < middleRow) {
+            if (row < middleRow) {
                 enemy.setDirection(DIRECTION_N);
             } else {
                 enemy.setDirection(DIRECTION_S);
@@ -197,7 +232,7 @@ public final class Enemies extends Entities {
             double distance = -1;
 
             //pick random location in the room for the enemy to walk to
-            List<Cell> tmpList = getLocationOptions(leaf.getRoom(), location);
+            List<Cell> tmpList = getLocationOptions(leaf.getRoom(), col, row);
 
             //pick the location furthest away so the enemy can patrol the room
             for (int i = 0; i < tmpList.size(); i++) {
@@ -205,7 +240,7 @@ public final class Enemies extends Entities {
                 Cell tmp = tmpList.get(i);
 
                 //calculate distance from enemy spawn point
-                double dist = getDistance(location, tmp);
+                double dist = getDistance(col, row, tmp);
 
                 //if the distance is longer this is the distance to beat
                 if (distance < 0 || dist > distance) {
@@ -219,7 +254,7 @@ public final class Enemies extends Entities {
         }
 
         //add enemy at the location
-        add(enemy, location.getCol(), location.getRow());
+        add(enemy, col, row);
 
         //set the destination if we have one
         if (winner != null) {
@@ -229,6 +264,10 @@ public final class Enemies extends Entities {
     }
 
     protected List<Cell> getLocationOptions(Room room, Cell target) {
+        return getLocationOptions(room, target.getCol(), target.getRow());
+    }
+
+    protected List<Cell> getLocationOptions(Room room, float targetCol, float targetRow) {
 
         List<Cell> options = new ArrayList<>();
 
@@ -236,15 +275,15 @@ public final class Enemies extends Entities {
         int centerY = room.getY() + (room.getH() / 2);
 
         //north south east west
-        addOption(options, getLevel().getDungeon().getCell(room.getX() + 2, centerY), target);
-        addOption(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - 3, centerY), target);
-        addOption(options, getLevel().getDungeon().getCell(centerX, room.getY() + 2), target);
-        addOption(options, getLevel().getDungeon().getCell(centerX, room.getY() + room.getH() - 3), target);
+        addOption(options, getLevel().getDungeon().getCell(room.getX() + 2, centerY), targetCol, targetRow);
+        addOption(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - 3, centerY), targetCol, targetRow);
+        addOption(options, getLevel().getDungeon().getCell(centerX, room.getY() + 2), targetCol, targetRow);
+        addOption(options, getLevel().getDungeon().getCell(centerX, room.getY() + room.getH() - 3), targetCol, targetRow);
 
         //center or close to it
         for (int row = -2; row <= 2; row++) {
             for (int col = -2; col <= 2; col++) {
-                addOption(options, getLevel().getDungeon().getCell(centerX + col, centerY + row), target);
+                addOption(options, getLevel().getDungeon().getCell(centerX + col, centerY + row), targetCol, targetRow);
             }
         }
 
@@ -252,13 +291,13 @@ public final class Enemies extends Entities {
         if (options.isEmpty()) {
 
             for (int col = room.getX() + 2; col < room.getX() + room.getW() - 2; col++) {
-                addOption(options, getLevel().getDungeon().getCell(col, room.getY() + 2), target);
-                addOption(options, getLevel().getDungeon().getCell(col, room.getY() + room.getH() - 3), target);
+                addOption(options, getLevel().getDungeon().getCell(col, room.getY() + 2), targetCol, targetRow);
+                addOption(options, getLevel().getDungeon().getCell(col, room.getY() + room.getH() - 3), targetCol, targetRow);
             }
 
             for (int row = room.getY() + 2; row < room.getY() + room.getH() - 2; row++) {
-                addOption(options, getLevel().getDungeon().getCell(room.getX() + 2, row), target);
-                addOption(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - 3, row), target);
+                addOption(options, getLevel().getDungeon().getCell(room.getX() + 2, row), targetCol, targetRow);
+                addOption(options, getLevel().getDungeon().getCell(room.getX() + room.getW() - 3, row), targetCol, targetRow);
             }
         }
 
@@ -266,9 +305,9 @@ public final class Enemies extends Entities {
         return options;
     }
 
-    private void addOption(List<Cell> options, Cell option, Cell target) {
+    private void addOption(List<Cell> options, Cell option, float col, float row) {
 
-        if (target != null && (option.getCol() == target.getCol() && option.getRow() == target.getRow()))
+        if (option.getCol() == col && option.getRow() == row)
             return;
 
         if (!hasEntityLocation(option.getCol(), option.getRow()))

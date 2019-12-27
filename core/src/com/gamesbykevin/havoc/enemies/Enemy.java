@@ -31,10 +31,10 @@ public abstract class Enemy extends Entity3d {
     private static final float DISTANCE_COLLISION = 0.75f;
 
     //how fast can the enemy move
-    public static final float SPEED_DEFAULT = 0.01f;
+    public static final float SPEED_DEFAULT = 0.02f;
 
     //how fast does the enemy move when chasing
-    public static final float SPEED_CHASE = 0.0275f;
+    public static final float SPEED_CHASE = 0.0333f;
 
     //how fast can the enemy move?
     private float speed;
@@ -207,8 +207,12 @@ public abstract class Enemy extends Entity3d {
         return canShoot(level, getDistance(this, level.getPlayer()));
     }
 
-    //is the enemy able to shoot
     public boolean canShoot(Level level, double distance) {
+        return canShoot(level, distance, isObstructed(level, this));
+    }
+
+    //is the enemy able to shoot
+    public boolean canShoot(Level level, double distance, boolean obstructed) {
 
         //have to be in ideal location to shoot
         if (getCol() != (int)getCol() || getRow() != (int)getRow())
@@ -219,7 +223,7 @@ public abstract class Enemy extends Entity3d {
             return false;
 
         //if obstructed, they can't shoot
-        if (isObstructed(level, this))
+        if (obstructed)
             return false;
 
         //make sure there isn't a door here
@@ -355,23 +359,5 @@ public abstract class Enemy extends Entity3d {
         return getStatus() == Status.Idle;
     }
 
-    protected boolean isFacing(Vector3 location) {
-
-        switch (getDirection()) {
-            case DIRECTION_E:
-                return (location.x > getCol());
-
-            case DIRECTION_W:
-                return (location.x < getCol());
-
-            case DIRECTION_N:
-                return (location.y > getRow());
-
-            case DIRECTION_S:
-                return (location.y < getRow());
-
-            default:
-                return false;
-        }
-    }
+    public abstract boolean isFacing(Vector3 location);
 }
