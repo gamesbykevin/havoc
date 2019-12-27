@@ -51,10 +51,19 @@ public class MyController implements InputProcessor, Disposable, Restart {
     //track the joystick position
     private float knobPercentX = 0, knobPercentY = 0;
 
-    //do we display the controller?
-    private final boolean display;
-
     public MyController(AssetManager assetManager) {
+
+        if (hasController())
+            setupController(assetManager, this);
+
+        //make sure we are capturing input correct
+        setInput();
+
+        //create our camera
+        getCamera2d();
+    }
+
+    public static boolean hasController() {
 
         //setup our controller ui when needed
         switch (Gdx.app.getType()) {
@@ -63,23 +72,12 @@ public class MyController implements InputProcessor, Disposable, Restart {
             case iOS:
             case WebGL:
             case HeadlessDesktop:
-                display = true;
-                break;
+                return true;
 
             case Desktop:
             default:
-                display = false;
-                break;
+                return false;
         }
-
-        if (isDisplay())
-            setupController(assetManager, this);
-
-        //make sure we are capturing input correct
-        setInput();
-
-        //create our camera
-        getCamera2d();
     }
 
     @Override
@@ -111,10 +109,6 @@ public class MyController implements InputProcessor, Disposable, Restart {
         this.camera2d = null;
     }
 
-    private boolean isDisplay() {
-        return this.display;
-    }
-
     public void setKnobPercentX(float knobPercentX) {
         this.knobPercentX = knobPercentX;
     }
@@ -143,7 +137,7 @@ public class MyController implements InputProcessor, Disposable, Restart {
     }
 
     public void setInput() {
-        if (isDisplay()) {
+        if (hasController()) {
             Gdx.input.setInputProcessor(getStage());
         } else {
             Gdx.input.setInputProcessor(this);

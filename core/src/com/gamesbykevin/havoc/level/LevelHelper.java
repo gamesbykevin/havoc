@@ -136,7 +136,7 @@ public class LevelHelper {
                     //if locked and we don't have a key
                     if (cell.isLocked() && !key) {
                         playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelLocked);
-                        level.getPlayer().setTextNotify("Door locked");
+                        level.getPlayer().setTextNotify("Door locked, find the key");
                         continue;
                     }
 
@@ -242,6 +242,7 @@ public class LevelHelper {
 
         //only play the sound effects a single time
         if (secret) {
+            level.getPlayer().setTextNotify("Secret room");
             playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelSecret);
         } else if (open) {
             playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelOpen);

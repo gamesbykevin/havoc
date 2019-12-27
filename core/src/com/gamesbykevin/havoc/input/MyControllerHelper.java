@@ -230,19 +230,15 @@ public class MyControllerHelper {
             //make sure we are moving enough
             if (controller.getKnobPercentY() < -DEAD_ZONE_IGNORE) {
                 yMove = controller.getKnobPercentY();
-                //yMove = controller.getKnobPercentY() + DEAD_ZONE_IGNORE;
             } else if (controller.getKnobPercentY() > DEAD_ZONE_IGNORE) {
                 yMove = controller.getKnobPercentY();
-                //yMove = controller.getKnobPercentY() - DEAD_ZONE_IGNORE;
             }
 
             //make sure we are moving enough
             if (controller.getKnobPercentX() < -DEAD_ZONE_IGNORE) {
                 rotationA = (DEFAULT_SPEED_ROTATE * -controller.getKnobPercentX());
-                //rotationA = (DEFAULT_SPEED_ROTATE * (-controller.getKnobPercentX() - DEAD_ZONE_IGNORE));
             } else if (controller.getKnobPercentX() > DEAD_ZONE_IGNORE) {
                 rotationA = (DEFAULT_SPEED_ROTATE * -controller.getKnobPercentX());
-                //rotationA = (DEFAULT_SPEED_ROTATE * (-controller.getKnobPercentX() + DEAD_ZONE_IGNORE));
             }
         }
 

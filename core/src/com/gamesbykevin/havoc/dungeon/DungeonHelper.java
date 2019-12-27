@@ -16,7 +16,7 @@ import static com.gamesbykevin.havoc.level.LevelHelper.isDoorOpen;
 public class DungeonHelper {
 
     //how big is the dungeon
-    public static final int DUNGEON_SIZE = ROOM_DIMENSION_MAX * 2;
+    public static final int DUNGEON_SIZE = ROOM_DIMENSION_MAX * 4;
 
     protected static void divide(Dungeon dungeon) {
 

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -18,8 +19,7 @@ import com.gamesbykevin.havoc.weapon.Weapons;
 import com.gamesbykevin.havoc.util.Disposable;
 import com.gamesbykevin.havoc.util.Hud;
 
-import static com.gamesbykevin.havoc.MyGdxGame.getSizeHeight;
-import static com.gamesbykevin.havoc.MyGdxGame.getSizeWidth;
+import static com.gamesbykevin.havoc.MyGdxGame.*;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_COLLECT;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_HURT;
 import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
@@ -47,8 +47,18 @@ public final class Player implements Disposable, Restart {
     //the previous location of the player
     private Vector3 previous;
 
+    //track how long we played the level
+    private Timer timerGame;
+
     //is the player?
     private boolean hurt = false, collect = false;
+
+    //how long to display the overlay
+    private Timer timerHurt, timerCollect;
+
+    //how long to display
+    public static final float DURATION_HURT = 100f;
+    public static final float DURATION_COLLECT = 100f;
 
     //our 3d camera
     private PerspectiveCamera camera3d;
@@ -77,14 +87,20 @@ public final class Player implements Disposable, Restart {
     //keep track how long message is displayed
     private Timer timerNotify;
 
-    //how long to display notification message
+    //how long to display
     public static final float DURATION_NOTIFY = 5000f;
 
     //font to display text
     private BitmapFont font;
 
-    //pixel padding when drawing our text
+    //provide space
     private static final int PADDING = 5;
+
+    //where do we render our notification message
+    private int notifyX, notifyY;
+
+    //used for font metrics
+    private GlyphLayout glyphLayout;
 
     public Player(AssetManager assetManager) {
 
@@ -93,6 +109,46 @@ public final class Player implements Disposable, Restart {
 
         //reset values
         reset();
+    }
+
+    public int getNotifyX() {
+        return this.notifyX;
+    }
+
+    public void setNotifyX(int notifyX) {
+        this.notifyX = notifyX;
+    }
+
+    public int getNotifyY() {
+        return this.notifyY;
+    }
+
+    public void setNotifyY(int notifyY) {
+        this.notifyY = notifyY;
+    }
+
+    public Timer getTimerGame() {
+
+        if (this.timerGame == null)
+            this.timerGame = new Timer(0);
+
+        return this.timerGame;
+    }
+
+    public Timer getTimerHurt() {
+
+        if (this.timerHurt == null)
+            this.timerHurt = new Timer(DURATION_HURT);
+
+        return this.timerHurt;
+    }
+
+    public Timer getTimerCollect() {
+
+        if (this.timerCollect == null)
+            this.timerCollect = new Timer(DURATION_COLLECT);
+
+        return this.timerCollect;
     }
 
     public Timer getTimerNotify() {
@@ -111,15 +167,34 @@ public final class Player implements Disposable, Restart {
         return this.font;
     }
 
+    public GlyphLayout getGlyphLayout() {
+
+        if (this.glyphLayout == null)
+            this.glyphLayout = new GlyphLayout();
+
+        return this.glyphLayout;
+    }
+
     public String getTextNotify() {
         return this.textNotify;
     }
 
     public void setTextNotify(String textNotify) {
+
         this.textNotify = textNotify;
 
-        if (this.textNotify != null)
-            getTimerNotify().reset();
+        if (this.textNotify == null)
+            return;
+
+        //reset timer
+        getTimerNotify().reset();
+
+        //set text for our font metrics
+        getGlyphLayout().setText(getFont(), getTextNotify());
+
+        //now we know where to render the image
+        setNotifyX((SIZE_WIDTH / 2) - (int)(getGlyphLayout().width / 2));
+        setNotifyY(SIZE_HEIGHT - (int)(getGlyphLayout().height) - PADDING);
     }
 
     public AssetManager getAssetManager() {
@@ -254,10 +329,16 @@ public final class Player implements Disposable, Restart {
 
     public void setHurt(boolean hurt) {
         this.hurt = hurt;
+
+        if (isHurt())
+            getTimerHurt().reset();
     }
 
     public void setCollect(boolean collect) {
         this.collect = collect;
+
+        if (isCollect())
+            getTimerCollect().reset();
     }
 
     public boolean isCollect() {
@@ -267,8 +348,9 @@ public final class Player implements Disposable, Restart {
     //update the player
     public void update(Level level) {
 
-        //update timer
+        //update timer(s)
         getTimerNotify().update();
+        getTimerGame().update();
 
         if (isDead()) {
 
@@ -296,9 +378,6 @@ public final class Player implements Disposable, Restart {
         } else if (isGoal()) {
 
             setTextNotify("Level Complete");
-            //if the controller has been touched, flag reset
-            //if (getController().isTouch() || Gdx.input.justTouched())
-            //    level.setReset(true);
         }
     }
 
@@ -319,6 +398,10 @@ public final class Player implements Disposable, Restart {
         this.font = null;
         this.timerNotify = null;
         this.textNotify = null;
+        this.glyphLayout = null;
+        this.timerHurt = null;
+        this.timerCollect = null;
+        this.timerGame = null;
     }
 
     @Override
@@ -341,6 +424,11 @@ public final class Player implements Disposable, Restart {
 
         //reset timer
         setTextNotify(null);
+
+        getTimerCollect().reset();
+        getTimerHurt().reset();
+        getTimerNotify().reset();
+        getTimerGame().reset();
     }
 
     public void render() {
@@ -357,11 +445,26 @@ public final class Player implements Disposable, Restart {
 
         //if hurt render the screen graphic
         if (isHurt() || isDead()) {
+
             batch.draw(getAssetManager().get(PATH_HURT, Texture.class), 0, 0, getSizeWidth(), getSizeHeight());
-            setHurt(false);
+
+            if (getTimerHurt().isExpired()) {
+                //stop rendering if time expired
+                setHurt(false);
+            } else {
+                getTimerHurt().update();
+            }
+
         } else if (isCollect()) {
+
             batch.draw(getAssetManager().get(PATH_COLLECT, Texture.class), 0, 0, getSizeWidth(), getSizeHeight());
-            setCollect(false);
+
+            if (getTimerCollect().isExpired()) {
+                //stop rendering if time expired
+                setCollect(false);
+            } else {
+                getTimerCollect().update();
+            }
         }
 
         //render health
@@ -377,7 +480,7 @@ public final class Player implements Disposable, Restart {
 
         //if we have text to display and the timer hasn't expired yet
         if (getTextNotify() != null && !getTimerNotify().isExpired())
-            getFont().draw(batch, getTextNotify(), PADDING, PADDING + getFont().getLineHeight());
+            getFont().draw(batch, getTextNotify(), getNotifyX(), getNotifyY());
 
         //we are done
         batch.end();

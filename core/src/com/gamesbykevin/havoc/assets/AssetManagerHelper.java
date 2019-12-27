@@ -14,6 +14,7 @@ import java.util.List;
 
 import static com.gamesbykevin.havoc.assets.AudioHelper.Sfx.*;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
+import static com.gamesbykevin.havoc.input.MyController.hasController;
 
 public class AssetManagerHelper {
 
@@ -258,8 +259,9 @@ public class AssetManagerHelper {
             load(assetManager, type.sound.getPath(), Sound.class);
         }
 
-        //load controller images
-        loadController(assetManager);
+        //load controller images if we are displaying the controller
+        if (hasController())
+            loadController(assetManager);
 
         //load standard textures used in every level
         load(assetManager, ASSET_SHEET_STANDARD, Texture.class);

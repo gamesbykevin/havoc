@@ -26,6 +26,7 @@ public final class Enemies extends Entities {
 
     //how many enemies in each room
     public static final int ENEMIES_PER_ROOM_MAX = 3;
+    public static final int ENEMIES_PER_ROOM_MIN = 1;
 
     //how close do we need to be to play the sound effect
     public static final float ENEMY_DISTANCE_SFX_RATIO = 1.25f;
@@ -95,7 +96,7 @@ public final class Enemies extends Entities {
             int count = 0;
 
             //pick random number of enemies
-            int limit = getRandom().nextInt(ENEMIES_PER_ROOM_MAX) + 1;
+            int limit = getRandom().nextInt(ENEMIES_PER_ROOM_MAX - ENEMIES_PER_ROOM_MIN) + ENEMIES_PER_ROOM_MIN;
 
             //how many enemies per room
             while (!options.isEmpty() && count < limit) {
