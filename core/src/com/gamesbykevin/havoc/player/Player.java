@@ -24,8 +24,7 @@ import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_COLLECT;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_HURT;
 import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
-import static com.gamesbykevin.havoc.player.PlayerHelper.HEIGHT_MIN_Z;
-import static com.gamesbykevin.havoc.player.PlayerHelper.VELOCITY_Z;
+import static com.gamesbykevin.havoc.player.PlayerHelper.*;
 import static com.gamesbykevin.havoc.util.Hud.*;
 
 public final class Player implements Disposable, Restart {
@@ -101,6 +100,9 @@ public final class Player implements Disposable, Restart {
     //used for font metrics
     private GlyphLayout glyphLayout;
 
+    //percentage completion 0 - 100
+    private int statEnemy, statItem, statSecret;
+
     public Player(AssetManager assetManager) {
 
         //store reference
@@ -108,6 +110,30 @@ public final class Player implements Disposable, Restart {
 
         //reset values
         reset();
+    }
+
+    public int getStatEnemy() {
+        return this.statEnemy;
+    }
+
+    public void setStatEnemy(int statEnemy) {
+        this.statEnemy = statEnemy;
+    }
+
+    public int getStatItem() {
+        return this.statItem;
+    }
+
+    public void setStatItem(int statItem) {
+        this.statItem = statItem;
+    }
+
+    public int getStatSecret() {
+        return this.statSecret;
+    }
+
+    public void setStatSecret(int statSecret) {
+        this.statSecret = statSecret;
     }
 
     public int getNotifyX() {
@@ -290,9 +316,9 @@ public final class Player implements Disposable, Restart {
             this.health = HEALTH_MAX;
 
         if (isDead()) {
-            setTextNotify("You died");
+            setTextNotify(TEXT_NOTIFY_DEAD);
         } else if (getHealth() <= HEALTH_LOW) {
-            setTextNotify("Low health");
+            setTextNotify(TEXT_NOTIFY_LOW_HEALTH);
         }
     }
 
@@ -383,7 +409,7 @@ public final class Player implements Disposable, Restart {
 
         } else if (isGoal()) {
 
-            setTextNotify("Level Complete");
+            setTextNotify(TEXT_NOTIFY_LEVEL_COMPLETE);
             getTimerGameOver().update();
 
         } else {
@@ -418,30 +444,20 @@ public final class Player implements Disposable, Restart {
 
     @Override
     public void reset() {
-
-        //start out with the max health
         setHealth(HEALTH_MAX);
-
-        //we don't have the key (yet)
         setKey(false);
-
-        //player isn't hurt (just yet)
         setHurt(false);
-
-        //reset the camera position
         getCamera3d(true);
-
-        //we didn't find the goal yet
         setGoal(false);
-
-        //reset timer
         setTextNotify(null);
-
         getTimerCollect().reset();
         getTimerHurt().reset();
         getTimerNotify().reset();
         getTimerGame().reset();
         getTimerGameOver().reset();
+        setStatEnemy(0);
+        setStatItem(0);
+        setStatSecret(0);
     }
 
     public void render() {
@@ -481,7 +497,9 @@ public final class Player implements Disposable, Restart {
 
             //if time expired show level stats
             if (getTimerGameOver().isExpired()) {
-                //display stats
+
+                //display stats on screen
+                renderStats(getAssetManager(), batch, this);
             }
         }
 

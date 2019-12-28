@@ -17,6 +17,7 @@ import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.decals.Door.DOOR_DISTANCE_SFX_RATIO;
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
+import static com.gamesbykevin.havoc.player.PlayerHelper.*;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public class LevelHelper {
@@ -136,9 +137,13 @@ public class LevelHelper {
                     //if locked and we don't have a key
                     if (cell.isLocked() && !key) {
                         playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelLocked);
-                        level.getPlayer().setTextNotify("Door locked, find the key");
+                        level.getPlayer().setTextNotify(TEXT_NOTIFY_LOCKED);
                         continue;
                     }
+
+                    //display we found a secret room if 1st time opening secret door
+                    if (door.isSecret() && !door.isFound())
+                        level.getPlayer().setTextNotify(TEXT_NOTIFY_SECRET);
 
                     //open the door
                     door.open();
@@ -165,7 +170,7 @@ public class LevelHelper {
 
                     //sound we completed the level
                     playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelSwitch);
-                    level.getPlayer().setTextNotify("Level completed");
+                    level.getPlayer().setTextNotify(TEXT_NOTIFY_LEVEL_COMPLETE);
                     goal = true;
                 }
             }
@@ -237,7 +242,6 @@ public class LevelHelper {
 
         //only play the sound effects a single time
         if (secret) {
-            level.getPlayer().setTextNotify("Secret room");
             playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelSecret);
         } else if (open) {
             playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelOpen);
@@ -326,9 +330,13 @@ public class LevelHelper {
                     }
                 }
 
-                System.out.println("Enemies: " + enemiesKilled + " of " + enemiesTotal);
-                System.out.println("Collectibles: " + collectiblesConsumed + " of " + collectiblesTotal);
-                System.out.println("Secrets:" + secretOpen + " of " + secretTotal);
+                if (secretTotal <= 0) {
+                    player.setStatSecret(100);
+                } else {
+                    player.setStatSecret((int) ((secretOpen / secretTotal) * 100));
+                }
+                player.setStatItem((int)((collectiblesConsumed / collectiblesTotal) * 100));
+                player.setStatEnemy((int)((enemiesKilled / enemiesTotal) * 100));
             }
 
             //set action back to false

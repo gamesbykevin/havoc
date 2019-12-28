@@ -28,7 +28,7 @@ public abstract class Enemy extends Entity3d {
     private int damageMax;
 
     //how close can the player get to the enemy
-    private static final float DISTANCE_COLLISION = 0.75f;
+    public static final float DISTANCE_COLLISION = 0.75f;
 
     //how fast can the enemy move
     public static final float SPEED_DEFAULT = 0.02f;

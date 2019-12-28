@@ -41,6 +41,11 @@ public class Hud {
                 case 2:
                     index = (number % 10);
                     break;
+
+                //a % sign will be rendered on the end
+                case 3:
+                    index = -1;
+                    break;
             }
 
             //if less than 0 we display as 999

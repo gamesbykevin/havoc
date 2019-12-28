@@ -113,7 +113,7 @@ public class Dungeon implements Disposable {
         updateMap();
 
         //print the dungeon so we can see it
-        print();
+        //print();
     }
 
     private void calculateCost() {

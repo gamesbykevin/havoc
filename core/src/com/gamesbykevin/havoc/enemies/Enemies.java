@@ -121,8 +121,6 @@ public final class Enemies extends Entities {
         //decide at random if we are to add a boss to the goal room
         if (getRandom().nextBoolean()) {
 
-            System.out.println("Boss spawned here");
-
             //get the leaf for the goal room
             Leaf leaf = getLeafGoal(getLevel().getDungeon());
 
@@ -396,6 +394,9 @@ public final class Enemies extends Entities {
 
     @Override
     public void update() {
+
+        if (getLevel().getPlayer().isGoal())
+            return;
 
         //update timers
         updateTimers();

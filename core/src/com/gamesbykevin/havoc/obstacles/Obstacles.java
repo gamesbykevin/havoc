@@ -13,9 +13,6 @@ import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public final class Obstacles extends Entities {
 
-    //how close can we get to the obstacle
-    private static final float OBSTACLE_COLLISION = .75f;
-
     public Obstacles(Level level) {
         super(level);
     }
@@ -79,7 +76,7 @@ public final class Obstacles extends Entities {
 
 
         //how frequent do we add an obstacle
-        int offset = getRandom().nextInt(4) + 1;
+        int offset = getRandom().nextInt(3) + 2;
 
         boolean doorWest = room.hasWestDoor(getLevel().getDungeon());
         boolean doorEast = room.hasEastDoor(getLevel().getDungeon());
@@ -195,6 +192,9 @@ public final class Obstacles extends Entities {
 
         //then add to entity list
         add(obstacle, col, row);
+
+        //update dungeon map at location
+        getLevel().getDungeon().updateMap(col, row);
     }
 
     private boolean nearInteract(int col, int row) {
@@ -216,19 +216,7 @@ public final class Obstacles extends Entities {
 
     @Override
     public boolean hasCollision(float x, float y) {
-
-        for (int i = 0; i < getEntityList().size(); i++) {
-
-            //get the current entity
-            Entity entity = getEntityList().get(i);
-
-            if (!entity.isSolid())
-                continue;
-
-            if (getDistance(entity, x, y) < OBSTACLE_COLLISION)
-                return true;
-        }
-
+        //dungeon map is updated based on obstacle position, otherwise we could have a performance issue here
         return false;
     }
 
@@ -259,7 +247,7 @@ public final class Obstacles extends Entities {
             double distance = getDistance(entity, getLevel().getPlayer());
 
             //don't render if not solid and too close to the player
-            if (!entity.isSolid() && distance < DISTANCE_RENDER_IGNORE)
+            if (distance < DISTANCE_RENDER_IGNORE)
                 continue;
 
             //don't render if too far away

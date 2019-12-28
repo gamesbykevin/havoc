@@ -10,8 +10,7 @@ import com.gamesbykevin.havoc.weapon.Weapons;
 
 import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.player.Player.HEALTH_MAX;
-import static com.gamesbykevin.havoc.player.PlayerHelper.HEALTH_LARGE;
-import static com.gamesbykevin.havoc.player.PlayerHelper.HEALTH_SMALL;
+import static com.gamesbykevin.havoc.player.PlayerHelper.*;
 
 public class CollectibleHelper {
 
@@ -55,35 +54,35 @@ public class CollectibleHelper {
                     weapons.add(WeaponHelper.Type.smg);
                     add = true;
                     collected = true;
-                    player.setTextNotify("found smg auto rifle");
+                    player.setTextNotify(TEXT_NOTIFY_SMG);
                     break;
 
                 case impact:
                     weapons.add(WeaponHelper.Type.impact);
                     add = true;
                     collected = true;
-                    player.setTextNotify("found impact cannon");
+                    player.setTextNotify(TEXT_NOTIFY_IMPACT);
                     break;
 
                 case magnum:
                     weapons.add(WeaponHelper.Type.magnum);
                     add = true;
                     collected = true;
-                    player.setTextNotify("found magnum");
+                    player.setTextNotify(TEXT_NOTIFY_MAGNUM);
                     break;
 
                 case buzzsaw:
                     weapons.add(WeaponHelper.Type.buzz);
                     add = true;
                     collected = true;
-                    player.setTextNotify("found buzz saw gun");
+                    player.setTextNotify(TEXT_NOTIFY_BUZZ);
                     break;
 
                 case shotgun:
                     weapons.add(WeaponHelper.Type.shotgun);
                     add = true;
                     collected = true;
-                    player.setTextNotify("found shotgun");
+                    player.setTextNotify(TEXT_NOTIFY_SHOTGUN);
                     break;
 
                 case ammo:
@@ -92,7 +91,7 @@ public class CollectibleHelper {
                     if (weapons.getWeapon().getBullets() < weapons.getWeapon().getType().getBulletsMax()) {
                         playSfx(level.getAssetManager(), collectible.getSoundEffect());
                         weapons.getWeapon().addAmmoSmall();
-                        player.setTextNotify("ammo added");
+                        player.setTextNotify(TEXT_NOTIFY_AMMO);
                         collected = true;
                     }
                     break;
@@ -103,7 +102,7 @@ public class CollectibleHelper {
                     if (weapons.getWeapon().getBullets() < weapons.getWeapon().getType().getBulletsMax()) {
                         playSfx(level.getAssetManager(), collectible.getSoundEffect());
                         weapons.getWeapon().addAmmoLarge();
-                        player.setTextNotify("ammo added");
+                        player.setTextNotify(TEXT_NOTIFY_AMMO);
                         collected = true;
                     }
                     break;
@@ -114,7 +113,7 @@ public class CollectibleHelper {
                     if (player.getHealth() < HEALTH_MAX) {
                         playSfx(level.getAssetManager(), collectible.getSoundEffect());
                         player.setHealth(player.getHealth() + HEALTH_LARGE);
-                        player.setTextNotify("large health pack found");
+                        player.setTextNotify(TEXT_NOTIFY_HEALTH_LARGE);
                         collected = true;
                     }
                     break;
@@ -125,14 +124,14 @@ public class CollectibleHelper {
                     if (player.getHealth() < HEALTH_MAX) {
                         playSfx(level.getAssetManager(), collectible.getSoundEffect());
                         player.setHealth(player.getHealth() + HEALTH_SMALL);
-                        player.setTextNotify("health pack found");
+                        player.setTextNotify(TEXT_NOTIFY_HEALTH_SMALL);
                         collected = true;
                     }
                     break;
 
                 case key:
                     playSfx(level.getAssetManager(), collectible.getSoundEffect());
-                    player.setTextNotify("key found");
+                    player.setTextNotify(TEXT_NOTIFY_KEY);
                     player.setKey(true);
                     collected = true;
                     break;
