@@ -215,6 +215,10 @@ public class WeaponHelper {
         //we can only hit 1 enemy
         boolean strike = false;
 
+        //we check the middle part of the screen
+        Ray ray1 = level.getPlayer().getCamera3d().getPickRay(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+        Ray ray2 = level.getPlayer().getCamera3d().getPickRay(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 4);
+
         //check every enemy
         for (int i = 0; i < level.getEnemies().getEntityList().size(); i++) {
 
@@ -236,17 +240,12 @@ public class WeaponHelper {
             //check if we are close enough to strike the enemy and make sure we didn't hit a wall
             if (!collisionWall && distance <= weapon.getRange()) {
 
-                //we check the middle of the screen
-                Ray ray = level.getPlayer().getCamera3d().getPickRay(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
-
                 //hopefully we hit the enemy
-                collisionEnemy = Intersector.intersectRaySphere(ray, enemy.getAnimation().getDecal().getPosition(), COLLISION_RADIUS, null);
+                collisionEnemy = Intersector.intersectRaySphere(ray1, enemy.getAnimation().getDecal().getPosition(), COLLISION_RADIUS, null);
 
                 //if we didn't hit the enemy check 1 more spot
-                if (!collisionEnemy) {
-                    ray = level.getPlayer().getCamera3d().getPickRay(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 4);
-                    collisionEnemy = Intersector.intersectRaySphere(ray, enemy.getAnimation().getDecal().getPosition(), COLLISION_RADIUS, null);
-                }
+                if (!collisionEnemy)
+                    collisionEnemy = Intersector.intersectRaySphere(ray2, enemy.getAnimation().getDecal().getPosition(), COLLISION_RADIUS, null);
             }
 
             //if we have collision and have not hit an enemy yet
