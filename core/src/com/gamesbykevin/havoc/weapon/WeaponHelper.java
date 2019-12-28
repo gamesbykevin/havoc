@@ -51,8 +51,8 @@ public class WeaponHelper {
     protected static final float DEFAULT_VELOCITY_SWITCH_Y = 6f;
 
     //how much ammo to add when we collect a collectible
-    public static final float AMMO_SMALL_RATIO = .10f;
-    public static final float AMMO_LARGE_RATIO = .25f;
+    public static final float AMMO_SMALL_RATIO = .05f;
+    public static final float AMMO_LARGE_RATIO = .15f;
 
     //when firing the weapon everyone with in range will be notified
     public static final float RANGE_FIRE_RATIO = 2.25f;
@@ -215,10 +215,6 @@ public class WeaponHelper {
         //we can only hit 1 enemy
         boolean strike = false;
 
-        //we check the middle part of the screen
-        Ray ray1 = level.getPlayer().getCamera3d().getPickRay(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
-        Ray ray2 = level.getPlayer().getCamera3d().getPickRay(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 4);
-
         //check every enemy
         for (int i = 0; i < level.getEnemies().getEntityList().size(); i++) {
 
@@ -241,11 +237,14 @@ public class WeaponHelper {
             if (!collisionWall && distance <= weapon.getRange()) {
 
                 //hopefully we hit the enemy
-                collisionEnemy = Intersector.intersectRaySphere(ray1, enemy.getAnimation().getDecal().getPosition(), COLLISION_RADIUS, null);
+                Ray ray = level.getPlayer().getCamera3d().getPickRay(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+                collisionEnemy = Intersector.intersectRaySphere(ray, enemy.getAnimation().getDecal().getPosition(), COLLISION_RADIUS, null);
 
                 //if we didn't hit the enemy check 1 more spot
-                if (!collisionEnemy)
-                    collisionEnemy = Intersector.intersectRaySphere(ray2, enemy.getAnimation().getDecal().getPosition(), COLLISION_RADIUS, null);
+                if (!collisionEnemy) {
+                    ray = level.getPlayer().getCamera3d().getPickRay(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 4);
+                    collisionEnemy = Intersector.intersectRaySphere(ray, enemy.getAnimation().getDecal().getPosition(), COLLISION_RADIUS, null);
+                }
             }
 
             //if we have collision and have not hit an enemy yet
