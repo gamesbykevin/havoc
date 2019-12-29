@@ -55,11 +55,18 @@ public final class Player implements Disposable, Restart {
     //how long to display the overlay
     private Timer timerHurt, timerCollect;
 
+    //delay showing the stats
+    private Timer timerStatEnemy, timerStatItem, timerStatSecret, timerStatTime;
+
     //how long to display
     public static final float DURATION_HURT = 100f;
     public static final float DURATION_COLLECT = 100f;
     public static final float DURATION_NOTIFY = 5000f;
     public static final float DURATION_GAME_OVER = 1000f;
+    public static final float DURATION_STATS_TIME = 1000f;
+    public static final float DURATION_STATS_SECRET = 2000f;
+    public static final float DURATION_STATS_ITEM = 3000f;
+    public static final float DURATION_STATS_ENEMY = 4000f;
 
     //our 3d camera
     private PerspectiveCamera camera3d;
@@ -89,7 +96,10 @@ public final class Player implements Disposable, Restart {
     private Timer timerNotify;
 
     //font to display text
-    private BitmapFont font;
+    private BitmapFont font, fontStats;
+
+    //how big is the font
+    private static final float FONT_SIZE_STATS_RATIO = 1.25F;
 
     //provide space
     private static final int PADDING = 5;
@@ -103,6 +113,9 @@ public final class Player implements Disposable, Restart {
     //percentage completion 0 - 100
     private int statEnemy, statItem, statSecret;
 
+    //time used to beat level
+    private int minutes, seconds, milliseconds;
+
     public Player(AssetManager assetManager) {
 
         //store reference
@@ -110,6 +123,62 @@ public final class Player implements Disposable, Restart {
 
         //reset values
         reset();
+    }
+
+    public Timer getTimerStatEnemy() {
+
+        if (this.timerStatEnemy == null)
+            this.timerStatEnemy = new Timer(DURATION_STATS_ENEMY);
+
+        return this.timerStatEnemy;
+    }
+
+    public Timer getTimerStatItem() {
+
+        if (this.timerStatItem == null)
+            this.timerStatItem = new Timer(DURATION_STATS_ITEM);
+
+        return this.timerStatItem;
+    }
+
+    public Timer getTimerStatSecret() {
+
+        if (this.timerStatSecret == null)
+            this.timerStatSecret = new Timer(DURATION_STATS_SECRET);
+
+        return this.timerStatSecret;
+    }
+
+    public Timer getTimerStatTime() {
+
+        if (this.timerStatTime == null)
+            this.timerStatTime = new Timer(DURATION_STATS_TIME);
+
+        return this.timerStatTime;
+    }
+
+    public int getMinutes() {
+        return this.minutes;
+    }
+
+    public void setMinutes(int minutes) {
+        this.minutes = minutes;
+    }
+
+    public int getSeconds() {
+        return this.seconds;
+    }
+
+    public void setSeconds(int seconds) {
+        this.seconds = seconds;
+    }
+
+    public int getMilliseconds() {
+        return this.milliseconds;
+    }
+
+    public void setMilliseconds(int milliseconds) {
+        this.milliseconds = milliseconds;
     }
 
     public int getStatEnemy() {
@@ -198,6 +267,16 @@ public final class Player implements Disposable, Restart {
             this.font = new BitmapFont();
 
         return this.font;
+    }
+
+    public BitmapFont getFontStats() {
+
+        if (this.fontStats == null) {
+            this.fontStats = new BitmapFont();
+            this.fontStats.getData().setScale(FONT_SIZE_STATS_RATIO);
+        }
+
+        return this.fontStats;
     }
 
     public GlyphLayout getGlyphLayout() {
@@ -328,6 +407,13 @@ public final class Player implements Disposable, Restart {
 
     public void setGoal(boolean goal) {
         this.goal = goal;
+
+        //if we reached the goal record the time to beat the level
+        if (goal) {
+            setMinutes((int)((getTimerGame().getLapsed() / 1000) / 60));
+            setSeconds((int)((getTimerGame().getLapsed() / 1000) % 60));
+            setMilliseconds((int)(getTimerGame().getLapsed() - (getSeconds() * 1000) - (getMinutes() * 60 * 1000)));
+        }
     }
 
     public boolean hasKey() {
@@ -428,18 +514,25 @@ public final class Player implements Disposable, Restart {
             this.weapons.dispose();
         if (this.font != null)
             this.font.dispose();
+        if (this.fontStats != null)
+            this.fontStats.dispose();
 
         this.previous = null;
         this.controller = null;
         this.camera3d = null;
         this.weapons = null;
         this.font = null;
+        this.fontStats = null;
         this.timerNotify = null;
         this.textNotify = null;
         this.glyphLayout = null;
         this.timerHurt = null;
         this.timerCollect = null;
         this.timerGame = null;
+        this.timerStatEnemy = null;
+        this.timerStatItem = null;
+        this.timerStatSecret = null;
+        this.timerStatTime = null;
     }
 
     @Override
@@ -458,6 +551,10 @@ public final class Player implements Disposable, Restart {
         setStatEnemy(0);
         setStatItem(0);
         setStatSecret(0);
+        getTimerStatEnemy().reset();
+        getTimerStatItem().reset();
+        getTimerStatSecret().reset();
+        getTimerStatTime().reset();
     }
 
     public void render() {
@@ -506,7 +603,7 @@ public final class Player implements Disposable, Restart {
         if (!isGoal()) {
 
             //render health
-            Hud.renderNumber(getAssetManager(), batch, getHealth(), HUD_HEALTH_X, HUD_HEALTH_Y);
+            Hud.renderNumberDigits3(getAssetManager(), batch, getHealth(), true, HUD_HEALTH_X, HUD_HEALTH_Y, HUD_WIDTH, HUD_HEIGHT);
 
             //render key?
             if (hasKey())

@@ -3,6 +3,7 @@ package com.gamesbykevin.havoc.player;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.decals.Square;
 import com.gamesbykevin.havoc.level.Level;
@@ -11,7 +12,11 @@ import com.gamesbykevin.havoc.util.Hud;
 import static com.gamesbykevin.havoc.MyGdxGame.getSizeHeight;
 import static com.gamesbykevin.havoc.MyGdxGame.getSizeWidth;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_HURT;
+import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
+import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.input.MyController.SPEED_WALK;
+import static com.gamesbykevin.havoc.util.Hud.SHEET_HEIGHT;
+import static com.gamesbykevin.havoc.util.Hud.SHEET_WIDTH;
 
 public class PlayerHelper {
 
@@ -29,6 +34,11 @@ public class PlayerHelper {
     public static final String TEXT_NOTIFY_SECRET = "secret room";
     public static final String TEXT_NOTIFY_DEAD = "you died";
     public static final String TEXT_NOTIFY_LOW_HEALTH = "low health";
+    public static final String TEXT_STAT_TIME = "Time";
+    public static final String TEXT_STAT_ENEMY = "Enemy";
+    public static final String TEXT_STAT_ITEM = "Item";
+    public static final String TEXT_STAT_SECRET = "Secret";
+
 
     //if we aren't moving the joystick enough we will ignore
     public static final float DEAD_ZONE_IGNORE = .2f;
@@ -44,10 +54,12 @@ public class PlayerHelper {
 
     //where we render our stats
     public static final int STATS_X = 50;
-    public static final int STATS_Y = 75;
-    public static final int STATS_Y_DIFF = 25;
-    public static final int INCREMENT_X = 75;
-    public static final int INCREMENT_Y = 100;
+    public static final int STATS_Y_ENEMY = 75;
+    public static final int STATS_Y_ITEM = 175;
+    public static final int STATS_Y_SECRET = 275;
+    public static final int STATS_Y_TIMER = 375;
+    public static final int STATS_Y_DIFF = 50;
+    public static final int STATS_X_DIFF = 75;
 
     public static void checkCollision(Level level) {
 
@@ -146,16 +158,52 @@ public class PlayerHelper {
         //draw our background
         batch.draw(assetManager.get(PATH_HURT, Texture.class), 0, 0, getSizeWidth(), getSizeHeight());
 
-        int x = STATS_X;
-        int y = STATS_Y;
+        player.getFontStats().draw(batch, TEXT_STAT_SECRET, STATS_X, STATS_Y_SECRET);
 
-        player.getFont().draw(batch, "Secret", x, y);
-        Hud.renderNumber(assetManager, batch, player.getStatSecret(), x + INCREMENT_X, y - STATS_Y_DIFF);
-        y += INCREMENT_Y;
-        player.getFont().draw(batch, "Item", x,y);
-        Hud.renderNumber(assetManager, batch, player.getStatItem(), x + INCREMENT_X, y - STATS_Y_DIFF);
-        y += INCREMENT_Y;
-        player.getFont().draw(batch, "Enemy", x, y);
-        Hud.renderNumber(assetManager, batch, player.getStatEnemy(), x + INCREMENT_X, y - STATS_Y_DIFF);
+        if (player.getTimerStatSecret().isExpired()) {
+            Hud.renderNumberDigits3(assetManager, batch, player.getStatSecret(), true, STATS_X + STATS_X_DIFF, STATS_Y_SECRET - STATS_Y_DIFF, SHEET_WIDTH, SHEET_HEIGHT);
+        } else {
+            Hud.renderNumberDigits3(assetManager, batch, getRandom().nextInt(900) + 100, true, STATS_X + STATS_X_DIFF, STATS_Y_SECRET - STATS_Y_DIFF, SHEET_WIDTH, SHEET_HEIGHT);
+            player.getTimerStatSecret().update();
+
+            if (player.getTimerStatSecret().isExpired())
+                playSfx(assetManager, AudioHelper.Sfx.ItemKey);
+        }
+
+        player.getFontStats().draw(batch, TEXT_STAT_ITEM, STATS_X, STATS_Y_ITEM);
+
+        if (player.getTimerStatItem().isExpired()) {
+            Hud.renderNumberDigits3(assetManager, batch, player.getStatItem(), true, STATS_X + STATS_X_DIFF, STATS_Y_ITEM - STATS_Y_DIFF, SHEET_WIDTH, SHEET_HEIGHT);
+        } else {
+            Hud.renderNumberDigits3(assetManager, batch, getRandom().nextInt(900) + 100, true, STATS_X + STATS_X_DIFF, STATS_Y_ITEM - STATS_Y_DIFF, SHEET_WIDTH, SHEET_HEIGHT);
+            player.getTimerStatItem().update();
+
+            if (player.getTimerStatItem().isExpired())
+                playSfx(assetManager, AudioHelper.Sfx.ItemKey);
+        }
+
+        player.getFontStats().draw(batch, TEXT_STAT_ENEMY, STATS_X, STATS_Y_ENEMY);
+
+        if (player.getTimerStatEnemy().isExpired()) {
+            Hud.renderNumberDigits3(assetManager, batch, player.getStatEnemy(), true, STATS_X + STATS_X_DIFF, STATS_Y_ENEMY - STATS_Y_DIFF, SHEET_WIDTH, SHEET_HEIGHT);
+        } else {
+            Hud.renderNumberDigits3(assetManager, batch, getRandom().nextInt(900) + 100, true, STATS_X + STATS_X_DIFF, STATS_Y_ENEMY - STATS_Y_DIFF, SHEET_WIDTH, SHEET_HEIGHT);
+            player.getTimerStatEnemy().update();
+
+            if (player.getTimerStatEnemy().isExpired())
+                playSfx(assetManager, AudioHelper.Sfx.ItemKey);
+        }
+
+        player.getFontStats().draw(batch, TEXT_STAT_TIME, STATS_X, STATS_Y_TIMER);
+
+        if (player.getTimerStatTime().isExpired()) {
+            Hud.renderTime(assetManager, batch, player.getMinutes(), player.getSeconds(), player.getMilliseconds(), STATS_X + STATS_X_DIFF, STATS_Y_TIMER - STATS_Y_DIFF, SHEET_WIDTH, SHEET_HEIGHT);
+        } else {
+            Hud.renderTime(assetManager, batch, getRandom().nextInt(900) + 100, getRandom().nextInt(90) + 10, getRandom().nextInt(900) + 100, STATS_X + STATS_X_DIFF, STATS_Y_TIMER - STATS_Y_DIFF, SHEET_WIDTH, SHEET_HEIGHT);
+            player.getTimerStatTime().update();
+
+            if (player.getTimerStatTime().isExpired())
+                playSfx(assetManager, AudioHelper.Sfx.ItemKey);
+        }
     }
 }

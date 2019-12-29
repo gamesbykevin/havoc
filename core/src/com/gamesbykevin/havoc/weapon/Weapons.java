@@ -237,7 +237,7 @@ public final class Weapons extends Entities implements Disposable, Restart {
         count++;
 
         //render weapon bullet count
-        Hud.renderNumber(assetManager, batch, getWeapon().getBullets(), HUD_BULLET_X, HUD_BULLET_Y);
+        Hud.renderNumberDigits3(assetManager, batch, getWeapon().getBullets(), false, HUD_BULLET_X, HUD_BULLET_Y, HUD_WIDTH, HUD_HEIGHT);
 
         //we rendered 1 item
         return count;
