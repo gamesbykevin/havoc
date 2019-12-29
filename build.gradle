@@ -1,5 +1,4 @@
 buildscript {
-    
 
     repositories {
         mavenLocal()
@@ -9,11 +8,11 @@ buildscript {
         jcenter()
         google()
     }
+
     dependencies {
         classpath 'org.wisepersist:gwt-gradle-plugin:1.0.9'
         classpath 'com.android.tools.build:gradle:3.5.0'
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.8'
-        
 
     }
 }
@@ -28,6 +27,10 @@ allprojects {
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
+
+        gamesvcsVersion = '1.0.0'
+        gapiVersion = '1.22.0'
+        gms_library_version = '16.0.0'
     }
 
     repositories {
@@ -52,7 +55,12 @@ project(":desktop") {
         api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-controllers-platform:$gdxVersion:natives-desktop"
-        
+
+        implementation "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamesvcsVersion"
+        implementation "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamesvcsVersion:sources"
+        implementation "de.golfgl.gdxgamesvcs:gdx-gamesvcs-desktop-gpgs:$gamesvcsVersion"
+        implementation "de.golfgl.gdxgamesvcs:gdx-gamesvcs-desktop-gpgs:$gamesvcsVersion:sources"
+
     }
 }
 
@@ -78,7 +86,13 @@ project(":android") {
         api "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        
+
+
+        //custom game services library
+        implementation "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:$gamesvcsVersion"
+
+        //google apis
+        implementation "com.google.android.gms:play-services-games:$gms_library_version"
     }
 }
 
@@ -115,7 +129,14 @@ project(":html") {
         api "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion:sources"
         api "com.badlogicgames.gdx:gdx-ai:$aiVersion:sources"
-        
+
+        implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
+        implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+        implementation "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamesvcsVersion:sources"
+        implementation "de.golfgl.gdxgamesvcs:gdx-gamesvcs-html-gpgs:$gamesvcsVersion"
+        implementation "de.golfgl.gdxgamesvcs:gdx-gamesvcs-html-gpgs:$gamesvcsVersion:sources"
+
     }
 }
 
@@ -128,6 +149,10 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        
+
+        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+
+        // added to support google play services
+        implementation "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamesvcsVersion"
     }
 }

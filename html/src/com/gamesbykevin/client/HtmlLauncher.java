@@ -4,9 +4,10 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.gamesbykevin.havoc.MyGdxGame;
+import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 
-import static com.gamesbykevin.havoc.MyGdxGame.SIZE_HEIGHT;
-import static com.gamesbykevin.havoc.MyGdxGame.SIZE_WIDTH;
+import static com.gamesbykevin.havoc.GameMain.SIZE_HEIGHT;
+import static com.gamesbykevin.havoc.GameMain.SIZE_WIDTH;
 
 public class HtmlLauncher extends GwtApplication {
 
@@ -19,6 +20,6 @@ public class HtmlLauncher extends GwtApplication {
 
         @Override
         public ApplicationListener createApplicationListener () {
-                return new MyGdxGame();
+                return new MyGdxGame(new NoGameServiceClient());
         }
 }

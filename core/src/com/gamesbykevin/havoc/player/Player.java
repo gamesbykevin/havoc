@@ -19,7 +19,7 @@ import com.gamesbykevin.havoc.weapon.Weapons;
 import com.gamesbykevin.havoc.util.Disposable;
 import com.gamesbykevin.havoc.util.Hud;
 
-import static com.gamesbykevin.havoc.MyGdxGame.*;
+import static com.gamesbykevin.havoc.GameMain.*;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_COLLECT;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_HURT;
 import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;

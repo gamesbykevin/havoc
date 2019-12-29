@@ -4,8 +4,6 @@ import com.gamesbykevin.havoc.animation.DecalAnimation;
 import com.gamesbykevin.havoc.dungeon.Cell;
 import com.gamesbykevin.havoc.util.Timer;
 
-import static com.gamesbykevin.havoc.MyGdxGame.FRAME_MS;
-
 public class Door extends DecalCustom {
 
     //how deep is the door placed

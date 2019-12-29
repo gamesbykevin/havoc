@@ -9,8 +9,8 @@ import com.gamesbykevin.havoc.decals.Square;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Hud;
 
-import static com.gamesbykevin.havoc.MyGdxGame.getSizeHeight;
-import static com.gamesbykevin.havoc.MyGdxGame.getSizeWidth;
+import static com.gamesbykevin.havoc.GameMain.getSizeHeight;
+import static com.gamesbykevin.havoc.GameMain.getSizeWidth;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_HURT;
 import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
