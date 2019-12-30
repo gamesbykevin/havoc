@@ -8,7 +8,6 @@ import com.gamesbykevin.havoc.util.Disposable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static com.gamesbykevin.havoc.dungeon.DungeonHelper.*;
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.createSecrets;

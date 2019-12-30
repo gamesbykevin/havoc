@@ -163,8 +163,6 @@ public class Achievement {
         if (!isConnected(client))
             return;
 
-        System.out.println("Achievement unlocked: " + achievementId);
-
         //make sure our client is there and connected
         client.unlockAchievement(achievementId);
     }

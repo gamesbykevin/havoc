@@ -23,14 +23,6 @@ public class MyProgressBar implements Disposable {
     //change the size of the font
     private static final float FONT_SCALE = 1.5f;
 
-    public static final String TEXT_STEP_1 = "Step 1 of 7 Loading assets";
-    public static final String TEXT_STEP_2 = "Step 2 of 7 Generating dungeon";
-    public static final String TEXT_STEP_3 = "Step 3 of 7 Creating weapons";
-    public static final String TEXT_STEP_4 = "Step 4 of 7 Spawning obstacles";
-    public static final String TEXT_STEP_5 = "Step 5 of 7 Spawning enemies";
-    public static final String TEXT_STEP_6 = "Step 6 of 7 Spawning collectibles";
-    public static final String TEXT_STEP_7 = "Step 7 of 7 Applying textures";
-
     //our background texture
     private Texture background, backgroundProgress, progress;
 

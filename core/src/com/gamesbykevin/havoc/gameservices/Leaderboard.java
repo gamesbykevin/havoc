@@ -95,8 +95,6 @@ public class Leaderboard {
         if (leaderBoardId == null)
             return;
 
-        System.out.println("Leaderboard: " + time);
-
         //submit score to leader board
         client.submitToLeaderboard(leaderBoardId, time, null);
     }

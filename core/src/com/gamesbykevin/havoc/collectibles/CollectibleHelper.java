@@ -11,6 +11,7 @@ import com.gamesbykevin.havoc.weapon.Weapons;
 import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.player.Player.HEALTH_MAX;
 import static com.gamesbykevin.havoc.player.PlayerHelper.*;
+import static com.gamesbykevin.havoc.util.Language.*;
 
 public class CollectibleHelper {
 
@@ -54,35 +55,35 @@ public class CollectibleHelper {
                     weapons.add(WeaponHelper.Type.smg);
                     add = true;
                     collected = true;
-                    player.setTextNotify(TEXT_NOTIFY_SMG);
+                    player.setTextNotify(getTranslatedText(KEY_NOTIFICATION_SMG));
                     break;
 
                 case impact:
                     weapons.add(WeaponHelper.Type.impact);
                     add = true;
                     collected = true;
-                    player.setTextNotify(TEXT_NOTIFY_IMPACT);
+                    player.setTextNotify(getTranslatedText(KEY_NOTIFICATION_IMPACT));
                     break;
 
                 case magnum:
                     weapons.add(WeaponHelper.Type.magnum);
                     add = true;
                     collected = true;
-                    player.setTextNotify(TEXT_NOTIFY_MAGNUM);
+                    player.setTextNotify(getTranslatedText(KEY_NOTIFICATION_MAGNUM));
                     break;
 
                 case buzzsaw:
                     weapons.add(WeaponHelper.Type.buzz);
                     add = true;
                     collected = true;
-                    player.setTextNotify(TEXT_NOTIFY_BUZZ);
+                    player.setTextNotify(getTranslatedText(KEY_NOTIFICATION_BUZZ));
                     break;
 
                 case shotgun:
                     weapons.add(WeaponHelper.Type.shotgun);
                     add = true;
                     collected = true;
-                    player.setTextNotify(TEXT_NOTIFY_SHOTGUN);
+                    player.setTextNotify(getTranslatedText(KEY_NOTIFICATION_SHOTGUN));
                     break;
 
                 case ammo:
@@ -91,7 +92,7 @@ public class CollectibleHelper {
                     if (weapons.getWeapon().getBullets() < weapons.getWeapon().getType().getBulletsMax()) {
                         playSfx(level.getAssetManager(), collectible.getSoundEffect());
                         weapons.getWeapon().addAmmoSmall();
-                        player.setTextNotify(TEXT_NOTIFY_AMMO);
+                        player.setTextNotify(getTranslatedText(KEY_NOTIFICATION_AMMO));
                         collected = true;
                     }
                     break;
@@ -102,7 +103,7 @@ public class CollectibleHelper {
                     if (weapons.getWeapon().getBullets() < weapons.getWeapon().getType().getBulletsMax()) {
                         playSfx(level.getAssetManager(), collectible.getSoundEffect());
                         weapons.getWeapon().addAmmoLarge();
-                        player.setTextNotify(TEXT_NOTIFY_AMMO);
+                        player.setTextNotify(getTranslatedText(KEY_NOTIFICATION_AMMO));
                         collected = true;
                     }
                     break;
@@ -113,7 +114,7 @@ public class CollectibleHelper {
                     if (player.getHealth() < HEALTH_MAX) {
                         playSfx(level.getAssetManager(), collectible.getSoundEffect());
                         player.setHealth(player.getHealth() + HEALTH_LARGE);
-                        player.setTextNotify(TEXT_NOTIFY_HEALTH_LARGE);
+                        player.setTextNotify(getTranslatedText(KEY_NOTIFICATION_HEALTH_LARGE));
                         collected = true;
                     }
                     break;
@@ -124,14 +125,14 @@ public class CollectibleHelper {
                     if (player.getHealth() < HEALTH_MAX) {
                         playSfx(level.getAssetManager(), collectible.getSoundEffect());
                         player.setHealth(player.getHealth() + HEALTH_SMALL);
-                        player.setTextNotify(TEXT_NOTIFY_HEALTH_SMALL);
+                        player.setTextNotify(getTranslatedText(KEY_NOTIFICATION_HEALTH_SMALL));
                         collected = true;
                     }
                     break;
 
                 case key:
                     playSfx(level.getAssetManager(), collectible.getSoundEffect());
-                    player.setTextNotify(TEXT_NOTIFY_KEY);
+                    player.setTextNotify(getTranslatedText(KEY_NOTIFICATION_KEY));
                     player.setKey(true);
                     collected = true;
                     break;

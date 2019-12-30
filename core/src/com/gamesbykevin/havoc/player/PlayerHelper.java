@@ -15,27 +15,9 @@ import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.input.MyController.SPEED_WALK;
 import static com.gamesbykevin.havoc.util.Hud.SHEET_HEIGHT;
 import static com.gamesbykevin.havoc.util.Hud.SHEET_WIDTH;
+import static com.gamesbykevin.havoc.util.Language.*;
 
 public class PlayerHelper {
-
-    public static final String TEXT_NOTIFY_LEVEL_COMPLETE = "level completed";
-    public static final String TEXT_NOTIFY_SMG = "found smg auto rifle";
-    public static final String TEXT_NOTIFY_IMPACT = "found impact cannon";
-    public static final String TEXT_NOTIFY_MAGNUM = "found magnum";
-    public static final String TEXT_NOTIFY_BUZZ = "found buzz saw gun";
-    public static final String TEXT_NOTIFY_SHOTGUN = "found shotgun";
-    public static final String TEXT_NOTIFY_AMMO = "ammo added";
-    public static final String TEXT_NOTIFY_HEALTH_LARGE = "large health pack found";
-    public static final String TEXT_NOTIFY_HEALTH_SMALL = "health pack found";
-    public static final String TEXT_NOTIFY_KEY = "key found";
-    public static final String TEXT_NOTIFY_LOCKED = "door locked, find the key";
-    public static final String TEXT_NOTIFY_SECRET = "secret room";
-    public static final String TEXT_NOTIFY_DEAD = "you died";
-    public static final String TEXT_NOTIFY_LOW_HEALTH = "low health";
-    public static final String TEXT_STAT_TIME = "Time";
-    public static final String TEXT_STAT_ENEMY = "Enemy";
-    public static final String TEXT_STAT_ITEM = "Item";
-    public static final String TEXT_STAT_SECRET = "Secret";
 
     //if we aren't moving the joystick enough we will ignore
     public static final float DEAD_ZONE_IGNORE = .2f;
@@ -155,7 +137,7 @@ public class PlayerHelper {
         //draw our background
         batch.draw(assetManager.get(PATH_HURT, Texture.class), 0, 0, getSizeWidth(), getSizeHeight());
 
-        player.getFontStats().draw(batch, TEXT_STAT_SECRET, STATS_X, STATS_Y_SECRET);
+        player.getFontStats().draw(batch, getTranslatedText(KEY_STAT_SECRET), STATS_X, STATS_Y_SECRET);
 
         if (player.getTimerStatSecret().isExpired()) {
             Hud.renderNumberDigits3(assetManager, batch, player.getStatSecret(), true, STATS_X + STATS_X_DIFF, STATS_Y_SECRET - STATS_Y_DIFF, SHEET_WIDTH, SHEET_HEIGHT);
@@ -167,7 +149,7 @@ public class PlayerHelper {
                 playSfx(assetManager, AudioHelper.Sfx.ItemKey);
         }
 
-        player.getFontStats().draw(batch, TEXT_STAT_ITEM, STATS_X, STATS_Y_ITEM);
+        player.getFontStats().draw(batch, getTranslatedText(KEY_STAT_ITEM), STATS_X, STATS_Y_ITEM);
 
         if (player.getTimerStatItem().isExpired()) {
             Hud.renderNumberDigits3(assetManager, batch, player.getStatItem(), true, STATS_X + STATS_X_DIFF, STATS_Y_ITEM - STATS_Y_DIFF, SHEET_WIDTH, SHEET_HEIGHT);
@@ -179,7 +161,7 @@ public class PlayerHelper {
                 playSfx(assetManager, AudioHelper.Sfx.ItemKey);
         }
 
-        player.getFontStats().draw(batch, TEXT_STAT_ENEMY, STATS_X, STATS_Y_ENEMY);
+        player.getFontStats().draw(batch, getTranslatedText(KEY_STAT_ENEMY), STATS_X, STATS_Y_ENEMY);
 
         if (player.getTimerStatEnemy().isExpired()) {
             Hud.renderNumberDigits3(assetManager, batch, player.getStatEnemy(), true, STATS_X + STATS_X_DIFF, STATS_Y_ENEMY - STATS_Y_DIFF, SHEET_WIDTH, SHEET_HEIGHT);
@@ -191,7 +173,7 @@ public class PlayerHelper {
                 playSfx(assetManager, AudioHelper.Sfx.ItemKey);
         }
 
-        player.getFontStats().draw(batch, TEXT_STAT_TIME, STATS_X, STATS_Y_TIMER);
+        player.getFontStats().draw(batch, getTranslatedText(KEY_STAT_TIME), STATS_X, STATS_Y_TIMER);
 
         if (player.getTimerStatTime().isExpired()) {
             Hud.renderTime(assetManager, batch, player.getMinutes(), player.getSeconds(), player.getMilliseconds(), STATS_X + STATS_X_DIFF, STATS_Y_TIMER - STATS_Y_DIFF, SHEET_WIDTH, SHEET_HEIGHT);

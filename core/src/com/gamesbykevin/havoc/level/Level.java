@@ -267,6 +267,7 @@ public class Level implements Disposable, Restart {
         getCollectibles().update();
     }
 
+    //need to determine the range here so we don't render too many objects
     public void render() {
 
         //if we are flagged to reset, reset everything
@@ -319,6 +320,7 @@ public class Level implements Disposable, Restart {
         render(colMin, colMax, rowMin, rowMax);
     }
 
+    //now we can render the objects within range
     private void render(int colMin, int colMax, int rowMin, int rowMax) {
 
         //update game components, etc...

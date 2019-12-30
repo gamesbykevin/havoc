@@ -10,9 +10,9 @@ import com.gamesbykevin.havoc.MyGdxGame;
 import static com.gamesbykevin.havoc.MyGdxGame.EXIT;
 import static com.gamesbykevin.havoc.assets.ScreenAudio.playMenu;
 import static com.gamesbykevin.havoc.assets.ScreenAudio.playSelect;
-import static com.gamesbykevin.havoc.util.Language.getMyBundle;
 import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_OPTIONS;
 import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_SELECT_LEVEL;
+import static com.gamesbykevin.havoc.util.Language.*;
 
 public class MenuScreen extends TemplateScreen {
 
@@ -51,11 +51,11 @@ public class MenuScreen extends TemplateScreen {
         table.center();
 
         //Create buttons
-        TextButton buttonPlay = new TextButton(getMyBundle().get("menuScreenPlay"), getSkin());
-        TextButton buttonOptions = new TextButton(getMyBundle().get("menuScreenOptions"), getSkin());
-        TextButton buttonRate = new TextButton(getMyBundle().get("menuScreenRate"), getSkin());
-        TextButton buttonMore = new TextButton(getMyBundle().get("menuScreenMore"), getSkin());
-        TextButton buttonExit = new TextButton(getMyBundle().get("menuScreenExit"), getSkin());
+        TextButton buttonPlay = new TextButton(getTranslatedText(KEY_MENU_PLAY), getSkin());
+        TextButton buttonOptions = new TextButton(getTranslatedText(KEY_MENU_OPTIONS), getSkin());
+        TextButton buttonRate = new TextButton(getTranslatedText(KEY_MENU_RATE), getSkin());
+        TextButton buttonMore = new TextButton(getTranslatedText(KEY_MENU_MORE), getSkin());
+        TextButton buttonExit = new TextButton(getTranslatedText(KEY_MENU_EXIT), getSkin());
 
         //Add listeners to buttons
         buttonPlay.addListener(new ClickListener() {

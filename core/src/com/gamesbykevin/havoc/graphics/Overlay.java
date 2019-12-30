@@ -10,7 +10,8 @@ import com.gamesbykevin.havoc.util.Disposable;
 import com.gamesbykevin.havoc.util.Restart;
 import com.gamesbykevin.havoc.util.Timer;
 
-import static com.gamesbykevin.havoc.util.Language.getMyBundle;
+import static com.gamesbykevin.havoc.util.Language.KEY_OVERLAY_PAUSED;
+import static com.gamesbykevin.havoc.util.Language.getTranslatedText;
 
 public class Overlay implements Restart, Disposable {
 
@@ -18,7 +19,7 @@ public class Overlay implements Restart, Disposable {
     public static final float OVERLAY_TRANSPARENCY_PAUSED = .6f;
 
     //what text to display
-    public static final String OVERLAY_TEXT_PAUSED = getMyBundle().get("overlayPaused");
+    public static final String OVERLAY_TEXT_PAUSED = getTranslatedText(KEY_OVERLAY_PAUSED);
 
     //texture for a single black pixel used for our overlay
     private Texture pixelMapTexture;

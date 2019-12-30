@@ -10,7 +10,6 @@ import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.decals.Square;
 import com.gamesbykevin.havoc.decals.Wall;
 import com.gamesbykevin.havoc.dungeon.Cell;
-import com.gamesbykevin.havoc.dungeon.Dungeon;
 import com.gamesbykevin.havoc.player.Player;
 
 import java.util.List;
@@ -20,10 +19,10 @@ import static com.gamesbykevin.havoc.decals.Door.DOOR_DISTANCE_SFX_RATIO;
 import static com.gamesbykevin.havoc.dungeon.DungeonHelper.isAvailable;
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
-import static com.gamesbykevin.havoc.player.PlayerHelper.*;
 import static com.gamesbykevin.havoc.preferences.AppPreferences.DURATION_VIBRATE;
 import static com.gamesbykevin.havoc.preferences.AppPreferences.hasEnabledVibrate;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
+import static com.gamesbykevin.havoc.util.Language.*;
 
 public class LevelHelper {
 
@@ -128,13 +127,13 @@ public class LevelHelper {
                             Gdx.input.vibrate(DURATION_VIBRATE);
 
                         playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelLocked);
-                        level.getPlayer().setTextNotify(TEXT_NOTIFY_LOCKED);
+                        level.getPlayer().setTextNotify(getTranslatedText(KEY_NOTIFICATION_LOCKED));
                         continue;
                     }
 
                     //display we found a secret room if 1st time opening secret door
                     if (door.isSecret() && !door.isFound())
-                        level.getPlayer().setTextNotify(TEXT_NOTIFY_SECRET);
+                        level.getPlayer().setTextNotify(getTranslatedText(KEY_NOTIFICATION_SECRET));
 
                     //open the door
                     door.open();
@@ -161,7 +160,7 @@ public class LevelHelper {
 
                     //sound we completed the level
                     playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelSwitch);
-                    level.getPlayer().setTextNotify(TEXT_NOTIFY_LEVEL_COMPLETE);
+                    level.getPlayer().setTextNotify(getTranslatedText(KEY_NOTIFICATION_LEVEL_COMPLETE));
                     goal = true;
                 }
             }

@@ -26,6 +26,7 @@ import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
 import static com.gamesbykevin.havoc.player.PlayerHelper.*;
 import static com.gamesbykevin.havoc.util.Hud.*;
+import static com.gamesbykevin.havoc.util.Language.*;
 
 public final class Player implements Disposable, Restart {
 
@@ -395,9 +396,9 @@ public final class Player implements Disposable, Restart {
             this.health = HEALTH_MAX;
 
         if (isDead()) {
-            setTextNotify(TEXT_NOTIFY_DEAD);
+            setTextNotify(getTranslatedText(KEY_NOTIFICATION_DEAD));
         } else if (getHealth() <= HEALTH_LOW) {
-            setTextNotify(TEXT_NOTIFY_LOW_HEALTH);
+            setTextNotify(getTranslatedText(KEY_NOTIFICATION_LOW_HEALTH));
         }
     }
 
@@ -495,7 +496,7 @@ public final class Player implements Disposable, Restart {
 
         } else if (isGoal()) {
 
-            setTextNotify(TEXT_NOTIFY_LEVEL_COMPLETE);
+            setTextNotify(getTranslatedText(KEY_NOTIFICATION_LEVEL_COMPLETE));
             getTimerGameOver().update();
 
         } else {

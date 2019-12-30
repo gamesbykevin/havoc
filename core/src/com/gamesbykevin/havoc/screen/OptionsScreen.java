@@ -13,8 +13,7 @@ import com.gamesbykevin.havoc.util.Language;
 import static com.gamesbykevin.havoc.assets.ScreenAudio.*;
 import static com.gamesbykevin.havoc.preferences.AppPreferences.*;
 import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_MENU;
-import static com.gamesbykevin.havoc.util.Language.changeMyBundle;
-import static com.gamesbykevin.havoc.util.Language.getMyBundle;
+import static com.gamesbykevin.havoc.util.Language.*;
 
 public class OptionsScreen extends TemplateScreen {
 
@@ -30,7 +29,7 @@ public class OptionsScreen extends TemplateScreen {
         //capture the menu input
         captureInput();
 
-        TextButton buttonMusic = new TextButton(getMyBundle().get("optionsScreenMusic"), getSkin(), "toggle");
+        TextButton buttonMusic = new TextButton(getTranslatedText(KEY_OPTIONS_MUSIC), getSkin(), "toggle");
         buttonMusic.setChecked(hasEnabledMusic());
 
         //Add listeners to buttons
@@ -49,7 +48,7 @@ public class OptionsScreen extends TemplateScreen {
             }
         });
 
-        TextButton buttonSound = new TextButton(getMyBundle().get("optionsScreenSound"), getSkin(), "toggle");
+        TextButton buttonSound = new TextButton(getTranslatedText(KEY_OPTIONS_SOUND), getSkin(), "toggle");
         buttonSound.setChecked(hasEnabledSfx());
 
         //Add listeners to buttons
@@ -61,7 +60,7 @@ public class OptionsScreen extends TemplateScreen {
             }
         });
 
-        TextButton buttonVibrate = new TextButton(getMyBundle().get("optionsScreenVibrate"), getSkin(), "toggle");
+        TextButton buttonVibrate = new TextButton(getTranslatedText(KEY_OPTIONS_VIBRATE), getSkin(), "toggle");
         buttonVibrate.setChecked(hasEnabledVibrate());
 
         //Add listeners to buttons
@@ -74,7 +73,7 @@ public class OptionsScreen extends TemplateScreen {
         });
 
         //create our back button
-        TextButton buttonBack = new TextButton(getMyBundle().get("optionsScreenBack"), getSkin());
+        TextButton buttonBack = new TextButton(getTranslatedText(KEY_OPTIONS_BACK), getSkin());
 
         //Add listeners to buttons
         buttonBack.addListener(new ClickListener() {

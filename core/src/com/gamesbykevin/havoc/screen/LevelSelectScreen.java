@@ -6,7 +6,7 @@ import com.gamesbykevin.havoc.MyGdxGame;
 import static com.gamesbykevin.havoc.assets.ScreenAudio.stopAll;
 import static com.gamesbykevin.havoc.preferences.AppPreferences.hasLevelCompleted;
 import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_GAME;
-import static com.gamesbykevin.havoc.util.Language.getMyBundle;
+import static com.gamesbykevin.havoc.util.Language.*;
 
 public class LevelSelectScreen extends CustomSelectScreen {
 
@@ -63,7 +63,7 @@ public class LevelSelectScreen extends CustomSelectScreen {
     public String getButtonText(int index) {
 
         if (hasLevelCompleted(index)) {
-            return getMyBundle().get("levelSelectScreenSolved");
+            return getTranslatedText(KEY_LEVEL_SELECT_SOLVED);
         } else {
             return (index + 1) + "";
         }
@@ -76,6 +76,6 @@ public class LevelSelectScreen extends CustomSelectScreen {
 
     @Override
     public String getTitleText() {
-        return getMyBundle().get("levelSelectScreenTitleText");
+        return getTranslatedText(KEY_LEVEL_SELECT_TITLE);
     }
 }

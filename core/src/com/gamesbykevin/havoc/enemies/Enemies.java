@@ -41,6 +41,9 @@ public final class Enemies extends Entities {
     public static final float DURATION_SHOOT = 400f;
     public static final float DURATION_CHASE = 850f;
 
+    //chance a boss is spawned
+    public static final float PROBABILITY_BOSS = .66f;
+
     public Enemies(Level level) {
         super(level);
     }
@@ -129,7 +132,7 @@ public final class Enemies extends Entities {
         }
 
         //decide at random if we are to add a boss to the goal room
-        if (getRandom().nextBoolean()) {
+        if (getRandom().nextFloat() < PROBABILITY_BOSS) {
 
             //get the leaf for the goal room
             Leaf leaf = getLeafGoal(getLevel().getDungeon());

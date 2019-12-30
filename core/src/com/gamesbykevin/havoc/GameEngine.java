@@ -2,7 +2,6 @@ package com.gamesbykevin.havoc;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.gamesbykevin.havoc.assets.AssetManagerHelper;
 import com.gamesbykevin.havoc.assets.AudioHelper;
@@ -21,7 +20,7 @@ import static com.gamesbykevin.havoc.assets.TextureHelper.*;
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
 import static com.gamesbykevin.havoc.enemies.Enemies.ENEMIES_PER_ROOM_MAX;
 import static com.gamesbykevin.havoc.enemies.Enemies.ENEMIES_PER_ROOM_MIN;
-import static com.gamesbykevin.havoc.util.MyProgressBar.*;
+import static com.gamesbykevin.havoc.util.Language.*;
 
 public class GameEngine implements Disposable {
 
@@ -275,18 +274,18 @@ public class GameEngine implements Disposable {
 
 						//if we are good, go to the next step
 						setStep(Steps.Step2);
-						getMyProgressBar().renderProgressBar(TEXT_STEP_2);
+						getMyProgressBar().renderProgressBar(getTranslatedText(KEY_PROGRESS_STEP_2));
 					}
 
 				} else {
-					getMyProgressBar().renderProgressBar(getAssetManager().getProgress(), TEXT_STEP_1);
+					getMyProgressBar().renderProgressBar(getAssetManager().getProgress(), getTranslatedText(KEY_PROGRESS_STEP_1));
 				}
 				break;
 
 			case Step2:
 
 				//generate dungeon
-				getMyProgressBar().renderProgressBar(TEXT_STEP_2);
+				getMyProgressBar().renderProgressBar(getTranslatedText(KEY_PROGRESS_STEP_2));
 				getLevel().getDungeon().generate();
 
 				//flag the players start location
@@ -297,7 +296,7 @@ public class GameEngine implements Disposable {
 			case Step3:
 
 				//creating weapons
-				getMyProgressBar().renderProgressBar(TEXT_STEP_3);
+				getMyProgressBar().renderProgressBar(getTranslatedText(KEY_PROGRESS_STEP_3));
 				getLevel().getPlayer().createWeapons(getLevel());
 				setStep(Steps.Step4);
 				break;
@@ -305,7 +304,7 @@ public class GameEngine implements Disposable {
 			case Step4:
 
 				//add obstacles
-				getMyProgressBar().renderProgressBar(TEXT_STEP_4);
+				getMyProgressBar().renderProgressBar(getTranslatedText(KEY_PROGRESS_STEP_4));
 				getLevel().getObstacles().spawn();
 				setStep(Steps.Step5);
 				break;
@@ -313,7 +312,7 @@ public class GameEngine implements Disposable {
 			case Step5:
 
 				//add enemies
-				getMyProgressBar().renderProgressBar(TEXT_STEP_5);
+				getMyProgressBar().renderProgressBar(getTranslatedText(KEY_PROGRESS_STEP_5));
 				getLevel().getEnemies().spawn();
 				setStep(Steps.Step6);
 				break;
@@ -321,7 +320,7 @@ public class GameEngine implements Disposable {
 			case Step6:
 
 				//add collectibles
-				getMyProgressBar().renderProgressBar(TEXT_STEP_6);
+				getMyProgressBar().renderProgressBar(getTranslatedText(KEY_PROGRESS_STEP_6));
 				getLevel().getCollectibles().spawn();
 				setStep(Steps.Step7);
 				break;
@@ -330,10 +329,10 @@ public class GameEngine implements Disposable {
 
 				//create level textures
 				if (COUNT < TOTAL) {
-					getMyProgressBar().renderProgressBar((COUNT / TOTAL), TEXT_STEP_7);
+					getMyProgressBar().renderProgressBar((COUNT / TOTAL), getTranslatedText(KEY_PROGRESS_STEP_7));
 					addTextures(getLevel());
 				} else {
-					getMyProgressBar().renderProgressBar(TEXT_STEP_7);
+					getMyProgressBar().renderProgressBar(getTranslatedText(KEY_PROGRESS_STEP_7));
 					setStep(Steps.Step8);
 					playHero(getAssetManager());
 

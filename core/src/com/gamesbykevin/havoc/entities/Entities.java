@@ -113,6 +113,6 @@ public abstract class Entities implements Disposable, Restart {
         this.entityList = null;
     }
 
-    //implement logic to render the entities
+    //implement logic to render the entities within the specified range
     public abstract int render(int colMin, int colMax, int rowMin, int rowMax);
 }

@@ -10,6 +10,49 @@ import static com.gamesbykevin.havoc.preferences.AppPreferences.getPreferenceVal
 
 public class Language {
 
+    public static final String KEY_PROGRESS_STEP_1 = "progressStep1";
+    public static final String KEY_PROGRESS_STEP_2 = "progressStep2";
+    public static final String KEY_PROGRESS_STEP_3 = "progressStep3";
+    public static final String KEY_PROGRESS_STEP_4 = "progressStep4";
+    public static final String KEY_PROGRESS_STEP_5 = "progressStep5";
+    public static final String KEY_PROGRESS_STEP_6 = "progressStep6";
+    public static final String KEY_PROGRESS_STEP_7 = "progressStep7";
+
+    public static final String KEY_OVERLAY_PAUSED = "overlayPaused";
+
+    public static final String KEY_LEVEL_SELECT_TITLE = "levelSelectScreenTitleText";
+    public static final String KEY_LEVEL_SELECT_SOLVED = "levelSelectScreenSolved";
+
+    public static final String KEY_MENU_PLAY = "menuScreenPlay";
+    public static final String KEY_MENU_OPTIONS = "menuScreenOptions";
+    public static final String KEY_MENU_RATE = "menuScreenRate";
+    public static final String KEY_MENU_MORE = "menuScreenMore";
+    public static final String KEY_MENU_EXIT = "menuScreenExit";
+
+    public static final String KEY_OPTIONS_BACK = "optionsScreenBack";
+    public static final String KEY_OPTIONS_MUSIC = "optionsScreenMusic";
+    public static final String KEY_OPTIONS_SOUND = "optionsScreenSound";
+    public static final String KEY_OPTIONS_VIBRATE = "optionsScreenVibrate";
+
+    public static final String KEY_NOTIFICATION_LEVEL_COMPLETE = "notificationMessageLevelComplete";
+    public static final String KEY_NOTIFICATION_SMG = "notificationMessageSmg";
+    public static final String KEY_NOTIFICATION_IMPACT = "notificationMessageImpact";
+    public static final String KEY_NOTIFICATION_MAGNUM = "notificationMessageMagnum";
+    public static final String KEY_NOTIFICATION_BUZZ = "notificationMessageBuzz";
+    public static final String KEY_NOTIFICATION_SHOTGUN = "notificationMessageShotgun";
+    public static final String KEY_NOTIFICATION_AMMO = "notificationMessageAmmo";
+    public static final String KEY_NOTIFICATION_HEALTH_LARGE = "notificationMessageHealthLarge";
+    public static final String KEY_NOTIFICATION_HEALTH_SMALL = "notificationMessageHealthSmall";
+    public static final String KEY_NOTIFICATION_KEY = "notificationMessageKey";
+    public static final String KEY_NOTIFICATION_LOCKED = "notificationMessageLocked";
+    public static final String KEY_NOTIFICATION_SECRET = "notificationMessageSecret";
+    public static final String KEY_NOTIFICATION_DEAD = "notificationMessageDead";
+    public static final String KEY_NOTIFICATION_LOW_HEALTH = "notificationMessageLowHealth";
+    public static final String KEY_STAT_TIME = "statTime";
+    public static final String KEY_STAT_ENEMY = "statEnemy";
+    public static final String KEY_STAT_SECRET = "statSecret";
+    public static final String KEY_STAT_ITEM = "statItem";
+
     //object used for localization
     private static I18NBundle MY_BUNDLE;
 
@@ -127,7 +170,7 @@ public class Language {
         private final String languageCode;
         private final String countryCode;
 
-        private Languages(String desc, String languageCode, String countryCode) {
+        Languages(String desc, String languageCode, String countryCode) {
             this.desc = desc;
             this.languageCode = languageCode;
             this.countryCode = countryCode;
@@ -150,7 +193,11 @@ public class Language {
         MY_BUNDLE = null;
     }
 
-    public static I18NBundle getMyBundle() {
+    public static String getTranslatedText(String key) {
+        return getMyBundle().get(key);
+    }
+
+    private static I18NBundle getMyBundle() {
 
         if (MY_BUNDLE == null) {
 

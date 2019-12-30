@@ -12,7 +12,7 @@ import com.gamesbykevin.havoc.gameservices.Leaderboard;
 
 import static com.gamesbykevin.havoc.preferences.AppPreferences.setLevelCompleted;
 import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_MENU;
-import static com.gamesbykevin.havoc.util.Language.getMyBundle;
+import static com.gamesbykevin.havoc.util.Language.*;
 
 public class GameScreen extends TemplateScreen {
 
@@ -56,7 +56,7 @@ public class GameScreen extends TemplateScreen {
             case HeadlessDesktop:
 
                 //create our back button
-                TextButton buttonBack = new TextButton(getMyBundle().get("optionsScreenBack"), getSkin());
+                TextButton buttonBack = new TextButton(getTranslatedText(KEY_OPTIONS_BACK), getSkin());
 
                 //Add listeners to buttons
                 buttonBack.addListener(new ClickListener() {
