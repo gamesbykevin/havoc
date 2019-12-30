@@ -40,6 +40,9 @@ public class TextureHelper {
     //texture to use for the hallway(s)
     private static Location OPTION_HALLWAY;
 
+    //list of locations on the sprite sheet
+    private static List<Location> LOCATIONS;
+
     //needed to pick random location
     private static final int SPRITE_SHEET_WALL_COLS = 10;
     private static final int SPRITE_SHEET_WALL_ROWS = 10;
@@ -55,9 +58,12 @@ public class TextureHelper {
             OPTIONS.clear();
         if (OPTION_HALLWAY != null)
             OPTION_HALLWAY.dispose();
+        if (LOCATIONS != null)
+            LOCATIONS.clear();
 
         OPTIONS = null;
         OPTION_HALLWAY = null;
+        LOCATIONS = null;
     }
 
     private static Location getOptionHallway() {
@@ -68,14 +74,28 @@ public class TextureHelper {
         return OPTION_HALLWAY;
     }
 
+    private static List<Location> getLocations() {
+
+        if (LOCATIONS == null)
+            LOCATIONS = new ArrayList<>();
+
+        if (LOCATIONS.isEmpty()) {
+            for (int row = 0; row < SPRITE_SHEET_WALL_ROWS; row++) {
+                for (int col = 0; col < SPRITE_SHEET_WALL_COLS; col++) {
+                    LOCATIONS.add(new Location(col, row));
+                }
+            }
+        }
+
+        return LOCATIONS;
+    }
+
     private static HashMap<String, Location> getOptions(Dungeon dungeon) {
 
         if (OPTIONS == null)
             OPTIONS = new HashMap<>();
 
         if (OPTIONS.isEmpty()) {
-
-            List<Location> locations = new ArrayList<>();
 
             for (int y = 0; y < dungeon.getRows(); y++) {
                 for (int x = 0; x < dungeon.getCols(); x++) {
@@ -99,28 +119,16 @@ public class TextureHelper {
                     if (OPTIONS.get(cell.getId()) != null)
                         continue;
 
-                    //populate with values if empty
-                    if (locations.isEmpty()) {
-                        for (int row = 0; row < SPRITE_SHEET_WALL_ROWS; row++) {
-                            for (int col = 0; col < SPRITE_SHEET_WALL_COLS; col++) {
-                                locations.add(new Location(col, row));
-                            }
-                        }
-                    }
-
-                    //pick a random texutre
-                    int index = getRandom().nextInt(locations.size());
+                    //pick a random texture
+                    int index = getRandom().nextInt(getLocations().size());
 
                     //assign all cells with this id the same texture
-                    OPTIONS.put(cell.getId(), locations.get(index));
+                    OPTIONS.put(cell.getId(), getLocations().get(index));
 
                     //don't pick it again
-                    locations.remove(index);
+                    getLocations().remove(index);
                 }
             }
-
-            locations.clear();
-            locations = null;
         }
 
         return OPTIONS;
