@@ -166,6 +166,7 @@ public abstract class ParentScreen implements Screen {
         this.backgroundImage = null;
         this.batch = null;
         this.overlay = null;
+        this.camera = null;
     }
 
     public OrthographicCamera getCamera() {

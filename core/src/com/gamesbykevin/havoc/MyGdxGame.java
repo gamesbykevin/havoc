@@ -2,6 +2,7 @@ package com.gamesbykevin.havoc;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.gamesbykevin.havoc.input.ScreenController;
 import com.gamesbykevin.havoc.screen.ScreenHelper;
 import com.gamesbykevin.havoc.util.Language;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
@@ -13,6 +14,9 @@ public class MyGdxGame extends Game {
 
 	//manage our screens
 	private ScreenHelper screenHelper;
+
+	//controller for our screens
+	private ScreenController controller;
 
 	//is the game paused?
 	private boolean paused = false;
@@ -29,6 +33,9 @@ public class MyGdxGame extends Game {
 
 	public static void exit(MyGdxGame game) {
 
+		//flag exit
+		EXIT = true;
+
 		if (game != null)
 			game.dispose();
 
@@ -37,25 +44,17 @@ public class MyGdxGame extends Game {
 	}
 
 	@Override
-	public void dispose() {
-
-		super.dispose();
-
-		//recycle screen
-		if (this.screenHelper != null) {
-			this.screenHelper.dispose();
-			this.screenHelper = null;
-		}
-
-		//recycle language bundle
-		Language.recycle();
-	}
-
-	@Override
 	public void create() {
+
+		//create our menu controller first
+		this.controller = new ScreenController(this);
 
 		//create our screens
 		this.screenHelper = new ScreenHelper(this);
+	}
+
+	public ScreenController getController() {
+		return this.controller;
 	}
 
 	public IGameServiceClient getGsClient() {
@@ -72,12 +71,31 @@ public class MyGdxGame extends Game {
 
 	public void setPaused(final boolean paused) {
 		this.paused = paused;
-
-		System.out.println("Paused: " + paused);
 	}
 
 	@Override
 	public void pause() {
+		//call parent
 		super.pause();
+	}
+
+	@Override
+	public void dispose() {
+
+		super.dispose();
+
+		//recycle screen
+		if (this.screenHelper != null) {
+			this.screenHelper.dispose();
+			this.screenHelper = null;
+		}
+
+		if (this.controller != null)
+			this.controller.dispose();
+
+		this.controller = null;
+
+		//recycle language bundle
+		Language.recycle();
 	}
 }

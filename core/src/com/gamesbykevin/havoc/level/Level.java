@@ -64,6 +64,9 @@ public class Level implements Disposable, Restart {
     //do we reset?
     private boolean reset = false;
 
+    //is the game paused
+    private boolean paused = false;
+
     public Level(AssetManager assetManager, Player player) {
 
         //store reference to our asset manager
@@ -87,8 +90,17 @@ public class Level implements Disposable, Restart {
         getWalls();
     }
 
+    public boolean isPaused() {
+        return this.paused;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
     @Override
     public void reset() {
+        setPaused(false);
         getEnemies().reset();
         getObstacles().reset();
         getCollectibles().reset();
@@ -245,11 +257,13 @@ public class Level implements Disposable, Restart {
         //check for collision
         checkCollision(this);
 
-        //update the level
+        //update these
         updateLevel(this);
-
-        //update the player
         getPlayer().update(this);
+        getPlayer().getWeapons().update();
+        getEnemies().update();
+        getObstacles().update();
+        getCollectibles().update();
     }
 
     public void render() {
@@ -263,8 +277,9 @@ public class Level implements Disposable, Restart {
         //update the camera
         getPlayer().getCamera3d().update();
 
-        //update our decals, etc...
-        update();
+        //update game components, etc...
+        if (!isPaused())
+            update();
 
         int count = 0;
 

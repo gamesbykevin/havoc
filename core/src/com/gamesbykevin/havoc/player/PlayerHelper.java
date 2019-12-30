@@ -9,8 +9,8 @@ import com.gamesbykevin.havoc.decals.Square;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Hud;
 
-import static com.gamesbykevin.havoc.GameMain.getSizeHeight;
-import static com.gamesbykevin.havoc.GameMain.getSizeWidth;
+import static com.gamesbykevin.havoc.GameEngine.getSizeHeight;
+import static com.gamesbykevin.havoc.GameEngine.getSizeWidth;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_HURT;
 import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
 import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
@@ -38,7 +38,6 @@ public class PlayerHelper {
     public static final String TEXT_STAT_ENEMY = "Enemy";
     public static final String TEXT_STAT_ITEM = "Item";
     public static final String TEXT_STAT_SECRET = "Secret";
-
 
     //if we aren't moving the joystick enough we will ignore
     public static final float DEAD_ZONE_IGNORE = .2f;

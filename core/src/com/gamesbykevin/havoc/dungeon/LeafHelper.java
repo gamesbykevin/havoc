@@ -68,6 +68,9 @@ public class LeafHelper {
     //here we check our neighbors to determine if a door can be placed here
     protected static boolean isDoorValid(Dungeon dungeon, Cell cell) {
 
+        if (cell == null)
+            return false;
+
         //we want to turn a wall into a door
         if (!cell.isWall())
             return false;

@@ -5,13 +5,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.gamesbykevin.havoc.util.Disposable;
+import com.gamesbykevin.havoc.util.Restart;
+import com.gamesbykevin.havoc.util.Timer;
 
-import static com.gamesbykevin.havoc.GameMain.FRAME_MS;
 import static com.gamesbykevin.havoc.screen.ParentScreen.SCREEN_HEIGHT;
 import static com.gamesbykevin.havoc.screen.ParentScreen.SCREEN_WIDTH;
 import static com.gamesbykevin.havoc.util.Language.getMyBundle;
 
-public class Overlay {
+public class Overlay implements Restart, Disposable {
 
     //how visible is our overlay
     public static final float OVERLAY_TRANSPARENCY_PAUSED = .6f;
@@ -28,17 +30,17 @@ public class Overlay {
     //where do we render the text
     private float textX, textY;
 
-    //font metrics
-    private GlyphLayout glyphLayout;
+    //text to display
+    private final String text;
 
     //do we display the overlay
     private boolean display = true;
 
-    //how much time has lapsed
-    private long lapsed;
+    //timer for the overlay
+    private Timer timer;
 
-    //what is our time limit
-    private long duration;
+    //what is the font size
+    public static final float FONT_SIZE = 1.0f;
 
     public Overlay(final String text, final float transparency) {
         this(text, transparency, -1);
@@ -58,43 +60,37 @@ public class Overlay {
         pixmap.dispose();
         pixmap = null;
 
-        //create our bitmap font object
-        this.bitmapFont = new BitmapFont();
-
         //font will be white
-        this.bitmapFont.setColor(1, 1, 1, 1);
+        getBitmapFont().setColor(1, 1, 1, 1);
 
         //change font size
-        this.bitmapFont.getData().setScale(1.25f);
+        getBitmapFont().getData().setScale(FONT_SIZE);
 
         //create our layout so we can calculate the font metrics
-        this.glyphLayout = new GlyphLayout(this.bitmapFont, text);
+        GlyphLayout glyphLayout = new GlyphLayout(getBitmapFont(), text);
 
         //reference the font metrics so we can place our text in the middle of the screen
-        setTextX((SCREEN_WIDTH / 2) - (getGlyphLayout().width / 2));
-        setTextY((float)(SCREEN_HEIGHT * .75) - (getGlyphLayout().height / 2));
+        setTextX((SCREEN_WIDTH / 2) - (glyphLayout.width / 2));
+        setTextY((SCREEN_HEIGHT / 2) - (glyphLayout.height / 2));
+
+        glyphLayout = null;
 
         //default true
         setDisplay(true);
 
-        //unlimited duration
-        setDuration(duration);
+        //store our text
+        this.text = text;
+
+        //create our timer
+        this.timer = new Timer(duration);
     }
 
-    public long getLapsed() {
-        return this.lapsed;
+    public Timer getTimer() {
+        return this.timer;
     }
 
-    public void setLapsed(long lapsed) {
-        this.lapsed = lapsed;
-    }
-
-    public long getDuration() {
-        return this.duration;
-    }
-
-    public void setDuration(long duration) {
-        this.duration = duration;
+    public String getText() {
+        return this.text;
     }
 
     public boolean isDisplay() {
@@ -106,11 +102,11 @@ public class Overlay {
     }
 
     private BitmapFont getBitmapFont() {
-        return this.bitmapFont;
-    }
 
-    private GlyphLayout getGlyphLayout() {
-        return this.glyphLayout;
+        if (this.bitmapFont == null)
+            this.bitmapFont = new BitmapFont();
+
+        return this.bitmapFont;
     }
 
     public void setTextX(float textX) {
@@ -133,27 +129,12 @@ public class Overlay {
         return this.pixelMapTexture;
     }
 
+    @Override
     public void reset() {
-        setLapsed(0);
+        getTimer().reset();
     }
 
-    public void draw(SpriteBatch batch) {
-
-        //draw overlay
-        if (isDisplay()) {
-
-            batch.draw(getPixelMapTexture(), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-            getBitmapFont().draw(batch, getGlyphLayout(), getTextX(), getTextY());
-
-            if (getDuration() > 0) {
-                setLapsed((long)(FRAME_MS + getLapsed()));
-
-                if (getLapsed() >= getDuration())
-                    setDisplay(false);
-            }
-        }
-    }
-
+    @Override
     public void dispose() {
 
         if (pixelMapTexture != null)
@@ -163,6 +144,30 @@ public class Overlay {
 
         this.pixelMapTexture = null;
         this.bitmapFont = null;
-        this.glyphLayout = null;
+        this.timer = null;
+    }
+
+    public void draw(SpriteBatch batch) {
+
+        //draw overlay
+        if (isDisplay()) {
+
+            //render the overlay
+            batch.draw(getPixelMapTexture(), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+            //render the text
+            getBitmapFont().draw(batch, getText(), getTextX(), getTextY());
+
+            //if we specified a duration let's see if time expired
+            if (getTimer().getDuration() > 0) {
+
+                //if time ran out, hide the overlay
+                if (getTimer().isExpired())
+                    setDisplay(false);
+
+                //update the timer
+                getTimer().update();
+            }
+        }
     }
 }

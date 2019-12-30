@@ -211,10 +211,6 @@ public class AssetManagerHelper {
         if (TYPE_SOLDIER != null)
             TYPE_SOLDIER.clear();
 
-        PATHS_BACKGROUND = null;
-        TYPE_BOSS = null;
-        TYPE_SOLDIER = null;
-
         if (PATHS != null) {
 
             for (int index = 0; index < PATHS.size(); index++) {
@@ -229,6 +225,9 @@ public class AssetManagerHelper {
         }
 
         PATHS = null;
+        PATHS_BACKGROUND = null;
+        TYPE_BOSS = null;
+        TYPE_SOLDIER = null;
     }
 
     private static void load(AssetManager assetManager, String path, Class assetClass) {

@@ -10,8 +10,8 @@ import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
 
 public class RoomHelper {
 
-    public static final int ROOM_DIMENSION_MIN = 14;
-    public static final int ROOM_DIMENSION_MAX = 20;
+    public static final int ROOM_DIMENSION_MIN = 16;
+    public static final int ROOM_DIMENSION_MAX = 22;
 
     //split the room in half
     protected static void setupSplit(Dungeon dungeon, Room room) {

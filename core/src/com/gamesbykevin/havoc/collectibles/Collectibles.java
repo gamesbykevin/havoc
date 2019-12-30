@@ -363,9 +363,6 @@ public final class Collectibles extends Entities {
     @Override
     public int render() {
 
-        //update the entities accordingly
-        update();
-
         int count = 0;
 
         for (int i = 0; i < getEntityList().size(); i++) {

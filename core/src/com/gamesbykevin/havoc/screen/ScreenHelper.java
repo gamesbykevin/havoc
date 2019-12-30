@@ -1,13 +1,11 @@
 package com.gamesbykevin.havoc.screen;
 
 import com.gamesbykevin.havoc.MyGdxGame;
-import com.gamesbykevin.havoc.exception.ScreenException;
+import com.gamesbykevin.havoc.util.Disposable;
 
 import java.util.HashMap;
 
-import static com.gamesbykevin.havoc.MyGdxGame.exit;
-
-public class ScreenHelper {
+public class ScreenHelper implements Disposable {
 
     /**
      * Our different screens
@@ -32,13 +30,8 @@ public class ScreenHelper {
         //store game reference
         this.game = game;
 
-        try {
-            //set splash screen as start
-            this.changeScreen(SCREEN_SPLASH);
-        } catch (ScreenException exception) {
-            exception.printStackTrace();
-            exit(getGame());
-        }
+        //set splash screen as start
+        this.changeScreen(SCREEN_SPLASH);
     }
 
     private MyGdxGame getGame() {
@@ -59,6 +52,10 @@ public class ScreenHelper {
 
     public int getScreenIndex() {
         return this.screenIndex;
+    }
+
+    public TemplateScreen getScreen() {
+        return getScreen(getScreenIndex());
     }
 
     public TemplateScreen getScreen(int screenIndex) {
@@ -100,7 +97,13 @@ public class ScreenHelper {
         return screen;
     }
 
-    public void changeScreen(int screenIndex) throws ScreenException {
+    public void changeScreen(int screenIndex) {
+
+        //if leaving the game screen, recycle assets
+        if (getScreenIndex() == SCREEN_GAME && screenIndex != SCREEN_GAME) {
+            this.screens.get(getScreenIndex()).dispose();
+            this.screens.put(getScreenIndex(), null);
+        }
 
         //get the new screen
         TemplateScreen templateScreen = getScreen(screenIndex);
@@ -115,11 +118,13 @@ public class ScreenHelper {
         setScreenIndex(screenIndex);
     }
 
+    @Override
     public void dispose() {
 
         if (this.screens != null) {
             for (Integer integer : this.screens.keySet()) {
-                this.screens.get(integer).dispose();
+                if (this.screens.get(integer) != null)
+                    this.screens.get(integer).dispose();
                 this.screens.put(integer, null);
             }
 

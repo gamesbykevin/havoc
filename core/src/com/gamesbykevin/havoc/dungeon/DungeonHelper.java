@@ -140,7 +140,11 @@ public class DungeonHelper {
 
         if (!start) {
 
-            switch (getRandom().nextInt(10)) {
+            switch (getRandom().nextInt(9)) {
+
+                default:
+                    //empty room
+                    break;
 
                 case 0:
                     setupSplit(dungeon, room);
@@ -176,11 +180,6 @@ public class DungeonHelper {
 
                 case 8:
                     setupX(dungeon, room);
-                    break;
-
-                case 9:
-                default:
-                    //empty room
                     break;
             }
         }

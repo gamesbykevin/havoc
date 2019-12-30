@@ -6,8 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gamesbykevin.havoc.MyGdxGame;
-import com.gamesbykevin.havoc.exception.ScreenException;
 
+import static com.gamesbykevin.havoc.MyGdxGame.EXIT;
 import static com.gamesbykevin.havoc.util.Language.getMyBundle;
 import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_OPTIONS;
 import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_SELECT_LEVEL;
@@ -56,25 +56,15 @@ public class MenuScreen extends TemplateScreen {
         buttonPlay.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                try {
-
-                    //now switch screens
-                    getGame().getScreenHelper().changeScreen(SCREEN_SELECT_LEVEL);
-
-                } catch (ScreenException ex) {
-                    ex.printStackTrace();
-                }
+                //now switch screens
+                getGame().getScreenHelper().changeScreen(SCREEN_SELECT_LEVEL);
             }
         });
 
         buttonOptions.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                try {
-                    getGame().getScreenHelper().changeScreen(SCREEN_OPTIONS);
-                } catch (ScreenException ex) {
-                    ex.printStackTrace();
-                }
+                getGame().getScreenHelper().changeScreen(SCREEN_OPTIONS);
             }
         });
 
@@ -134,6 +124,9 @@ public class MenuScreen extends TemplateScreen {
 
     @Override
     public void render(float delta) {
+
+        if (EXIT)
+            return;
 
         //clear the screen
         super.clearScreen();

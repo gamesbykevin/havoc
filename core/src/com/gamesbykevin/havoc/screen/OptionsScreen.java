@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gamesbykevin.havoc.MyGdxGame;
-import com.gamesbykevin.havoc.exception.ScreenException;
 import com.gamesbykevin.havoc.preferences.AppPreferences;
 import com.gamesbykevin.havoc.util.Language;
 
@@ -70,11 +69,7 @@ public class OptionsScreen extends TemplateScreen {
         buttonBack.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                try {
-                    getGame().getScreenHelper().changeScreen(SCREEN_MENU);
-                } catch (ScreenException ex) {
-                    ex.printStackTrace();
-                }
+                getGame().getScreenHelper().changeScreen(SCREEN_MENU);
             }
         });
 

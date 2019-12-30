@@ -221,9 +221,6 @@ public final class Weapons extends Entities implements Disposable, Restart {
     @Override
     public int render() {
 
-        //update the entities accordingly
-        update();
-
         //keep track of the number of objects rendered
         int count = 0;
 

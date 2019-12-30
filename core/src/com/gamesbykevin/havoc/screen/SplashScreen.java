@@ -3,11 +3,10 @@ package com.gamesbykevin.havoc.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.gamesbykevin.havoc.MyGdxGame;
-import com.gamesbykevin.havoc.exception.ScreenException;
 
 import java.util.Date;
 
-import static com.gamesbykevin.havoc.GameMain.getSizeWidth;
+import static com.gamesbykevin.havoc.GameEngine.getSizeWidth;
 import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_MENU;
 
 public class SplashScreen extends TemplateScreen {
@@ -29,7 +28,8 @@ public class SplashScreen extends TemplateScreen {
     public static final String PATH_WEBSITE = PATH_PARENT_DIR + "website.png";
 
     //provide ourselves space
-    public static final int PADDING = 25;
+    public static final int PADDING_VERTICAL = 25;
+    public static final int PADDING_HORIZONTAL = 50;
 
     public SplashScreen(MyGdxGame game) {
 
@@ -48,25 +48,24 @@ public class SplashScreen extends TemplateScreen {
         //adjust if texture is bigger than the screen
         if (getWebsite().getWidth() > getSizeWidth()) {
             ratio = (float)getSizeWidth() / (float)getWebsite().getWidth();
-            setWebsiteWidth(getSizeWidth());
+            setWebsiteWidth(getSizeWidth() - (PADDING_HORIZONTAL * 2));
             setWebsiteHeight(getWebsite().getHeight() * ratio);
         }
 
         //adjust if texture is bigger than the screen
         if (getLoading().getWidth() > getSizeWidth()) {
             ratio = (float)getSizeWidth() / (float)getLoading().getWidth();
-            setLoadingWidth(getSizeWidth());
+            setLoadingWidth(getSizeWidth() - (PADDING_HORIZONTAL * 2));
             setLoadingHeight(getLoading().getHeight() * ratio);
         }
 
         //position our image
         setLoadingX((SCREEN_WIDTH / 2) - (getLoadingWidth() / 2));
-        setLoadingY((SCREEN_HEIGHT / 2) - ((getLoadingHeight() + getWebsiteHeight() + PADDING) / 2));
+        setLoadingY((SCREEN_HEIGHT / 2) - ((getLoadingHeight() + getWebsiteHeight() + PADDING_VERTICAL) / 2));
 
         //position our image
         setWebsiteX((SCREEN_WIDTH / 2) - (getWebsiteWidth() / 2));
-        setWebsiteY(getLoadingY() + getLoadingHeight() + PADDING);
-
+        setWebsiteY(getLoadingY() + getLoadingHeight() + PADDING_VERTICAL);
     }
 
     @Override
@@ -121,14 +120,8 @@ public class SplashScreen extends TemplateScreen {
         //when enough time has passed go to the next screen
         if (new Date().getTime() - getDate().getTime() >= DURATION_DELAY) {
 
-            try {
-
-                //now we can go to our menu screen
-                getGame().getScreenHelper().changeScreen(SCREEN_MENU);
-
-            } catch (ScreenException ex) {
-                ex.printStackTrace();
-            }
+            //now we can go to our menu screen
+            getGame().getScreenHelper().changeScreen(SCREEN_MENU);
         }
     }
 

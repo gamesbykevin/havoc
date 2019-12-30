@@ -2,7 +2,6 @@ package com.gamesbykevin.havoc.screen;
 
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.gamesbykevin.havoc.MyGdxGame;
-import com.gamesbykevin.havoc.exception.ScreenException;
 
 import static com.gamesbykevin.havoc.preferences.AppPreferences.hasLevelCompleted;
 import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_GAME;
@@ -19,12 +18,15 @@ public class LevelSelectScreen extends CustomSelectScreen {
     //provide some space between each selection
     private static final int PADDING = 20;
 
+    //how many levels are there?
+    public static final int LEVEL_COUNT = 10;
+
     public LevelSelectScreen(MyGdxGame game) {
         super(game);
         super.setButtonSize(BUTTON_SIZE);
         super.setColumns(COLUMNS);
         super.setPadding(PADDING);
-        super.setTotal(10);
+        super.setTotal(LEVEL_COUNT);
     }
 
     @Override
@@ -42,18 +44,12 @@ public class LevelSelectScreen extends CustomSelectScreen {
     @Override
     public void handleClick(int index) {
 
-        try {
+        //remember our position
+        setScrollY(getScroll().getScrollY());
 
-            //remember our position
-            setScrollY(getScroll().getScrollY());
-
-            //switch to the game screen
-            getGame().setPaused(false);
-            getGame().getScreenHelper().changeScreen(SCREEN_GAME);
-
-        } catch (ScreenException e) {
-            e.printStackTrace();
-        }
+        //switch to the game screen
+        getGame().setPaused(false);
+        getGame().getScreenHelper().changeScreen(SCREEN_GAME);
     }
 
     @Override

@@ -46,6 +46,20 @@ public class TextureHelper {
     private static final int SPRITE_SHEET_HALLWAY_COLS = 6;
     private static final int SPRITE_SHEET_HALLWAY_ROWS = 5;
 
+    public static void dispose() {
+
+        COUNT = 0;
+        TOTAL = 1;
+
+        if (OPTIONS != null)
+            OPTIONS.clear();
+        if (OPTION_HALLWAY != null)
+            OPTION_HALLWAY.dispose();
+
+        OPTIONS = null;
+        OPTION_HALLWAY = null;
+    }
+
     private static Location getOptionHallway() {
 
         if (OPTION_HALLWAY == null)

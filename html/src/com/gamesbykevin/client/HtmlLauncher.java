@@ -6,8 +6,8 @@ import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.gamesbykevin.havoc.MyGdxGame;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 
-import static com.gamesbykevin.havoc.GameMain.SIZE_HEIGHT;
-import static com.gamesbykevin.havoc.GameMain.SIZE_WIDTH;
+import static com.gamesbykevin.havoc.GameEngine.SIZE_HEIGHT;
+import static com.gamesbykevin.havoc.GameEngine.SIZE_WIDTH;
 
 public class HtmlLauncher extends GwtApplication {
 

@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.gamesbykevin.havoc.assets.AssetManagerHelper;
+import com.gamesbykevin.havoc.assets.TextureHelper;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.player.Player;
 import com.gamesbykevin.havoc.util.Disposable;
@@ -15,7 +16,7 @@ import static com.gamesbykevin.havoc.assets.AudioHelper.playHero;
 import static com.gamesbykevin.havoc.assets.TextureHelper.*;
 import static com.gamesbykevin.havoc.util.MyProgressBar.*;
 
-public class GameMain implements Disposable {
+public class GameEngine implements Disposable {
 
 	//size of our window
 	public static final int SIZE_WIDTH = 800;
@@ -51,7 +52,7 @@ public class GameMain implements Disposable {
 	//render progress bar to show progress
 	private MyProgressBar myProgressBar;
 
-	public GameMain() {
+	public GameEngine() {
 
 		//create objects etc...
 		getAssetManager();
@@ -75,9 +76,6 @@ public class GameMain implements Disposable {
 	}
 
 	public void resize(int width, int height) {
-
-		//call parent
-		//super.resize(width, height);
 
 		//set it up for rendering
 		getPlayer().getViewport().update(width, height);
@@ -136,13 +134,22 @@ public class GameMain implements Disposable {
 		return this.assetManager;
 	}
 
-	public void resume() {
+	public void resume(InputMultiplexer inputMultiplexer) {
+
+		getPlayer().getController().setInput(inputMultiplexer);
 
 		//use the asset manager
 		Texture.setAssetManager(getAssetManager());
 
 		//go back to reloading our assets
 		setStep(Steps.Step1);
+
+		//flag that we are no longer paused
+		setPaused(false);
+	}
+
+	public void setPaused(boolean paused) {
+		getLevel().setPaused(paused);
 	}
 
 	public void render () {
@@ -295,14 +302,15 @@ public class GameMain implements Disposable {
 			this.level.dispose();
 		if (this.myProgressBar != null)
 			this.myProgressBar.dispose();
-		if (this.assetManager != null) {
+		if (this.assetManager != null)
 			AssetManagerHelper.dispose(this.assetManager);
-			this.assetManager.dispose();
-		}
 
+		TextureHelper.dispose();
 		this.player = null;
 		this.level = null;
-		this.assetManager = null;
 		this.myProgressBar = null;
+		this.step = null;
+		this.created = false;
+		this.assetManager = null;
 	}
 }

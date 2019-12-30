@@ -119,9 +119,6 @@ public abstract class Entities implements Disposable, Restart {
     //logic to render the entities
     public int render(boolean hide, int range) {
 
-        //update the entities accordingly
-        update();
-
         int count = 0;
 
         for (int i = 0; i < getEntityList().size(); i++) {

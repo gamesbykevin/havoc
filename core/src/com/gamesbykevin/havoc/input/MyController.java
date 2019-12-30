@@ -1,6 +1,7 @@
 package com.gamesbykevin.havoc.input;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -9,8 +10,8 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.gamesbykevin.havoc.util.Restart;
 
-import static com.gamesbykevin.havoc.GameMain.getSizeHeight;
-import static com.gamesbykevin.havoc.GameMain.getSizeWidth;
+import static com.gamesbykevin.havoc.GameEngine.getSizeHeight;
+import static com.gamesbykevin.havoc.GameEngine.getSizeWidth;
 import static com.gamesbykevin.havoc.input.MyControllerHelper.*;
 
 public class MyController implements InputProcessor, Disposable, Restart {
@@ -56,9 +57,6 @@ public class MyController implements InputProcessor, Disposable, Restart {
         if (hasController())
             setupController(assetManager, this);
 
-        //make sure we are capturing input correct
-        setInput();
-
         //create our camera
         getCamera2d();
     }
@@ -74,8 +72,8 @@ public class MyController implements InputProcessor, Disposable, Restart {
             case HeadlessDesktop:
                 return true;
 
-            case Desktop:
             default:
+            case Desktop:
                 return false;
         }
     }
@@ -136,11 +134,11 @@ public class MyController implements InputProcessor, Disposable, Restart {
         return this.camera2d;
     }
 
-    public void setInput() {
+    public void setInput(InputMultiplexer inputMultiplexer) {
         if (hasController()) {
-            Gdx.input.setInputProcessor(getStage());
+            inputMultiplexer.addProcessor(getStage());
         } else {
-            Gdx.input.setInputProcessor(this);
+            inputMultiplexer.addProcessor(this);
         }
     }
 

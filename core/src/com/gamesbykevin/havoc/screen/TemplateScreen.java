@@ -18,8 +18,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gamesbykevin.havoc.MyGdxGame;
-import com.gamesbykevin.havoc.exception.ScreenException;
 import de.golfgl.gdxgamesvcs.GameServiceException;
+
+import static com.gamesbykevin.havoc.MyGdxGame.EXIT;
 
 public abstract class TemplateScreen extends ParentScreen {
 
@@ -93,28 +94,24 @@ public abstract class TemplateScreen extends ParentScreen {
             @Override
             public boolean keyDown(int keyCode) {
 
-                if (MyGdxGame.EXIT)
+                if (EXIT)
                     return false;
 
                 if (keyCode == Input.Keys.BACK || keyCode == Input.Keys.ESCAPE) {
-                    try {
-                        if (getGame().getScreenHelper().getScreenIndex() == ScreenHelper.SCREEN_OPTIONS) {
-                            getGame().getScreenHelper().changeScreen(ScreenHelper.SCREEN_MENU);
-                            setPrompt(false);
-                        } else if (getGame().getScreenHelper().getScreenIndex() == ScreenHelper.SCREEN_MENU) {
+                    if (getGame().getScreenHelper().getScreenIndex() == ScreenHelper.SCREEN_OPTIONS) {
+                        getGame().getScreenHelper().changeScreen(ScreenHelper.SCREEN_MENU);
+                        setPrompt(false);
+                    } else if (getGame().getScreenHelper().getScreenIndex() == ScreenHelper.SCREEN_MENU) {
 
-                            if (hasPrompt()) {
+                        if (hasPrompt()) {
 
-                                //if user was already prompted, flag close
-                                MyGdxGame.EXIT = true;
+                            //if user was already prompted, lose
+                            MyGdxGame.exit(getGame());
 
-                            } else {
+                        } else {
 
-                                setPrompt(true);
-                            }
+                            setPrompt(true);
                         }
-                    } catch (ScreenException ex) {
-                        ex.printStackTrace();
                     }
                 }
                 return super.keyDown(keyCode);
@@ -155,6 +152,9 @@ public abstract class TemplateScreen extends ParentScreen {
 
         //flag false
         setPrompt(false);
+
+        //capture the input
+        captureInput();
     }
 
     @Override
@@ -187,16 +187,19 @@ public abstract class TemplateScreen extends ParentScreen {
         batch.draw(getLogo(), getLogoX(), getLogoY());
     }
 
-    private InputMultiplexer getInputMultiplexer() {
+    public InputMultiplexer getInputMultiplexer() {
         return this.inputMultiplexer;
     }
 
     protected void captureInput() {
 
+        if (EXIT)
+            return;
+
         //clear anything we have added
         getInputMultiplexer().clear();
 
-        //getInputMultiplexer().addProcessor(getGame().getController());
+        getInputMultiplexer().addProcessor(getGame().getController());
         getInputMultiplexer().addProcessor(getStage());
 
         //then set the multiplexer to capture both input
@@ -216,6 +219,9 @@ public abstract class TemplateScreen extends ParentScreen {
 
     @Override
     public void dispose() {
+
+        //call parent
+        super.dispose();
 
         if (skin != null)
             skin.dispose();

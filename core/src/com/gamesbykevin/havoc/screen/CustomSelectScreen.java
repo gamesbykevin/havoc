@@ -1,12 +1,14 @@
 package com.gamesbykevin.havoc.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.gamesbykevin.havoc.MyGdxGame;
 
 public abstract class CustomSelectScreen extends TemplateScreen {
@@ -94,6 +96,7 @@ public abstract class CustomSelectScreen extends TemplateScreen {
         //we need to allow the user to scroll
         this.scroll = new ScrollPane(table, getSkin());
         getScroll().setFlickScroll(true);
+        table.background(new TextureRegionDrawable(new TextureRegion(getBackgroundImage())));
 
         table.pad(getPadding()).defaults().expandX().space(getPadding());
         table.row();

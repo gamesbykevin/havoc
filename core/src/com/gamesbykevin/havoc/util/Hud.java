@@ -4,8 +4,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
-import static com.gamesbykevin.havoc.GameMain.getSizeHeight;
-import static com.gamesbykevin.havoc.GameMain.getSizeWidth;
+import static com.gamesbykevin.havoc.GameEngine.getSizeHeight;
+import static com.gamesbykevin.havoc.GameEngine.getSizeWidth;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 
 public class Hud {

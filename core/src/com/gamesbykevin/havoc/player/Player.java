@@ -19,7 +19,7 @@ import com.gamesbykevin.havoc.weapon.Weapons;
 import com.gamesbykevin.havoc.util.Disposable;
 import com.gamesbykevin.havoc.util.Hud;
 
-import static com.gamesbykevin.havoc.GameMain.*;
+import static com.gamesbykevin.havoc.GameEngine.*;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_COLLECT;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_HURT;
 import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
@@ -99,7 +99,7 @@ public final class Player implements Disposable, Restart {
     private BitmapFont font, fontStats;
 
     //how big is the font
-    private static final float FONT_SIZE_STATS_RATIO = 1.25F;
+    private static final float FONT_SIZE_STATS_RATIO = 1.0F;
 
     //provide space
     private static final int PADDING = 5;
