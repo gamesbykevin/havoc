@@ -208,8 +208,32 @@ public class LevelHelper {
                         //flag door is opened
                         opened = true;
 
-                        //make sure the player and enemies don't get stuck in the door
-                        if (level.getEnemies().hasCollision(col, row) || ((int)level.getPlayer().getCamera3d().position.x == col && (int)level.getPlayer().getCamera3d().position.y == row))
+                        //reopen the door if enemies are in the way
+                        boolean reopen = level.getEnemies().hasCollision(col, row);
+
+                        //if this hasn't been reopened check if the player is also in the way
+                        if (!reopen) {
+
+                            for (int x = -1; x <= 1; x++) {
+                                for (int y = -1; y <= 1; y++) {
+
+                                    if (reopen)
+                                        break;
+
+                                    //position must equal or we will skip
+                                    if ((int)(level.getPlayer().getCamera3d().position.x + x) != col)
+                                        continue;
+                                    if ((int)(level.getPlayer().getCamera3d().position.y + y) != row)
+                                        continue;
+
+                                    //reopen the door
+                                    reopen = true;
+                                }
+                            }
+                        }
+
+                        //reset the timer until the door closes
+                        if (reopen)
                             door.getTimer().reset();
                         break;
                 }
