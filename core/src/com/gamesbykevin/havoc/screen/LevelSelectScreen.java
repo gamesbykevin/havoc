@@ -63,10 +63,12 @@ public class LevelSelectScreen extends CustomSelectScreen {
     public String getButtonText(int index) {
 
         if (hasLevelCompleted(index)) {
-            return getTranslatedText(KEY_LEVEL_SELECT_SOLVED);
+            //return getTranslatedText(KEY_LEVEL_SELECT_SOLVED);
         } else {
-            return (index + 1) + "";
+            //return (index + 1) + "";
         }
+
+        return (index + 1) + "";
     }
 
     @Override

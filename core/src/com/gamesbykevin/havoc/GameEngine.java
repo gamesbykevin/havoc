@@ -134,37 +134,37 @@ public class GameEngine implements Disposable {
 				break;
 
 			case 4:
-				factor = 4;
+				factor = 5;
 				enemyMax = 3;
 				enemyMin = 2;
 				break;
 
 			case 5:
-				factor = 4;
+				factor = 5;
 				enemyMax = 3;
 				enemyMin = 3;
 				break;
 
 			case 6:
-				factor = 5;
+				factor = 6;
 				enemyMax = 3;
 				enemyMin = 2;
 				break;
 
 			case 7:
-				factor = 5;
+				factor = 6;
 				enemyMax = 3;
 				enemyMin = 3;
 				break;
 
 			case 8:
-				factor = 6;
+				factor = 7;
 				enemyMax = 3;
 				enemyMin = 2;
 				break;
 
 			case 9:
-				factor = 6;
+				factor = 7;
 				enemyMax = 3;
 				enemyMin = 3;
 				break;

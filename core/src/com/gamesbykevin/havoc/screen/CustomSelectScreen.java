@@ -11,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.gamesbykevin.havoc.MyGdxGame;
 
+import static com.gamesbykevin.havoc.preferences.AppPreferences.hasLevelCompleted;
+
 public abstract class CustomSelectScreen extends TemplateScreen {
 
     //our container table
@@ -27,6 +29,10 @@ public abstract class CustomSelectScreen extends TemplateScreen {
 
     //remember our scroll position
     private float scrollY = 0;
+
+    //if the level is complete we will apply a different style
+    public static final String STYLE_NAME_DEFAULT = "default";
+    public static final String STYLE_NAME_COMPLETED = "select";
 
     public CustomSelectScreen(MyGdxGame game) {
         super(game);
@@ -123,7 +129,7 @@ public abstract class CustomSelectScreen extends TemplateScreen {
                 final int index = count;
 
                 //each button will have the # as the label
-                TextButton button = new TextButton(getButtonText(index), getSkin());
+                TextButton button = new TextButton(getButtonText(index), getSkin(), hasLevelCompleted(index) ? STYLE_NAME_COMPLETED : STYLE_NAME_DEFAULT);
 
                 //adjust the font size accordingly
                 setButtonTextFontSize(button, index);
