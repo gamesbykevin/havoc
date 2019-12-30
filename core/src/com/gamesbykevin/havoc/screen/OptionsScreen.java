@@ -10,6 +10,7 @@ import com.gamesbykevin.havoc.MyGdxGame;
 import com.gamesbykevin.havoc.preferences.AppPreferences;
 import com.gamesbykevin.havoc.util.Language;
 
+import static com.gamesbykevin.havoc.assets.ScreenAudio.*;
 import static com.gamesbykevin.havoc.preferences.AppPreferences.*;
 import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_MENU;
 import static com.gamesbykevin.havoc.util.Language.changeMyBundle;
@@ -37,6 +38,14 @@ public class OptionsScreen extends TemplateScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 setPreferenceMusic(buttonMusic.isChecked());
+
+                if (!hasEnabledMusic()) {
+                    stopAll();
+                } else {
+                    playMenu();
+                }
+
+                playSelect();
             }
         });
 
@@ -48,6 +57,7 @@ public class OptionsScreen extends TemplateScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 setPreferenceSound(buttonSound.isChecked());
+                playSelect();
             }
         });
 
@@ -59,6 +69,7 @@ public class OptionsScreen extends TemplateScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 setPreferenceVibrate(buttonVibrate.isChecked());
+                playSelect();
             }
         });
 
@@ -70,6 +81,7 @@ public class OptionsScreen extends TemplateScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 getGame().getScreenHelper().changeScreen(SCREEN_MENU);
+                playSelect();
             }
         });
 
@@ -90,7 +102,6 @@ public class OptionsScreen extends TemplateScreen {
 
             case iOS:
             case Android:
-            default:
                 table.add(buttonVibrate).width(BUTTON_WIDTH).height(BUTTON_HEIGHT).pad(BUTTON_PADDING);
                 break;
         }
@@ -133,6 +144,8 @@ public class OptionsScreen extends TemplateScreen {
                 dropdown.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event, Actor actor) {
+
+                        playSelect();
 
                         //change the language
                         changeMyBundle(dropdown.getSelectedIndex());

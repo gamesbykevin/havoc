@@ -1,11 +1,13 @@
 package com.gamesbykevin.havoc.assets;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.gamesbykevin.havoc.weapon.Weapon;
 
+import static com.gamesbykevin.havoc.GameEngine.getRandom;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
-import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
+import static com.gamesbykevin.havoc.preferences.AppPreferences.hasEnabledMusic;
+import static com.gamesbykevin.havoc.preferences.AppPreferences.hasEnabledSfx;
 
 public class AudioHelper {
 
@@ -81,12 +83,73 @@ public class AudioHelper {
         }
     }
 
+    public enum Song {
+        Theme(PATH_MUSIC_THEME),
+        Win(PATH_MUSIC_WIN);
+
+        private final String path;
+
+        Song(String path) {
+            this.path = path;
+        }
+
+        public String getPath() {
+            return this.path;
+        }
+    }
+
+    public static void stop(AssetManager assetManager) {
+        stopSfx(assetManager);
+        stopSong(assetManager);
+    }
+
+    public static void stopSfx(AssetManager assetManager) {
+        for (Sfx sfx : Sfx.values()) {
+            try {
+                assetManager.get(sfx.path, Sound.class).stop();
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+    public static void stopSong(AssetManager assetManager) {
+        for (Song song : Song.values()) {
+            try {
+                assetManager.get(song.path, Music.class).stop();
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+    public static void playMusic(AssetManager assetManager, Song song) {
+        playMusic(assetManager, song, true);
+    }
+
+    public static void playMusic(AssetManager assetManager, Song song, boolean loop) {
+
+        //only play if enabled
+        if (!hasEnabledMusic())
+            return;
+
+        if (assetManager.get(song.getPath(), Music.class).isPlaying())
+            return;
+
+        assetManager.get(song.getPath(), Music.class).setLooping(loop);
+        assetManager.get(song.getPath(), Music.class).play();
+    }
 
     public static void playSfx(AssetManager assetManager, Sfx sfx) {
         playSfx(assetManager, sfx, false);
     }
 
     public static void playSfx(AssetManager assetManager, Sfx sfx, boolean loop) {
+
+        //only play if sound is enabled
+        if (!hasEnabledSfx())
+            return;
+
         if (loop) {
             assetManager.get(sfx.getPath(), Sound.class).loop();
         } else {

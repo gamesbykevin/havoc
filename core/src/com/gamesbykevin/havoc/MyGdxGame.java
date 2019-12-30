@@ -2,6 +2,7 @@ package com.gamesbykevin.havoc;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.gamesbykevin.havoc.assets.ScreenAudio;
 import com.gamesbykevin.havoc.input.ScreenController;
 import com.gamesbykevin.havoc.screen.ScreenHelper;
 import com.gamesbykevin.havoc.util.Language;
@@ -103,6 +104,9 @@ public class MyGdxGame extends Game {
 			this.controller.dispose();
 
 		this.controller = null;
+
+		//cleanup audio asset(s)
+		ScreenAudio.recycle();
 
 		//recycle language bundle
 		Language.recycle();

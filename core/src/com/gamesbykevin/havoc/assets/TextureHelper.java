@@ -13,10 +13,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.gamesbykevin.havoc.GameEngine.getRandom;
 import static com.gamesbykevin.havoc.animation.DecalAnimation.*;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
 import static com.gamesbykevin.havoc.decals.Background.*;
-import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafGoal;
 
 public class TextureHelper {

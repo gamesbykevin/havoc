@@ -611,7 +611,7 @@ public final class Player implements Disposable, Restart {
 
             //render the weapons
             if (!isDead())
-                getWeapons().render();
+                getWeapons().render(-1, -1, -1, -1);
         }
 
         //if we have text to display and the timer hasn't expired yet

@@ -7,16 +7,17 @@ import com.gamesbykevin.havoc.level.Level;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
+import static com.gamesbykevin.havoc.GameEngine.getRandom;
 import static com.gamesbykevin.havoc.dungeon.Cell.Type;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.*;
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.*;
+import static com.gamesbykevin.havoc.level.LevelHelper.isDoorClosed;
 import static com.gamesbykevin.havoc.level.LevelHelper.isDoorOpen;
 
 public class DungeonHelper {
 
     //how big is the dungeon
-    public static final int DUNGEON_SIZE = ROOM_DIMENSION_MAX * 2;
+    public static int DUNGEON_SIZE = ROOM_DIMENSION_MAX * 2;
 
     protected static void divide(Dungeon dungeon) {
 
@@ -550,6 +551,10 @@ public class DungeonHelper {
     }
 
     public static boolean isAvailable(Level level, float x, float y) {
+        return isAvailable(level, x, y, true);
+    }
+
+    public static boolean isAvailable(Level level, float x, float y, boolean completelyOpen) {
 
         Dungeon dungeon = level.getDungeon();
 
@@ -557,9 +562,22 @@ public class DungeonHelper {
         if (!dungeon.hasMap(x, y))
             return false;
 
-        //if there is an interact item such as a door and it isn't open
-        if (dungeon.hasInteract(x, y) && !isDoorOpen(level, x, y))
-            return false;
+        //if there is an interact item such as a door, we need to check if it's open
+        if (dungeon.hasInteract(x, y)) {
+
+            if (completelyOpen) {
+
+                //if we require the door to be completely open in order to be available and it's not
+                if (!isDoorOpen(level, x, y))
+                    return false;
+
+            } else {
+
+                //here the door is available as long as it's not completely closed
+                if (isDoorClosed(level, x, y))
+                    return false;
+            }
+        }
 
         //space is available
         return true;

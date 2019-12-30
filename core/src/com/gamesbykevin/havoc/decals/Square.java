@@ -138,7 +138,6 @@ public class Square extends Location implements Disposable, Restart {
             //render the wall
             getWalls()[i].render(camera, batch);
 
-            //keep track of the number of items rendered
             count++;
         }
 

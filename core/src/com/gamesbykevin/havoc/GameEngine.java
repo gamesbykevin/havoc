@@ -5,15 +5,22 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.gamesbykevin.havoc.assets.AssetManagerHelper;
+import com.gamesbykevin.havoc.assets.AudioHelper;
 import com.gamesbykevin.havoc.assets.TextureHelper;
+
+import static com.gamesbykevin.havoc.assets.AudioHelper.*;
+import static com.gamesbykevin.havoc.dungeon.DungeonHelper.DUNGEON_SIZE;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.player.Player;
 import com.gamesbykevin.havoc.util.Disposable;
 import com.gamesbykevin.havoc.util.MyProgressBar;
 
-import static com.gamesbykevin.havoc.assets.AssetManagerHelper.*;
-import static com.gamesbykevin.havoc.assets.AudioHelper.playHero;
+import java.util.Random;
+
 import static com.gamesbykevin.havoc.assets.TextureHelper.*;
+import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
+import static com.gamesbykevin.havoc.enemies.Enemies.ENEMIES_PER_ROOM_MAX;
+import static com.gamesbykevin.havoc.enemies.Enemies.ENEMIES_PER_ROOM_MIN;
 import static com.gamesbykevin.havoc.util.MyProgressBar.*;
 
 public class GameEngine implements Disposable {
@@ -52,7 +59,13 @@ public class GameEngine implements Disposable {
 	//render progress bar to show progress
 	private MyProgressBar myProgressBar;
 
-	public GameEngine() {
+	//object used to make random decisions
+	private static Random RANDOM;
+
+	public GameEngine(int index) {
+
+		//setup the level
+		setLevel(index);
 
 		//create objects etc...
 		getAssetManager();
@@ -75,13 +88,97 @@ public class GameEngine implements Disposable {
 		return this.myProgressBar;
 	}
 
+	public static Random getRandom() {
+		return RANDOM;
+	}
+
 	public void resize(int width, int height) {
 
 		//set it up for rendering
 		getPlayer().getViewport().update(width, height);
+	}
 
-		//update progress bar
-		getMyProgressBar().resize(width, height);
+	private void setLevel(int index) {
+
+		float factor = 0;
+		int enemyMax = 0;
+		int enemyMin = 0;
+
+		//always use the same seed to generate the same levels etc...
+		RANDOM = new Random(index);
+
+		switch (index) {
+
+			default:
+			case 0:
+				factor = 2;
+				enemyMax = 1;
+				enemyMin = 1;
+				break;
+
+			case 1:
+				factor = 2;
+				enemyMax = 2;
+				enemyMin = 1;
+				break;
+
+			case 2:
+				factor = 3;
+				enemyMax = 3;
+				enemyMin = 2;
+				break;
+
+			case 3:
+				factor = 3;
+				enemyMax = 3;
+				enemyMin = 3;
+				break;
+
+			case 4:
+				factor = 4;
+				enemyMax = 3;
+				enemyMin = 2;
+				break;
+
+			case 5:
+				factor = 4;
+				enemyMax = 3;
+				enemyMin = 3;
+				break;
+
+			case 6:
+				factor = 5;
+				enemyMax = 3;
+				enemyMin = 2;
+				break;
+
+			case 7:
+				factor = 5;
+				enemyMax = 3;
+				enemyMin = 3;
+				break;
+
+			case 8:
+				factor = 6;
+				enemyMax = 3;
+				enemyMin = 2;
+				break;
+
+			case 9:
+				factor = 6;
+				enemyMax = 3;
+				enemyMin = 3;
+				break;
+		}
+
+		//set the entire size of the dungeon
+		DUNGEON_SIZE = (int)(ROOM_DIMENSION_MAX * factor);
+
+		//how many enemies can we have in 1 room
+		ENEMIES_PER_ROOM_MAX = enemyMax;
+
+		//the fewest number of enemies per room
+		ENEMIES_PER_ROOM_MIN = enemyMin;
 	}
 
 	public boolean isCreated() {
@@ -165,28 +262,9 @@ public class GameEngine implements Disposable {
 				//if assets are loaded move to the next step
 				if (getAssetManager().update()) {
 
-					boolean success = true;
-
-					//verify everything is loaded
-					for (int i = 0; i < getPaths().size(); i++) {
-
-						String path = getPaths().get(i);
-
-						//if an asset is not loaded, we need to verify the remaining
-						if (!getAssetManager().isLoaded(path)) {
-							success = false;
-
-							//check if the asset is a texture
-							if (path.contains(ASSET_EXT_BMP) || path.contains(ASSET_EXT_PNG)) {
-								getAssetManager().load(path, Texture.class);
-							} else if (path.contains(ASSET_EXT_MP3) || path.contains(ASSET_EXT_OGG) || path.contains(ASSET_EXT_WAV)) {
-								getAssetManager().load(path, Sound.class);
-							}
-
-							getMyProgressBar().renderProgressBar(TEXT_VERIFY);
-							break;
-						}
-					}
+					//stop all audio and start the theme
+					stop(getAssetManager());
+					playMusic(getAssetManager(), AudioHelper.Song.Theme);
 
 					if (isCreated()) {
 
@@ -196,10 +274,8 @@ public class GameEngine implements Disposable {
 					} else {
 
 						//if we are good, go to the next step
-						if (success) {
-							setStep(Steps.Step2);
-							getMyProgressBar().renderProgressBar(TEXT_STEP_2);
-						}
+						setStep(Steps.Step2);
+						getMyProgressBar().renderProgressBar(TEXT_STEP_2);
 					}
 
 				} else {
@@ -296,6 +372,9 @@ public class GameEngine implements Disposable {
 	@Override
 	public void dispose () {
 
+		//stop all audio
+		stop(this.assetManager);
+
 		if (this.player != null)
 			this.player.dispose();
 		if (this.level != null)
@@ -312,5 +391,6 @@ public class GameEngine implements Disposable {
 		this.step = null;
 		this.created = false;
 		this.assetManager = null;
+		RANDOM = null;
 	}
 }

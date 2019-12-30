@@ -3,6 +3,7 @@ package com.gamesbykevin.havoc.screen;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.gamesbykevin.havoc.MyGdxGame;
 
+import static com.gamesbykevin.havoc.assets.ScreenAudio.stopAll;
 import static com.gamesbykevin.havoc.preferences.AppPreferences.hasLevelCompleted;
 import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_GAME;
 import static com.gamesbykevin.havoc.util.Language.getMyBundle;
@@ -44,12 +45,18 @@ public class LevelSelectScreen extends CustomSelectScreen {
     @Override
     public void handleClick(int index) {
 
+        //stop existing audio
+        stopAll();
+
         //remember our position
         setScrollY(getScroll().getScrollY());
 
         //switch to the game screen
         getGame().setPaused(false);
         getGame().getScreenHelper().changeScreen(SCREEN_GAME);
+
+        //set the appropriate level for our game
+        ((GameScreen)getGame().getScreen()).createEngine(index);
     }
 
     @Override

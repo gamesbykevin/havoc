@@ -1,7 +1,18 @@
 package com.gamesbykevin.havoc.screen;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gamesbykevin.havoc.GameEngine;
 import com.gamesbykevin.havoc.MyGdxGame;
+import com.gamesbykevin.havoc.gameservices.Achievement;
+import com.gamesbykevin.havoc.gameservices.Leaderboard;
+
+import static com.gamesbykevin.havoc.preferences.AppPreferences.setLevelCompleted;
+import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_MENU;
+import static com.gamesbykevin.havoc.util.Language.getMyBundle;
 
 public class GameScreen extends TemplateScreen {
 
@@ -11,11 +22,20 @@ public class GameScreen extends TemplateScreen {
     //does the game have focus
     private boolean gameFocus = false;
 
+    //which level is selected
+    private int indexLevel = -1;
+
     public GameScreen(MyGdxGame game) {
         super(game);
+    }
 
-        //create new instance
-        this.engine = new GameEngine();
+    public void createEngine(int indexLevel) {
+        this.engine = new GameEngine(indexLevel);
+        this.indexLevel = indexLevel;
+    }
+
+    public int getIndexLevel() {
+        return this.indexLevel;
     }
 
     @Override
@@ -26,6 +46,43 @@ public class GameScreen extends TemplateScreen {
 
         //capture the game input
         captureInput();
+
+        //these platforms need a back button
+        switch(Gdx.app.getType()) {
+
+            case WebGL:
+            case Applet:
+            case Desktop:
+            case HeadlessDesktop:
+
+                //create our back button
+                TextButton buttonBack = new TextButton(getMyBundle().get("optionsScreenBack"), getSkin());
+
+                //Add listeners to buttons
+                buttonBack.addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        getGame().getScreenHelper().changeScreen(SCREEN_MENU);
+                    }
+                });
+
+                //Create Table
+                Table table = new Table();
+
+                //Set table to fill stage
+                table.setFillParent(true);
+
+                //Set alignment of contents in the table.
+                table.right();
+
+                //add button to the table
+                table.add(buttonBack).width(BUTTON_WIDTH).height(BUTTON_HEIGHT).pad(BUTTON_PADDING * 2);
+
+                //Add table to stage
+                getStage().clear();
+                getStage().addActor(table);
+                break;
+        }
     }
 
     @Override
@@ -72,11 +129,18 @@ public class GameScreen extends TemplateScreen {
         super.resize(width, height);
 
         //make sure game is updated
-        getEngine().resize(width, height);
+        if (getEngine() != null)
+            getEngine().resize(width, height);
     }
 
     @Override
     public void render(float delta) {
+
+        boolean goal = false;
+
+        //check if the player reached the goal once it's created
+        if (getEngine().isCreated())
+            goal = getEngine().getPlayer().isGoal();
 
         //render & update the game (if not paused)
         getEngine().render();
@@ -98,6 +162,31 @@ public class GameScreen extends TemplateScreen {
 
                 //we now have focus
                 setGameFocus(true);
+
+            } else {
+
+                //if we are at the goal, provide the user a way to go back and check for trophy(ies), achievement(s), etc...
+                if (getEngine().isCreated() && getEngine().getPlayer().isGoal()) {
+
+                    //if we just reached the goal
+                    if (!goal) {
+
+                        //save on the app preferences
+                        setLevelCompleted(getIndexLevel(), true);
+
+                        //unlock achievement
+                        Achievement.unlock(getGame().getGsClient(), getEngine().getLevel(), getIndexLevel());
+
+                        //submit time to leader board
+                        Leaderboard.submit(getGame().getGsClient(), getEngine().getLevel(), getIndexLevel());
+                    }
+
+                    //act the stage
+                    getStage().act();
+
+                    //draw the remaining of the stage
+                    getStage().draw();
+                }
             }
         }
     }

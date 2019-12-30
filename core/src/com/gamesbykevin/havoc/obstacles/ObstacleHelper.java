@@ -1,6 +1,6 @@
 package com.gamesbykevin.havoc.obstacles;
 
-import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
+import static com.gamesbykevin.havoc.GameEngine.getRandom;
 
 public class ObstacleHelper {
 

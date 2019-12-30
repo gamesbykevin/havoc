@@ -11,7 +11,7 @@ public class AppPreferences {
     /**
      * How long do we vibrate the phone
      */
-    public static final int DURATION_VIBRATE = 333;
+    public static final int DURATION_VIBRATE = 250;
 
     private static final String PREFS_NAME = "havoc_game_options";
 

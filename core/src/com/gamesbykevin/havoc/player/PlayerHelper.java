@@ -9,11 +9,9 @@ import com.gamesbykevin.havoc.decals.Square;
 import com.gamesbykevin.havoc.level.Level;
 import com.gamesbykevin.havoc.util.Hud;
 
-import static com.gamesbykevin.havoc.GameEngine.getSizeHeight;
-import static com.gamesbykevin.havoc.GameEngine.getSizeWidth;
+import static com.gamesbykevin.havoc.GameEngine.*;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.PATH_HURT;
 import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
-import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.input.MyController.SPEED_WALK;
 import static com.gamesbykevin.havoc.util.Hud.SHEET_HEIGHT;
 import static com.gamesbykevin.havoc.util.Hud.SHEET_WIDTH;

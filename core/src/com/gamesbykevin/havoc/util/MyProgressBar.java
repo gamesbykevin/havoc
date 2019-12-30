@@ -4,23 +4,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
-import static com.gamesbykevin.havoc.GameEngine.*;
 import static com.gamesbykevin.havoc.screen.ParentScreen.PATH_BACKGROUND;
 
 public class MyProgressBar implements Disposable {
 
     //dimensions of the progress bar
-    private static final float PROGRESS_BAR_WIDTH = (getSizeWidth() / 2f);
+    private static float PROGRESS_BAR_WIDTH;
     private static final float PROGRESS_BAR_HEIGHT = 100f;
 
     //where to render the progress bar
     private int progressX, progressY;
 
     //used to draw progress bar info
-    private Viewport viewport;
     private SpriteBatch batch;
     private BitmapFont font;
 
@@ -34,7 +30,6 @@ public class MyProgressBar implements Disposable {
     public static final String TEXT_STEP_5 = "Step 5 of 7 Spawning enemies";
     public static final String TEXT_STEP_6 = "Step 6 of 7 Spawning collectibles";
     public static final String TEXT_STEP_7 = "Step 7 of 7 Applying textures";
-    public static final String TEXT_VERIFY = "Verifying assets";
 
     //our background texture
     private Texture background, backgroundProgress, progress;
@@ -44,8 +39,7 @@ public class MyProgressBar implements Disposable {
 
     public MyProgressBar() {
 
-        //create view port
-        this.viewport = new StretchViewport(getSizeWidth(), getSizeHeight());
+        PROGRESS_BAR_WIDTH = (Gdx.graphics.getWidth() / 2f);
 
         //create sprite batch
         this.batch = new SpriteBatch();
@@ -59,13 +53,8 @@ public class MyProgressBar implements Disposable {
         this.backgroundProgress = new Texture(Gdx.files.internal(PATH_PROGRESS_BACKGROUND));
         this.progress = new Texture(Gdx.files.internal(PATH_PROGRESS));
 
-        this.progressX = (int)((getSizeWidth() - PROGRESS_BAR_WIDTH) / 2);
-        this.progressY = (int)((getSizeHeight() - PROGRESS_BAR_HEIGHT) / 2);
-    }
-
-    public void resize(int width, int height) {
-        getViewport().update(width, height, true);
-        getBatch().setProjectionMatrix(getViewport().getCamera().combined);
+        this.progressX = (int)((Gdx.graphics.getWidth() - PROGRESS_BAR_WIDTH) / 2);
+        this.progressY = (int)((Gdx.graphics.getHeight() - PROGRESS_BAR_HEIGHT) / 2);
     }
 
     public Texture getBackgroundProgress() {
@@ -88,10 +77,6 @@ public class MyProgressBar implements Disposable {
         return this.batch;
     }
 
-    public Viewport getViewport() {
-        return this.viewport;
-    }
-
     public BitmapFont getFont() {
         return this.font;
     }
@@ -110,7 +95,7 @@ public class MyProgressBar implements Disposable {
         getBatch().begin();
 
         //draw screen background
-        getBatch().draw(getBackground(), 0, 0, SIZE_WIDTH, SIZE_HEIGHT);
+        getBatch().draw(getBackground(), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         //render progress bar background
         getBatch().draw(getBackgroundProgress(), getProgressX(), getProgressY(), PROGRESS_BAR_WIDTH, PROGRESS_BAR_HEIGHT);
@@ -138,7 +123,6 @@ public class MyProgressBar implements Disposable {
         if (this.progress != null)
             this.progress.dispose();
 
-        this.viewport = null;
         this.batch = null;
         this.font = null;
         this.background = null;

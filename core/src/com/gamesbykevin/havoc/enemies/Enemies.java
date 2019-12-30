@@ -11,10 +11,10 @@ import com.gamesbykevin.havoc.util.Timer;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.gamesbykevin.havoc.GameEngine.getRandom;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.getTypeBoss;
 import static com.gamesbykevin.havoc.assets.AssetManagerHelper.getTypeSoldier;
 import static com.gamesbykevin.havoc.assets.AudioHelper.*;
-import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafGoal;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
@@ -25,8 +25,8 @@ import static com.gamesbykevin.havoc.util.Distance.getDistance;
 public final class Enemies extends Entities {
 
     //how many enemies in each room
-    public static final int ENEMIES_PER_ROOM_MAX = 3;
-    public static final int ENEMIES_PER_ROOM_MIN = 1;
+    public static int ENEMIES_PER_ROOM_MAX = 3;
+    public static int ENEMIES_PER_ROOM_MIN = 1;
 
     //how close do we need to be to play the sound effect
     public static final float ENEMY_DISTANCE_SFX_RATIO = 1.25f;
@@ -95,8 +95,18 @@ public final class Enemies extends Entities {
 
             int count = 0;
 
+            int limit;
+
             //pick random number of enemies
-            int limit = getRandom().nextInt(ENEMIES_PER_ROOM_MAX - ENEMIES_PER_ROOM_MIN) + ENEMIES_PER_ROOM_MIN;
+            if (ENEMIES_PER_ROOM_MAX - ENEMIES_PER_ROOM_MIN < 1) {
+                limit = ENEMIES_PER_ROOM_MIN;
+            } else {
+                limit = getRandom().nextInt(ENEMIES_PER_ROOM_MAX - ENEMIES_PER_ROOM_MIN) + ENEMIES_PER_ROOM_MIN;
+            }
+
+            //need at least 1 enemy
+            if (limit < 1)
+                limit = 1;
 
             //how many enemies per room
             while (!options.isEmpty() && count < limit) {
@@ -505,7 +515,7 @@ public final class Enemies extends Entities {
     }
 
     @Override
-    public int render() {
+    public int render(int colMin, int colMax, int rowMin, int rowMax) {
 
         int count = 0;
 
@@ -525,6 +535,10 @@ public final class Enemies extends Entities {
             if (distance > RENDER_RANGE)
                 continue;
 
+            //only render it if we can see it
+            if (entity.getCol() < colMin || entity.getCol() > colMax || entity.getRow() < rowMin || entity.getRow() > rowMax)
+                continue;
+
             //render the entity
             entity.render(
                     getLevel().getAssetManager(),
@@ -533,11 +547,9 @@ public final class Enemies extends Entities {
                     getLevel().getPlayer().getController().getStage().getBatch()
             );
 
-            //keep track of how many items we rendered
             count++;
         }
 
-        //return the count
         return count;
     }
 }

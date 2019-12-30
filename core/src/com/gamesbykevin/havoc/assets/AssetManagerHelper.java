@@ -1,6 +1,7 @@
 package com.gamesbykevin.havoc.assets;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.gamesbykevin.havoc.collectibles.Collectibles;
@@ -12,8 +13,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.gamesbykevin.havoc.GameEngine.getRandom;
 import static com.gamesbykevin.havoc.assets.AudioHelper.Sfx.*;
-import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
+import static com.gamesbykevin.havoc.assets.AudioHelper.Song.Theme;
+import static com.gamesbykevin.havoc.assets.AudioHelper.Song.Win;
 import static com.gamesbykevin.havoc.input.MyController.hasController;
 
 public class AssetManagerHelper {
@@ -51,11 +54,16 @@ public class AssetManagerHelper {
     //parent directory of our audio
     public static final String PARENT_DIR_AUDIO = "audio/";
 
-    //directory of sound effects
+    //directory of audio
     public static final String PARENT_DIR_SOUND = PARENT_DIR_AUDIO + "sound/";
+    public static final String PARENT_DIR_MUSIC = PARENT_DIR_AUDIO + "music/";
 
     //name of our sprite sheet
     public static final String SPRITE_SHEET = "/sheet.png";
+
+    //music in our game
+    public static final String PATH_MUSIC_THEME = PARENT_DIR_MUSIC + "theme" + ASSET_EXT_MP3;
+    public static final String PATH_MUSIC_WIN = PARENT_DIR_MUSIC + "win" + ASSET_EXT_MP3;
 
     //parent directories for our sound effects
     public static final String PARENT_DIR_SOUND_ENEMY   = PARENT_DIR_SOUND + "enemy/";
@@ -161,8 +169,8 @@ public class AssetManagerHelper {
     //bulk of file names start with this
     public static final String FILENAME_BACKGROUND = "background_";
 
-    public static final String PATH_HURT = PARENT_DIR_IMAGES + "/hud/" + "hurt" + ASSET_EXT_PNG;
-    public static final String PATH_COLLECT = PARENT_DIR_IMAGES + "/hud/" + "collect" + ASSET_EXT_PNG;
+    public static final String PATH_HURT = PARENT_DIR_IMAGES + "hud/" + "hurt" + ASSET_EXT_PNG;
+    public static final String PATH_COLLECT = PARENT_DIR_IMAGES + "hud/" + "collect" + ASSET_EXT_PNG;
 
     //path locations to the controller images
     public static final String PATH_CONTROL_SHOOT = ASSET_DIR_CONTROLS + "shoot" + ASSET_EXT_PNG;
@@ -308,6 +316,8 @@ public class AssetManagerHelper {
         load(assetManager, HeroTrash2.getPath(), Sound.class);
         load(assetManager, HeroTakeDown.getPath(), Sound.class);
         load(assetManager, HeroDead.getPath(), Sound.class);
+        load(assetManager, Theme.getPath(), Music.class);
+        load(assetManager, Win.getPath(), Music.class);
     }
 
     private static void loadController(AssetManager assetManager) {

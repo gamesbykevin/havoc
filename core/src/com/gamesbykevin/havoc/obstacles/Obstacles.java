@@ -6,7 +6,7 @@ import com.gamesbykevin.havoc.entities.Entities;
 import com.gamesbykevin.havoc.entities.Entity;
 import com.gamesbykevin.havoc.level.Level;
 
-import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
+import static com.gamesbykevin.havoc.GameEngine.getRandom;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
 import static com.gamesbykevin.havoc.obstacles.ObstacleHelper.*;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
@@ -76,7 +76,7 @@ public final class Obstacles extends Entities {
 
 
         //how frequent do we add an obstacle
-        int offset = getRandom().nextInt(3) + 2;
+        int offset = getRandom().nextInt(3) + 3;
 
         boolean doorWest = room.hasWestDoor(getLevel().getDungeon());
         boolean doorEast = room.hasEastDoor(getLevel().getDungeon());
@@ -105,7 +105,7 @@ public final class Obstacles extends Entities {
     private void addLights(Room room) {
 
         //frequency of lights
-        int frequency = getRandom().nextInt(4) + 2;
+        int frequency = getRandom().nextInt(3) + 3;
 
         Obstacle.Type type = getRandomTypeLight();
 
@@ -231,7 +231,7 @@ public final class Obstacles extends Entities {
     }
 
     @Override
-    public int render() {
+    public int render(int colMin, int colMax, int rowMin, int rowMax) {
 
         int count = 0;
 
@@ -251,6 +251,10 @@ public final class Obstacles extends Entities {
             if (distance > RENDER_RANGE)
                 continue;
 
+            //only render it if we can see it
+            if (entity.getCol() < colMin || entity.getCol() > colMax || entity.getRow() < rowMin || entity.getRow() > rowMax)
+                continue;
+
             //render the entity
             entity.render(
                     getLevel().getAssetManager(),
@@ -259,11 +263,9 @@ public final class Obstacles extends Entities {
                     getLevel().getPlayer().getController().getStage().getBatch()
             );
 
-            //keep track of how many items we rendered
             count++;
         }
 
-        //return the count
         return count;
     }
 }

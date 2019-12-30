@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gamesbykevin.havoc.MyGdxGame;
 
 import static com.gamesbykevin.havoc.MyGdxGame.EXIT;
+import static com.gamesbykevin.havoc.assets.ScreenAudio.playMenu;
+import static com.gamesbykevin.havoc.assets.ScreenAudio.playSelect;
 import static com.gamesbykevin.havoc.util.Language.getMyBundle;
 import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_OPTIONS;
 import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_SELECT_LEVEL;
@@ -32,6 +34,9 @@ public class MenuScreen extends TemplateScreen {
         //if session is not active, then we need to login
         if (getGame().getGsClient() != null && !getGame().getGsClient().isSessionActive())
             getGame().getGsClient().logIn();
+
+        //play menu music
+        playMenu();
 
         //capture the menu input
         captureInput();
@@ -58,6 +63,7 @@ public class MenuScreen extends TemplateScreen {
             public void clicked(InputEvent event, float x, float y) {
                 //now switch screens
                 getGame().getScreenHelper().changeScreen(SCREEN_SELECT_LEVEL);
+                playSelect();
             }
         });
 
@@ -65,6 +71,7 @@ public class MenuScreen extends TemplateScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 getGame().getScreenHelper().changeScreen(SCREEN_OPTIONS);
+                playSelect();
             }
         });
 
@@ -72,6 +79,7 @@ public class MenuScreen extends TemplateScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Gdx.net.openURI(URL_RATE);
+                playSelect();
             }
         });
 
@@ -79,12 +87,15 @@ public class MenuScreen extends TemplateScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Gdx.net.openURI(URL_MORE);
+                playSelect();
             }
         });
 
         buttonExit.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+
+                playSelect();
 
                 //exit the game
                 MyGdxGame.exit(getGame());
@@ -119,6 +130,7 @@ public class MenuScreen extends TemplateScreen {
 
     @Override
     public void resume() {
+
         super.resume();
     }
 

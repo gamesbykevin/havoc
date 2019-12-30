@@ -5,7 +5,7 @@ import com.gamesbykevin.havoc.dungeon.Cell.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
+import static com.gamesbykevin.havoc.GameEngine.getRandom;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
 
 public class RoomHelper {

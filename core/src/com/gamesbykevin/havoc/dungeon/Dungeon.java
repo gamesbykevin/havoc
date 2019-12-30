@@ -24,9 +24,6 @@ public class Dungeon implements Disposable {
     //details of the map
     private Cell[][] cells;
 
-    //object used to make random decisions
-    private static Random RANDOM;
-
     //used to find shortest path
     private AStar aStar;
 
@@ -340,13 +337,6 @@ public class Dungeon implements Disposable {
         return getMap().length;
     }
 
-    public static Random getRandom() {
-        if (RANDOM == null)
-            RANDOM = new Random();
-
-        return RANDOM;
-    }
-
     private void assignStart() {
 
         for (int i = 0; i < getLeafs().size(); i++) {
@@ -455,6 +445,5 @@ public class Dungeon implements Disposable {
         this.cells = null;
         this.map = null;
         this.interact = null;
-        RANDOM = null;
     }
 }

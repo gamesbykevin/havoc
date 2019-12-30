@@ -219,10 +219,7 @@ public final class Weapons extends Entities implements Disposable, Restart {
     }
 
     @Override
-    public int render() {
-
-        //keep track of the number of objects rendered
-        int count = 0;
+    public int render(int colMin, int colMax, int rowMin, int rowMax) {
 
         Batch batch = getLevel().getPlayer().getController().getStage().getBatch();
         AssetManager assetManager = getLevel().getAssetManager();
@@ -230,14 +227,10 @@ public final class Weapons extends Entities implements Disposable, Restart {
         //render the entity
         getEntityList().get(getIndex()).render(assetManager, getLevel().getPlayer().getCamera3d(), getLevel().getDecalBatch(), batch);
 
-        //keep track of how many items we rendered
-        count++;
-
         //render weapon bullet count
         Hud.renderNumberDigits3(assetManager, batch, getWeapon().getBullets(), false, HUD_BULLET_X, HUD_BULLET_Y, HUD_WIDTH, HUD_HEIGHT);
 
-        //we rendered 1 item
-        return count;
+        return 0;
     }
 
     @Override

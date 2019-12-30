@@ -12,7 +12,7 @@ import com.gamesbykevin.havoc.level.Level;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gamesbykevin.havoc.dungeon.Dungeon.getRandom;
+import static com.gamesbykevin.havoc.GameEngine.getRandom;
 import static com.gamesbykevin.havoc.dungeon.LeafHelper.getLeafRooms;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
@@ -361,7 +361,7 @@ public final class Collectibles extends Entities {
     }
 
     @Override
-    public int render() {
+    public int render(int colMin, int colMax, int rowMin, int rowMax) {
 
         int count = 0;
 
@@ -378,6 +378,10 @@ public final class Collectibles extends Entities {
             if (getDistance(entity, getLevel().getPlayer()) > RENDER_RANGE)
                 continue;
 
+            //only render it if we can see it
+            if (entity.getCol() < colMin || entity.getCol() > colMax || entity.getRow() < rowMin || entity.getRow() > rowMax)
+                continue;
+
             //render the entity
             entity.render(
                 getLevel().getAssetManager(),
@@ -386,11 +390,9 @@ public final class Collectibles extends Entities {
                 getLevel().getPlayer().getController().getStage().getBatch()
             );
 
-            //keep track of how many items we rendered
             count++;
         }
 
-        //return the count
         return count;
     }
 }

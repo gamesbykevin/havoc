@@ -113,40 +113,6 @@ public abstract class Entities implements Disposable, Restart {
         this.entityList = null;
     }
 
-    //implement logic to render the entities, return count of entities rendered
-    public abstract int render();
-
-    //logic to render the entities
-    public int render(boolean hide, int range) {
-
-        int count = 0;
-
-        for (int i = 0; i < getEntityList().size(); i++) {
-
-            //get the current entity
-            Entity entity = getEntityList().get(i);
-
-            //if we want to hide entities that are not solid
-            if (hide && !entity.isSolid())
-                continue;
-
-            //don't render if too far away
-            if (range > 0 && getDistance(entity, getLevel().getPlayer()) > range)
-                continue;
-
-            //render the entity
-            entity.render(
-                getLevel().getAssetManager(),
-                getLevel().getPlayer().getCamera3d(),
-                getLevel().getDecalBatch(),
-                getLevel().getPlayer().getController().getStage().getBatch()
-            );
-
-            //keep track of how many items we rendered
-            count++;
-        }
-
-        //return the count
-        return count;
-    }
+    //implement logic to render the entities
+    public abstract int render(int colMin, int colMax, int rowMin, int rowMax);
 }

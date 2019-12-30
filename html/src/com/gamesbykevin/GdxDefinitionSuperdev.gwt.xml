@@ -7,8 +7,8 @@
 	<inherits name='com.badlogic.gdx.ai' />
 
     <inherits name='com.gamesbykevin.GdxDefinition' />
-    
-    <collapse-all-properties />
+	<inherits name="de.golfgl.gdxgamesvcs.gdx_gamesvcs_gwt" />
+	<collapse-all-properties />
     
 	<add-linker name="xsiframe"/>	
 	<set-configuration-property name="devModeRedirectEnabled" value="true"/>

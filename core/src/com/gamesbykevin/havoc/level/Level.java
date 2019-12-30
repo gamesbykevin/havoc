@@ -1,6 +1,7 @@
 package com.gamesbykevin.havoc.level;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.gamesbykevin.havoc.collectibles.CollectibleHelper;
 import com.gamesbykevin.havoc.collectibles.Collectibles;
@@ -274,36 +275,81 @@ public class Level implements Disposable, Restart {
             return;
         }
 
-        //update the camera
-        getPlayer().getCamera3d().update();
+        //where are we facing
+        float rotation = getPlayer().getController().getRotation();
+
+        //get the camera
+        PerspectiveCamera camera = getPlayer().getCamera3d();
+
+        //calculate the min/max col/row so we render only items that we can see
+        int rowMin = (int)(camera.position.y - RENDER_RANGE);
+        int rowMax = (int)(camera.position.y + RENDER_RANGE);
+        int colMin = (int)(camera.position.x - RENDER_RANGE);
+        int colMax = (int)(camera.position.x + RENDER_RANGE);
+
+        //we don't want to render items that are behind us
+        if (rotation <= 45 || rotation >= 315)
+            rowMin = (int) (camera.position.y - 1);
+
+        if (rotation <= 315 && rotation >= 225)
+            colMin = (int) (camera.position.x - 1);
+
+        if (rotation <= 225 && rotation >= 135)
+            rowMax = (int) (camera.position.y + 1);
+
+        if (rotation <= 135 && rotation >= 45)
+            colMax = (int) (camera.position.x + 1);
+
+        //can we reduce the range
+        colMax = getRangeColMax(camera, this, colMax, rowMin, rowMax);
+        colMin = getRangeColMin(camera, this, colMin, rowMin, rowMax);
+        rowMax = getRangeRowMax(camera, this, rowMax, colMin, colMax);
+        rowMin = getRangeRowMin(camera, this, rowMin, colMin, colMax);
+
+        if (rowMin < 0)
+            rowMin = 0;
+        if (colMin < 0)
+            colMin = 0;
+        if (rowMax >= walls.length)
+            rowMax = walls.length - 1;
+        if (colMax >= walls[0].length)
+            colMax = walls[0].length - 1;
+
+        //now that we know the range we can now render the objects
+        render(colMin, colMax, rowMin, rowMax);
+    }
+
+    private void render(int colMin, int colMax, int rowMin, int rowMax) {
 
         //update game components, etc...
         if (!isPaused())
             update();
 
+        //update the camera
+        getPlayer().getCamera3d().update();
+
         int count = 0;
 
         //draw the walls
-        count += renderWalls(getWalls(), getDecalBatch(), getPlayer().getCamera3d());
+        count += renderWalls(getWalls(), getDecalBatch(), getPlayer().getCamera3d(), colMin, colMax, rowMin, rowMax);
 
         //render the backgrounds
         count += renderBackground(getBackgrounds(), getPlayer().getCamera3d().position, getDecalBatch());
 
         //render the doors
-        count += renderDoorDecals(getDoorDecals(), getDecalBatch(), getPlayer().getCamera3d());
+        count += renderDoorDecals(getDoorDecals(), getDecalBatch(), getPlayer().getCamera3d(), colMin, colMax, rowMin, rowMax);
 
         //render the enemies
-        count += getEnemies().render();
+        count += getEnemies().render(colMin, colMax, rowMin, rowMax);
 
         //render the obstacles
-        count += getObstacles().render();
+        count += getObstacles().render(colMin, colMax, rowMin, rowMax);
 
         //render the collectibles
-        count += getCollectibles().render();
+        count += getCollectibles().render(colMin, colMax, rowMin, rowMax);
 
-        //tracking performance
-        if (count > 400)
-            System.out.println("Rendered: " + count);
+        if (count > 300)
+            System.out.println(count);
 
         //call flush at the end to draw
         getDecalBatch().flush();

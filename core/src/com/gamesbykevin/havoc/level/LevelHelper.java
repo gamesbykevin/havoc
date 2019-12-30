@@ -1,5 +1,6 @@
 package com.gamesbykevin.havoc.level;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector3;
@@ -9,15 +10,19 @@ import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.decals.Square;
 import com.gamesbykevin.havoc.decals.Wall;
 import com.gamesbykevin.havoc.dungeon.Cell;
+import com.gamesbykevin.havoc.dungeon.Dungeon;
 import com.gamesbykevin.havoc.player.Player;
 
 import java.util.List;
 
-import static com.gamesbykevin.havoc.assets.AudioHelper.playSfx;
+import static com.gamesbykevin.havoc.assets.AudioHelper.*;
 import static com.gamesbykevin.havoc.decals.Door.DOOR_DISTANCE_SFX_RATIO;
+import static com.gamesbykevin.havoc.dungeon.DungeonHelper.isAvailable;
 import static com.gamesbykevin.havoc.dungeon.RoomHelper.ROOM_DIMENSION_MAX;
 import static com.gamesbykevin.havoc.level.Level.RENDER_RANGE;
 import static com.gamesbykevin.havoc.player.PlayerHelper.*;
+import static com.gamesbykevin.havoc.preferences.AppPreferences.DURATION_VIBRATE;
+import static com.gamesbykevin.havoc.preferences.AppPreferences.hasEnabledVibrate;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 
 public class LevelHelper {
@@ -25,23 +30,9 @@ public class LevelHelper {
     //how close we have to be to open a door
     public static final int DOOR_DISTANCE = 2;
 
-    protected static int renderWalls(Square[][] walls, DecalBatch batch, PerspectiveCamera camera) {
+    protected static int renderWalls(Square[][] walls, DecalBatch batch, PerspectiveCamera camera, int colMin, int colMax, int rowMin, int rowMax) {
 
         int count = 0;
-
-        int rowMin = (int)(camera.position.y - RENDER_RANGE);
-        int rowMax = (int)(camera.position.y + RENDER_RANGE);
-        int colMin = (int)(camera.position.x - RENDER_RANGE);
-        int colMax = (int)(camera.position.x + RENDER_RANGE);
-
-        if (rowMin < 0)
-            rowMin = 0;
-        if (colMin < 0)
-            colMin = 0;
-        if (rowMax >= walls.length)
-            rowMax = walls.length - 1;
-        if (colMax >= walls[0].length)
-            colMax = walls[0].length - 1;
 
         for (int row = rowMin; row <= rowMax; row++) {
             for (int col = colMin; col <= colMax; col++) {
@@ -53,7 +44,6 @@ public class LevelHelper {
             }
         }
 
-        //return number of items rendered
         return count;
     }
 
@@ -69,20 +59,19 @@ public class LevelHelper {
             if (getDistance(decal, position) > RENDER_RANGE * 1.25)
                 continue;
 
-            count++;
             batch.add(decal.getDecal());
+            count++;
         }
 
-        //return number of items rendered
         return count;
     }
 
-    protected static int renderDoorDecals(Door[][] decals, DecalBatch batch, PerspectiveCamera camera) {
+    protected static int renderDoorDecals(Door[][] decals, DecalBatch batch, PerspectiveCamera camera, int colMin, int colMax, int rowMin, int rowMax) {
 
         int count = 0;
 
-        for (int col = 0; col < decals[0].length; col++) {
-            for (int row = 0; row < decals.length; row++) {
+        for (int col = colMin; col <= colMax; col++) {
+            for (int row = rowMin; row <= rowMax; row++) {
 
                 DecalCustom custom = decals[row][col];
 
@@ -95,13 +84,10 @@ public class LevelHelper {
 
                 //render item
                 custom.render(camera, batch);
-
-                //keep track of total number items rendered
                 count++;
             }
         }
 
-        //return number of items rendered
         return count;
     }
 
@@ -136,6 +122,11 @@ public class LevelHelper {
 
                     //if locked and we don't have a key
                     if (cell.isLocked() && !key) {
+
+                        //vibrate if the option is enabled
+                        if (hasEnabledVibrate())
+                            Gdx.input.vibrate(DURATION_VIBRATE);
+
                         playSfx(level.getAssetManager(), AudioHelper.Sfx.LevelLocked);
                         level.getPlayer().setTextNotify(TEXT_NOTIFY_LOCKED);
                         continue;
@@ -274,6 +265,28 @@ public class LevelHelper {
         }
     }
 
+    public static boolean isDoorClosed(Level level, float col, float row) {
+        return isDoorClosed(level, (int)col, (int)row);
+    }
+
+    public static boolean isDoorClosed(Level level, int col, int row) {
+
+        //get the door
+        Door door = level.getDoorDecal(col, row);
+
+        //if the door is not there return false
+        if (door == null)
+            return false;
+
+        switch (door.getState()) {
+            case Closed:
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
     protected static void updateLevel(Level level) {
 
         //update the doors in the level
@@ -335,12 +348,113 @@ public class LevelHelper {
                 } else {
                     player.setStatSecret((int) ((secretOpen / secretTotal) * 100));
                 }
+
                 player.setStatItem((int)((collectiblesConsumed / collectiblesTotal) * 100));
                 player.setStatEnemy((int)((enemiesKilled / enemiesTotal) * 100));
+
+                //stop any other songs
+                stopSong(level.getAssetManager());
+
+                //play the win song
+                playMusic(level.getAssetManager(), AudioHelper.Song.Win);
             }
 
             //set action back to false
             player.getController().setAction(false);
         }
+    }
+
+    protected static int getRangeColMax(PerspectiveCamera camera, Level level, int colMax, int rowMin, int rowMax) {
+
+        //can we reduce the range even further?
+        for (int col = (int)(camera.position.x) + 1; col < colMax; col++) {
+
+            boolean success = true;
+
+            //make sure all areas between are not available
+            for (int row = rowMin; row <= rowMax; row++) {
+                if (isAvailable(level, col, row, false)) {
+                    success = false;
+                    break;
+                }
+            }
+
+            //if successful, reduce the range
+            if (success)
+                return col;
+        }
+
+        return colMax;
+    }
+
+    protected static int getRangeColMin(PerspectiveCamera camera, Level level, int colMin, int rowMin, int rowMax) {
+
+        //can we reduce the range even further?
+        for (int col = (int)(camera.position.x) - 1; col > colMin; col--) {
+
+            boolean success = true;
+
+            //make sure all areas between are not available
+            for (int row = rowMin; row <= rowMax; row++) {
+                if (isAvailable(level, col, row, false)) {
+                    success = false;
+                    break;
+                }
+            }
+
+            //if successful, reduce the range
+            if (success)
+                return col;
+        }
+
+        return colMin;
+    }
+
+    protected static int getRangeRowMax(PerspectiveCamera camera, Level level, int rowMax, int colMin, int colMax) {
+
+        //can we reduce the range even further?
+        for (int row = (int)(camera.position.y) + 1; row < rowMax; row++) {
+
+            boolean success = true;
+
+            //make sure all areas between are not available
+            for (int col = colMin; col <= colMax; col++) {
+                if (isAvailable(level, col, row, false)) {
+                    success = false;
+                    break;
+                }
+            }
+
+            //if successful, reduce the range
+            if (success)
+                return row;
+        }
+
+        return rowMax;
+    }
+
+    protected static int getRangeRowMin(PerspectiveCamera camera, Level level, int rowMin, int colMin, int colMax) {
+
+        //can we reduce the range even further?
+        for (int row = (int)(camera.position.y) - 1; row > rowMin; row--) {
+
+            boolean success = true;
+
+            //make sure all areas between are not available
+            for (int col = colMin; col <= colMax; col++) {
+                if (isAvailable(level, col, row, false)) {
+                    success = false;
+                    break;
+                }
+            }
+
+            //if successful, reduce the range
+            if (success) {
+                rowMin = row;
+                break;
+            }
+        }
+
+        return rowMin;
     }
 }

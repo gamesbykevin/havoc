@@ -1,5 +1,6 @@
 package com.gamesbykevin.havoc.enemies;
 
+import com.badlogic.gdx.Gdx;
 import com.gamesbykevin.havoc.astar.Node;
 import com.gamesbykevin.havoc.decals.Door;
 import com.gamesbykevin.havoc.entities.Entity;
@@ -10,6 +11,8 @@ import java.util.List;
 
 import static com.gamesbykevin.havoc.enemies.Enemy.*;
 import static com.gamesbykevin.havoc.entities.EntityHelper.isObstructed;
+import static com.gamesbykevin.havoc.preferences.AppPreferences.DURATION_VIBRATE;
+import static com.gamesbykevin.havoc.preferences.AppPreferences.hasEnabledVibrate;
 import static com.gamesbykevin.havoc.util.Distance.getDistance;
 import static com.gamesbykevin.havoc.weapon.WeaponHelper.RANGE_FIRE_RATIO;
 
@@ -208,6 +211,10 @@ public class EnemyHelper {
 
                 //deduct health from the player
                 level.getPlayer().setHealth(level.getPlayer().getHealth() - damage);
+
+                //vibrate if the option is enabled
+                if (hasEnabledVibrate())
+                    Gdx.input.vibrate(DURATION_VIBRATE);
             }
 
             //if close enough the enemy will remain alert

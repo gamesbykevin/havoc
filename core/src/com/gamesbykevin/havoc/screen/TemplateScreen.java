@@ -99,8 +99,10 @@ public abstract class TemplateScreen extends ParentScreen {
 
                 if (keyCode == Input.Keys.BACK || keyCode == Input.Keys.ESCAPE) {
                     if (getGame().getScreenHelper().getScreenIndex() == ScreenHelper.SCREEN_OPTIONS) {
+
                         getGame().getScreenHelper().changeScreen(ScreenHelper.SCREEN_MENU);
                         setPrompt(false);
+
                     } else if (getGame().getScreenHelper().getScreenIndex() == ScreenHelper.SCREEN_MENU) {
 
                         if (hasPrompt()) {
@@ -110,10 +112,13 @@ public abstract class TemplateScreen extends ParentScreen {
 
                         } else {
 
+                            //set flag now so we know the user has been prompted
                             setPrompt(true);
                         }
                     }
+
                 } else {
+
                     return super.keyDown(keyCode);
                 }
 
