@@ -113,8 +113,11 @@ public abstract class TemplateScreen extends ParentScreen {
                             setPrompt(true);
                         }
                     }
+                } else {
+                    return super.keyDown(keyCode);
                 }
-                return super.keyDown(keyCode);
+
+                return false;
             }
         };
 

@@ -1,5 +1,6 @@
 package com.gamesbykevin.havoc.graphics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -9,8 +10,6 @@ import com.gamesbykevin.havoc.util.Disposable;
 import com.gamesbykevin.havoc.util.Restart;
 import com.gamesbykevin.havoc.util.Timer;
 
-import static com.gamesbykevin.havoc.screen.ParentScreen.SCREEN_HEIGHT;
-import static com.gamesbykevin.havoc.screen.ParentScreen.SCREEN_WIDTH;
 import static com.gamesbykevin.havoc.util.Language.getMyBundle;
 
 public class Overlay implements Restart, Disposable {
@@ -70,8 +69,8 @@ public class Overlay implements Restart, Disposable {
         GlyphLayout glyphLayout = new GlyphLayout(getBitmapFont(), text);
 
         //reference the font metrics so we can place our text in the middle of the screen
-        setTextX((SCREEN_WIDTH / 2) - (glyphLayout.width / 2));
-        setTextY((SCREEN_HEIGHT / 2) - (glyphLayout.height / 2));
+        setTextX((Gdx.graphics.getWidth() / 2) - (glyphLayout.width / 2));
+        setTextY((Gdx.graphics.getHeight() / 2) - (glyphLayout.height / 2));
 
         glyphLayout = null;
 
@@ -153,7 +152,7 @@ public class Overlay implements Restart, Disposable {
         if (isDisplay()) {
 
             //render the overlay
-            batch.draw(getPixelMapTexture(), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            batch.draw(getPixelMapTexture(), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
             //render the text
             getBitmapFont().draw(batch, getText(), getTextX(), getTextY());

@@ -75,13 +75,22 @@ public class MyGdxGame extends Game {
 
 	@Override
 	public void pause() {
+
 		//call parent
 		super.pause();
 	}
 
 	@Override
+	public void resume() {
+
+		//call parent
+		super.resume();
+	}
+
+	@Override
 	public void dispose() {
 
+		//call parent
 		super.dispose();
 
 		//recycle screen

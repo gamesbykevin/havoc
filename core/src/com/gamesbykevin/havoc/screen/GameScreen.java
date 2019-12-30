@@ -1,6 +1,5 @@
 package com.gamesbykevin.havoc.screen;
 
-import com.badlogic.gdx.assets.AssetManager;
 import com.gamesbykevin.havoc.GameEngine;
 import com.gamesbykevin.havoc.MyGdxGame;
 
