@@ -26,6 +26,9 @@ public class OptionsScreen extends TemplateScreen {
 
         super.show();
 
+        //play menu music
+        playMenu();
+
         //capture the menu input
         captureInput();
 
@@ -172,6 +175,16 @@ public class OptionsScreen extends TemplateScreen {
 
         //add our social media icons
         super.addSocialIcons();
+    }
+
+    @Override
+    public void resume() {
+
+        //call parent
+        super.resume();
+
+        //play menu music
+        playMenu();
     }
 
     @Override

@@ -69,6 +69,13 @@ public class SplashScreen extends TemplateScreen {
     }
 
     @Override
+    public void resume() {
+
+        //call parent
+        super.resume();
+    }
+
+    @Override
     public void dispose() {
 
         //call parent

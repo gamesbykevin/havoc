@@ -132,6 +132,9 @@ public class MenuScreen extends TemplateScreen {
     public void resume() {
 
         super.resume();
+
+        //play menu music
+        playMenu();
     }
 
     @Override

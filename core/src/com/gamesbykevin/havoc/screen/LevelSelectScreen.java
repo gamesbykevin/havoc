@@ -3,8 +3,8 @@ package com.gamesbykevin.havoc.screen;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.gamesbykevin.havoc.MyGdxGame;
 
+import static com.gamesbykevin.havoc.assets.ScreenAudio.playMenu;
 import static com.gamesbykevin.havoc.assets.ScreenAudio.stopAll;
-import static com.gamesbykevin.havoc.preferences.AppPreferences.hasLevelCompleted;
 import static com.gamesbykevin.havoc.screen.ScreenHelper.SCREEN_GAME;
 import static com.gamesbykevin.havoc.util.Language.*;
 
@@ -32,14 +32,26 @@ public class LevelSelectScreen extends CustomSelectScreen {
 
     @Override
     public void show() {
+
+        //call parent
         super.show();
+
+        //remember our scroll position
         getScroll().layout();
         getScroll().setScrollY(getScrollY());
+
+        //play menu music
+        playMenu();
     }
 
     @Override
     public void resume() {
+
+        //call parent
         super.resume();
+
+        //play menu music
+        playMenu();
     }
 
     @Override
@@ -62,11 +74,13 @@ public class LevelSelectScreen extends CustomSelectScreen {
     @Override
     public String getButtonText(int index) {
 
+        /*
         if (hasLevelCompleted(index)) {
-            //return getTranslatedText(KEY_LEVEL_SELECT_SOLVED);
+            return getTranslatedText(KEY_LEVEL_SELECT_SOLVED);
         } else {
-            //return (index + 1) + "";
+            return (index + 1) + "";
         }
+        */
 
         return (index + 1) + "";
     }
