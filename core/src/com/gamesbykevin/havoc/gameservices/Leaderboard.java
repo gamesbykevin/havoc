@@ -9,16 +9,16 @@ public class Leaderboard {
     //<string name="app_id" translatable="false">960441003299</string>
 
     //<!-- leaderboards -->
-    public static final String LEADERBOARD_LEVEL_1 = "CgkIo9r69fkbEAIQFA";
-    public static final String LEADERBOARD_LEVEL_2 = "CgkIo9r69fkbEAIQFQ";
-    public static final String LEADERBOARD_LEVEL_3 = "CgkIo9r69fkbEAIQFg";
-    public static final String LEADERBOARD_LEVEL_4 = "CgkIo9r69fkbEAIQFw";
-    public static final String LEADERBOARD_LEVEL_5 = "CgkIo9r69fkbEAIQGA";
-    public static final String LEADERBOARD_LEVEL_6 = "CgkIo9r69fkbEAIQGQ";
-    public static final String LEADERBOARD_LEVEL_7 = "CgkIo9r69fkbEAIQGg";
-    public static final String LEADERBOARD_LEVEL_8 = "CgkIo9r69fkbEAIQGw";
-    public static final String LEADERBOARD_LEVEL_9 = "CgkIo9r69fkbEAIQHA";
-    public static final String LEADERBOARD_LEVEL_10 = "CgkIo9r69fkbEAIQHQ";
+    public static final String LEADER_BOARD_LEVEL_1 = "CgkIo9r69fkbEAIQFA";
+    public static final String LEADER_BOARD_LEVEL_2 = "CgkIo9r69fkbEAIQFQ";
+    public static final String LEADER_BOARD_LEVEL_3 = "CgkIo9r69fkbEAIQFg";
+    public static final String LEADER_BOARD_LEVEL_4 = "CgkIo9r69fkbEAIQFw";
+    public static final String LEADER_BOARD_LEVEL_5 = "CgkIo9r69fkbEAIQGA";
+    public static final String LEADER_BOARD_LEVEL_6 = "CgkIo9r69fkbEAIQGQ";
+    public static final String LEADER_BOARD_LEVEL_7 = "CgkIo9r69fkbEAIQGg";
+    public static final String LEADER_BOARD_LEVEL_8 = "CgkIo9r69fkbEAIQGw";
+    public static final String LEADER_BOARD_LEVEL_9 = "CgkIo9r69fkbEAIQHA";
+    public static final String LEADER_BOARD_LEVEL_10 = "CgkIo9r69fkbEAIQHQ";
 
     private static boolean isConnected(IGameServiceClient client) {
         return (client != null && client.isSessionActive());
@@ -39,43 +39,43 @@ public class Leaderboard {
                     break;
 
                 case 0:
-                    leaderBoardId = LEADERBOARD_LEVEL_1;
+                    leaderBoardId = LEADER_BOARD_LEVEL_1;
                     break;
 
                 case 1:
-                    leaderBoardId = LEADERBOARD_LEVEL_2;
+                    leaderBoardId = LEADER_BOARD_LEVEL_2;
                     break;
 
                 case 2:
-                    leaderBoardId = LEADERBOARD_LEVEL_3;
+                    leaderBoardId = LEADER_BOARD_LEVEL_3;
                     break;
 
                 case 3:
-                    leaderBoardId = LEADERBOARD_LEVEL_4;
+                    leaderBoardId = LEADER_BOARD_LEVEL_4;
                     break;
 
                 case 4:
-                    leaderBoardId = LEADERBOARD_LEVEL_5;
+                    leaderBoardId = LEADER_BOARD_LEVEL_5;
                     break;
 
                 case 5:
-                    leaderBoardId = LEADERBOARD_LEVEL_6;
+                    leaderBoardId = LEADER_BOARD_LEVEL_6;
                     break;
 
                 case 6:
-                    leaderBoardId = LEADERBOARD_LEVEL_7;
+                    leaderBoardId = LEADER_BOARD_LEVEL_7;
                     break;
 
                 case 7:
-                    leaderBoardId = LEADERBOARD_LEVEL_8;
+                    leaderBoardId = LEADER_BOARD_LEVEL_8;
                     break;
 
                 case 8:
-                    leaderBoardId = LEADERBOARD_LEVEL_9;
+                    leaderBoardId = LEADER_BOARD_LEVEL_9;
                     break;
 
                 case 9:
-                    leaderBoardId = LEADERBOARD_LEVEL_10;
+                    leaderBoardId = LEADER_BOARD_LEVEL_10;
                     break;
             }
 
