@@ -1,4 +1,4 @@
-package com.gamesbykevin;
+package com.gamesbykevin.havoc;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,11 +24,10 @@ public class AndroidLauncher extends AndroidApplication {
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 
 		//create our game services client
-		//this.client = new GpgsClient().initialize(this, false);
+		this.client = new GpgsClient().initialize(this, false);
 
 		//create a new game with our specified client
-		//MyGdxGame game = new MyGdxGame(this.client);
-		MyGdxGame game = new MyGdxGame(new NoGameServiceClient());
+		MyGdxGame game = new MyGdxGame(this.client);
 
 		//let's start
 		initialize(game, config);

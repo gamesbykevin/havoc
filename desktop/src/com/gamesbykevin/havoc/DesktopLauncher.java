@@ -1,8 +1,7 @@
-package com.gamesbykevin.desktop;
+package com.gamesbykevin.havoc;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.gamesbykevin.havoc.MyGdxGame;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 
 import static com.gamesbykevin.havoc.GameEngine.SIZE_HEIGHT;
