@@ -6,17 +6,19 @@ import de.golfgl.gdxgamesvcs.IGameServiceClient;
 
 public class Leaderboard {
 
+    //<string name="app_id" translatable="false">960441003299</string>
+
     //<!-- leaderboards -->
-    public static final String LEADERBOARD_LEVEL_1 = "";
-    public static final String LEADERBOARD_LEVEL_2 = "";
-    public static final String LEADERBOARD_LEVEL_3 = "";
-    public static final String LEADERBOARD_LEVEL_4 = "";
-    public static final String LEADERBOARD_LEVEL_5 = "";
-    public static final String LEADERBOARD_LEVEL_6 = "";
-    public static final String LEADERBOARD_LEVEL_7 = "";
-    public static final String LEADERBOARD_LEVEL_8 = "";
-    public static final String LEADERBOARD_LEVEL_9 = "";
-    public static final String LEADERBOARD_LEVEL_10 = "";
+    public static final String LEADERBOARD_LEVEL_1 = "CgkIo9r69fkbEAIQFA";
+    public static final String LEADERBOARD_LEVEL_2 = "CgkIo9r69fkbEAIQFQ";
+    public static final String LEADERBOARD_LEVEL_3 = "CgkIo9r69fkbEAIQFg";
+    public static final String LEADERBOARD_LEVEL_4 = "CgkIo9r69fkbEAIQFw";
+    public static final String LEADERBOARD_LEVEL_5 = "CgkIo9r69fkbEAIQGA";
+    public static final String LEADERBOARD_LEVEL_6 = "CgkIo9r69fkbEAIQGQ";
+    public static final String LEADERBOARD_LEVEL_7 = "CgkIo9r69fkbEAIQGg";
+    public static final String LEADERBOARD_LEVEL_8 = "CgkIo9r69fkbEAIQGw";
+    public static final String LEADERBOARD_LEVEL_9 = "CgkIo9r69fkbEAIQHA";
+    public static final String LEADERBOARD_LEVEL_10 = "CgkIo9r69fkbEAIQHQ";
 
     private static boolean isConnected(IGameServiceClient client) {
         return (client != null && client.isSessionActive());
